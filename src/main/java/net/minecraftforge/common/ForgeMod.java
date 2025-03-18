@@ -63,6 +63,8 @@ import net.minecraftforge.common.world.NoneStructureModifier;
 import net.minecraftforge.common.world.StructureModifier;
 import net.minecraftforge.event.network.GatherLoginConfigurationTasksEvent;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -118,6 +120,7 @@ import com.mojang.serialization.MapCodec;
 
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -383,25 +386,28 @@ public class ForgeMod {
         CrashReportCallables.registerCrashCallable("Forge", ()->ForgeVersion.getGroup()+":"+ForgeVersion.getVersion());
 
         // Todo: [Forge][ForgeMod] mod bus registrations
-//        final IEventBus modEventBus = context.getModEventBus();
-//        // Forge-provided datapack registries
-//        modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
-//            event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
-//            event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
-//        });
-//        modEventBus.addListener(this::preInit);
-//        modEventBus.addListener(this::gatherData);
-//        modEventBus.addListener(this::registerFluids);
-//        modEventBus.addListener(this::registerVanillaDisplayContexts);
-//        modEventBus.addListener(this::onRegisterAttributes);
-//        ForgeDeferredRegistriesSetup.setup(modEventBus);
-//        for (var reg : registries)
-//            reg.register(modEventBus);
+        final BusGroup modEventBus = context.getModEventBus();
+        // Forge-provided datapack registries
+        // Hacky code, do not copy!
+        EventBus.create(modEventBus, DataPackRegistryEvent.NewRegistry.class).addListener(event -> {
+            event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
+            event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
+        });
+        synchronized (ForgeMod.class.getClassLoader()) {
+            EventBus.create(modEventBus, FMLCommonSetupEvent.class).addListener(this::preInit);
+            EventBus.create(modEventBus, GatherDataEvent.class).addListener(this::gatherData);
+            EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerFluids);
+            EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerVanillaDisplayContexts);
+            EventBus.create(modEventBus, EntityAttributeModificationEvent.class).addListener(this::onRegisterAttributes);
+        }
+        ForgeDeferredRegistriesSetup.setup(modEventBus);
+        for (var reg : registries)
+            reg.register(modEventBus);
 
         context.registerConfig(ModConfig.Type.CLIENT, ForgeConfig.clientSpec);
         context.registerConfig(ModConfig.Type.SERVER, ForgeConfig.serverSpec);
         context.registerConfig(ModConfig.Type.COMMON, ForgeConfig.commonSpec);
-//        modEventBus.register(ForgeConfig.class);
+        modEventBus.register(MethodHandles.lookup(), ForgeConfig.class);
 
         // Forge does not display problems when the remote is not matching.
         context.registerDisplayTest(IExtensionPoint.DisplayTest.IGNORE_ALL_VERSION);

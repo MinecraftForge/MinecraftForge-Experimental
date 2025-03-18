@@ -16,7 +16,9 @@ import net.minecraftforge.client.model.ElementsModel;
 import net.minecraftforge.client.model.EmptyModel;
 import net.minecraftforge.client.model.ItemLayerModel;
 import net.minecraftforge.client.model.SeparateTransformsModel;
+import net.minecraftforge.client.model.data.ModelDataManager;
 import net.minecraftforge.client.model.obj.ObjLoader;
+import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -41,5 +43,10 @@ public class ClientForgeMod {
     @SubscribeEvent
     public static void onRegisterNamedRenderTypes(RegisterNamedRenderTypesEvent event) {
         event.register("item_unlit", RenderType.translucent(), ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get());
+    }
+
+    @SubscribeEvent
+    public static void onChunkUnload(ChunkEvent.Unload event) {
+        ModelDataManager.onChunkUnload(event);
     }
 }

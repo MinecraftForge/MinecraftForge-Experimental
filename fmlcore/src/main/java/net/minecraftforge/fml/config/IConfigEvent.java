@@ -5,13 +5,14 @@
 
 package net.minecraftforge.fml.config;
 
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.fml.Bindings;
 
 import java.util.function.Function;
 
 import org.jetbrains.annotations.Nullable;
 
-public interface IConfigEvent {
+public interface IConfigEvent extends InheritableEvent {
     record ConfigConfig(Function<ModConfig, IConfigEvent> loading, Function<ModConfig, IConfigEvent> reloading, @Nullable Function<ModConfig, IConfigEvent> unloading) {}
 
     ConfigConfig CONFIGCONFIG = Bindings.getConfigConfiguration().get();

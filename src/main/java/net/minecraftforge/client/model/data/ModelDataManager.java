@@ -11,11 +11,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.level.ChunkEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber;
-import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -32,7 +28,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * Users should not be instantiating or using this themselves unless they know what they're doing.
  */
 @ApiStatus.Internal
-@EventBusSubscriber(modid = "forge", bus = Bus.FORGE, value = Dist.CLIENT)
 public class ModelDataManager {
     private final Level level;
     private final Map<ChunkPos, Set<BlockPos>> needModelDataRefresh = new ConcurrentHashMap<>();
@@ -82,7 +77,6 @@ public class ModelDataManager {
         return modelDataCache.getOrDefault(pos, Collections.emptyMap());
     }
 
-    @SubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         var level = event.getChunk().getWorldForge();
         if (level == null)

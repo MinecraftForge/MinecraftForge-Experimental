@@ -6,6 +6,7 @@
 package net.minecraftforge.fml.javafmlmod;
 
 import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingException;
 import net.minecraftforge.fml.ModLoadingStage;
@@ -177,9 +178,15 @@ public class FMLModContainer extends ModContainer {
     protected <T extends IModBusEvent> void acceptEvent(final T e) {
         try {
             LOGGER.trace(LOADING, "Firing event for modid {} : {}", this.getModId(), e);
-            throw new RuntimeException("Todo: [FML][Event] Dispatch lifecycle event from the right BusGroup");
+//            throw new RuntimeException("Todo: [FML][Event] Dispatch lifecycle event from the right BusGroup");
+            // Temp code until the FML rewrite is done - do not copy! May break at any time without notice as this
+            // technically violates the API contract of EventBus#create
+            EventBus eventBus = (EventBus) EventBus.create(eventBusGroup, e.getClass());
+            eventBus.post(e);
 //            this.eventBusGroup.post(e);
 //            LOGGER.trace(LOADING, "Fired event for modid {} : {}", this.getModId(), e);
+        } catch (NoClassDefFoundError err) {
+            // lol wth?
         } catch (Throwable t) {
             LOGGER.error(LOADING,"Caught exception during event {} dispatch for modid {}", e, this.getModId(), t);
             throw new ModLoadingException(modInfo, modLoadingStage, "fml.modloading.errorduringevent", t);
@@ -188,7 +195,9 @@ public class FMLModContainer extends ModContainer {
 
     @Override
     public void dispatchConfigEvent(IConfigEvent event) {
-        throw new RuntimeException("Todo: [FML][Event] Dispatch config event from the right BusGroup");
+        EventBus eventBus = (EventBus) EventBus.create(eventBusGroup, event.self().getClass());
+        eventBus.post(event.self());
+//        throw new RuntimeException("Todo: [FML][Event] Dispatch config event from the right BusGroup");
 //        this.eventBusGroup.post(event.self());
     }
 

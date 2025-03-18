@@ -16,10 +16,12 @@ import net.minecraftforge.forgespi.language.ModFileScanData;
 import net.minecraftforge.forgespi.language.ModFileScanData.AnnotationData;
 import net.minecraftforge.forgespi.language.ModFileScanData.EnumData;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.unsafe.UnsafeHacks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.objectweb.asm.Type;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -73,14 +75,20 @@ public class AutomaticEventSubscriber {
             var busName = value(data, "bus", defaultBus).value();
             var busTarget = Bus.valueOf(busName);
             if (Objects.equals(mod.getModId(), modId) && sides.contains(FMLEnvironment.dist)) {
-//                try {
+                try {
                     LOGGER.debug(Logging.LOADING, "Auto-subscribing {} to {}", data.clazz().getClassName(), busTarget);
-                    throw new RuntimeException("Todo: [FML][EventBusSubscriber] Adjust EventBusSubscriber to support EventBus v7");
+                    var lookupField = MethodHandles.Lookup.class.getDeclaredField("IMPL_LOOKUP");
+                    UnsafeHacks.setAccessible(lookupField);
+                    var lookup = (MethodHandles.Lookup) lookupField.get(null);
+                    busTarget.bus().get().register(lookup, Class.forName(data.clazz().getClassName(), true, loader));
+//                    throw new RuntimeException("Todo: [FML][EventBusSubscriber] Adjust EventBusSubscriber to support EventBus v7");
 //                    busTarget.bus().get().register(Class.forName(data.clazz().getClassName(), true, loader));
-//                } catch (ClassNotFoundException e) {
-//                    LOGGER.fatal(Logging.LOADING, "Failed to load mod class {} for @EventBusSubscriber annotation", data.clazz(), e);
-//                    throw new RuntimeException(e);
-//                }
+                } catch (ClassNotFoundException e) {
+                    LOGGER.fatal(Logging.LOADING, "Failed to load mod class {} for @EventBusSubscriber annotation", data.clazz(), e);
+                    throw new RuntimeException(e);
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
     }
