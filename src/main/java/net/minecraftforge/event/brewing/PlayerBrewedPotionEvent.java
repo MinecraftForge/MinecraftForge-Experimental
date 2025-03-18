@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
  * This event is called when a player picks up a potion from a brewing stand.
  */
 public class PlayerBrewedPotionEvent extends PlayerEvent {
-    private static final EventBus<PlayerBrewedPotionEvent> BUS = new EventBus<>(PlayerBrewedPotionEvent.class);
+    public static final EventBus<PlayerBrewedPotionEvent> BUS = EventBus.create(PlayerBrewedPotionEvent.class);
 
     private final ItemStack stack;
 

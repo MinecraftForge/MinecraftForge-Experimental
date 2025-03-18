@@ -12,13 +12,14 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.registries.tags.ITagManager;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -318,8 +319,8 @@ public class DeferredRegister<T> {
      *
      * @param bus The Mod Specific event bus.
      */
-    public void register(IEventBus bus) {
-        bus.register(new EventDispatcher());
+    public void register(BusGroup busGroup) {
+        new EventDispatcher().register(busGroup);
     }
 
     /**
@@ -372,7 +373,13 @@ public class DeferredRegister<T> {
         return value;
     }
 
-    private class EventDispatcher {
+    private final class EventDispatcher {
+        private static final MethodHandles.Lookup LOOKUP = MethodHandles.lookup();
+
+        public void register(BusGroup busGroup) {
+            busGroup.register(LOOKUP, this);
+        }
+
         @SubscribeEvent
         public void handleEvent(RegisterEvent event) {
             if (event.getRegistryKey().equals(registryKey)) {

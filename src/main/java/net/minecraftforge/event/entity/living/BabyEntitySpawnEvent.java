@@ -13,6 +13,7 @@ import net.minecraft.world.entity.animal.Fox;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -38,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class BabyEntitySpawnEvent extends MutableEvent implements Cancellable {
+public class BabyEntitySpawnEvent extends MutableEvent implements Cancellable, CancellableAware {
     public static final CancellableEventBus<BabyEntitySpawnEvent> BUS = CancellableEventBus.create(BabyEntitySpawnEvent.class);
 
     private final Mob parentA;

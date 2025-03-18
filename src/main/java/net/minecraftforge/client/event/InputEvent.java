@@ -9,6 +9,7 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -143,7 +144,7 @@ public abstract class InputEvent extends MutableEvent {
      *
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
      */
-    public static class MouseScrollingEvent extends InputEvent {
+    public static class MouseScrollingEvent extends InputEvent implements Cancellable {
         public static final CancellableEventBus<MouseScrollingEvent> BUS = CancellableEventBus.create(MouseScrollingEvent.class);
 
         private final double deltaX;
@@ -308,7 +309,7 @@ public abstract class InputEvent extends MutableEvent {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     // TODO: Change the 'button' to sub events. - Lex 0422202
-    public static class InteractionKeyMappingTriggered extends InputEvent implements Cancellable {
+    public static class InteractionKeyMappingTriggered extends InputEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<InteractionKeyMappingTriggered> BUS = CancellableEventBus.create(InteractionKeyMappingTriggered.class);
 
         private final int button;

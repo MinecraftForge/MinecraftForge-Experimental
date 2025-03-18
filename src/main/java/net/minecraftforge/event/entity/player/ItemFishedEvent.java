@@ -9,6 +9,7 @@ import com.google.common.base.Preconditions;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
@@ -22,7 +23,7 @@ import java.util.List;
  * Canceling the event will cause the player to receive no items at all.
  * The hook will still take the damage specified
  */
-public class ItemFishedEvent extends PlayerEvent implements Cancellable {
+public class ItemFishedEvent extends PlayerEvent implements Cancellable, CancellableAware {
     public static final CancellableEventBus<ItemFishedEvent> BUS = CancellableEventBus.create(ItemFishedEvent.class);
 
     private final NonNullList<ItemStack> stacks = NonNullList.create();

@@ -6,6 +6,7 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.*;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -274,7 +275,7 @@ public abstract class MobSpawnEvent extends EntityEvent {
      * @see ForgeEventFactory#onFinalizeSpawn
      * @apiNote Callers do not need to check if the entity's spawn was cancelled, as the spawn will be blocked by Forge.
      */
-    public static class FinalizeSpawn extends MobSpawnEvent implements Cancellable {
+    public static class FinalizeSpawn extends MobSpawnEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<FinalizeSpawn> BUS = CancellableEventBus.create(FinalizeSpawn.class);
 
         private final EntitySpawnReason spawnReason;

@@ -39,7 +39,7 @@ public class ClientCommandHandler {
     private static CommandDispatcher<CommandSourceStack> commands = null;
 
     public static void init() {
-        MinecraftForge.EVENT_BUS.addListener(ClientCommandHandler::handleClientPlayerLogin);
+        ClientPlayerNetworkEvent.LoggingIn.BUS.addListener(ClientCommandHandler::handleClientPlayerLogin);
     }
 
     private static void handleClientPlayerLogin(ClientPlayerNetworkEvent.LoggingIn event) {
@@ -58,7 +58,7 @@ public class ClientCommandHandler {
     @ApiStatus.Internal
     public static CommandDispatcher<SharedSuggestionProvider> mergeServerCommands(CommandDispatcher<SharedSuggestionProvider> serverCommands, CommandBuildContext buildContext) {
         CommandDispatcher<CommandSourceStack> commandsTemp = new CommandDispatcher<>();
-        MinecraftForge.EVENT_BUS.post(new RegisterClientCommandsEvent(commandsTemp, buildContext));
+        RegisterClientCommandsEvent.BUS.post(new RegisterClientCommandsEvent(commandsTemp, buildContext));
 
         // Copies the client commands into another RootCommandNode so that redirects can't be used with server commands
         commands = new CommandDispatcher<>();

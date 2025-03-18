@@ -32,7 +32,7 @@ public class AttachCapabilitiesEvent<T> extends MutableEvent {
 
     public AttachCapabilitiesEvent(Class<T> type, T obj)
     {
-        super(type);
+        //super(type);
         this.obj = obj;
     }
 

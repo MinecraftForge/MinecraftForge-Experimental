@@ -105,7 +105,7 @@ public final class PermissionAPI
         PermissionAPI.activeHandler = null;
 
         PermissionGatherEvent.Handler handlerEvent = new PermissionGatherEvent.Handler();
-        MinecraftForge.EVENT_BUS.post(handlerEvent);
+        PermissionGatherEvent.Handler.BUS.post(handlerEvent);
         Map<ResourceLocation, IPermissionHandlerFactory> availableHandlers = handlerEvent.getAvailablePermissionHandlerFactories();
 
         try
@@ -120,7 +120,7 @@ public final class PermissionAPI
             IPermissionHandlerFactory factory = availableHandlers.get(selectedPermissionHandler);
 
             PermissionGatherEvent.Nodes nodesEvent = new PermissionGatherEvent.Nodes();
-            MinecraftForge.EVENT_BUS.post(nodesEvent);
+            PermissionGatherEvent.Nodes.BUS.post(nodesEvent);
 
             PermissionAPI.activeHandler = factory.create(nodesEvent.getNodes());
 

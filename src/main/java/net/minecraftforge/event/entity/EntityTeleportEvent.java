@@ -12,6 +12,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
@@ -116,7 +117,7 @@ public class EntityTeleportEvent extends EntityEvent implements Cancellable {
      * <br>
      * If this event is canceled, the entity will not be teleported.
      */
-    public static class EnderEntity extends EntityTeleportEvent implements Cancellable {
+    public static class EnderEntity extends EntityTeleportEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<EnderEntity> BUS = CancellableEventBus.create(EnderEntity.class);
 
         private final LivingEntity entityLiving;
@@ -147,7 +148,7 @@ public class EntityTeleportEvent extends EntityEvent implements Cancellable {
      * <br>
      * If this event is canceled, the entity will not be teleported.
      */
-    public static class EnderPearl extends EntityTeleportEvent implements Cancellable {
+    public static class EnderPearl extends EntityTeleportEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<EnderPearl> BUS = CancellableEventBus.create(EnderPearl.class);
 
         private final ServerPlayer player;

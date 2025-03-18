@@ -9,6 +9,7 @@ import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -60,7 +61,7 @@ public abstract class CustomizeGuiOverlayEvent extends MutableEvent {
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static class BossEventProgress extends CustomizeGuiOverlayEvent implements Cancellable {
+    public static class BossEventProgress extends CustomizeGuiOverlayEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<BossEventProgress> BUS = CancellableEventBus.create(BossEventProgress.class);
 
         private final LerpingBossEvent bossEvent;

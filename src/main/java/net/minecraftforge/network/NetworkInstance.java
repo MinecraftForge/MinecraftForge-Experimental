@@ -8,10 +8,7 @@ package net.minecraftforge.network;
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.network.CustomPayloadEvent;
-import net.minecraftforge.eventbus.api.BusBuilder;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.IEventListener;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.network.Channel.VersionTest;
 
 import java.util.HashSet;
@@ -32,7 +29,8 @@ import io.netty.util.AttributeKey;
 public final class NetworkInstance {
     // We use an event bus here so that we don't have to have a handle(event) public function on Channel.
     // Should this be changed so that modders can fire other channel's handlers?
-    private final IEventBus networkEventBus;
+    // Todo: [Forge][Networking] Update the above comment
+    private final BusGroup networkEventBusGroup;
     private final ResourceLocation channelName;
     private final int networkProtocolVersion;
     final VersionTest clientAcceptedVersions;
@@ -52,27 +50,28 @@ public final class NetworkInstance {
         this.serverAcceptedVersions = serverAcceptedVersions;
         this.attributes = attributes;
         this.channelHandler = channelHandler;
-        this.networkEventBus = BusBuilder.builder().setExceptionHandler(this::handleError).useModLauncher().build();
+        this.networkEventBusGroup = BusGroup.create(channelName.toString() + "_networkInstance", CustomPayloadEvent.class);
         this.pingData = new ServerStatusPing.ChannelData(channelName, networkProtocolVersion, this.clientAcceptedVersions.accepts(VersionTest.Status.MISSING, -1));
     }
 
-    private void handleError(IEventBus iEventBus, Event event, IEventListener[] iEventListeners, int i, Throwable throwable) {
-    }
-
     public <T extends CustomPayloadEvent> void addListener(Consumer<T> eventListener) {
-        this.networkEventBus.addListener(eventListener);
+        // TODO: [Forge][Networking] Adjust this to use the new event bus system
+//        this.networkEventBusGroup.addListener(eventListener);
     }
 
     public void registerObject(final Object object) {
-        this.networkEventBus.register(object);
+        // TODO: [Forge][Networking] Adjust this to use the new event bus system
+//        this.networkEventBusGroup.register(object);
     }
 
     public void unregisterObject(final Object object) {
-        this.networkEventBus.unregister(object);
+        // TODO: [Forge][Networking] Adjust this to use the new event bus system
+//        this.networkEventBusGroup.unregister(object);
     }
 
     public boolean dispatch(CustomPayloadEvent event) {
-        this.networkEventBus.post(event);
+        // TODO: [Forge][Networking] Adjust this to use the new event bus system
+//        this.networkEventBusGroup.post(event);
         return event.getSource().getPacketHandled();
     }
 
@@ -101,5 +100,9 @@ public final class NetworkInstance {
     boolean isRemotePresent(Connection con) {
         var channels = NetworkContext.get(con).getRemoteChannels();
         return channels.containsAll(ids);
+    }
+
+    public BusGroup getNetworkEventBusGroup() {
+        return networkEventBusGroup;
     }
 }

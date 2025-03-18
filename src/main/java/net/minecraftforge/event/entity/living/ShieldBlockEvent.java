@@ -8,6 +8,7 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
@@ -18,7 +19,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * Note: The shield item stack "should" be available from {@link LivingEntity#getUseItem()}
  * at least for players.
  */
-public class ShieldBlockEvent extends LivingEvent implements Cancellable {
+public class ShieldBlockEvent extends LivingEvent implements Cancellable, CancellableAware {
     public static final CancellableEventBus<ShieldBlockEvent> BUS = CancellableEventBus.create(ShieldBlockEvent.class);
 
     private final DamageSource source;

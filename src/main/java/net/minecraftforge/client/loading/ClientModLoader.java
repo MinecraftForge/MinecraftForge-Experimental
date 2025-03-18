@@ -14,6 +14,7 @@ import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.world.level.DataPackConfig;
 import net.minecraftforge.event.AddPackFindersEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.loading.ImmediateWindowHandler;
 import net.minecraftforge.internal.BrandingControl;
@@ -108,7 +109,7 @@ public class ClientModLoader {
         File dumpedLocation = null;
         if (error == null) {
             // We can finally start the forge eventbus up
-            MinecraftForge.EVENT_BUS.start();
+            BusGroup.DEFAULT.startup();
         } else {
             // Double check we have the langs loaded for forge
             LanguageHook.loadForgeAndMCLangs();

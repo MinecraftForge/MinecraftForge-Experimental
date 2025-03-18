@@ -29,6 +29,7 @@ import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.util.BlockSnapshot;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -69,7 +70,7 @@ public class BlockEvent extends MutableEvent {
      * Event that is fired when an Block is about to be broken by a player
      * Canceling this event will prevent the Block from being broken.
      */
-    public static class BreakEvent extends BlockEvent implements Cancellable {
+    public static class BreakEvent extends BlockEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<BreakEvent> BUS = CancellableEventBus.create(BreakEvent.class);
 
         /** Reference to the Player who broke the block. If no player is available, use a EntityFakePlayer */
@@ -374,7 +375,7 @@ public class BlockEvent extends MutableEvent {
      * Fired when when farmland gets trampled
      * This event is {@link Cancelable}
      */
-    public static class FarmlandTrampleEvent extends BlockEvent {
+    public static class FarmlandTrampleEvent extends BlockEvent implements Cancellable {
         public static final CancellableEventBus<FarmlandTrampleEvent> BUS = CancellableEventBus.create(FarmlandTrampleEvent.class);
 
         private final Entity entity;
@@ -401,7 +402,7 @@ public class BlockEvent extends MutableEvent {
      *
      * If cancelled, the portal will not be spawned.
      */
-    public static class PortalSpawnEvent extends BlockEvent {
+    public static class PortalSpawnEvent extends BlockEvent implements Cancellable {
         public static final CancellableEventBus<PortalSpawnEvent> BUS = CancellableEventBus.create(PortalSpawnEvent.class);
 
         private final PortalShape size;
@@ -426,7 +427,7 @@ public class BlockEvent extends MutableEvent {
      * This event is {@link Cancelable}. If canceled, this will prevent the tool
      * from changing the block's state.
      */
-    public static class BlockToolModificationEvent extends BlockEvent {
+    public static class BlockToolModificationEvent extends BlockEvent implements Cancellable {
         public static final CancellableEventBus<BlockToolModificationEvent> BUS = CancellableEventBus.create(BlockToolModificationEvent.class);
 
         private final UseOnContext context;

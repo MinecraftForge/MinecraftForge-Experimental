@@ -50,7 +50,7 @@ public class PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     public static class XpChange extends PlayerXpEvent implements Cancellable {
-        private static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
+        public static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
 
         private int amount;
 
@@ -73,7 +73,7 @@ public class PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     public static class LevelChange extends PlayerXpEvent implements Cancellable {
-        private static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
+        public static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
 
         private int levels;
 

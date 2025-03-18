@@ -5,6 +5,7 @@
 
 package net.minecraftforge.event.entity.living;
 
+import net.minecraftforge.common.util.CancellableAware;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,7 +27,7 @@ import net.minecraftforge.common.MinecraftForge;
  * This event does not {@linkplain HasResult have a result}.
  * This event is fired on {@link MinecraftForge#EVENT_BUS}
  **/
-public class LivingDrownEvent extends LivingEvent implements Cancellable {
+public class LivingDrownEvent extends LivingEvent implements Cancellable, CancellableAware {
     public static final CancellableEventBus<LivingDrownEvent> BUS = CancellableEventBus.create(LivingDrownEvent.class);
 
     private boolean isDrowning;

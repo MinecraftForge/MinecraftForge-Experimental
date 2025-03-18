@@ -25,6 +25,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 
+import net.minecraftforge.common.util.CancellableAware;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -64,7 +67,7 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Let result be the return value of {@link Entity#interactAt(Player, Vec3, InteractionHand)}, or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then try {@link EntityInteract}.
      */
-    public static class EntityInteractSpecific extends PlayerInteractEvent implements Cancellable {
+    public static class EntityInteractSpecific extends PlayerInteractEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<EntityInteractSpecific> BUS = CancellableEventBus.create(EntityInteractSpecific.class);
 
         private final Vec3 localPos;
@@ -104,7 +107,7 @@ public class PlayerInteractEvent extends PlayerEvent {
      * or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then try {@link RightClickItem}.
      */
-    public static class EntityInteract extends PlayerInteractEvent implements Cancellable {
+    public static class EntityInteract extends PlayerInteractEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<EntityInteract> BUS = CancellableEventBus.create(EntityInteract.class);
 
         private final Entity target;
@@ -132,7 +135,7 @@ public class PlayerInteractEvent extends PlayerEvent {
      * There are various results to this event, see the getters below.  <br>
      * Note that handling things differently on the client vs server may cause desynchronizations!
      */
-    public static class RightClickBlock extends PlayerInteractEvent implements Cancellable {
+    public static class RightClickBlock extends PlayerInteractEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<RightClickBlock> BUS = CancellableEventBus.create(RightClickBlock.class);
 
         private Result useBlock = Result.DEFAULT;
@@ -184,14 +187,15 @@ public class PlayerInteractEvent extends PlayerEvent {
             this.useItem = triggerItem;
         }
 
-        @Override
-        public void setCanceled(boolean canceled) {
-            super.setCanceled(canceled);
-            if (canceled) {
-                useBlock = Result.DENY;
-                useItem = Result.DENY;
-            }
-        }
+        // Todo: [Forge][Event] PlayerInteractEvent.RightClickBlock#setCanceled(boolean) override
+//        @Override
+//        public void setCanceled(boolean canceled) {
+//            super.setCanceled(canceled);
+//            if (canceled) {
+//                useBlock = Result.DENY;
+//                useItem = Result.DENY;
+//            }
+//        }
     }
 
     /**
@@ -201,7 +205,7 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Let result be the return value of {@link Item#use(Level, Player, InteractionHand)}, or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then continue to other hands.
      */
-    public static class RightClickItem extends PlayerInteractEvent implements Cancellable {
+    public static class RightClickItem extends PlayerInteractEvent implements Cancellable, CancellableAware {
         public static final CancellableEventBus<RightClickItem> BUS = CancellableEventBus.create(RightClickItem.class);
 
         public RightClickItem(Player player, InteractionHand hand) {
@@ -237,12 +241,13 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Also note that creative mode directly breaks the block without running any other logic.
      * Therefore, in creative mode, {@link #setUseBlock} and {@link #setUseItem} have no effect.
      */
-    public static class LeftClickBlock extends PlayerInteractEvent {
+    public static class LeftClickBlock extends PlayerInteractEvent implements Cancellable, HasResult, CancellableAware {
         public static final CancellableEventBus<LeftClickBlock> BUS = CancellableEventBus.create(LeftClickBlock.class);
 
         private Result useBlock = Result.DEFAULT;
         private Result useItem = Result.DEFAULT;
         private final Action action;
+        private Result result = Result.DEFAULT;
 
         @ApiStatus.Internal
         public LeftClickBlock(Player player, BlockPos pos, Direction face, Action action) {
@@ -278,6 +283,16 @@ public class PlayerInteractEvent extends PlayerEvent {
 
         public void setUseItem(Result triggerItem) {
             this.useItem = triggerItem;
+        }
+
+        @Override
+        public Result getResult() {
+            return result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
 
         // Todo: [Forge][Event] PlayerInteractEvent.LeftClickBlock#setCanceled(boolean) override

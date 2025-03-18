@@ -16,7 +16,7 @@ import net.minecraft.world.entity.SpawnPlacementType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
-import net.minecraftforge.eventbus.api.EventPriority;
+import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.ApiStatus;
  * So that you ensure that your entity has a heightmap type and placement type registered.
  *
  * If modifying vanilla or another mod's spawn placements, you can use three operations:
- *  REPLACE: checked first, the last mod to replace the predicate wipes out all other predicates. Listen with a low {@link EventPriority} if you need to do this.
+ *  REPLACE: checked first, the last mod to replace the predicate wipes out all other predicates. Listen with a low {@link Priority} if you need to do this.
  *  OR: checked second, only one of these predicates must pass along with the original predicate
  *  AND: checked third, these predicates must all pass along with the original predicate
  *

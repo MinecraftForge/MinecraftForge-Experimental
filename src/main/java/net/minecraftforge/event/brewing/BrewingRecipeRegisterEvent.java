@@ -17,7 +17,7 @@ import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
 
 public class BrewingRecipeRegisterEvent extends MutableEvent {
-    private static final EventBus<BrewingRecipeRegisterEvent> BUS = EventBus.create(BrewingRecipeRegisterEvent.class);
+    public static final EventBus<BrewingRecipeRegisterEvent> BUS = EventBus.create(BrewingRecipeRegisterEvent.class);
 
     private final PotionBrewing.Builder builder;
     private final FeatureFlagSet features;

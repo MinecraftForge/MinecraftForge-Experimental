@@ -41,8 +41,6 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.ForgeI18n;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 
 public interface IForgeGameTestHelper {
     private GameTestHelper self() {
@@ -150,20 +148,29 @@ public interface IForgeGameTestHelper {
         return player;
     }
 
-    /**
-     * Registers an event listener that will be unregistered when the test is finished running.
-     */
-    default <E extends Event> void addEventListener(Consumer<E> consumer) {
-        MinecraftForge.EVENT_BUS.addListener(consumer);
-        self().addCleanup(success -> MinecraftForge.EVENT_BUS.unregister(consumer));
+    // Todo: [Forge][GameTest] add/remove event listener methods need migrating to EventBus v7
+//    /**
+//     * Registers an event listener that will be unregistered when the test is finished running.
+//     */
+//    default <E extends Event> void addEventListener(Consumer<E> consumer) {
+//        MinecraftForge.EVENT_BUS.addListener(consumer);
+//        self().addCleanup(success -> MinecraftForge.EVENT_BUS.unregister(consumer));
+//    }
+//
+//    /**
+//     * Registers an event listener that will be unregistered when the test is finished running.
+//     */
+//    default void registerEventListener(Object handler) {
+//        MinecraftForge.EVENT_BUS.register(handler);
+//        self().addCleanup(success -> MinecraftForge.EVENT_BUS.unregister(handler));
+//    }
+
+    default void addEventListener(Consumer<?> consumer) {
+        throw new RuntimeException("Todo: [Forge][GameTest] addEventListener(Consumer<?>) method needs migrating to EventBus v7");
     }
 
-    /**
-     * Registers an event listener that will be unregistered when the test is finished running.
-     */
     default void registerEventListener(Object handler) {
-        MinecraftForge.EVENT_BUS.register(handler);
-        self().addCleanup(success -> MinecraftForge.EVENT_BUS.unregister(handler));
+        throw new RuntimeException("Todo: [Forge][GameTest] registerEventListener(Object) method needs migrating to EventBus v7");
     }
 
     /**

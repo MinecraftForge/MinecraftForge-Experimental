@@ -77,7 +77,7 @@ public class ServerLifecycleHooks {
         LogicalSidedProvider.setServer(()->server);
         ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
         runModifiers(server);
-        return !MinecraftForge.EVENT_BUS.post(new ServerAboutToStartEvent(server));
+        return !ServerAboutToStartEvent.BUS.post(new ServerAboutToStartEvent(server));
     }
 
     public static boolean handleServerStarting(final MinecraftServer server) {
@@ -88,7 +88,7 @@ public class ServerLifecycleHooks {
                 net.minecraftforge.gametest.ForgeGameTestHooks.registerGametests();
         });
         PermissionAPI.initializePermissionAPI();
-        return !MinecraftForge.EVENT_BUS.post(new ServerStartingEvent(server));
+        return !ServerStartingEvent.BUS.post(new ServerStartingEvent(server));
     }
 
 
@@ -98,7 +98,7 @@ public class ServerLifecycleHooks {
 
     public static void handleServerStopped(final MinecraftServer server) {
         if (!server.isDedicatedServer()) GameData.revertToFrozen();
-        MinecraftForge.EVENT_BUS.post(new ServerStoppedEvent(server));
+        ServerStoppedEvent.BUS.post(new ServerStoppedEvent(server));
         currentServer = null;
         LogicalSidedProvider.setServer(null);
         CountDownLatch latch = exitLatch;
@@ -149,13 +149,13 @@ public class ServerLifecycleHooks {
     //==================================================================================================================================================================================
 
     public static void handleServerStarted(final MinecraftServer server) {
-        MinecraftForge.EVENT_BUS.post(new ServerStartedEvent(server));
+        ServerStartedEvent.BUS.post(new ServerStartedEvent(server));
         allowLogins.set(true);
     }
 
     public static void handleServerStopping(final MinecraftServer server) {
         allowLogins.set(false);
-        MinecraftForge.EVENT_BUS.post(new ServerStoppingEvent(server));
+        ServerStoppingEvent.BUS.post(new ServerStoppingEvent(server));
     }
 
     public static boolean handleServerLogin(final ClientIntentionPacket packet, final Connection connection) {

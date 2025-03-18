@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
  * if the output is empty, and the event is not canceled, vanilla behavior will execute. <br>
  */
 public class AnvilUpdateEvent extends MutableEvent implements Cancellable {
-    public static final CancellableEventBus<AnvilUpdateEvent> BUS = CancancellableEventBus.create(AnvilUpdateEvent.class);
+    public static final CancellableEventBus<AnvilUpdateEvent> BUS = CancellableEventBus.create(AnvilUpdateEvent.class);
 
     private final ItemStack left;
     private final ItemStack right;
