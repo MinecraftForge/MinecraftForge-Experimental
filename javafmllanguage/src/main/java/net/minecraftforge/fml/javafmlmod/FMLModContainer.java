@@ -5,11 +5,7 @@
 
 package net.minecraftforge.fml.javafmlmod;
 
-import net.minecraftforge.eventbus.EventBusErrorMessage;
-import net.minecraftforge.eventbus.api.BusBuilder;
-import net.minecraftforge.eventbus.api.Event;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.IEventListener;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingException;
 import net.minecraftforge.fml.ModLoadingStage;
@@ -36,7 +32,7 @@ public class FMLModContainer extends ModContainer {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker LOADING = MarkerManager.getMarker("LOADING");
     private final ModFileScanData scanResults;
-    private final IEventBus eventBus;
+    private final BusGroup eventBusGroup;
     private Object modInstance;
     private final Class<?> modClass;
     private final FMLJavaModLoadingContext context = new FMLJavaModLoadingContext(this);
@@ -46,7 +42,7 @@ public class FMLModContainer extends ModContainer {
         LOGGER.debug(LOADING,"Creating FMLModContainer instance for {}", className);
         this.scanResults = modFileScanResults;
         activityMap.put(ModLoadingStage.CONSTRUCT, this::constructMod);
-        this.eventBus = BusBuilder.builder().setExceptionHandler(FMLModContainer::onEventFailed).setTrackPhases(false).markerType(IModBusEvent.class).useModLauncher().build();
+        this.eventBusGroup = BusGroup.create("modBusFor" + info.getModId());// BusBuilder.builder().setExceptionHandler(FMLModContainer::onEventFailed).setTrackPhases(false).markerType(IModBusEvent.class).useModLauncher().build();
         this.contextExtension = () -> context;
         try {
             var moduleName = info.getOwningFile().moduleName();
@@ -128,9 +124,9 @@ public class FMLModContainer extends ModContainer {
         implAddExportsOrOpens.invoke(target, pkg, reader, open, /*syncVM*/true);
     }
 
-    private static void onEventFailed(IEventBus iEventBus, Event event, IEventListener[] iEventListeners, int i, Throwable throwable) {
-        LOGGER.error(new EventBusErrorMessage(event, i, iEventListeners, throwable));
-    }
+//    private static void onEventFailed(IEventBus iEventBus, Event event, IEventListener[] iEventListeners, int i, Throwable throwable) {
+//        LOGGER.error(new EventBusErrorMessage(event, i, iEventListeners, throwable));
+//    }
 
     private void constructMod() {
         try {
@@ -173,16 +169,17 @@ public class FMLModContainer extends ModContainer {
         return modInstance;
     }
 
-    public IEventBus getEventBus() {
-        return this.eventBus;
+    public BusGroup getEventBusGroup() {
+        return this.eventBusGroup;
     }
 
     @Override
-    protected <T extends Event & IModBusEvent> void acceptEvent(final T e) {
+    protected <T extends IModBusEvent> void acceptEvent(final T e) {
         try {
             LOGGER.trace(LOADING, "Firing event for modid {} : {}", this.getModId(), e);
-            this.eventBus.post(e);
-            LOGGER.trace(LOADING, "Fired event for modid {} : {}", this.getModId(), e);
+            throw new RuntimeException("Todo: [FML][Event] Dispatch lifecycle event from the right BusGroup");
+//            this.eventBusGroup.post(e);
+//            LOGGER.trace(LOADING, "Fired event for modid {} : {}", this.getModId(), e);
         } catch (Throwable t) {
             LOGGER.error(LOADING,"Caught exception during event {} dispatch for modid {}", e, this.getModId(), t);
             throw new ModLoadingException(modInfo, modLoadingStage, "fml.modloading.errorduringevent", t);
@@ -191,7 +188,8 @@ public class FMLModContainer extends ModContainer {
 
     @Override
     public void dispatchConfigEvent(IConfigEvent event) {
-        this.eventBus.post(event.self());
+        throw new RuntimeException("Todo: [FML][Event] Dispatch config event from the right BusGroup");
+//        this.eventBusGroup.post(event.self());
     }
 
     @Override

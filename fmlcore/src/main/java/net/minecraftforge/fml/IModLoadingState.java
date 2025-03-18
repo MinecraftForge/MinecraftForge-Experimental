@@ -5,7 +5,6 @@
 
 package net.minecraftforge.fml;
 
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
@@ -68,7 +67,7 @@ public interface IModLoadingState {
      * @return a transition task for this state
      * @see #buildTransition(Executor, Executor, ProgressMeter, Function, Function)
      */
-    default <T extends Event & IModBusEvent> Optional<CompletableFuture<Void>> buildTransition(
+    default <T extends IModBusEvent> Optional<CompletableFuture<Void>> buildTransition(
         final Executor syncExecutor,
         final Executor parallelExecutor,
         final ProgressMeter progressBar
@@ -91,7 +90,7 @@ public interface IModLoadingState {
      * @param postSyncTask     a function which returns a task to run after event post-dispatch hook
      * @return a transition task for this state
      */
-    <T extends Event & IModBusEvent>
+    <T extends IModBusEvent>
     Optional<CompletableFuture<Void>> buildTransition(final Executor syncExecutor,
                                                       final Executor parallelExecutor,
                                                       final ProgressMeter progressBar,

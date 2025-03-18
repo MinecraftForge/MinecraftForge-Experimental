@@ -12,8 +12,7 @@ import java.lang.annotation.Target;
 import java.util.function.Supplier;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.Bindings;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 /**
@@ -73,21 +72,21 @@ public @interface Mod
              *
              * <p>See {@code MinecraftForge#EVENT_BUS}</p>
              */
-            FORGE(Bindings.getForgeBus()),
+            FORGE(() -> BusGroup.DEFAULT),
             /**
-             * The mod specific Event bus.
+             * The mod specific event BusGroup.
              * @see FMLJavaModLoadingContext#getModEventBus()
              */
             MOD(()-> FMLJavaModLoadingContext.get().getModEventBus());
 
-            private final Supplier<IEventBus> busSupplier;
+            private final Supplier<BusGroup> busGroupSupplier;
 
-            Bus(final Supplier<IEventBus> eventBusSupplier) {
-                this.busSupplier = eventBusSupplier;
+            Bus(final Supplier<BusGroup> busGroupSupplier) {
+                this.busGroupSupplier = busGroupSupplier;
             }
 
-            public Supplier<IEventBus> bus() {
-                return busSupplier;
+            public Supplier<BusGroup> bus() {
+                return busGroupSupplier;
             }
         }
     }

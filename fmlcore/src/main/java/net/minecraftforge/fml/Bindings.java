@@ -5,7 +5,6 @@
 
 package net.minecraftforge.fml;
 
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
 
@@ -25,13 +24,6 @@ public class Bindings {
      */
     private static final IBindingsProvider PROVIDER = ServiceLoader.load(FMLLoader.getGameLayer(), IBindingsProvider.class)
             .findFirst().orElseThrow(() -> new IllegalStateException("Could not find bindings provider"));
-
-    /**
-     * @return A supplier of net.minecraftforge.common.MinecraftForge#EVENT_BUS
-     */
-    public static Supplier<IEventBus> getForgeBus() {
-        return PROVIDER.getForgeBusSupplier();
-    }
 
     public static Supplier<I18NParser> getMessageParser() {
         return PROVIDER.getMessageParser();

@@ -5,7 +5,7 @@
 
 package net.minecraftforge.fml.javafmlmod;
 
-import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.ModLoadingContext;
 
 /**
@@ -22,9 +22,9 @@ public class FMLJavaModLoadingContext extends ModLoadingContext
     /**
      * @return The mod's event bus, to allow subscription to Mod specific events
      */
-    public IEventBus getModEventBus()
+    public BusGroup getModEventBus()
     {
-        return container.getEventBus();
+        return container.getEventBusGroup();
     }
 
     /**

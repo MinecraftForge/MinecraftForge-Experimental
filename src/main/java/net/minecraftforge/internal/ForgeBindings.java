@@ -6,8 +6,6 @@
 package net.minecraftforge.internal;
 
 import net.minecraftforge.common.ForgeI18n;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.I18NParser;
 import net.minecraftforge.fml.IBindingsProvider;
 import net.minecraftforge.fml.config.IConfigEvent;
@@ -30,11 +28,6 @@ public final class ForgeBindings implements IBindingsProvider {
         };
 
         private LazyInit() {}
-    }
-
-    @Override
-    public Supplier<IEventBus> getForgeBusSupplier() {
-        return () -> MinecraftForge.EVENT_BUS;
     }
 
     @Override

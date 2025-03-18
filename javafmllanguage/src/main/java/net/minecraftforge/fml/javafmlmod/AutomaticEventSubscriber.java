@@ -73,13 +73,14 @@ public class AutomaticEventSubscriber {
             var busName = value(data, "bus", defaultBus).value();
             var busTarget = Bus.valueOf(busName);
             if (Objects.equals(mod.getModId(), modId) && sides.contains(FMLEnvironment.dist)) {
-                try {
+//                try {
                     LOGGER.debug(Logging.LOADING, "Auto-subscribing {} to {}", data.clazz().getClassName(), busTarget);
-                    busTarget.bus().get().register(Class.forName(data.clazz().getClassName(), true, loader));
-                } catch (ClassNotFoundException e) {
-                    LOGGER.fatal(Logging.LOADING, "Failed to load mod class {} for @EventBusSubscriber annotation", data.clazz(), e);
-                    throw new RuntimeException(e);
-                }
+                    throw new RuntimeException("Todo: [FML][EventBusSubscriber] Adjust EventBusSubscriber to support EventBus v7");
+//                    busTarget.bus().get().register(Class.forName(data.clazz().getClassName(), true, loader));
+//                } catch (ClassNotFoundException e) {
+//                    LOGGER.fatal(Logging.LOADING, "Failed to load mod class {} for @EventBusSubscriber annotation", data.clazz(), e);
+//                    throw new RuntimeException(e);
+//                }
             }
         }
     }

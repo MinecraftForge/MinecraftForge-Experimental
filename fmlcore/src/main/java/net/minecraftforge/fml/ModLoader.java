@@ -6,7 +6,6 @@
 package net.minecraftforge.fml;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -357,7 +356,7 @@ public class ModLoader {
         return completedStates.contains(state);
     }
 
-    public <T extends Event & IModBusEvent> void runEventGenerator(Function<ModContainer, T> generator) {
+    public <T extends IModBusEvent> void runEventGenerator(Function<ModContainer, T> generator) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event generator to a broken mod state");
             return;
@@ -365,7 +364,7 @@ public class ModLoader {
         ModList.get().forEachModInOrder(mc -> mc.acceptEvent(generator.apply(mc)));
     }
 
-    public <T extends Event & IModBusEvent> void postEvent(T e) {
+    public <T extends IModBusEvent> void postEvent(T e) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;
@@ -373,7 +372,7 @@ public class ModLoader {
         ModList.get().forEachModInOrder(mc -> mc.acceptEvent(e));
     }
 
-    public <T extends Event & IModBusEvent> T postEventWithReturn(T e) {
+    public <T extends IModBusEvent> T postEventWithReturn(T e) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return e;
@@ -383,14 +382,14 @@ public class ModLoader {
     }
 
     @SuppressWarnings("removal")
-    public <T extends Event & IModBusEvent> void postEventWrapContainerInModOrder(T event) {
+    public <T extends IModBusEvent> void postEventWrapContainerInModOrder(T event) {
         postEventWithWrapInModOrder(event,
             (mc, e) -> ModLoadingContext.get().setActiveContainer(mc),
             (mc, e) -> ModLoadingContext.get().setActiveContainer(null)
         );
     }
 
-    public <T extends Event & IModBusEvent> void postEventWithWrapInModOrder(T e, BiConsumer<ModContainer, T> pre, BiConsumer<ModContainer, T> post) {
+    public <T extends IModBusEvent> void postEventWithWrapInModOrder(T e, BiConsumer<ModContainer, T> pre, BiConsumer<ModContainer, T> post) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;

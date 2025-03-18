@@ -17,7 +17,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.IModStateTransition.EventGenerator;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
@@ -76,7 +75,7 @@ class ModStateTransitionHelper {
         return CompletableFuture.allOf(results).handle((r, th)->null).thenApply(res -> list);
     }
 
-    private static <T extends Event & IModBusEvent> void addCompletableFutureTaskForModDispatch(
+    private static <T extends IModBusEvent> void addCompletableFutureTaskForModDispatch(
         final IModStateTransition transition,
         final Executor executor,
         final List<CompletableFuture<Void>> completableFutures,
@@ -135,14 +134,14 @@ class ModStateTransitionHelper {
             completableFutures.add(postDispatchHook);
     }
 
-    private static <T extends Event & IModBusEvent> CompletableFuture<Void> getHook(BiFunction<Executor, ? extends EventGenerator<?>, CompletableFuture<Void>> hook, Executor executor, EventGenerator<T> eventGenerator) {
+    private static <T extends IModBusEvent> CompletableFuture<Void> getHook(BiFunction<Executor, ? extends EventGenerator<?>, CompletableFuture<Void>> hook, Executor executor, EventGenerator<T> eventGenerator) {
         if (hook == null || hook == IModStateTransition.NULL_HOOK) return null;
         @SuppressWarnings("unchecked")
         var hookTyped = (BiFunction<Executor, EventGenerator<T>, CompletableFuture<Void>>)hook;
         return hookTyped.apply(executor, eventGenerator);
     }
 
-    static <T extends Event & IModBusEvent> CompletableFuture<Void> build(
+    static <T extends IModBusEvent> CompletableFuture<Void> build(
         final IModStateTransition transition,
         final String name,
         final Executor syncExecutor,
