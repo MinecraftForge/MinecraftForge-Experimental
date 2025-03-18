@@ -6,6 +6,8 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.*;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -107,8 +109,7 @@ public abstract class MobSpawnEvent extends EntityEvent {
      * @apiNote If your modifications are for a single entity, and do not vary at runtime, use {@link SpawnPlacementRegisterEvent}.
      * @see SpawnPlacementRegisterEvent
      */
-    @HasResult
-    public static class SpawnPlacementCheck extends MutableEvent {
+    public static class SpawnPlacementCheck extends MutableEvent implements HasResult {
         public static final EventBus<SpawnPlacementCheck> BUS = EventBus.create(SpawnPlacementCheck.class);
 
         private final EntityType<?> entityType;
@@ -117,6 +118,7 @@ public abstract class MobSpawnEvent extends EntityEvent {
         private final BlockPos pos;
         private final RandomSource random;
         private final boolean defaultResult;
+        private Result result = Result.DEFAULT;
 
         /**
          * Internal.
@@ -177,6 +179,16 @@ public abstract class MobSpawnEvent extends EntityEvent {
         public boolean getDefaultResult() {
             return this.defaultResult;
         }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
+        }
     }
 
     /**
@@ -206,13 +218,13 @@ public abstract class MobSpawnEvent extends EntityEvent {
      * @see {@link SpawnPlacementRegisterEvent} To modify spawn placements statically at startup.
      * @see {@link SpawnPlacementCheck} To modify the result of spawn placements at runtime.
      */
-    @HasResult
-    public static class PositionCheck extends MobSpawnEvent {
+    public static class PositionCheck extends MobSpawnEvent implements HasResult {
         public static final EventBus<PositionCheck> BUS = EventBus.create(PositionCheck.class);
 
         @Nullable
         private final BaseSpawner spawner;
         private final EntitySpawnReason spawnReason;
+        private Result result = Result.DEFAULT;
 
         public PositionCheck(Mob mob, ServerLevelAccessor level, EntitySpawnReason spawnReason, @Nullable BaseSpawner spawner) {
             super(mob, level, mob.getX(), mob.getY(), mob.getZ());
@@ -237,6 +249,16 @@ public abstract class MobSpawnEvent extends EntityEvent {
          */
         public EntitySpawnReason getSpawnReason() {
             return this.spawnReason;
+        }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 
@@ -391,12 +413,23 @@ public abstract class MobSpawnEvent extends EntityEvent {
      */
     // TODO: 1.20 Move to standalone class, as it is unrelated to the complex mob spawning flow.
     // Such a refactor will allow the BaseSpawner and MobSpawnType params to be hoisted to MobSpawnEvent.
-    @HasResult
-    public static class AllowDespawn extends MobSpawnEvent {
+    public static class AllowDespawn extends MobSpawnEvent implements HasResult {
         public static final EventBus<AllowDespawn> BUS = EventBus.create(AllowDespawn.class);
+
+        private Result result = Result.DEFAULT;
 
         public AllowDespawn(Mob mob, ServerLevelAccessor level) {
             super(mob, level, mob.getX(), mob.getY(), mob.getZ());
+        }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 }

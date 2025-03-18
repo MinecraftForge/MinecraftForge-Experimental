@@ -9,6 +9,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * ItemStack to your inventory and reducing the stack size to process.
  * setResult(ALLOW) is the same as the old setHandled();
  */
-@HasResult
-public class FillBucketEvent extends PlayerEvent implements Cancellable {
+public class FillBucketEvent extends PlayerEvent implements Cancellable, HasResult {
     public static final CancellableEventBus<FillBucketEvent> BUS = CancellableEventBus.create(FillBucketEvent.class);
 
     private final ItemStack current;
@@ -33,6 +34,7 @@ public class FillBucketEvent extends PlayerEvent implements Cancellable {
     private final HitResult target;
 
     private ItemStack result;
+    private Result eventResult = Result.DEFAULT;
 
     public FillBucketEvent(Player player, @NotNull ItemStack current, Level level, @Nullable HitResult target)
     {
@@ -50,4 +52,14 @@ public class FillBucketEvent extends PlayerEvent implements Cancellable {
     @NotNull
     public ItemStack getFilledBucket() { return this.result; }
     public void setFilledBucket(@NotNull ItemStack bucket) { this.result = bucket; }
+
+    @Override
+    public Result getResult() {
+        return this.eventResult;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.eventResult = result;
+    }
 }

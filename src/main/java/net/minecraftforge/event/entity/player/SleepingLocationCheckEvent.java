@@ -11,6 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 
@@ -23,11 +25,11 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * setResult(ALLOW) informs game that player is still "in bed"<br>
  * setResult(DEFAULT) causes game to check {@link Block#isBed(BlockState, BlockGetter, BlockPos, Entity)} instead
  */
-@HasResult
-public class SleepingLocationCheckEvent extends LivingEvent {
+public class SleepingLocationCheckEvent extends LivingEvent implements HasResult {
     public static final EventBus<SleepingLocationCheckEvent> BUS = EventBus.create(SleepingLocationCheckEvent.class);
 
     private final BlockPos sleepingLocation;
+    private Result result = Result.DEFAULT;
 
     public SleepingLocationCheckEvent(LivingEntity player, BlockPos sleepingLocation)
     {
@@ -38,5 +40,15 @@ public class SleepingLocationCheckEvent extends LivingEvent {
     public BlockPos getSleepingLocation()
     {
         return sleepingLocation;
+    }
+
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

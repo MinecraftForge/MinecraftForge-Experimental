@@ -10,6 +10,8 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -427,11 +429,11 @@ public abstract class ScreenEvent extends MutableEvent {
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
-        @HasResult
-        public static class Post extends MouseButtonPressed {
+        public static class Post extends MouseButtonPressed implements HasResult {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
             private final boolean handled;
+            private Result result = Result.DEFAULT;
 
             @ApiStatus.Internal
             public Post(Screen screen, double mouseX, double mouseY, int button, boolean handled) {
@@ -444,6 +446,16 @@ public abstract class ScreenEvent extends MutableEvent {
              */
             public boolean wasHandled() {
                 return handled;
+            }
+
+            @Override
+            public Result getResult() {
+                return result;
+            }
+
+            @Override
+            public void setResult(Result result) {
+                this.result = result;
             }
         }
     }
@@ -510,11 +522,11 @@ public abstract class ScreenEvent extends MutableEvent {
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
-        @HasResult
-        public static class Post extends MouseButtonReleased {
+        public static class Post extends MouseButtonReleased implements HasResult {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
             private final boolean handled;
+            private Result result = Result.DEFAULT;
 
             @ApiStatus.Internal
             public Post(Screen screen, double mouseX, double mouseY, int button, boolean handled) {
@@ -527,6 +539,16 @@ public abstract class ScreenEvent extends MutableEvent {
              */
             public boolean wasHandled() {
                 return handled;
+            }
+
+            @Override
+            public Result getResult() {
+                return result;
+            }
+
+            @Override
+            public void setResult(Result result) {
+                this.result = result;
             }
         }
     }

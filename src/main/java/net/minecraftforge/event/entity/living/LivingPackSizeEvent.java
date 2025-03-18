@@ -6,13 +6,15 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 
-@HasResult
-public class LivingPackSizeEvent extends LivingEvent {
+public class LivingPackSizeEvent extends LivingEvent implements HasResult {
     public static final EventBus<LivingPackSizeEvent> BUS = EventBus.create(LivingPackSizeEvent.class);
 
     private int maxPackSize;
+    private Result result = Result.DEFAULT;
     
     public LivingPackSizeEvent(Mob entity)
     {
@@ -35,5 +37,15 @@ public class LivingPackSizeEvent extends LivingEvent {
     public void setMaxPackSize(int maxPackSize)
     {
         this.maxPackSize = maxPackSize;
+    }
+
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

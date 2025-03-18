@@ -7,6 +7,8 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
@@ -20,11 +22,11 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *
  *  setResult(ALLOW) is the same as the old setHandled()
  */
-@HasResult
-public class EntityItemPickupEvent extends PlayerEvent implements Cancellable {
+public class EntityItemPickupEvent extends PlayerEvent implements Cancellable, HasResult {
     public static final CancellableEventBus<EntityItemPickupEvent> BUS = CancellableEventBus.create(EntityItemPickupEvent.class);
 
     private final ItemEntity item;
+    private Result result = Result.DEFAULT;
 
     public EntityItemPickupEvent(Player player, ItemEntity item)
     {
@@ -35,5 +37,15 @@ public class EntityItemPickupEvent extends PlayerEvent implements Cancellable {
     public ItemEntity getItem()
     {
         return item;
+    }
+
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

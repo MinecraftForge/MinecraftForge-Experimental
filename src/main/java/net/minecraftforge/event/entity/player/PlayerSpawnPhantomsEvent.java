@@ -8,6 +8,8 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,11 +24,11 @@ import org.jetbrains.annotations.NotNull;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  * @see PlayerSpawnPhantomsEvent#setResult for the effects of each result.
  */
-@HasResult
-public class PlayerSpawnPhantomsEvent extends PlayerEvent {
+public class PlayerSpawnPhantomsEvent extends PlayerEvent implements HasResult {
     public static final EventBus<PlayerSpawnPhantomsEvent> BUS = EventBus.create(PlayerSpawnPhantomsEvent.class);
 
     private int phantomsToSpawn;
+    private Result result = Result.DEFAULT;
 
     public PlayerSpawnPhantomsEvent(Player player, int phantomsToSpawn) {
         super(player);
@@ -48,6 +50,11 @@ public class PlayerSpawnPhantomsEvent extends PlayerEvent {
         this.phantomsToSpawn = phantomsToSpawn;
     }
 
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
     /**
      * The result of this event controls if phantoms will be spawned.<br>
      * <ul>
@@ -58,6 +65,6 @@ public class PlayerSpawnPhantomsEvent extends PlayerEvent {
      */
     @Override
     public void setResult(@NotNull Result result) {
-        super.setResult(result);
+        this.result = result;
     }
 }

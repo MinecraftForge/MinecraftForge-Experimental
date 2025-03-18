@@ -11,6 +11,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -84,9 +86,10 @@ public class MobEffectEvent extends LivingEvent {
      * {@link Result#DENY DENY} will not apply this mob effect.
      * {@link Result#DEFAULT DEFAULT} will run vanilla logic to determine if this mob effect is applicable in {@link LivingEntity#canBeAffected}.
      */
-    @HasResult
-    public static class Applicable extends MobEffectEvent {
+    public static class Applicable extends MobEffectEvent implements HasResult {
         public static final EventBus<Applicable> BUS = EventBus.create(Applicable.class);
+
+        private Result result = Result.DEFAULT;
 
         public Applicable(LivingEntity living, @NotNull MobEffectInstance effectInstance) {
             super(living, effectInstance);
@@ -96,6 +99,16 @@ public class MobEffectEvent extends LivingEvent {
         @NotNull
         public MobEffectInstance getEffectInstance() {
             return super.getEffectInstance();
+        }
+
+        @Override
+        public Result getResult() {
+            return result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 

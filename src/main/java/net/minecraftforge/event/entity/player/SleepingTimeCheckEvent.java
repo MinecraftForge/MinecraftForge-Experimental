@@ -8,6 +8,8 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 
 import java.util.Optional;
@@ -21,11 +23,11 @@ import java.util.Optional;
  * setResult(ALLOW) informs game that player can sleep at this time.<br>
  * setResult(DEFAULT) causes game to check !{@link Level#isDay()} instead.
  */
-@HasResult
-public class SleepingTimeCheckEvent extends PlayerEvent {
+public class SleepingTimeCheckEvent extends PlayerEvent implements HasResult {
     public static final EventBus<SleepingTimeCheckEvent> BUS = EventBus.create(SleepingTimeCheckEvent.class);
 
     private final Optional<BlockPos> sleepingLocation;
+    private Result result = Result.DEFAULT;
 
     public SleepingTimeCheckEvent(Player player, Optional<BlockPos> sleepingLocation)
     {
@@ -40,5 +42,15 @@ public class SleepingTimeCheckEvent extends PlayerEvent {
     public Optional<BlockPos> getSleepingLocation()
     {
         return sleepingLocation;
+    }
+
+    @Override
+    public Result getResult() {
+        return result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

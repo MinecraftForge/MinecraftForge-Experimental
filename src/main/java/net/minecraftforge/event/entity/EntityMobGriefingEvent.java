@@ -7,6 +7,8 @@ package net.minecraftforge.event.entity;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
@@ -21,12 +23,22 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * </ul>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-@HasResult
-public class EntityMobGriefingEvent extends EntityEvent {
+public class EntityMobGriefingEvent extends EntityEvent implements HasResult {
     public static final EventBus<EntityMobGriefingEvent> BUS = EventBus.create(EntityMobGriefingEvent.class);
 
-    public EntityMobGriefingEvent(Entity entity)
-    {
+    private Result result = Result.DEFAULT;
+
+    public EntityMobGriefingEvent(Entity entity) {
         super(entity);
+    }
+
+    @Override
+    public Result getResult() {
+        return this.result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

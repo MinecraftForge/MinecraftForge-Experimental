@@ -11,6 +11,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -31,8 +33,7 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see EntityRenderer
  */
-@HasResult
-public class RenderNameTagEvent extends MutableEvent {
+public class RenderNameTagEvent extends MutableEvent implements HasResult {
     public static final EventBus<RenderNameTagEvent> BUS = EventBus.create(RenderNameTagEvent.class);
 
     private Component nameplateContent;
@@ -42,6 +43,7 @@ public class RenderNameTagEvent extends MutableEvent {
     private final PoseStack poseStack;
     private final MultiBufferSource multiBufferSource;
     private final int packedLight;
+    private Result result = Result.DEFAULT;
 
     @ApiStatus.Internal
     public RenderNameTagEvent(EntityRenderState state, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
@@ -110,5 +112,15 @@ public class RenderNameTagEvent extends MutableEvent {
      */
     public int getPackedLight() {
         return this.packedLight;
+    }
+
+    @Override
+    public Result getResult() {
+        return this.result;
+    }
+
+    @Override
+    public void setResult(Result result) {
+        this.result = result;
     }
 }

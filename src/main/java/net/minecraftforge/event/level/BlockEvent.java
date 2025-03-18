@@ -29,6 +29,8 @@ import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.util.BlockSnapshot;
 
 import com.google.common.collect.ImmutableList;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -216,13 +218,13 @@ public class BlockEvent extends MutableEvent {
      * usually doesn't do that (like lava), and a result of DENY prevents creation
      * even if the liquid usually does do that (like water).
      */
-    @HasResult
-    public static class CreateFluidSourceEvent extends MutableEvent {
+    public static class CreateFluidSourceEvent extends MutableEvent implements HasResult {
         public static final EventBus<CreateFluidSourceEvent> BUS = EventBus.create(CreateFluidSourceEvent.class);
 
         private final Level level;
         private final BlockPos pos;
         private final BlockState state;
+        private Result result = Result.DEFAULT;
 
         public CreateFluidSourceEvent(Level level, BlockPos pos, BlockState state) {
             this.level = level;
@@ -240,6 +242,16 @@ public class BlockEvent extends MutableEvent {
 
         public BlockState getState() {
             return state;
+        }
+
+        @Override
+        public Result getResult() {
+            return result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 
@@ -313,12 +325,23 @@ public class BlockEvent extends MutableEvent {
          * This event is not {@link Cancelable}.<br>
          * <br>
          */
-        @HasResult
-        public static class Pre extends CropGrowEvent {
+        public static class Pre extends CropGrowEvent implements HasResult {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
+            private Result result = Result.DEFAULT;
 
             public Pre(Level level, BlockPos pos, BlockState state) {
                 super(level, pos, state);
+            }
+
+            @Override
+            public Result getResult() {
+                return result;
+            }
+
+            @Override
+            public void setResult(Result result) {
+                this.result = result;
             }
         }
 
