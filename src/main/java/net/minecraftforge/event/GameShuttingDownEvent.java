@@ -5,7 +5,8 @@
 
 package net.minecraftforge.event;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * A simple marker event that notifies when the game is about to close.
@@ -17,7 +18,8 @@ import net.minecraftforge.eventbus.api.Event;
  *
  * @author Curle
  */
-public class GameShuttingDownEvent extends Event
-{
+public class GameShuttingDownEvent extends MutableEvent {
+    public static final EventBus<GameShuttingDownEvent> BUS = EventBus.create(GameShuttingDownEvent.class);
+
     public GameShuttingDownEvent() {}
 }

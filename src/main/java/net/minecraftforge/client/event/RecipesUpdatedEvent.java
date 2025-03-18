@@ -6,10 +6,9 @@
 package net.minecraftforge.client.event;
 
 import net.minecraft.client.ClientRecipeBook;
-import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -21,7 +20,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public class RecipesUpdatedEvent extends Event {
+public class RecipesUpdatedEvent extends MutableEvent {
+    public static final EventBus<RecipesUpdatedEvent> BUS = EventBus.create(RecipesUpdatedEvent.class);
+
     private final ClientRecipeBook recipeBook;
 
     @ApiStatus.Internal

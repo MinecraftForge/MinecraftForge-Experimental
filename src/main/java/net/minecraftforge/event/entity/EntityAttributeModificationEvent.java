@@ -13,7 +13,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -28,7 +28,8 @@ import java.util.stream.Collectors;
  * <br>
  * Fired on the Mod bus {@link IModBusEvent}.<br>
  **/
-public class EntityAttributeModificationEvent extends Event implements IModBusEvent {
+public class EntityAttributeModificationEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] EntityAttributeCreationEvent.BUS from mod BusGroup
     private final Map<EntityType<? extends LivingEntity>, AttributeSupplier.Builder> entityAttributes;
     private final List<EntityType<? extends LivingEntity>> entityTypes;
 

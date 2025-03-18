@@ -9,14 +9,16 @@ import net.minecraft.world.level.block.piston.PistonStructureResolver;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Base piston event, use {@link PistonEvent.Post} and {@link PistonEvent.Pre}
  */
-public abstract class PistonEvent extends BlockEvent
-{
+public abstract class PistonEvent extends BlockEvent {
+    public static final EventBus<PistonEvent> BUS = EventBus.create(PistonEvent.class);
 
     private final Direction direction;
     private final PistonMoveType moveType;
@@ -72,8 +74,8 @@ public abstract class PistonEvent extends BlockEvent
     /**
      * Fires after the piston has moved and set surrounding states. This will not fire if {@link PistonEvent.Pre} is cancelled.
      */
-    public static class Post extends PistonEvent
-    {
+    public static class Post extends PistonEvent {
+        public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
         public Post(Level world, BlockPos pos, Direction direction, PistonMoveType moveType)
         {
@@ -85,9 +87,8 @@ public abstract class PistonEvent extends BlockEvent
     /**
      * Fires before the piston has updated block states. Cancellation prevents movement.
      */
-    @Cancelable
-    public static class Pre extends PistonEvent
-    {
+    public static class Pre extends PistonEvent implements Cancellable {
+        public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
         public Pre(Level world, BlockPos pos, Direction direction, PistonMoveType moveType)
         {

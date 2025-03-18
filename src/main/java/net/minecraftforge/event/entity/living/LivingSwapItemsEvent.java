@@ -8,11 +8,13 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
-public class LivingSwapItemsEvent extends LivingEvent
-{
+public class LivingSwapItemsEvent extends LivingEvent {
+    public static final EventBus<LivingSwapItemsEvent> BUS = EventBus.create(LivingSwapItemsEvent.class);
 
     @ApiStatus.Internal
     public LivingSwapItemsEvent(LivingEntity entity)
@@ -26,9 +28,9 @@ public class LivingSwapItemsEvent extends LivingEvent
      *
      * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
      */
-    @Cancelable
-    public static class Hands extends LivingSwapItemsEvent
-    {
+    public static class Hands extends LivingSwapItemsEvent implements Cancellable {
+        public static final CancellableEventBus<Hands> BUS = CancellableEventBus.create(Hands.class);
+
         private ItemStack toMainHand;
         private ItemStack toOffHand;
 

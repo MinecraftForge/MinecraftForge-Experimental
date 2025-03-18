@@ -9,7 +9,8 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import com.mojang.blaze3d.audio.Channel;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -23,8 +24,9 @@ import org.jetbrains.annotations.ApiStatus;
  * @see PlaySoundEvent
  * @see SoundEngineLoadEvent
  */
-public abstract class SoundEvent extends Event
-{
+public abstract class SoundEvent extends MutableEvent {
+    public static final EventBus<SoundEvent> BUS = EventBus.create(SoundEvent.class);
+
     private final SoundEngine engine;
 
     @ApiStatus.Internal
@@ -50,8 +52,9 @@ public abstract class SoundEvent extends Event
      * @see PlaySoundSourceEvent
      * @see PlayStreamingSourceEvent
      */
-    public static abstract class SoundSourceEvent extends SoundEvent
-    {
+    public static abstract class SoundSourceEvent extends SoundEvent {
+        public static final EventBus<SoundSourceEvent> BUS = EventBus.create(SoundSourceEvent.class);
+
         private final SoundInstance sound;
         private final Channel channel;
         private final String name;

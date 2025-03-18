@@ -8,7 +8,7 @@ package net.minecraftforge.event;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
 
 import java.util.function.Consumer;
@@ -16,7 +16,8 @@ import java.util.function.Consumer;
 /**
  * Fired on {@link PackRepository} creation to allow mods to add new pack finders.
  */
-public class AddPackFindersEvent extends Event implements IModBusEvent {
+public class AddPackFindersEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] AddPackFindersEvent.BUS from mod BusGroup
     private final PackType packType;
     private final Consumer<RepositorySource> sources;
 

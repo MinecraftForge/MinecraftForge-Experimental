@@ -10,8 +10,7 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ColorResolver;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -27,7 +26,9 @@ import org.jetbrains.annotations.ApiStatus;
  * @see RegisterColorHandlersEvent.Block
  * @see RegisterColorHandlersEvent.Item
  */
-public abstract class RegisterColorHandlersEvent extends Event implements IModBusEvent {
+public abstract class RegisterColorHandlersEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
+
     @ApiStatus.Internal
     protected RegisterColorHandlersEvent() {}
 
@@ -40,6 +41,8 @@ public abstract class RegisterColorHandlersEvent extends Event implements IModBu
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class Block extends RegisterColorHandlersEvent {
+        // Todo: [Forge][Event] BUS from mod BusGroup
+
         private final BlockColors blockColors;
 
         @ApiStatus.Internal
@@ -73,6 +76,8 @@ public abstract class RegisterColorHandlersEvent extends Event implements IModBu
      * {@link net.minecraft.world.level.BlockAndTintGetter#getBlockTint(BlockPos, ColorResolver)}.
      */
     public static class ColorResolvers extends RegisterColorHandlersEvent {
+        // Todo: [Forge][Event] BUS from mod BusGroup
+
         private final ImmutableList.Builder<ColorResolver> builder;
 
         @ApiStatus.Internal

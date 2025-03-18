@@ -13,8 +13,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -25,9 +27,9 @@ import org.jetbrains.annotations.ApiStatus;
  * @see Block
  * @see Entity
  */
-@Cancelable
-public abstract class RenderHighlightEvent extends Event
-{
+public abstract class RenderHighlightEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderHighlightEvent> BUS = CancellableEventBus.create(RenderHighlightEvent.class);
+
     private final LevelRenderer levelRenderer;
     private final Camera camera;
     private final HitResult target;
@@ -103,9 +105,9 @@ public abstract class RenderHighlightEvent extends Event
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    @Cancelable
-    public static class Block extends RenderHighlightEvent
-    {
+    public static class Block extends RenderHighlightEvent implements Cancellable {
+        public static final CancellableEventBus<Block> BUS = CancellableEventBus.create(Block.class);
+
         @ApiStatus.Internal
         public Block(LevelRenderer levelRenderer, Camera camera, BlockHitResult target, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource)
         {
@@ -130,8 +132,11 @@ public abstract class RenderHighlightEvent extends Event
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static class Entity extends RenderHighlightEvent
-    {
+    public static class Entity extends RenderHighlightEvent {
+        public static final EventBus<Entity> BUS = EventBus.create(Entity.class);
+
+        // Todo: [Forge][Event] Non-cancellable event inherits from cancellable event, possibly a bug?
+
         @ApiStatus.Internal
         public Entity(LevelRenderer levelRenderer, Camera camera, EntityHitResult target, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource)
         {

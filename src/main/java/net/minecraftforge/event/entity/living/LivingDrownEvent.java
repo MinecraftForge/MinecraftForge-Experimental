@@ -5,6 +5,8 @@
 
 package net.minecraftforge.event.entity.living;
 
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.core.particles.ParticleTypes;
@@ -13,7 +15,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
 
 /**
  * LivingDrownEvent is fired whenever a living entity can't breathe and its air supply is less than or equal to zero.
@@ -25,8 +26,9 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * This event does not {@linkplain HasResult have a result}.
  * This event is fired on {@link MinecraftForge#EVENT_BUS}
  **/
-@Cancelable
-public class LivingDrownEvent extends LivingEvent {
+public class LivingDrownEvent extends LivingEvent implements Cancellable {
+    public static final CancellableEventBus<LivingDrownEvent> BUS = CancellableEventBus.create(LivingDrownEvent.class);
+
     private boolean isDrowning;
     private float damageAmount;
     private int bubbleCount;
@@ -112,13 +114,14 @@ public class LivingDrownEvent extends LivingEvent {
         this.bubbleCount = bubbleCount;
     }
 
-    /**
-     * Cancels the drowning event.<br>
-     * Cancellation is mostly equivalent to {@link #setDrowning(boolean)} with a value of false.<br>
-     * However, this also incurs the usual side effects of cancellation.
-     */
-    @Override
-    public void setCanceled(boolean cancel) {
-        super.setCanceled(cancel);
-    }
+    // Todo: [Forge][Event] LivingDownEvent#setCanceled(boolean) override for javadoc
+//    /**
+//     * Cancels the drowning event.<br>
+//     * Cancellation is mostly equivalent to {@link #setDrowning(boolean)} with a value of false.<br>
+//     * However, this also incurs the usual side effects of cancellation.
+//     */
+//    @Override
+//    public void setCanceled(boolean cancel) {
+//        super.setCanceled(cancel);
+//    }
 }

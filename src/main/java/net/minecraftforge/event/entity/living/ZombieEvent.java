@@ -11,7 +11,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * ZombieEvent is fired whenever a zombie is spawned for aid.
@@ -21,6 +21,8 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
 public class ZombieEvent extends EntityEvent {
+    public static final EventBus<ZombieEvent> BUS = EventBus.create(ZombieEvent.class);
+
     private final Zombie zombie;
 
     public ZombieEvent(Zombie zombie)
@@ -60,6 +62,8 @@ public class ZombieEvent extends EntityEvent {
      **/
     @HasResult
     public static class SummonAidEvent extends ZombieEvent {
+        public static final EventBus<SummonAidEvent> BUS = EventBus.create(SummonAidEvent.class);
+
         private Zombie customSummonedAid;
 
         private final Level level;

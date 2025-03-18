@@ -5,12 +5,13 @@
 
 package net.minecraftforge.fml.event.config;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.IModBusEvent;
 
-public class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent {
+public class ModConfigEvent extends MutableEvent implements IModBusEvent, IConfigEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
     private final ModConfig config;
 
     ModConfigEvent(final ModConfig config) {

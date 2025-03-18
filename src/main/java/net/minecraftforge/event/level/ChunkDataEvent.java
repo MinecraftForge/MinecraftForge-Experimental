@@ -13,8 +13,7 @@ import net.minecraft.world.level.chunk.status.ChunkType;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * ChunkDataEvent is fired when an event involving chunk data occurs.<br>
@@ -26,6 +25,8 @@ import net.minecraftforge.eventbus.api.Event;
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
 public class ChunkDataEvent extends ChunkEvent {
+    public static final EventBus<ChunkDataEvent> BUS = EventBus.create(ChunkDataEvent.class);
+
     private final SerializableChunkData data;
 
     public ChunkDataEvent(ChunkAccess chunk, SerializableChunkData data) {
@@ -54,7 +55,9 @@ public class ChunkDataEvent extends ChunkEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static class Load extends ChunkDataEvent {
-        private ChunkType status;
+        public static final EventBus<ChunkDataEvent.Load> BUS = EventBus.create(ChunkDataEvent.Load.class);
+
+        private final ChunkType status;
 
         public Load(ChunkAccess chunk, SerializableChunkData data, ChunkType status) {
             super(chunk, data);
@@ -78,6 +81,8 @@ public class ChunkDataEvent extends ChunkEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static class Save extends ChunkDataEvent {
+        public static final EventBus<ChunkDataEvent.Save> BUS = EventBus.create(ChunkDataEvent.Save.class);
+
         public Save(ChunkAccess chunk, LevelAccessor world, SerializableChunkData data) {
             super(chunk, world, data);
         }

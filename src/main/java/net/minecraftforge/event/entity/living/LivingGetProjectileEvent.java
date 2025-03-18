@@ -7,6 +7,7 @@ package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * This event is fired when a living entity attempts to get a projectile with the
@@ -20,8 +21,9 @@ import net.minecraft.world.item.ItemStack;
  * <p>
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS}.
  */
-public class LivingGetProjectileEvent extends LivingEvent
-{
+public class LivingGetProjectileEvent extends LivingEvent {
+    public static final EventBus<LivingGetProjectileEvent> BUS = EventBus.create(LivingGetProjectileEvent.class);
+
     private final ItemStack projectileWeaponItemStack;
     private ItemStack projectileItemStack;
 

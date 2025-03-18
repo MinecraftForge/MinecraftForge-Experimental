@@ -10,7 +10,7 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraftforge.client.event.sound.SoundEvent.SoundSourceEvent;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -26,8 +26,9 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see PlayStreamingSourceEvent
  */
-public class PlayStreamingSourceEvent extends SoundSourceEvent
-{
+public class PlayStreamingSourceEvent extends SoundSourceEvent {
+    public static final EventBus<PlayStreamingSourceEvent> BUS = EventBus.create(PlayStreamingSourceEvent.class);
+
     @ApiStatus.Internal
     public PlayStreamingSourceEvent(SoundEngine engine, SoundInstance sound, Channel channel)
     {

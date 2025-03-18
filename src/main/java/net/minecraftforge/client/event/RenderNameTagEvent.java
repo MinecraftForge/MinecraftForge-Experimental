@@ -11,8 +11,8 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -31,8 +31,10 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see EntityRenderer
  */
-@Event.HasResult
-public class RenderNameTagEvent extends Event {
+@HasResult
+public class RenderNameTagEvent extends MutableEvent {
+    public static final EventBus<RenderNameTagEvent> BUS = EventBus.create(RenderNameTagEvent.class);
+
     private Component nameplateContent;
     private final EntityRenderState state;
     private final Component originalContent;

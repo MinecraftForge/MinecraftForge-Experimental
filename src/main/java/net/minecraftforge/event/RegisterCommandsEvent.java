@@ -9,11 +9,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
-
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * Commands are rebuilt whenever {@link ReloadableServerResources} is recreated.
@@ -21,8 +21,9 @@ import net.minecraft.commands.Commands;
  *
  * The event is fired on the {@link MinecraftForge#EVENT_BUS}
  */
-public class RegisterCommandsEvent extends Event
-{
+public class RegisterCommandsEvent extends MutableEvent {
+    public static final EventBus<RegisterCommandsEvent> BUS = EventBus.create(RegisterCommandsEvent.class);
+
     private final CommandDispatcher<CommandSourceStack> dispatcher;
     private final Commands.CommandSelection environment;
     private final CommandBuildContext context;

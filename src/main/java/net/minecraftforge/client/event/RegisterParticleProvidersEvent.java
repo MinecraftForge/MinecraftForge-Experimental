@@ -10,8 +10,7 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -29,8 +28,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public class RegisterParticleProvidersEvent extends Event implements IModBusEvent
-{
+public class RegisterParticleProvidersEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
+
     private final ParticleEngine particleEngine;
 
     @ApiStatus.Internal

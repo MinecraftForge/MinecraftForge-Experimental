@@ -8,12 +8,14 @@ package net.minecraftforge.event.level;
 import java.util.List;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /** ExplosionEvent triggers when an explosion happens in the level.<br>
  * <br>
@@ -25,7 +27,9 @@ import net.minecraft.world.level.Level;
  * Children do not use {@link HasResult}.<br>
  * Children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  */
-public class ExplosionEvent extends Event {
+public class ExplosionEvent extends MutableEvent {
+    public static final EventBus<ExplosionEvent> BUS = EventBus.create(ExplosionEvent.class);
+
     private final Level level;
     private final Explosion explosion;
 
@@ -48,8 +52,9 @@ public class ExplosionEvent extends Event {
      * This event does not use {@link HasResult}.<br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      */
-    @Cancelable
-    public static class Start extends ExplosionEvent {
+    public static class Start extends ExplosionEvent implements Cancellable {
+        public static final CancellableEventBus<Start> BUS = CancellableEventBus.create(Start.class);
+
         public Start(Level level, Explosion explosion) {
             super(level, explosion);
         }
@@ -62,6 +67,8 @@ public class ExplosionEvent extends Event {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      */
     public static class Detonate extends ExplosionEvent {
+        public static final EventBus<Detonate> BUS = EventBus.create(Detonate.class);
+
         private final List<BlockPos> blocks;
         private final List<Entity> entityList;
 

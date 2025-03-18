@@ -5,12 +5,12 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -23,10 +23,9 @@ import org.jetbrains.annotations.Nullable;
  * ItemStack to your inventory and reducing the stack size to process.
  * setResult(ALLOW) is the same as the old setHandled();
  */
-@Cancelable
-@Event.HasResult
-public class FillBucketEvent extends PlayerEvent
-{
+@HasResult
+public class FillBucketEvent extends PlayerEvent implements Cancellable {
+    public static final CancellableEventBus<FillBucketEvent> BUS = CancellableEventBus.create(FillBucketEvent.class);
 
     private final ItemStack current;
     private final Level level;

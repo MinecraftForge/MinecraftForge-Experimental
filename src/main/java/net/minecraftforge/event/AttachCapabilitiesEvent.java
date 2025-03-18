@@ -12,7 +12,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.eventbus.api.GenericEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * Fired whenever an object with Capabilities support {currently TileEntity/Item/Entity)
@@ -21,8 +21,9 @@ import net.minecraftforge.eventbus.api.GenericEvent;
  * Please note that as this is fired for ALL object creations efficient code is recommended.
  * And if possible use one of the sub-classes to filter your intended objects.
  */
-public class AttachCapabilitiesEvent<T> extends GenericEvent<T>
-{
+public class AttachCapabilitiesEvent<T> extends MutableEvent {
+    // Todo: [Forge][Event] Make this play nice with EventBus v7
+
     private final T obj;
     private final Map<ResourceLocation, ICapabilityProvider> caps = Maps.newLinkedHashMap();
     private final Map<ResourceLocation, ICapabilityProvider> view = Collections.unmodifiableMap(caps);

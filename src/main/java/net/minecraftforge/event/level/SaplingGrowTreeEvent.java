@@ -13,8 +13,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event.HasResult;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -32,6 +31,8 @@ import org.jetbrains.annotations.Nullable;
 @HasResult
 @Deprecated(forRemoval = true, since = "1.21.1") // Dont remove, rename
 public class SaplingGrowTreeEvent extends LevelEvent {
+    public static final EventBus<SaplingGrowTreeEvent> BUS = EventBus.create(SaplingGrowTreeEvent.class);
+
     private final RandomSource randomSource;
     private final BlockPos pos;
     @Nullable

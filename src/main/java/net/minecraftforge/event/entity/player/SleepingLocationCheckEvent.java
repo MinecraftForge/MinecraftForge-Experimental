@@ -12,7 +12,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.eventbus.api.Event.HasResult;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * This event is fired when game checks, if sleeping player should be still considered "in bed".<br>
@@ -24,8 +24,8 @@ import net.minecraftforge.eventbus.api.Event.HasResult;
  * setResult(DEFAULT) causes game to check {@link Block#isBed(BlockState, BlockGetter, BlockPos, Entity)} instead
  */
 @HasResult
-public class SleepingLocationCheckEvent extends LivingEvent
-{
+public class SleepingLocationCheckEvent extends LivingEvent {
+    public static final EventBus<SleepingLocationCheckEvent> BUS = EventBus.create(SleepingLocationCheckEvent.class);
 
     private final BlockPos sleepingLocation;
 

@@ -8,7 +8,7 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -22,8 +22,10 @@ import org.jetbrains.annotations.NotNull;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  * @see PlayerSpawnPhantomsEvent#setResult for the effects of each result.
  */
-@Event.HasResult
+@HasResult
 public class PlayerSpawnPhantomsEvent extends PlayerEvent {
+    public static final EventBus<PlayerSpawnPhantomsEvent> BUS = EventBus.create(PlayerSpawnPhantomsEvent.class);
+
     private int phantomsToSpawn;
 
     public PlayerSpawnPhantomsEvent(Player player, int phantomsToSpawn) {

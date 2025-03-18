@@ -8,8 +8,8 @@ package net.minecraftforge.event.level;
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,8 +29,9 @@ import org.jetbrains.annotations.Nullable;
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * only on the {@linkplain LogicalSide#SERVER logical server}.
  **/
-public class ChunkTicketLevelUpdatedEvent extends Event
-{
+public class ChunkTicketLevelUpdatedEvent extends MutableEvent {
+    public static final EventBus<ChunkTicketLevelUpdatedEvent> BUS = EventBus.create(ChunkTicketLevelUpdatedEvent.class);
+
     private final ServerLevel level;
     private final long chunkPos;
     private final int oldTicketLevel;

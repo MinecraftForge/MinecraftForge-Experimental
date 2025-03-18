@@ -8,7 +8,7 @@ package net.minecraftforge.client.event.sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +27,9 @@ import org.jetbrains.annotations.Nullable;
  * @see PlaySoundSourceEvent
  * @see PlayStreamingSourceEvent
  */
-public class PlaySoundEvent extends SoundEvent
-{
+public class PlaySoundEvent extends SoundEvent {
+    public static final EventBus<PlaySoundEvent> BUS = EventBus.create(PlaySoundEvent.class);
+
     private final String name;
     private final SoundInstance originalSound;
     @Nullable

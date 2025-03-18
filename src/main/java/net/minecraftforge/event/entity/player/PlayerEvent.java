@@ -17,13 +17,15 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,8 +36,9 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class PlayerEvent extends LivingEvent
-{
+public class PlayerEvent extends LivingEvent {
+    public static final EventBus<PlayerEvent> BUS = EventBus.create(PlayerEvent.class);
+
     private final Player player;
 
     public PlayerEvent(Player player)
@@ -66,8 +69,9 @@ public class PlayerEvent extends LivingEvent
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    public static class HarvestCheck extends PlayerEvent
-    {
+    public static class HarvestCheck extends PlayerEvent {
+        public static final EventBus<HarvestCheck> BUS = EventBus.create(HarvestCheck.class);
+
         private final BlockState state;
         private boolean success;
 
@@ -102,9 +106,9 @@ public class PlayerEvent extends LivingEvent
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    @Cancelable
-    public static class BreakSpeed extends PlayerEvent
-    {
+    public static class BreakSpeed extends PlayerEvent implements Cancellable {
+        public static final CancellableEventBus<BreakSpeed> BUS = CancellableEventBus.create(BreakSpeed.class);
+
         private static final BlockPos LEGACY_UNKNOWN = new BlockPos(0, -1, 0);
         private final BlockState state;
         private final float originalSpeed;
@@ -143,8 +147,9 @@ public class PlayerEvent extends LivingEvent
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    public static class NameFormat extends PlayerEvent
-    {
+    public static class NameFormat extends PlayerEvent {
+        public static final EventBus<NameFormat> BUS = EventBus.create(NameFormat.class);
+
         private final Component username;
         private Component displayname;
 
@@ -186,8 +191,9 @@ public class PlayerEvent extends LivingEvent
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    public static class TabListNameFormat extends PlayerEvent
-    {
+    public static class TabListNameFormat extends PlayerEvent {
+        public static final EventBus<TabListNameFormat> BUS = EventBus.create(TabListNameFormat.class);
+
         @Nullable
         private Component displayName;
 
@@ -212,8 +218,9 @@ public class PlayerEvent extends LivingEvent
      * Fired when the EntityPlayer is cloned, typically caused by the impl sending a RESPAWN_PLAYER event.
      * Either caused by death, or by traveling from the End to the overworld.
      */
-    public static class Clone extends PlayerEvent
-    {
+    public static class Clone extends PlayerEvent {
+        public static final EventBus<Clone> BUS = EventBus.create(Clone.class);
+
         private final Player original;
         private final boolean wasDeath;
 
@@ -247,6 +254,7 @@ public class PlayerEvent extends LivingEvent
      *
      */
     public static class StartTracking extends PlayerEvent {
+        public static final EventBus<StartTracking> BUS = EventBus.create(StartTracking.class);
 
         private final Entity target;
 
@@ -270,6 +278,7 @@ public class PlayerEvent extends LivingEvent
      *
      */
     public static class StopTracking extends PlayerEvent {
+        public static final EventBus<StopTracking> BUS = EventBus.create(StopTracking.class);
 
         private final Entity target;
 
@@ -295,6 +304,8 @@ public class PlayerEvent extends LivingEvent
      * containing additional mod related player data.
      */
     public static class LoadFromFile extends PlayerEvent {
+        public static final EventBus<LoadFromFile> BUS = EventBus.create(LoadFromFile.class);
+
         private final File playerDirectory;
         private final String playerUUID;
 
@@ -347,6 +358,8 @@ public class PlayerEvent extends LivingEvent
      * corrupt the world state.
      */
     public static class SaveToFile extends PlayerEvent {
+        public static final EventBus<SaveToFile> BUS = EventBus.create(SaveToFile.class);
+
         private final File playerDirectory;
         private final String playerUUID;
 
@@ -387,6 +400,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class ItemPickupEvent extends PlayerEvent {
+        public static final EventBus<ItemPickupEvent> BUS = EventBus.create(ItemPickupEvent.class);
+
         /**
          * Original EntityItem with current remaining stack size
          */
@@ -412,6 +427,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class ItemCraftedEvent extends PlayerEvent {
+        public static final EventBus<ItemCraftedEvent> BUS = EventBus.create(ItemCraftedEvent.class);
+
         @NotNull
         private final ItemStack crafting;
         private final Container craftMatrix;
@@ -435,6 +452,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class ItemSmeltedEvent extends PlayerEvent {
+        public static final EventBus<ItemSmeltedEvent> BUS = EventBus.create(ItemSmeltedEvent.class);
+
         @NotNull
         private final ItemStack smelting;
         public ItemSmeltedEvent(Player player, @NotNull ItemStack crafting)
@@ -451,6 +470,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class PlayerLoggedInEvent extends PlayerEvent {
+        public static final EventBus<PlayerLoggedInEvent> BUS = EventBus.create(PlayerLoggedInEvent.class);
+
         public PlayerLoggedInEvent(Player player)
         {
             super(player);
@@ -458,6 +479,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class PlayerLoggedOutEvent extends PlayerEvent {
+        public static final EventBus<PlayerLoggedOutEvent> BUS = EventBus.create(PlayerLoggedOutEvent.class);
+
         public PlayerLoggedOutEvent(Player player)
         {
             super(player);
@@ -465,6 +488,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class PlayerRespawnEvent extends PlayerEvent {
+        public static final EventBus<PlayerRespawnEvent> BUS = EventBus.create(PlayerRespawnEvent.class);
+
         private final boolean endConquered;
 
         public PlayerRespawnEvent(Player player, boolean endConquered)
@@ -486,6 +511,8 @@ public class PlayerEvent extends LivingEvent
     }
 
     public static class PlayerChangedDimensionEvent extends PlayerEvent {
+        public static final EventBus<PlayerChangedDimensionEvent> BUS = EventBus.create(PlayerChangedDimensionEvent.class);
+
         private final ResourceKey<Level> fromDim;
         private final ResourceKey<Level> toDim;
         public PlayerChangedDimensionEvent(Player player, ResourceKey<Level> fromDim, ResourceKey<Level> toDim)
@@ -510,9 +537,9 @@ public class PlayerEvent extends LivingEvent
      * Fired when the game type of a server player is changed to a different value than what it was previously. Eg Creative to Survival, not Survival to Survival.
      * If the event is cancelled the game mode of the player is not changed and the value of <code>newGameMode</code> is ignored.
      */
-    @Cancelable
-    public static class PlayerChangeGameModeEvent extends PlayerEvent
-    {
+    public static class PlayerChangeGameModeEvent extends PlayerEvent implements Cancellable {
+        public static final CancellableEventBus<PlayerChangeGameModeEvent> BUS = CancellableEventBus.create(PlayerChangeGameModeEvent.class);
+
         private final GameType currentGameMode;
         private GameType newGameMode;
 

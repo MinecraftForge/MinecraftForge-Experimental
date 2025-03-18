@@ -10,8 +10,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -24,9 +25,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-@Cancelable
-public class RenderBlockScreenEffectEvent extends Event
-{
+public class RenderBlockScreenEffectEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderBlockScreenEffectEvent> BUS = CancellableEventBus.create(RenderBlockScreenEffectEvent.class);
+
     /**
      * The type of the block overlay to be rendered.
      *

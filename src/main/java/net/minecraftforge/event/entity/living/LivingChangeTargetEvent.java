@@ -10,7 +10,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.behavior.StartAttacking;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * This event allows you to change the target an entity has. <br>
@@ -33,8 +34,9 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-@Cancelable
-public class LivingChangeTargetEvent extends LivingEvent {
+public class LivingChangeTargetEvent extends LivingEvent implements Cancellable {
+    public static final CancellableEventBus<LivingChangeTargetEvent> BUS = CancellableEventBus.create(LivingChangeTargetEvent.class);
+
     private final ILivingTargetType targetType;
     private final LivingEntity originalTarget;
     private LivingEntity newTarget;

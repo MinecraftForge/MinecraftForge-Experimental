@@ -8,7 +8,8 @@ package net.minecraftforge.event.entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * This event gets fired whenever a entity mounts/dismounts another entity.<br>
@@ -23,10 +24,8 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  *
  */
-
-@Cancelable
-public class EntityMountEvent extends EntityEvent
-{
+public class EntityMountEvent extends EntityEvent implements Cancellable {
+    public static final CancellableEventBus<EntityMountEvent> BUS = CancellableEventBus.create(EntityMountEvent.class);
 
     private final Entity entityMounting;
     private final Entity entityBeingMounted;

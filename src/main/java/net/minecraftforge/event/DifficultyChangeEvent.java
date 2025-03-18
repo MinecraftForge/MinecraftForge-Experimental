@@ -8,7 +8,8 @@ package net.minecraftforge.event;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * DifficultyChangeEvent is fired when difficulty is changing. <br>
@@ -19,7 +20,9 @@ import net.minecraftforge.eventbus.api.Event;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class DifficultyChangeEvent extends Event {
+public class DifficultyChangeEvent extends MutableEvent {
+    public static final EventBus<DifficultyChangeEvent> BUS = EventBus.create(DifficultyChangeEvent.class);
+
     private final Difficulty difficulty;
     private final Difficulty oldDifficulty;
 

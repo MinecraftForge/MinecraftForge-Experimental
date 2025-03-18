@@ -6,10 +6,11 @@
 package net.minecraftforge.event.server;
 
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
-public class ServerLifecycleEvent extends Event
-{
+public class ServerLifecycleEvent extends MutableEvent {
+    public static final EventBus<ServerLifecycleEvent> BUS = EventBus.create(ServerLifecycleEvent.class);
 
     protected final MinecraftServer server;
 

@@ -8,13 +8,13 @@ package net.minecraftforge.event;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.StructuresBecomeConfiguredFix;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 
 import java.util.Locale;
 import java.util.Map;
 
 import com.google.common.base.Preconditions;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * Fired for registering structure conversions for pre-1.18.2 worlds. This is used by {@link StructuresBecomeConfiguredFix}
@@ -35,8 +35,9 @@ import com.google.common.base.Preconditions;
  * @see StructuresBecomeConfiguredFix
  * @see #register(String, StructuresBecomeConfiguredFix.Conversion)
  */
-public class RegisterStructureConversionsEvent extends Event
-{
+public class RegisterStructureConversionsEvent extends MutableEvent {
+    public static final EventBus<RegisterStructureConversionsEvent> BUS = EventBus.create(RegisterStructureConversionsEvent.class);
+
     private final Map<String, StructuresBecomeConfiguredFix.Conversion> map;
 
     /**

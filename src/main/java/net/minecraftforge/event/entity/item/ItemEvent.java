@@ -7,6 +7,7 @@ package net.minecraftforge.event.entity.item;
 
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.event.entity.EntityEvent;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * Base class for all {@link ItemEntity} events. Contains a reference to the
@@ -14,8 +15,9 @@ import net.minecraftforge.event.entity.EntityEvent;
  * additional useful data from the firing method that isn't already contained
  * within the ItemEntity instance.
  */
-public class ItemEvent extends EntityEvent
-{
+public class ItemEvent extends EntityEvent {
+    public static final EventBus<ItemEvent> BUS = EventBus.create(ItemEvent.class);
+
     private final ItemEntity itemEntity;
 
     /**

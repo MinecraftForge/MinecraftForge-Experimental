@@ -11,7 +11,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
 
 /**
@@ -21,7 +21,8 @@ import net.minecraftforge.fml.event.IModBusEvent;
  * <br>
  * Fired on the Mod bus {@link IModBusEvent}.<br>
  **/
-public class EntityAttributeCreationEvent extends Event implements IModBusEvent {
+public class EntityAttributeCreationEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] EntityAttributeCreationEvent.BUS from mod BusGroup
     private final Map<EntityType<? extends LivingEntity>, AttributeSupplier> map;
 
     public EntityAttributeCreationEvent(Map<EntityType<? extends LivingEntity>, AttributeSupplier> map) {

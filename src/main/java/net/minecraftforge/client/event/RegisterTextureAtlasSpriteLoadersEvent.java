@@ -10,8 +10,7 @@ import com.google.common.collect.BiMap;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.textures.ITextureAtlasSpriteLoader;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -26,7 +25,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public class RegisterTextureAtlasSpriteLoadersEvent extends Event implements IModBusEvent {
+public class RegisterTextureAtlasSpriteLoadersEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
+
     private final BiMap<ResourceLocation, ITextureAtlasSpriteLoader> loaders;
 
     @ApiStatus.Internal

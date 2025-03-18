@@ -12,8 +12,9 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -33,9 +34,9 @@ import org.jetbrains.annotations.ApiStatus;
  *  If the event is cancelled, the container's logic halts, the carried item and the slot will not be swapped, and handling is assumed to have been done by the mod.
  *  This also means that the two vanilla checks described above will not be called.
  */
-@Cancelable
-public class ItemStackedOnOtherEvent extends Event
-{
+public class ItemStackedOnOtherEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<ItemStackedOnOtherEvent> BUS = CancellableEventBus.create(ItemStackedOnOtherEvent.class);
+
     private final ItemStack carriedItem;
     private final ItemStack stackedOnItem;
     private final Slot slot;

@@ -10,7 +10,8 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 
 /**
@@ -22,9 +23,9 @@ import net.minecraftforge.fml.LogicalSide;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS Forge event bus},
  * only on the {@linkplain LogicalSide#SERVER logical server}.</p>
  */
-@Cancelable
-public class LivingUseTotemEvent extends LivingEvent
-{
+public class LivingUseTotemEvent extends LivingEvent implements Cancellable {
+    public static final CancellableEventBus<LivingUseTotemEvent> BUS = CancellableEventBus.create(LivingUseTotemEvent.class);
+
     private final DamageSource source;
     private final ItemStack totem;
     private final InteractionHand hand;

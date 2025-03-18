@@ -7,9 +7,11 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
-public class PlayerContainerEvent extends PlayerEvent
-{
+public class PlayerContainerEvent extends PlayerEvent {
+    public static final EventBus<PlayerContainerEvent> BUS = EventBus.create(PlayerContainerEvent.class);
+
     private final AbstractContainerMenu container;
     public PlayerContainerEvent(Player player, AbstractContainerMenu container)
     {

@@ -9,7 +9,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -20,8 +20,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#SERVER logical server}.</p>
  */
-public class TradeWithVillagerEvent extends PlayerEvent
-{
+public class TradeWithVillagerEvent extends PlayerEvent {
+    public static final EventBus<TradeWithVillagerEvent> BUS = EventBus.create(TradeWithVillagerEvent.class);
+
     private final MerchantOffer offer;
     private final AbstractVillager abstractVillager;
 

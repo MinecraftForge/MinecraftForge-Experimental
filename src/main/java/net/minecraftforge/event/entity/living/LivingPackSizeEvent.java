@@ -5,12 +5,13 @@
 
 package net.minecraftforge.event.entity.living;
 
-import net.minecraftforge.eventbus.api.Event.HasResult;
 import net.minecraft.world.entity.Mob;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 @HasResult
-public class LivingPackSizeEvent extends LivingEvent
-{
+public class LivingPackSizeEvent extends LivingEvent {
+    public static final EventBus<LivingPackSizeEvent> BUS = EventBus.create(LivingPackSizeEvent.class);
+
     private int maxPackSize;
     
     public LivingPackSizeEvent(Mob entity)

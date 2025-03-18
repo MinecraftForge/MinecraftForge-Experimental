@@ -12,16 +12,16 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
-public class DataPackRegistryEvent extends Event implements IModBusEvent
-{
+public class DataPackRegistryEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
+
     @ApiStatus.Internal
     public DataPackRegistryEvent() {}
 
@@ -36,8 +36,9 @@ public class DataPackRegistryEvent extends Event implements IModBusEvent
      * This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
      * on both {@linkplain LogicalSide logical sides}.
      */
-    public static final class NewRegistry extends DataPackRegistryEvent
-    {
+    public static final class NewRegistry extends DataPackRegistryEvent {
+        // Todo: [Forge][Event] BUS from mod BusGroup
+
         private final List<DataPackRegistryData<?>> registryDataList = new ArrayList<>();
 
         @ApiStatus.Internal

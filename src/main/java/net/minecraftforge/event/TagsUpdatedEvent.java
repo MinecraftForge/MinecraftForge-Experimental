@@ -6,13 +6,15 @@
 package net.minecraftforge.event;
 
 import net.minecraft.core.RegistryAccess;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * Fired when tags are updated on either server or client. This event can be used to refresh data that depends on tags.
  */
-public class TagsUpdatedEvent extends Event
-{
+public class TagsUpdatedEvent extends MutableEvent {
+    public static final EventBus<TagsUpdatedEvent> BUS = EventBus.create(TagsUpdatedEvent.class);
+
     private final RegistryAccess registryAccess;
     private final UpdateCause updateCause;
     private final boolean integratedServer;

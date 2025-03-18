@@ -5,6 +5,8 @@
 
 package net.minecraftforge.event.brewing;
 
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -13,9 +15,10 @@ import net.minecraft.world.item.alchemy.PotionBrewing;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.common.brewing.BrewingRecipe;
 import net.minecraftforge.common.brewing.IBrewingRecipe;
-import net.minecraftforge.eventbus.api.Event;
 
-public class BrewingRecipeRegisterEvent extends Event {
+public class BrewingRecipeRegisterEvent extends MutableEvent {
+    private static final EventBus<BrewingRecipeRegisterEvent> BUS = EventBus.create(BrewingRecipeRegisterEvent.class);
+
     private final PotionBrewing.Builder builder;
     private final FeatureFlagSet features;
 

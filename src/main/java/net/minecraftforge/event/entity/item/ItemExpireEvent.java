@@ -5,8 +5,9 @@
 
 package net.minecraftforge.event.entity.item;
 
-import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * Event that is fired when an EntityItem's age has reached its maximum
@@ -14,9 +15,8 @@ import net.minecraft.world.entity.item.ItemEntity;
  * flagged as dead, thus staying it's removal from the world. If canceled
  * it will add more time to the entities life equal to extraLife.
  */
-@Cancelable
-public class ItemExpireEvent extends ItemEvent
-{
+public class ItemExpireEvent extends ItemEvent implements Cancellable {
+    public static final CancellableEventBus<ItemExpireEvent> BUS = CancellableEventBus.create(ItemExpireEvent.class);
 
     private int extraLife;
 

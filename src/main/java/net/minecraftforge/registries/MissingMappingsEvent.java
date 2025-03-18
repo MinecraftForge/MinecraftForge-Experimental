@@ -8,7 +8,8 @@ package net.minecraftforge.registries;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.apache.commons.lang3.Validate;
 
 import java.util.Collection;
@@ -18,8 +19,9 @@ import java.util.Locale;
 /**
  * Fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS forge bus}.
  */
-public class MissingMappingsEvent extends Event
-{
+public class MissingMappingsEvent extends MutableEvent {
+    public static final EventBus<MissingMappingsEvent> BUS = EventBus.create(MissingMappingsEvent.class);
+
     private final ResourceKey<? extends Registry<?>> key;
     private final IForgeRegistry<?> registry;
     private final List<Mapping<?>> mappings;

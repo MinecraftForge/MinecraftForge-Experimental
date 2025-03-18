@@ -7,15 +7,14 @@ package net.minecraftforge.event;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.LayeredRegistryAccess;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.server.RegistryLayer;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.ModLoader;
 
 import java.util.ArrayList;
@@ -29,7 +28,9 @@ import java.util.concurrent.Executor;
  * The event is fired on each reload and lets modders add their own ReloadListeners, for server-side resources.
  * The event is fired on the {@link MinecraftForge#EVENT_BUS}
  */
-public class AddReloadListenerEvent extends Event {
+public class AddReloadListenerEvent extends MutableEvent {
+    public static final EventBus<AddReloadListenerEvent> BUS = EventBus.create(AddReloadListenerEvent.class);
+
     private final List<PreparableReloadListener> listeners = new ArrayList<>();
     private final ReloadableServerResources serverResources;
 

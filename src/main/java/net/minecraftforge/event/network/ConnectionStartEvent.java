@@ -5,11 +5,12 @@
 
 package net.minecraftforge.event.network;
 
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraftforge.eventbus.api.Event;
 
 /**
  * Fired when a network connection is started, either on the server when it receives the
@@ -18,7 +19,9 @@ import net.minecraftforge.eventbus.api.Event;
  *
  * As this is a blocking event modders can also do things like load data. Need some example uses.
  */
-public class ConnectionStartEvent extends Event {
+public class ConnectionStartEvent extends MutableEvent {
+    public static final EventBus<ConnectionStartEvent> BUS = EventBus.create(ConnectionStartEvent.class);
+
     private final Connection connection;
 
     @ApiStatus.Internal

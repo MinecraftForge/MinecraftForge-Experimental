@@ -10,8 +10,9 @@ import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import java.util.UUID;
@@ -28,8 +29,9 @@ import java.util.UUID;
  *
  * @see ChatType
  */
-@Cancelable
-public class ClientChatReceivedEvent extends Event {
+public class ClientChatReceivedEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<ClientChatReceivedEvent> BUS = CancellableEventBus.create(ClientChatReceivedEvent.class);
+
     private Component message;
     private final ChatType.Bound boundChatType;
     private final UUID sender;
@@ -94,7 +96,9 @@ public class ClientChatReceivedEvent extends Event {
      *
      * @see ChatType
      */
-    public static class Player extends ClientChatReceivedEvent {
+    public static class Player extends ClientChatReceivedEvent implements Cancellable {
+        public static final CancellableEventBus<Player> BUS = CancellableEventBus.create(Player.class);
+
         private final PlayerChatMessage playerChatMessage;
 
         @ApiStatus.Internal
@@ -119,7 +123,9 @@ public class ClientChatReceivedEvent extends Event {
      * So moved to it's own event. {@link SystemMessageReceivedEvent}
      */
     @Deprecated(forRemoval = true, since = "1.21.1")
-    public static class System extends ClientChatReceivedEvent {
+    public static class System extends ClientChatReceivedEvent implements Cancellable {
+        public static final CancellableEventBus<System> BUS = CancellableEventBus.create(System.class);
+
         private final boolean overlay;
 
         @ApiStatus.Internal

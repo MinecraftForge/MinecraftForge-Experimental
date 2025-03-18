@@ -8,10 +8,11 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.BowItem;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,9 +31,9 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-@Cancelable
-public class ArrowLooseEvent extends PlayerEvent
-{
+public class ArrowLooseEvent extends PlayerEvent implements Cancellable {
+    public static final CancellableEventBus<ArrowLooseEvent> BUS = CancellableEventBus.create(ArrowLooseEvent.class);
+
     private final ItemStack bow;
     private final Level level;
     private final boolean hasAmmo;

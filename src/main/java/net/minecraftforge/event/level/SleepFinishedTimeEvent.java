@@ -6,14 +6,16 @@
 package net.minecraftforge.event.level;
 
 import net.minecraft.server.level.ServerLevel;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * This event is fired when all players are asleep and the time should be set to day.<br>
  *
  * setWakeUpTime(wakeUpTime) sets a new time that will be added to the dayTime.<br>
  */
-public class SleepFinishedTimeEvent extends LevelEvent
-{
+public class SleepFinishedTimeEvent extends LevelEvent {
+    public static final EventBus<SleepFinishedTimeEvent> BUS = EventBus.create(SleepFinishedTimeEvent.class);
+
     private long newTime;
     private final long minTime;
 

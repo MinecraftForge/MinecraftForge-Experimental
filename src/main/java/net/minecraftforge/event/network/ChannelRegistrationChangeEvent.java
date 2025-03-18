@@ -10,7 +10,8 @@ import java.util.Set;
 
 import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * Fired when the channel registration (see minecraft custom channel documentation) changes.
@@ -18,7 +19,9 @@ import net.minecraftforge.eventbus.api.Event;
  * It seems plausible that this will fire multiple times for the same state, depending on what the server is doing.
  * It just directly dispatches upon receipt.
  */
-public class ChannelRegistrationChangeEvent extends Event {
+public class ChannelRegistrationChangeEvent extends MutableEvent {
+    public static final EventBus<ChannelRegistrationChangeEvent> BUS = EventBus.create(ChannelRegistrationChangeEvent.class);
+
     public enum Type {
         REGISTER, UNREGISTER;
     }

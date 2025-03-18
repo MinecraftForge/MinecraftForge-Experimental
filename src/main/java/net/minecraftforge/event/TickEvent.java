@@ -13,10 +13,13 @@ import java.util.function.BooleanSupplier;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public class TickEvent extends Event {
+public class TickEvent extends MutableEvent {
+    public static final EventBus<TickEvent> BUS = EventBus.create(TickEvent.class);
+
     public enum Type {
         LEVEL, PLAYER, CLIENT, SERVER, RENDER;
     }
@@ -36,6 +39,8 @@ public class TickEvent extends Event {
     }
 
     public static class ServerTickEvent extends TickEvent {
+        public static final EventBus<ServerTickEvent> BUS = EventBus.create(ServerTickEvent.class);
+
         private final BooleanSupplier haveTime;
         private final MinecraftServer server;
 
@@ -62,12 +67,16 @@ public class TickEvent extends Event {
         }
 
         public static class Pre extends ServerTickEvent {
+            public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
             public Pre(BooleanSupplier haveTime, MinecraftServer server) {
                 super(haveTime, server, Phase.START);
             }
         }
 
         public static class Post extends ServerTickEvent {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             public Post(BooleanSupplier haveTime, MinecraftServer server) {
                 super(haveTime, server, Phase.END);
             }
@@ -75,17 +84,23 @@ public class TickEvent extends Event {
     }
 
     public static class ClientTickEvent extends TickEvent {
+        public static final EventBus<ClientTickEvent> BUS = EventBus.create(ClientTickEvent.class);
+
         protected ClientTickEvent(Phase phase) {
             super(Type.CLIENT, LogicalSide.CLIENT, phase);
         }
 
         public static class Pre extends ClientTickEvent {
+            public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
             public Pre() {
                 super(Phase.START);
             }
         }
 
         public static class Post extends ClientTickEvent {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             public Post() {
                 super(Phase.END);
             }
@@ -93,6 +108,8 @@ public class TickEvent extends Event {
     }
 
     public static class LevelTickEvent extends TickEvent {
+        public static final EventBus<LevelTickEvent> BUS = EventBus.create(LevelTickEvent.class);
+
         public final Level level;
         private final BooleanSupplier haveTime;
 
@@ -113,12 +130,16 @@ public class TickEvent extends Event {
         }
 
         public static class Pre extends LevelTickEvent {
+            public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
             public Pre(LogicalSide side, Level level, BooleanSupplier haveTime) {
                 super(side, level, haveTime, Phase.START);
             }
         }
 
         public static class Post extends LevelTickEvent {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             public Post(LogicalSide side, Level level, BooleanSupplier haveTime) {
                 super(side, level, haveTime, Phase.END);
             }
@@ -126,6 +147,8 @@ public class TickEvent extends Event {
     }
 
     public static class PlayerTickEvent extends TickEvent {
+        public static final EventBus<PlayerTickEvent> BUS = EventBus.create(PlayerTickEvent.class);
+
         public final Player player;
 
         protected PlayerTickEvent(Player player, Phase phase) {
@@ -134,12 +157,16 @@ public class TickEvent extends Event {
         }
 
         public static class Pre extends PlayerTickEvent {
+            public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
             public Pre(Player player) {
                 super(player, Phase.START);
             }
         }
 
         public static class Post extends PlayerTickEvent {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             public Post(Player player) {
                 super(player, Phase.END);
             }
@@ -147,6 +174,8 @@ public class TickEvent extends Event {
     }
 
     public static class RenderTickEvent extends TickEvent {
+        public static final EventBus<RenderTickEvent> BUS = EventBus.create(RenderTickEvent.class);
+
         private final DeltaTracker timer;
 
         private RenderTickEvent(Phase phase, DeltaTracker timer) {
@@ -159,12 +188,16 @@ public class TickEvent extends Event {
         }
 
         public static class Pre extends RenderTickEvent {
+            public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+
             public Pre(DeltaTracker timer) {
                 super(Phase.START, timer);
             }
         }
 
         public static class Post extends RenderTickEvent {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             public Post(DeltaTracker timer) {
                 super(Phase.END, timer);
             }

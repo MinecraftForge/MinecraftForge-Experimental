@@ -12,7 +12,8 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * LivingKnockBackEvent is fired when a living entity is about to be knocked back. <br>
@@ -35,9 +36,9 @@ import net.minecraftforge.eventbus.api.Cancelable;
  *<br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-@Cancelable
-public class LivingKnockBackEvent extends LivingEvent
-{
+public class LivingKnockBackEvent extends LivingEvent implements Cancellable {
+    public static final CancellableEventBus<LivingKnockBackEvent> BUS = CancellableEventBus.create(LivingKnockBackEvent.class);
+
     protected float strength;
     protected double ratioX, ratioZ;
     protected final float originalStrength;

@@ -6,8 +6,7 @@
 package net.minecraftforge.event;
 
 import net.minecraft.world.level.storage.LevelStorageSource;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModList;
@@ -39,8 +38,9 @@ import java.util.stream.Stream;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * on both {@linkplain LogicalSide logical sides}.</p>
  */
-public class ModMismatchEvent extends Event implements IModBusEvent
-{
+public class ModMismatchEvent extends MutableEvent implements IModBusEvent {
+    // Todo: [Forge][Event] BUS from mod BusGroup
+
     /**
      * The level being loaded. Useful for things like {@link net.minecraft.world.level.storage.DimensionDataStorage}
      * to manage multiple files changing between mod versions.

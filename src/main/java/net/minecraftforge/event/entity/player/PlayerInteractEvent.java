@@ -24,8 +24,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
 
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -38,6 +40,8 @@ import org.jetbrains.annotations.Nullable;
  * See the individual documentation on each subevent for more details.
  **/
 public class PlayerInteractEvent extends PlayerEvent {
+    public static final EventBus<PlayerInteractEvent> BUS = EventBus.create(PlayerInteractEvent.class);
+
     private final InteractionHand hand;
     private final BlockPos pos;
     @Nullable
@@ -60,8 +64,9 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Let result be the return value of {@link Entity#interactAt(Player, Vec3, InteractionHand)}, or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then try {@link EntityInteract}.
      */
-    @Cancelable
-    public static class EntityInteractSpecific extends PlayerInteractEvent {
+    public static class EntityInteractSpecific extends PlayerInteractEvent implements Cancellable {
+        public static final CancellableEventBus<EntityInteractSpecific> BUS = CancellableEventBus.create(EntityInteractSpecific.class);
+
         private final Vec3 localPos;
         private final Entity target;
 
@@ -99,8 +104,9 @@ public class PlayerInteractEvent extends PlayerEvent {
      * or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then try {@link RightClickItem}.
      */
-    @Cancelable
-    public static class EntityInteract extends PlayerInteractEvent {
+    public static class EntityInteract extends PlayerInteractEvent implements Cancellable {
+        public static final CancellableEventBus<EntityInteract> BUS = CancellableEventBus.create(EntityInteract.class);
+
         private final Entity target;
 
         public EntityInteract(Player player, InteractionHand hand, Entity target) {
@@ -126,8 +132,9 @@ public class PlayerInteractEvent extends PlayerEvent {
      * There are various results to this event, see the getters below.  <br>
      * Note that handling things differently on the client vs server may cause desynchronizations!
      */
-    @Cancelable
-    public static class RightClickBlock extends PlayerInteractEvent {
+    public static class RightClickBlock extends PlayerInteractEvent implements Cancellable {
+        public static final CancellableEventBus<RightClickBlock> BUS = CancellableEventBus.create(RightClickBlock.class);
+
         private Result useBlock = Result.DEFAULT;
         private Result useItem = Result.DEFAULT;
         private BlockHitResult hitVec;
@@ -194,8 +201,9 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Let result be the return value of {@link Item#use(Level, Player, InteractionHand)}, or {@link #cancellationResult} if the event is cancelled.
      * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then continue to other hands.
      */
-    @Cancelable
-    public static class RightClickItem extends PlayerInteractEvent {
+    public static class RightClickItem extends PlayerInteractEvent implements Cancellable {
+        public static final CancellableEventBus<RightClickItem> BUS = CancellableEventBus.create(RightClickItem.class);
+
         public RightClickItem(Player player, InteractionHand hand) {
             super(player, hand, player.blockPosition(), null);
         }
@@ -207,6 +215,8 @@ public class PlayerInteractEvent extends PlayerEvent {
      * This event cannot be canceled.
      */
     public static class RightClickEmpty extends PlayerInteractEvent {
+        public static final EventBus<RightClickEmpty> BUS = EventBus.create(RightClickEmpty.class);
+
         public RightClickEmpty(Player player, InteractionHand hand) {
             super(player, hand, player.blockPosition(), null);
         }
@@ -227,8 +237,9 @@ public class PlayerInteractEvent extends PlayerEvent {
      * Also note that creative mode directly breaks the block without running any other logic.
      * Therefore, in creative mode, {@link #setUseBlock} and {@link #setUseItem} have no effect.
      */
-    @Cancelable
     public static class LeftClickBlock extends PlayerInteractEvent {
+        public static final CancellableEventBus<LeftClickBlock> BUS = CancellableEventBus.create(LeftClickBlock.class);
+
         private Result useBlock = Result.DEFAULT;
         private Result useItem = Result.DEFAULT;
         private final Action action;
@@ -269,14 +280,15 @@ public class PlayerInteractEvent extends PlayerEvent {
             this.useItem = triggerItem;
         }
 
-        @Override
-        public void setCanceled(boolean canceled) {
-            super.setCanceled(canceled);
-            if (canceled) {
-                useBlock = Result.DENY;
-                useItem = Result.DENY;
-            }
-        }
+        // Todo: [Forge][Event] PlayerInteractEvent.LeftClickBlock#setCanceled(boolean) override
+//        @Override
+//        public void setCanceled(boolean canceled) {
+//            super.setCanceled(canceled);
+//            if (canceled) {
+//                useBlock = Result.DENY;
+//                useItem = Result.DENY;
+//            }
+//        }
 
         public static enum Action {
             /**
@@ -314,6 +326,8 @@ public class PlayerInteractEvent extends PlayerEvent {
      * This event cannot be canceled.
      */
     public static class LeftClickEmpty extends PlayerInteractEvent {
+        public static final EventBus<LeftClickEmpty> BUS = EventBus.create(LeftClickEmpty.class);
+
         public LeftClickEmpty(Player player) {
             super(player, InteractionHand.MAIN_HAND, player.blockPosition(), null);
         }

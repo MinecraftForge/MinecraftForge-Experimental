@@ -7,11 +7,14 @@ package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 
-public class LivingEntityUseItemEvent extends LivingEvent
-{
+public class LivingEntityUseItemEvent extends LivingEvent {
+    public static final EventBus<LivingEntityUseItemEvent> BUS = EventBus.create(LivingEntityUseItemEvent.class);
+
     private final ItemStack item;
     private int duration;
 
@@ -49,9 +52,9 @@ public class LivingEntityUseItemEvent extends LivingEvent
      * Cancel the event, or set the duration or {@literal <} 0 to prevent it from processing.
      *
      */
-    @Cancelable
-    public static class Start extends LivingEntityUseItemEvent
-    {
+    public static class Start extends LivingEntityUseItemEvent implements Cancellable {
+        public static final CancellableEventBus<Start> BUS = CancellableEventBus.create(Start.class);
+
         public Start(LivingEntity entity, @NotNull ItemStack item, int duration)
         {
             super(entity, item, duration);
@@ -64,9 +67,9 @@ public class LivingEntityUseItemEvent extends LivingEvent
      * Cancel the event, or set the duration to {@literal <=} 0 to cause the player to stop using the item.
      *
      */
-    @Cancelable
-    public static class Tick extends LivingEntityUseItemEvent
-    {
+    public static class Tick extends LivingEntityUseItemEvent implements Cancellable {
+        public static final CancellableEventBus<Tick> BUS = CancellableEventBus.create(Tick.class);
+
         public Tick(LivingEntity entity, @NotNull ItemStack item, int duration)
         {
             super(entity, item, duration);
@@ -85,9 +88,9 @@ public class LivingEntityUseItemEvent extends LivingEvent
      * Canceling this event will prevent the Item from being notified that it has stopped being used,
      * The only vanilla item this would effect are bows, and it would cause them NOT to fire there arrow.
      */
-    @Cancelable
-    public static class Stop extends LivingEntityUseItemEvent
-    {
+    public static class Stop extends LivingEntityUseItemEvent implements Cancellable {
+        public static final CancellableEventBus<Stop> BUS = CancellableEventBus.create(Stop.class);
+
         public Stop(LivingEntity entity, @NotNull ItemStack item, int duration)
         {
             super(entity, item, duration);
@@ -106,8 +109,9 @@ public class LivingEntityUseItemEvent extends LivingEvent
      * The result item stack is the stack that is placed in the player's inventory in replacement of the stack that is currently being used.
      *
      */
-    public static class Finish extends LivingEntityUseItemEvent
-    {
+    public static class Finish extends LivingEntityUseItemEvent {
+        public static final EventBus<Finish> BUS = EventBus.create(Finish.class);
+
         private ItemStack result;
         public Finish(LivingEntity entity, @NotNull ItemStack item, int duration, @NotNull ItemStack result)
         {

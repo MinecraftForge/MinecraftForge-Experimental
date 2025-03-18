@@ -6,10 +6,9 @@
 package net.minecraftforge.event.entity.player;
 
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event.HasResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * This event is fired whenever a player attacks an Entity in
@@ -25,8 +24,9 @@ import net.minecraft.world.entity.player.Player;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
 @HasResult
-public class CriticalHitEvent extends PlayerEvent
-{
+public class CriticalHitEvent extends PlayerEvent {
+    public static final EventBus<CriticalHitEvent> BUS = EventBus.create(CriticalHitEvent.class);
+
     private float damageModifier;
     private final float oldDamageModifier;
     private final Entity target;

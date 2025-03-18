@@ -15,7 +15,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.network.ForgePayload;
 import net.minecraftforge.common.util.LogicalSidedProvider;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,9 @@ import java.util.concurrent.CompletableFuture;
 
 // TODO make this not an event, and instead move it to a callback in the Channel itself.
 // But also expose it as a generic listener event for anyone who cares about it but is outside out channel control system.
-public class CustomPayloadEvent extends Event {
+public class CustomPayloadEvent extends MutableEvent {
+    public static final EventBus<CustomPayloadEvent> BUS = EventBus.create(CustomPayloadEvent.class);
+
     private final ResourceLocation channel;
     private final Object payload;
     private final FriendlyByteBuf data;

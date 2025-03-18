@@ -11,8 +11,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -27,9 +28,9 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see RenderArmEvent
  */
-@Cancelable
-public class RenderHandEvent extends Event
-{
+public class RenderHandEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderHandEvent> BUS = CancellableEventBus.create(RenderHandEvent.class);
+
     private final InteractionHand hand;
     private final PoseStack poseStack;
     private final MultiBufferSource multiBufferSource;

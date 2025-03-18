@@ -9,8 +9,9 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.Screenshot;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -29,9 +30,9 @@ import java.io.IOException;
  *
  * @see Screenshot
  */
-@Cancelable
-public class ScreenshotEvent extends Event
-{
+public class ScreenshotEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<ScreenshotEvent> BUS = CancellableEventBus.create(ScreenshotEvent.class);
+
     public static final Component DEFAULT_CANCEL_REASON = Component.literal("Screenshot canceled");
 
     private final NativeImage image;

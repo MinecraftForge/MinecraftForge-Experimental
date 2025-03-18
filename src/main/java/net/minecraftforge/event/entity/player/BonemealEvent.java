@@ -5,13 +5,13 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event.HasResult;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,10 +24,11 @@ import org.jetbrains.annotations.Nullable;
  *
  * setResult(ALLOW) is the same as the old setHandled()
  */
-@Cancelable
 @HasResult
 // TODO: Redesign BonemealEvent the whole thing, it doens't make sense.
-public class BonemealEvent extends PlayerEvent {
+public class BonemealEvent extends PlayerEvent implements Cancellable {
+    public static final CancellableEventBus<BonemealEvent> BUS = CancellableEventBus.create(BonemealEvent.class);
+
     private final Level level;
     private final BlockPos pos;
     private final BlockState block;

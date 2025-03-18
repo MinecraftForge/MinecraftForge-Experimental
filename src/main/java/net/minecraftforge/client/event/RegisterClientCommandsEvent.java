@@ -11,8 +11,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ObjectiveArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -34,8 +34,9 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see net.minecraftforge.event.RegisterCommandsEvent
  */
-public class RegisterClientCommandsEvent extends Event
-{
+public class RegisterClientCommandsEvent extends MutableEvent {
+    public static final EventBus<RegisterClientCommandsEvent> BUS = EventBus.create(RegisterClientCommandsEvent.class);
+
     private final CommandDispatcher<CommandSourceStack> dispatcher;
     private final CommandBuildContext context;
 
