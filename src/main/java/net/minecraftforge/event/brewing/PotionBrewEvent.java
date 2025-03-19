@@ -8,6 +8,7 @@ package net.minecraftforge.event.brewing;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -61,6 +62,8 @@ public class PotionBrewEvent extends MutableEvent {
      * If this event is canceled, and items have been modified, PotionBrewEvent.Post will automatically be fired.
      **/
     public static class Pre extends PotionBrewEvent implements Cancellable {
+        public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
+
         public Pre(NonNullList<ItemStack> stacks)
         {
             super(stacks);
@@ -81,6 +84,8 @@ public class PotionBrewEvent extends MutableEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static class Post extends PotionBrewEvent {
+        public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
         public Post(NonNullList<ItemStack> stacks)
         {
             super(stacks);
