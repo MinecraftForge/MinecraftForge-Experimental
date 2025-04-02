@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
 
+import net.minecraft.client.renderer.item.properties.conditional.ExtendedView;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.entity.*;
@@ -582,8 +583,7 @@ public final class ForgeEventFactory {
 
     @Nullable
     private static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent<?> event, @Nullable ICapabilityProvider parent) {
-        // Todo: [Forge][EventFactory] gatherCapabilities event post
-//        post(event);
+        event.post();
         return !event.getCapabilities().isEmpty() || parent != null ? new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent) : null;
     }
 

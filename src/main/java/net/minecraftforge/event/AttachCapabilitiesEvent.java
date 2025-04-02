@@ -20,6 +20,9 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.SelfPosting;
+import net.minecraftforge.eventbus.internal.Event;
+import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fired whenever an object with Capabilities support {currently TileEntity/Item/Entity)
@@ -30,7 +33,7 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
  */
 public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
 
-    public interface Factory<T> {
+    interface Factory<T> {
         AttachCapabilitiesEvent<T> create(T obj);
     }
 
@@ -41,7 +44,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> AttachCapabilitiesEvent<T> create(Class<? extends T> tClass, T provider) {
+    static <T> AttachCapabilitiesEvent<T> create(Class<? extends T> tClass, T provider) {
         return ((Factory<T>) factoryMap.get(tClass)).create(provider);
     }
 
@@ -55,36 +58,71 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
 
     public static final class EntityEvent extends AttachCapabilitiesEvent<Entity> {
         public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
-        public EntityEvent(Entity obj) {
+
+        @ApiStatus.Internal
+        EntityEvent(Entity obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
     public static final class BlockEntityEvent extends AttachCapabilitiesEvent<BlockEntity> {
         public static final EventBus<BlockEntityEvent> BUS = EventBus.create(BlockEntityEvent.class);
-        public BlockEntityEvent(BlockEntity obj) {
+
+        @ApiStatus.Internal
+        BlockEntityEvent(BlockEntity obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
     public static final class ItemStackEvent extends AttachCapabilitiesEvent<ItemStack> {
         public static final EventBus<ItemStackEvent> BUS = EventBus.create(ItemStackEvent.class);
-        public ItemStackEvent(ItemStack obj) {
+
+        @ApiStatus.Internal
+        ItemStackEvent(ItemStack obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
     public static final class LevelEvent extends AttachCapabilitiesEvent<Level> {
         public static final EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
-        public LevelEvent(Level obj) {
+
+        @ApiStatus.Internal
+        LevelEvent(Level obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
     public static final class LevelChunkEvent extends AttachCapabilitiesEvent<LevelChunk> {
         public static final EventBus<LevelChunkEvent> BUS = EventBus.create(LevelChunkEvent.class);
-        public LevelChunkEvent(LevelChunk obj) {
+
+        @ApiStatus.Internal
+        LevelChunkEvent(LevelChunk obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -146,4 +184,6 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
     {
         return this.listenersView;
     }
+
+    abstract void post();
 }
