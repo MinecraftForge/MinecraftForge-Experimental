@@ -393,13 +393,11 @@ public class ForgeMod {
             event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
             event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
         });
-        synchronized (ForgeMod.class.getClassLoader()) {
-            EventBus.create(modEventBus, FMLCommonSetupEvent.class).addListener(this::preInit);
-            EventBus.create(modEventBus, GatherDataEvent.class).addListener(this::gatherData);
-            EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerFluids);
-            EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerVanillaDisplayContexts);
-            EventBus.create(modEventBus, EntityAttributeModificationEvent.class).addListener(this::onRegisterAttributes);
-        }
+        EventBus.create(modEventBus, FMLCommonSetupEvent.class).addListener(this::preInit);
+        EventBus.create(modEventBus, GatherDataEvent.class).addListener(this::gatherData);
+        EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerFluids);
+        EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerVanillaDisplayContexts);
+        EventBus.create(modEventBus, EntityAttributeModificationEvent.class).addListener(this::onRegisterAttributes);
         ForgeDeferredRegistriesSetup.setup(modEventBus);
         for (var reg : registries)
             reg.register(modEventBus);
