@@ -6,12 +6,19 @@
 package net.minecraftforge.event;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
@@ -21,7 +28,66 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
  * Please note that as this is fired for ALL object creations efficient code is recommended.
  * And if possible use one of the sub-classes to filter your intended objects.
  */
-public class AttachCapabilitiesEvent<T> extends MutableEvent {
+public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
+
+    public interface Factory<T> {
+        AttachCapabilitiesEvent<T> create(T obj);
+    }
+
+    private static final Map<Class<?>, Factory<?>> factoryMap = new HashMap<>();
+
+    private static <T> void register(Class<T> tClass, Factory<T> factory) {
+        factoryMap.put(tClass, factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <T> AttachCapabilitiesEvent<T> create(Class<? extends T> tClass, T provider) {
+        return ((Factory<T>) factoryMap.get(tClass)).create(provider);
+    }
+
+    static {
+        register(Entity.class, EntityEvent::new);
+        register(BlockEntity.class, BlockEntityEvent::new);
+        register(ItemStack.class, ItemStackEvent::new);
+        register(Level.class, LevelEvent::new);
+        register(LevelChunk.class, LevelChunkEvent::new);
+    }
+
+    public static final class EntityEvent extends AttachCapabilitiesEvent<Entity> {
+        public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
+        public EntityEvent(Entity obj) {
+            super(obj);
+        }
+    }
+
+    public static final class BlockEntityEvent extends AttachCapabilitiesEvent<BlockEntity> {
+        public static final EventBus<BlockEntityEvent> BUS = EventBus.create(BlockEntityEvent.class);
+        public BlockEntityEvent(BlockEntity obj) {
+            super(obj);
+        }
+    }
+
+    public static final class ItemStackEvent extends AttachCapabilitiesEvent<ItemStack> {
+        public static final EventBus<ItemStackEvent> BUS = EventBus.create(ItemStackEvent.class);
+        public ItemStackEvent(ItemStack obj) {
+            super(obj);
+        }
+    }
+
+    public static final class LevelEvent extends AttachCapabilitiesEvent<Level> {
+        public static final EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
+        public LevelEvent(Level obj) {
+            super(obj);
+        }
+    }
+
+    public static final class LevelChunkEvent extends AttachCapabilitiesEvent<LevelChunk> {
+        public static final EventBus<LevelChunkEvent> BUS = EventBus.create(LevelChunkEvent.class);
+        public LevelChunkEvent(LevelChunk obj) {
+            super(obj);
+        }
+    }
+
     // Todo: [Forge][Event] Make this play nice with EventBus v7
 
     private final T obj;
@@ -30,9 +96,8 @@ public class AttachCapabilitiesEvent<T> extends MutableEvent {
     private final List<Runnable> listeners = Lists.newArrayList();
     private final List<Runnable> listenersView = Collections.unmodifiableList(listeners);
 
-    public AttachCapabilitiesEvent(Class<T> type, T obj)
+    public AttachCapabilitiesEvent(T obj)
     {
-        //super(type);
         this.obj = obj;
     }
 
