@@ -25,7 +25,7 @@
  
          try {
 +            var event = new net.minecraftforge.event.CommandEvent(p_242844_);
-+            if (net.minecraftforge.common.MinecraftForge.EVENT_BUS.post(event)) {
++            if (!net.minecraftforge.event.CommandEvent.BUS.post(event)) { // TODO [MANGO]: Might not be !, perhaps we are checking it is cancelled vs not cancelled?
 +                if (event.getException() instanceof Exception exception) {
 +                    throw exception;
 +                } else if (event.getException() != null) {
