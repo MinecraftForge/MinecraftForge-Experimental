@@ -10,6 +10,8 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -29,7 +31,9 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterParticleProvidersEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterParticleProvidersEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterParticleProvidersEvent.class);
+    }
 
     private final ParticleEngine particleEngine;
 

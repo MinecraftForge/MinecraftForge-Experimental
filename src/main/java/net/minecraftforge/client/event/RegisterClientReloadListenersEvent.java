@@ -9,6 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -27,7 +29,9 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterClientReloadListenersEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterClientReloadListenersEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterClientReloadListenersEvent.class);
+    }
 
     private final ReloadableResourceManager resourceManager;
 

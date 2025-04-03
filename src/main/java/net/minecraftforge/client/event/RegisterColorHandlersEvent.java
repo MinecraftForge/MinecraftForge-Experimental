@@ -10,6 +10,8 @@ import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ColorResolver;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -27,8 +29,6 @@ import org.jetbrains.annotations.ApiStatus;
  * @see RegisterColorHandlersEvent.Item
  */
 public abstract class RegisterColorHandlersEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
-
     @ApiStatus.Internal
     protected RegisterColorHandlersEvent() {}
 
@@ -41,7 +41,9 @@ public abstract class RegisterColorHandlersEvent extends MutableEvent implements
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class Block extends RegisterColorHandlersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<Block> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, Block.class);
+        }
 
         private final BlockColors blockColors;
 
@@ -76,7 +78,9 @@ public abstract class RegisterColorHandlersEvent extends MutableEvent implements
      * {@link net.minecraft.world.level.BlockAndTintGetter#getBlockTint(BlockPos, ColorResolver)}.
      */
     public static class ColorResolvers extends RegisterColorHandlersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<ColorResolvers> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, ColorResolvers.class);
+        }
 
         private final ImmutableList.Builder<ColorResolver> builder;
 

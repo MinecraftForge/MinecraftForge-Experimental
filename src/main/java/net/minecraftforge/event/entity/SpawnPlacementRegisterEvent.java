@@ -16,6 +16,9 @@ import net.minecraft.world.entity.SpawnPlacementType;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.SpawnPlacements;
 import net.minecraft.world.level.levelgen.Heightmap;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.listener.Priority;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -42,7 +45,10 @@ import org.jetbrains.annotations.ApiStatus;
  *  Fired on the Mod bus {@link IModBusEvent}.<br>
  */
 public class SpawnPlacementRegisterEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] SpawnPlacementRegisterEvent.BUS from mod BusGroup
+    public static EventBus<SpawnPlacementRegisterEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, SpawnPlacementRegisterEvent.class);
+    }
+
     private final Map<EntityType<?>, MergedSpawnPredicate<?>> map;
 
     @ApiStatus.Internal

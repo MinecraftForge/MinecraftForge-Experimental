@@ -386,26 +386,27 @@ public class ForgeMod {
         CrashReportCallables.registerCrashCallable("Forge", ()->ForgeVersion.getGroup()+":"+ForgeVersion.getVersion());
 
         // Todo: [Forge][ForgeMod] mod bus registrations
-        final BusGroup modEventBus = context.getModEventBus();
+        final BusGroup modBusGroup = context.getModEventBus();
         // Forge-provided datapack registries
         // Hacky code, do not copy!
-        EventBus.create(modEventBus, DataPackRegistryEvent.NewRegistry.class).addListener(event -> {
+        DataPackRegistryEvent.NewRegistry.getBus(modBusGroup).addListener(event -> {
             event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
             event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
         });
-        EventBus.create(modEventBus, FMLCommonSetupEvent.class).addListener(this::preInit);
-        EventBus.create(modEventBus, GatherDataEvent.class).addListener(this::gatherData);
-        EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerFluids);
-        EventBus.create(modEventBus, RegisterEvent.class).addListener(this::registerVanillaDisplayContexts);
-        EventBus.create(modEventBus, EntityAttributeModificationEvent.class).addListener(this::onRegisterAttributes);
-        ForgeDeferredRegistriesSetup.setup(modEventBus);
+        FMLCommonSetupEvent.getBus(modBusGroup).addListener(this::preInit);
+        GatherDataEvent.getBus(modBusGroup).addListener(this::gatherData);
+        RegisterEvent.getBus(modBusGroup).addListener(this::registerFluids);
+        RegisterEvent.getBus(modBusGroup).addListener(this::registerVanillaDisplayContexts);
+        EntityAttributeModificationEvent.getBus(modBusGroup).addListener(this::onRegisterAttributes);
+
+        ForgeDeferredRegistriesSetup.setup(modBusGroup);
         for (var reg : registries)
-            reg.register(modEventBus);
+            reg.register(modBusGroup);
 
         context.registerConfig(ModConfig.Type.CLIENT, ForgeConfig.clientSpec);
         context.registerConfig(ModConfig.Type.SERVER, ForgeConfig.serverSpec);
         context.registerConfig(ModConfig.Type.COMMON, ForgeConfig.commonSpec);
-        modEventBus.register(MethodHandles.lookup(), ForgeConfig.class);
+        modBusGroup.register(MethodHandles.lookup(), ForgeConfig.class);
 
         // Forge does not display problems when the remote is not matching.
         context.registerDisplayTest(IExtensionPoint.DisplayTest.IGNORE_ALL_VERSION);

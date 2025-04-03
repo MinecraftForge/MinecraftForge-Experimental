@@ -7,6 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -26,7 +28,9 @@ import java.util.function.Function;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterClientTooltipComponentFactoriesEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterClientTooltipComponentFactoriesEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterClientTooltipComponentFactoriesEvent.class);
+    }
 
     private final Map<Class<? extends TooltipComponent>, Function<TooltipComponent, ClientTooltipComponent>> factories;
 

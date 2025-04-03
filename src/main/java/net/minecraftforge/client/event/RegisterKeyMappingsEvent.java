@@ -7,6 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -23,7 +25,9 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterKeyMappingsEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterKeyMappingsEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterKeyMappingsEvent.class);
+    }
 
     private final Options options;
 

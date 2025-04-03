@@ -13,6 +13,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -48,7 +50,10 @@ public abstract class ModelEvent extends MutableEvent {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class ModifyBakingResult extends ModelEvent implements IModBusEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<ModifyBakingResult> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, ModifyBakingResult.class);
+        }
+
         private final ModelBakery modelBakery;
         private final ModelBakery.BakingResult results;
 
@@ -85,7 +90,10 @@ public abstract class ModelEvent extends MutableEvent {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class BakingCompleted extends ModelEvent implements IModBusEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<BakingCompleted> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, BakingCompleted.class);
+        }
+
         private final ModelManager modelManager;
         private final ModelBakery modelBakery;
 
@@ -120,7 +128,10 @@ public abstract class ModelEvent extends MutableEvent {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterModelStateDefinitions extends ModelEvent implements IModBusEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<RegisterModelStateDefinitions> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, RegisterModelStateDefinitions.class);
+        }
+
         private final Map<ResourceLocation, StateDefinition<Block, BlockState>> states = new HashMap<>();
         private final Map<ResourceLocation, StateDefinition<Block, BlockState>> view = Collections.unmodifiableMap(states);
 
@@ -151,7 +162,10 @@ public abstract class ModelEvent extends MutableEvent {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<RegisterGeometryLoaders> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, RegisterGeometryLoaders.class);
+        }
+
         private final Map<ResourceLocation, IGeometryLoader<?>> loaders;
 
         @ApiStatus.Internal

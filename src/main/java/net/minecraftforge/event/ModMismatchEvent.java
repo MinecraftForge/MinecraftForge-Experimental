@@ -6,6 +6,8 @@
 package net.minecraftforge.event;
 
 import net.minecraft.world.level.storage.LevelStorageSource;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModContainer;
@@ -39,7 +41,9 @@ import java.util.stream.Stream;
  * on both {@linkplain LogicalSide logical sides}.</p>
  */
 public class ModMismatchEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<ModMismatchEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, ModMismatchEvent.class);
+    }
 
     /**
      * The level being loaded. Useful for things like {@link net.minecraft.world.level.storage.DimensionDataStorage}

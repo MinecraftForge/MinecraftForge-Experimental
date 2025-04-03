@@ -7,6 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -25,6 +27,9 @@ import java.util.Map;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterEntitySpectatorShadersEvent extends MutableEvent implements IModBusEvent {
+    public static EventBus<RegisterEntitySpectatorShadersEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterEntitySpectatorShadersEvent.class);
+    }
     // Todo: [Forge][Event] BUS from mod BusGroup
 
     private final Map<EntityType<?>, ResourceLocation> shaders;

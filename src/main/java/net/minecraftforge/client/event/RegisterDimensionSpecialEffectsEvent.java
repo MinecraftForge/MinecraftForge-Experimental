@@ -7,6 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.client.renderer.DimensionSpecialEffects;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -24,7 +26,9 @@ import java.util.Map;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterDimensionSpecialEffectsEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterDimensionSpecialEffectsEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterDimensionSpecialEffectsEvent.class);
+    }
 
     private final Map<ResourceLocation, DimensionSpecialEffects> effects;
 

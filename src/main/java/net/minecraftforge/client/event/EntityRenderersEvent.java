@@ -29,6 +29,8 @@ import net.minecraft.world.level.block.SkullBlock.Type;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.ForgeHooksClient;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -53,8 +55,6 @@ import java.util.function.Supplier;
  * @see EntityRenderersEvent.AddLayers
  */
 public abstract class EntityRenderersEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
-
     @ApiStatus.Internal
     protected EntityRenderersEvent() {}
 
@@ -67,7 +67,9 @@ public abstract class EntityRenderersEvent extends MutableEvent implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterLayerDefinitions extends EntityRenderersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<RegisterLayerDefinitions> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, RegisterLayerDefinitions.class);
+        }
 
         @ApiStatus.Internal
         public RegisterLayerDefinitions() {}
@@ -97,7 +99,9 @@ public abstract class EntityRenderersEvent extends MutableEvent implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class RegisterRenderers extends EntityRenderersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<RegisterRenderers> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, RegisterRenderers.class);
+        }
 
         @ApiStatus.Internal
         public RegisterRenderers() {}
@@ -133,7 +137,9 @@ public abstract class EntityRenderersEvent extends MutableEvent implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class AddLayers extends EntityRenderersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<AddLayers> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, AddLayers.class);
+        }
 
         private final Map<EntityType<?>, EntityRenderer<?, ?>> renderers;
         private final Map<PlayerSkin.Model, EntityRenderer<? extends Player, ?>> skinMap;
@@ -209,7 +215,9 @@ public abstract class EntityRenderersEvent extends MutableEvent implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static class CreateSkullModels extends EntityRenderersEvent {
-        // Todo: [Forge][Event] BUS from mod BusGroup
+        public static EventBus<CreateSkullModels> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, CreateSkullModels.class);
+        }
 
         private final ImmutableMap.Builder<Type, Function<EntityModelSet, SkullModelBase>> builder;
 

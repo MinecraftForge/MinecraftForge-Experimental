@@ -7,6 +7,8 @@ package net.minecraftforge.event;
 
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestGenerator;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.gametest.ForgeGameTestHooks;
@@ -23,7 +25,9 @@ import java.util.Set;
  * Fired on the Mod bus, see {@link IModBusEvent}.
  */
 public class RegisterGameTestsEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterGameTestsEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterGameTestsEvent.class);
+    }
 
     private final Set<Method> gameTestMethods;
 

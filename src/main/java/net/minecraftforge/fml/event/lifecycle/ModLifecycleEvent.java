@@ -18,7 +18,6 @@ import java.util.stream.Stream;
  * ModContainer's eventbus instance.
  */
 public class ModLifecycleEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
     private final ModContainer container;
 
     public ModLifecycleEvent(ModContainer container)

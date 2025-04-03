@@ -7,6 +7,8 @@ package net.minecraftforge.common.capabilities;
 
 import java.util.Objects;
 
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.objectweb.asm.Type;
 
@@ -20,7 +22,9 @@ import net.minecraftforge.fml.event.IModBusEvent;
  */
 @Deprecated(forRemoval = true, since = "1.21")
 public final class RegisterCapabilitiesEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterCapabilitiesEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterCapabilitiesEvent.class);
+    }
 
     /**
      * Registers a capability to be consumed by others.

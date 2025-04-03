@@ -5,8 +5,11 @@
 
 package net.minecraftforge.fml.event.lifecycle;
 
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingStage;
+import net.minecraftforge.fml.event.IModBusEvent;
 
 /**
  * This is a mostly internal event fired to mod containers that indicates that loading is complete. Mods should not
@@ -14,8 +17,11 @@ import net.minecraftforge.fml.ModLoadingStage;
  *
  * @author cpw
  */
-public class FMLLoadCompleteEvent extends ParallelDispatchEvent
-{
+public class FMLLoadCompleteEvent extends ParallelDispatchEvent {
+    public static EventBus<FMLLoadCompleteEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, FMLLoadCompleteEvent.class);
+    }
+
     public FMLLoadCompleteEvent(final ModContainer container, final ModLoadingStage stage)
     {
         super(container, stage);

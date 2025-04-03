@@ -11,6 +11,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.util.MutableHashedLinkedMap;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -29,7 +31,9 @@ import java.util.function.Supplier;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.
  */
 public final class BuildCreativeModeTabContentsEvent extends MutableEvent implements IModBusEvent, CreativeModeTab.Output {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<BuildCreativeModeTabContentsEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, BuildCreativeModeTabContentsEvent.class);
+    }
 
     private final CreativeModeTab tab;
     private final CreativeModeTab.ItemDisplayParameters parameters;

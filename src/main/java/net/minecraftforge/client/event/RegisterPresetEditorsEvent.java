@@ -7,6 +7,8 @@ package net.minecraftforge.client.event;
 
 import java.util.Map;
 
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -29,7 +31,9 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterPresetEditorsEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterPresetEditorsEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterPresetEditorsEvent.class);
+    }
 
     private static final Logger LOGGER = LogManager.getLogger();
 

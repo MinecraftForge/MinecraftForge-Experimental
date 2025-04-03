@@ -6,6 +6,8 @@
 package net.minecraftforge.client.event.sound;
 
 import net.minecraft.client.sounds.SoundEngine;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -21,7 +23,10 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class SoundEngineLoadEvent extends SoundEvent implements IModBusEvent {
-    // Todo: [Forge][Event] SoundEngineLoadEvent.BUS from mod BusGroup
+    public static EventBus<SoundEngineLoadEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, SoundEngineLoadEvent.class);
+    }
+
     @ApiStatus.Internal
     public SoundEngineLoadEvent(SoundEngine manager)
     {

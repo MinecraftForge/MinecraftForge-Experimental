@@ -6,6 +6,8 @@
 package net.minecraftforge.client.event;
 
 import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -19,8 +21,6 @@ import org.jetbrains.annotations.ApiStatus;
  * @see TextureAtlas
  */
 public class TextureStitchEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
-
     private final TextureAtlas atlas;
 
     @ApiStatus.Internal
@@ -80,8 +80,11 @@ public class TextureStitchEvent extends MutableEvent implements IModBusEvent {
      * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus()} mod-specific event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static class Post extends TextureStitchEvent
-    {
+    public static class Post extends TextureStitchEvent {
+        public static EventBus<Post> getBus(BusGroup modEventBusGroup) {
+            return IModBusEvent.getBus(modEventBusGroup, Post.class);
+        }
+
         @ApiStatus.Internal
         public Post(TextureAtlas map)
         {

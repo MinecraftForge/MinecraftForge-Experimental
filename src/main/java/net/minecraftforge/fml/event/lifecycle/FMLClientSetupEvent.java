@@ -5,8 +5,11 @@
 
 package net.minecraftforge.fml.event.lifecycle;
 
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingStage;
+import net.minecraftforge.fml.event.IModBusEvent;
 
 
 /**
@@ -24,6 +27,10 @@ import net.minecraftforge.fml.ModLoadingStage;
  * This is a parallel dispatch event.
  */
 public class FMLClientSetupEvent extends ParallelDispatchEvent {
+    public static EventBus<FMLClientSetupEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, FMLClientSetupEvent.class);
+    }
+
     public FMLClientSetupEvent(ModContainer container, ModLoadingStage stage) {
         super(container, stage);
     }

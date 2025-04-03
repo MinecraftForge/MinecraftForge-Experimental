@@ -10,6 +10,8 @@ import com.google.common.collect.BiMap;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.textures.ITextureAtlasSpriteLoader;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -26,7 +28,9 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public class RegisterTextureAtlasSpriteLoadersEvent extends MutableEvent implements IModBusEvent {
-    // Todo: [Forge][Event] BUS from mod BusGroup
+    public static EventBus<RegisterTextureAtlasSpriteLoadersEvent> getBus(BusGroup modEventBusGroup) {
+        return IModBusEvent.getBus(modEventBusGroup, RegisterTextureAtlasSpriteLoadersEvent.class);
+    }
 
     private final BiMap<ResourceLocation, ITextureAtlasSpriteLoader> loaders;
 
