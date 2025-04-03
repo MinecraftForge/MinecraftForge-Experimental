@@ -16,7 +16,7 @@
      public void setTarget(@Nullable LivingEntity p_21544_) {
 -        this.target = p_21544_;
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingChangeTargetMob(this, p_21544_);
-+        if (!event.isCanceled()) {
++        if (event != null) {
 +            this.target = event.getNewTarget();
 +        }
      }
@@ -62,10 +62,10 @@
          } else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence()) {
              Entity entity = this.level().getNearestPlayer(this, -1.0);
 +            var result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this, (ServerLevel)this.level());
-+            if (result == net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (result == net.minecraftforge.common.util.Result.DENY) {
 +                noActionTime = 0;
 +                entity = null;
-+            } else if (result == net.minecraftforge.eventbus.api.Event.Result.ALLOW) {
++            } else if (result == net.minecraftforge.common.util.Result.ALLOW) {
 +                this.discard();
 +                entity = null;
 +            }

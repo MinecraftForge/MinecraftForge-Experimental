@@ -293,7 +293,7 @@
  
      public void giveExperiencePoints(int p_36291_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onPlayerXpChange(this, p_36291_);
-+        if (event.isCanceled()) {
++        if (event == null) {
 +            return;
 +        }
 +        p_36291_ = event.getAmount();
@@ -315,7 +315,7 @@
  
      public void giveExperienceLevels(int p_36276_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onPlayerLevelChange(this, p_36276_);
-+        if (event.isCanceled()) {
++        if (event == null) {
 +            return;
 +        }
 +        p_36276_ = event.getLevels();

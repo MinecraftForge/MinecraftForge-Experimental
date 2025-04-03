@@ -38,11 +38,11 @@
                  this.startPrediction(this.minecraft.level, p_233728_ -> {
                      boolean flag = !blockstate1.isAir();
                      if (flag && this.destroyProgress == 0.0F) {
-+                        if (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY)
++                        if (event.getUseBlock() != net.minecraftforge.common.util.Result.DENY)
                          blockstate1.attack(this.minecraft.level, p_105270_, this.minecraft.player);
                      }
  
-+                    if (event.getUseItem() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++                    if (event.getUseItem() != net.minecraftforge.common.util.Result.DENY) {
                      if (flag && blockstate1.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), p_105270_) >= 1.0F) {
                          this.destroyBlock(p_105270_);
                      } else {
@@ -75,7 +75,7 @@
  
                  this.destroyTicks++;
                  this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, p_105284_, blockstate, Mth.clamp(this.destroyProgress, 0.0F, 1.0F));
-+                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, p_105284_, p_105285_).getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY) return true;
++                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, p_105284_, p_105285_).getUseItem() == net.minecraftforge.common.util.Result.DENY) return true;
                  if (this.destroyProgress >= 1.0F) {
                      this.isDestroying = false;
                      this.startPrediction(this.minecraft.level, p_233739_ -> {
@@ -101,7 +101,7 @@
          } else {
 -            boolean flag = !p_233747_.getMainHandItem().isEmpty() || !p_233747_.getOffhandItem().isEmpty();
 +            UseOnContext useoncontext = new UseOnContext(p_233747_, p_233748_, p_233749_);
-+            if (event.getUseItem() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (event.getUseItem() != net.minecraftforge.common.util.Result.DENY) {
 +               InteractionResult result = itemstack.onItemUseFirst(useoncontext);
 +               if (result != InteractionResult.PASS) {
 +                  return result;
@@ -110,7 +110,7 @@
 +            boolean flag = !p_233747_.getMainHandItem().doesSneakBypassUse(p_233747_.level(), blockpos, p_233747_) || !p_233747_.getOffhandItem().doesSneakBypassUse(p_233747_.level(), blockpos, p_233747_);
              boolean flag1 = p_233747_.isSecondaryUseActive() && flag;
 -            if (!flag1) {
-+            if (event.getUseBlock() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY && !flag1)) {
++            if (event.getUseBlock() == net.minecraftforge.common.util.Result.ALLOW || (event.getUseBlock() != net.minecraftforge.common.util.Result.DENY && !flag1)) {
                  BlockState blockstate = this.minecraft.level.getBlockState(blockpos);
                  if (!this.connection.isFeatureEnabled(blockstate.getBlock().requiredFeatures())) {
                      return InteractionResult.FAIL;
@@ -120,10 +120,10 @@
  
 -            if (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack)) {
 -                UseOnContext useoncontext = new UseOnContext(p_233747_, p_233748_, p_233749_);
-+            if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (event.getUseItem() == net.minecraftforge.common.util.Result.DENY) {
 +               return InteractionResult.PASS;
 +            }
-+            if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack))) {
++            if (event.getUseItem() == net.minecraftforge.common.util.Result.ALLOW || (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack))) {
                  InteractionResult interactionresult2;
                  if (this.localPlayerMode.isCreative()) {
                      int i = itemstack.getCount();

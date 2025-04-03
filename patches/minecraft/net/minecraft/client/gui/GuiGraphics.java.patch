@@ -105,7 +105,7 @@
      ) {
          if (!p_282615_.isEmpty()) {
 +            var preEvent = net.minecraftforge.client.ForgeHooksClient.onRenderTooltipPre(this.tooltipStack, this, p_283230_, p_283417_, guiWidth(), guiHeight(), p_282615_, p_282675_, p_282442_);
-+            if (preEvent.isCanceled()) return;
++            if (preEvent == null) return;
              int i = 0;
              int j = p_282615_.size() == 1 ? -2 : 0;
  

@@ -50,7 +50,7 @@
          long p_263408_
      ) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtPosition(this, p_263372_, p_263404_, p_263365_, p_263335_, p_263417_, p_263416_, p_263349_);
-+        if (event.isCanceled() || event.getSound() == null) return;
++        if (event == null || event.getSound() == null) return;
 +        p_263335_ = event.getSound();
 +        p_263417_ = event.getSource();
 +        p_263416_ = event.getNewVolume();
@@ -63,7 +63,7 @@
          @Nullable Player p_263514_, Entity p_263536_, Holder<SoundEvent> p_263518_, SoundSource p_263487_, float p_263538_, float p_263524_, long p_263509_
      ) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtEntity(p_263536_, p_263518_, p_263487_, p_263538_, p_263524_);
-+        if (event.isCanceled() || event.getSound() == null) return;
++        if (event == null || event.getSound() == null) return;
 +        p_263518_ = event.getSound();
 +        p_263487_ = event.getSource();
 +        p_263538_ = event.getNewVolume();

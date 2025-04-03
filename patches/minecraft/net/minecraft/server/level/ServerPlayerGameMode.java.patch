@@ -15,7 +15,7 @@
                  float f = 1.0F;
                  BlockState blockstate = this.level.getBlockState(p_215120_);
                  if (!blockstate.isAir()) {
-+                    if (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++                    if (event.getUseBlock() != net.minecraftforge.common.util.Result.DENY) {
                      EnchantmentHelper.onHitBlock(
                          this.level,
                          this.player.getMainHandItem(),
@@ -118,7 +118,7 @@
              }
          } else {
 +            UseOnContext useoncontext = new UseOnContext(p_9266_, p_9269_, p_9270_);
-+            if (event.getUseItem() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (event.getUseItem() != net.minecraftforge.common.util.Result.DENY) {
 +                InteractionResult result = p_9268_.onItemUseFirst(useoncontext);
 +                if (result != InteractionResult.PASS) return result;
 +            }
@@ -127,7 +127,7 @@
 +            flag1 &= !(p_9266_.getMainHandItem().doesSneakBypassUse(p_9267_, blockpos, p_9266_) && p_9266_.getOffhandItem().doesSneakBypassUse(p_9267_, blockpos, p_9266_));
              ItemStack itemstack = p_9268_.copy();
 -            if (!flag1) {
-+            if (event.getUseBlock() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY && !flag1)) {
++            if (event.getUseBlock() == net.minecraftforge.common.util.Result.ALLOW || (event.getUseBlock() != net.minecraftforge.common.util.Result.DENY && !flag1)) {
                  InteractionResult interactionresult = blockstate.useItemOn(p_9266_.getItemInHand(p_9269_), p_9267_, p_9266_, p_9269_, p_9270_);
                  if (interactionresult.consumesAction()) {
                      CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(p_9266_, blockpos, itemstack);
@@ -137,8 +137,8 @@
  
 -            if (!p_9268_.isEmpty() && !p_9266_.getCooldowns().isOnCooldown(p_9268_)) {
 -                UseOnContext useoncontext = new UseOnContext(p_9266_, p_9269_, p_9270_);
-+            if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (!p_9268_.isEmpty() && !p_9266_.getCooldowns().isOnCooldown(p_9268_))) {
-+                if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY) return InteractionResult.PASS;
++            if (event.getUseItem() == net.minecraftforge.common.util.Result.ALLOW || (!p_9268_.isEmpty() && !p_9266_.getCooldowns().isOnCooldown(p_9268_))) {
++                if (event.getUseItem() == net.minecraftforge.common.util.Result.DENY) return InteractionResult.PASS;
                  InteractionResult interactionresult2;
                  if (this.isCreative()) {
                      int i = p_9268_.getCount();

@@ -268,7 +268,7 @@
  
      public void knockback(double p_147241_, double p_147242_, double p_147243_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingKnockBack(this, (float) p_147241_, p_147242_, p_147243_);
-+        if (event.isCanceled()) return;
++        if (event == null) return;
 +        p_147241_ = event.getStrength();
 +        p_147242_ = event.getRatioX();
 +        p_147243_ = event.getRatioZ();
@@ -294,7 +294,7 @@
      @Override
      public boolean causeFallDamage(float p_147187_, float p_147188_, DamageSource p_147189_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, p_147187_, p_147188_);
-+        if (event.isCanceled()) return false;
++        if (event == null) return false;
 +        p_147187_ = event.getDistance();
 +        p_147188_ = event.getDamageMultiplier();
          boolean flag = super.causeFallDamage(p_147187_, p_147188_, p_147189_);
@@ -359,7 +359,7 @@
 -        this.setItemSlot(EquipmentSlot.OFFHAND, this.getItemBySlot(EquipmentSlot.MAINHAND));
 -        this.setItemSlot(EquipmentSlot.MAINHAND, itemstack);
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingSwapHandItems(this);
-+        if (event.isCanceled()) return;
++        if (event == null) return;
 +        this.setItemSlot(EquipmentSlot.OFFHAND, event.getItemSwappedToOffHand());
 +        this.setItemSlot(EquipmentSlot.MAINHAND, event.getItemSwappedToMainHand());
      }
