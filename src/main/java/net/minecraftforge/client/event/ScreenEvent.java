@@ -111,11 +111,11 @@ public abstract class ScreenEvent extends MutableEvent {
         /**
          * Fired <b>before</b> the screen's overridable initialization method is fired.
          *
-         * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
          * If the event is cancelled, the initialization method will not be called, and the widgets and children lists
          * will not be cleared.</p>
          *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
+         * <p>This event is fired on the {@linkplain Pre#BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         public static class Pre extends Init implements Cancellable {
@@ -130,9 +130,9 @@ public abstract class ScreenEvent extends MutableEvent {
         /**
          * Fired <b>after</b> the screen's overridable initialization method is called.
          *
-         * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
+         * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
          *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
+         * <p>This event is fired on the {@linkplain Post#BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         public static class Post extends Init {
