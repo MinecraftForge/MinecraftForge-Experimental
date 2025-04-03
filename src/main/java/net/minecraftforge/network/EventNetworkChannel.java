@@ -27,7 +27,7 @@ public class EventNetworkChannel extends Channel<FriendlyByteBuf> {
         super(instance);
     }
 
-    public <T extends CustomPayloadEvent> EventNetworkChannel addListener(Consumer<T> eventListener) {
+    public EventNetworkChannel addListener(Consumer<CustomPayloadEvent> eventListener) {
         instance.addListener(eventListener);
         return this;
     }

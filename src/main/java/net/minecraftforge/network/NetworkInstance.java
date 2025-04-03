@@ -9,6 +9,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.network.Channel.VersionTest;
 
 import java.util.HashSet;
@@ -26,37 +27,45 @@ import io.netty.util.AttributeKey;
  * as the internal API and {@link Channel} as the public.
  */
 @ApiStatus.Internal
-public final class NetworkInstance {
+public record NetworkInstance(
+        BusGroup networkEventBusGroup,
+        EventBus<CustomPayloadEvent> eventBus,
+        ResourceLocation channelName,
+        int networkProtocolVersion,
+        VersionTest clientAcceptedVersions,
+        VersionTest serverAcceptedVersions,
+        Map<AttributeKey<?>, Function<Connection, ?>> attributes,
+        Consumer<Connection> channelHandler,
+        ServerStatusPing.ChannelData pingData,
+        Set<ResourceLocation> ids
+) {
     // We use an event bus here so that we don't have to have a handle(event) public function on Channel.
     // Should this be changed so that modders can fire other channel's handlers?
     // Todo: [Forge][Networking] Update the above comment
-    private final BusGroup networkEventBusGroup;
-    private final ResourceLocation channelName;
-    private final int networkProtocolVersion;
-    final VersionTest clientAcceptedVersions;
-    final VersionTest serverAcceptedVersions;
-    final Map<AttributeKey<?>, Function<Connection, ?>> attributes;
-    final Consumer<Connection> channelHandler;
-    final ServerStatusPing.ChannelData pingData;
-    private final Set<ResourceLocation> ids = new HashSet<>();
 
-    NetworkInstance(ResourceLocation channelName, int networkProtocolVersion,
+    static NetworkInstance of(ResourceLocation channelName, int networkProtocolVersion,
         VersionTest clientAcceptedVersions, VersionTest serverAcceptedVersions,
         Map<AttributeKey<?>, Function<Connection, ?>> attributes, Consumer<Connection> channelHandler
     ) {
-        this.channelName = channelName;
-        this.networkProtocolVersion = networkProtocolVersion;
-        this.clientAcceptedVersions = clientAcceptedVersions;
-        this.serverAcceptedVersions = serverAcceptedVersions;
-        this.attributes = attributes;
-        this.channelHandler = channelHandler;
-        this.networkEventBusGroup = BusGroup.create(channelName.toString() + "_networkInstance", CustomPayloadEvent.class);
-        this.pingData = new ServerStatusPing.ChannelData(channelName, networkProtocolVersion, this.clientAcceptedVersions.accepts(VersionTest.Status.MISSING, -1));
+        return new NetworkInstance(
+                channelName, networkProtocolVersion, clientAcceptedVersions, serverAcceptedVersions,
+                BusGroup.create(channelName.toString() + "_networkInstance", CustomPayloadEvent.class),
+                attributes, channelHandler);
     }
 
-    public <T extends CustomPayloadEvent> void addListener(Consumer<T> eventListener) {
+    public NetworkInstance(ResourceLocation channelName, int networkProtocolVersion,
+        VersionTest clientAcceptedVersions, VersionTest serverAcceptedVersions, BusGroup busGroup,
+        Map<AttributeKey<?>, Function<Connection, ?>> attributes, Consumer<Connection> channelHandler
+    ) {
+        this(busGroup, EventBus.create(busGroup, CustomPayloadEvent.class), channelName, networkProtocolVersion,
+                clientAcceptedVersions, serverAcceptedVersions, attributes, channelHandler,
+                new ServerStatusPing.ChannelData(channelName, networkProtocolVersion, clientAcceptedVersions.accepts(VersionTest.Status.MISSING, -1)),
+                new HashSet<>());
+    }
+
+    public void addListener(Consumer<CustomPayloadEvent> eventListener) {
         // TODO: [Forge][Networking] Adjust this to use the new event bus system
-//        this.networkEventBusGroup.addListener(eventListener);
+        eventBus.addListener(eventListener);
     }
 
     public void registerObject(final Object object) {
@@ -70,8 +79,7 @@ public final class NetworkInstance {
     }
 
     public boolean dispatch(CustomPayloadEvent event) {
-        // TODO: [Forge][Networking] Adjust this to use the new event bus system
-//        this.networkEventBusGroup.post(event);
+        this.eventBus.post(event);
         return event.getSource().getPacketHandled();
     }
 

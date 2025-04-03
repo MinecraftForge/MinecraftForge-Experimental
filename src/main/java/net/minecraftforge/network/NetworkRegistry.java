@@ -41,15 +41,15 @@ public class NetworkRegistry {
     static final Logger LOGGER = LogManager.getLogger();
     static final Marker NETREGISTRY = MarkerManager.getMarker("NETREGISTRY");
 
-    private static Map<ResourceLocation, NetworkInstance> instances = Collections.synchronizedMap(new HashMap<>());
-    private static Map<ResourceLocation, NetworkInstance> byName = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<ResourceLocation, NetworkInstance> instances = Collections.synchronizedMap(new HashMap<>());
+    private static final Map<ResourceLocation, NetworkInstance> byName = Collections.synchronizedMap(new HashMap<>());
 
     public static boolean acceptsVanillaClientConnections() {
-        return listRejectedVanillaMods(n -> n.clientAcceptedVersions).isEmpty() && DataPackRegistriesHooks.getSyncedCustomRegistries().isEmpty();
+        return listRejectedVanillaMods(NetworkInstance::clientAcceptedVersions).isEmpty() && DataPackRegistriesHooks.getSyncedCustomRegistries().isEmpty();
     }
 
     public static boolean canConnectToVanillaServer() {
-        return listRejectedVanillaMods(n -> n.serverAcceptedVersions).isEmpty();
+        return listRejectedVanillaMods(NetworkInstance::serverAcceptedVersions).isEmpty();
     }
 
     @Nullable
@@ -60,7 +60,7 @@ public class NetworkRegistry {
     static Map<ResourceLocation, ServerStatusPing.ChannelData> buildChannelVersionsForListPing() {
         var ret = new HashMap<ResourceLocation, ServerStatusPing.ChannelData>();
         for (var channel : instances.values()) {
-            ret.put(channel.getChannelName(), channel.pingData);
+            ret.put(channel.getChannelName(), channel.pingData());
         }
         return ret;
     }
@@ -91,7 +91,7 @@ public class NetworkRegistry {
         Map<ResourceLocation, NetworkMismatchData.Version> results = new HashMap<>();
         for (var net : instances.values()) {
             var name = net.getChannelName();
-            VersionTest test = fromClient ? net.clientAcceptedVersions : net.serverAcceptedVersions;
+            VersionTest test = fromClient ? net.clientAcceptedVersions() : net.serverAcceptedVersions();
 
             var status = VersionTest.Status.MISSING;
             var version = 0;
@@ -133,7 +133,7 @@ public class NetworkRegistry {
                 version = incoming.get(net.getChannelName()).version();
             }
 
-            boolean accepted = net.serverAcceptedVersions.accepts(status, version);
+            boolean accepted = net.serverAcceptedVersions().accepts(status, version);
             LOGGER.debug(NETREGISTRY, "Channel '{}' : Version test of '{} {}' during listping : {}", net.getChannelName(), status, version, accepted ? "ACCEPTED" : "REJECTED");
 
             if (!accepted)
@@ -171,10 +171,10 @@ public class NetworkRegistry {
         ForgeEventFactory.onConnectionStart(connection);
         var channel = connection.channel();
         for (var inst : instances.values()) {
-            if (inst.attributes != null)
-                inst.attributes.forEach((k, v) -> ((Attribute<Object>)channel.attr(k)).compareAndSet(null, (Object)v.apply(connection)));
-            if (inst.channelHandler != null)
-                inst.channelHandler.accept(connection);
+            if (inst.attributes() != null)
+                inst.attributes().forEach((k, v) -> ((Attribute<Object>)channel.attr(k)).compareAndSet(null, (Object)v.apply(connection)));
+            if (inst.channelHandler() != null)
+                inst.channelHandler().accept(connection);
         }
     }
 

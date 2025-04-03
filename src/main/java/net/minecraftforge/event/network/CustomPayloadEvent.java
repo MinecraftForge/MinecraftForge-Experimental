@@ -25,7 +25,7 @@ import java.util.concurrent.CompletableFuture;
 
 // TODO make this not an event, and instead move it to a callback in the Channel itself.
 // But also expose it as a generic listener event for anyone who cares about it but is outside out channel control system.
-public class CustomPayloadEvent extends MutableEvent {
+public final class CustomPayloadEvent extends MutableEvent {
     public static final EventBus<CustomPayloadEvent> BUS = EventBus.create(CustomPayloadEvent.class);
 
     private final ResourceLocation channel;

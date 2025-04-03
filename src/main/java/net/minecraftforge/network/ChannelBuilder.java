@@ -174,7 +174,7 @@ public class ChannelBuilder {
      * @return the {@link NetworkInstance}
      */
     private NetworkInstance createNetworkInstance() {
-        var instance = new NetworkInstance(name, networkProtocolVersion,
+        var instance = NetworkInstance.of(name, networkProtocolVersion,
             getClientAcceptedVersions(), getServerAcceptedVersions(),
             attributes, connectionHandler
         );

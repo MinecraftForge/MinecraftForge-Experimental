@@ -1104,8 +1104,7 @@ public final class ForgeHooks {
 
         // Should we always fire this, even if the channel consumed the packet?
         if (!event.getSource().getPacketHandled()) {
-            // Todo: [Forge][Networking] Adjust this to use the new event bus system
-//            MinecraftForge.EVENT_BUS.post(event);
+            CustomPayloadEvent.BUS.post(event);
             return event.getSource().getPacketHandled();
         }
 
