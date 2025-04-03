@@ -18,7 +18,7 @@ import java.util.function.Consumer;
  * {@link FMLClientSetupEvent} or {@link FMLDedicatedServerSetupEvent} during mod startup.
  *
  * Either register your listener using {@link net.minecraftforge.fml.javafmlmod.AutomaticEventSubscriber} and
- * {@link net.minecraftforge.eventbus.api.SubscribeEvent} or
+ * {@link net.minecraftforge.eventbus.api.listener.SubscribeEvent} or
  * {@link net.minecraftforge.eventbus.api.IEventBus#addListener(Consumer)} in your constructor.
  *
  * Most non-specific mod setup will be performed here. Note that this is a parallel dispatched event - you cannot
