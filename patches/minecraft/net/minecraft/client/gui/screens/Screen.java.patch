@@ -13,7 +13,7 @@
          this.width = p_96608_;
          this.height = p_96609_;
          if (!this.initialized) {
-+            if (!net.minecraftforge.client.event.ScreenEvent.Init.Pre.BUS.post(new net.minecraftforge.client.event.ScreenEvent.Init.Pre(this, this.children, this::addEventWidget, this::removeWidget))) return;
++            if (!net.minecraftforge.client.event.ScreenEvent.Init.Pre.BUS.post(new net.minecraftforge.client.event.ScreenEvent.Init.Pre(this, this.children, this::addEventWidget, this::removeWidget)))
              this.init();
              this.setInitialFocus();
 +            net.minecraftforge.client.event.ScreenEvent.Init.Post.BUS.post(new net.minecraftforge.client.event.ScreenEvent.Init.Post(this, this.children, this::addEventWidget, this::removeWidget));
