@@ -60,7 +60,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
 
         @ApiStatus.Internal
-        EntityEvent(Entity obj) {
+        public EntityEvent(Entity obj) {
             super(obj);
         }
 
@@ -74,7 +74,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<BlockEntityEvent> BUS = EventBus.create(BlockEntityEvent.class);
 
         @ApiStatus.Internal
-        BlockEntityEvent(BlockEntity obj) {
+        public BlockEntityEvent(BlockEntity obj) {
             super(obj);
         }
 
@@ -88,7 +88,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<ItemStackEvent> BUS = EventBus.create(ItemStackEvent.class);
 
         @ApiStatus.Internal
-        ItemStackEvent(ItemStack obj) {
+        public ItemStackEvent(ItemStack obj) {
             super(obj);
         }
 
@@ -102,7 +102,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
 
         @ApiStatus.Internal
-        LevelEvent(Level obj) {
+        public LevelEvent(Level obj) {
             super(obj);
         }
 
@@ -116,7 +116,7 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<LevelChunkEvent> BUS = EventBus.create(LevelChunkEvent.class);
 
         @ApiStatus.Internal
-        LevelChunkEvent(LevelChunk obj) {
+        public LevelChunkEvent(LevelChunk obj) {
             super(obj);
         }
 

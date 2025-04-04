@@ -11,9 +11,12 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.VisibleForTesting;
@@ -23,10 +26,14 @@ import java.util.function.Supplier;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> implements ICapabilityProviderImpl<B> {
+
+    public interface CapabilitySupplier<B> {
+        AttachCapabilitiesEvent<B> create(B provider);
+    }
+
     @VisibleForTesting
     static boolean SUPPORTS_LAZY_CAPABILITIES = true;
 
-    private final @NotNull Class<B> baseClass;
     private @Nullable CapabilityDispatcher capabilities;
     private boolean valid = true;
 
@@ -36,12 +43,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     private HolderLookup.Provider         registryAccess     = null;
     private boolean initialized = false;
 
-    protected CapabilityProvider(Class<B> baseClass) {
-        this(baseClass, false);
+    protected CapabilityProvider() {
+        this(false);
     }
 
-    protected CapabilityProvider(final Class<B> baseClass, final boolean isLazy) {
-        this.baseClass = baseClass;
+    protected CapabilityProvider(final boolean isLazy) {
         this.isLazy = SUPPORTS_LAZY_CAPABILITIES && isLazy;
     }
 
@@ -63,9 +69,12 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     }
 
     private void doGatherCapabilities(@Nullable ICapabilityProvider parent) {
-        this.capabilities = ForgeEventFactory.gatherCapabilities(baseClass, getProvider(), parent);
+        var event = postEvent(getProvider());
+        this.capabilities = !event.getCapabilities().isEmpty() || parent != null ? new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent) : null;
         this.initialized = true;
     }
+
+    protected abstract AttachCapabilitiesEvent<?> postEvent(B provider);
 
     @SuppressWarnings("unchecked")
     @NotNull
@@ -146,14 +155,16 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      */
     public static class AsField<B extends ICapabilityProviderImpl<B>> extends CapabilityProvider<B> {
         private final B owner;
+        private final CapabilitySupplier<B> supplier;
 
-        public AsField(Class<B> baseClass, B owner) {
-            super(baseClass);
+        public AsField(final CapabilitySupplier<B> eventSupplier, B owner) {
+            this.supplier = eventSupplier;
             this.owner = owner;
         }
 
-        public AsField(Class<B> baseClass, B owner, boolean isLazy) {
-            super(baseClass, isLazy);
+        public AsField(final CapabilitySupplier<B> eventSupplier, B owner, boolean isLazy) {
+            super(isLazy);
+            this.supplier = eventSupplier;
             this.owner = owner;
         }
 
@@ -168,6 +179,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
 
         public void deserializeInternal(HolderLookup.Provider registryAccess, CompoundTag tag) {
             deserializeCaps(registryAccess, tag);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<?> postEvent(B provider) {
+            return supplier.create(provider);
         }
 
         @Override
