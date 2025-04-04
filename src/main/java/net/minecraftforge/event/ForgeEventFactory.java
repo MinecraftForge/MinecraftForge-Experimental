@@ -20,7 +20,9 @@ import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
+import net.minecraftforge.common.capabilities.CapabilityProvider;
 import net.minecraftforge.common.util.Result;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
@@ -568,23 +570,6 @@ public final class ForgeEventFactory {
 
     public static void onPlayerBrewedPotion(Player player, ItemStack stack) {
         PlayerBrewedPotionEvent.BUS.post(new PlayerBrewedPotionEvent(player, stack));
-    }
-
-    @Nullable
-    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider) {
-        return gatherCapabilities(type, provider, null);
-    }
-
-    @SuppressWarnings("unchecked")
-    @Nullable
-    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider, @Nullable ICapabilityProvider parent) {
-        return gatherCapabilities(AttachCapabilitiesEvent.create(type, provider), parent);
-    }
-
-    @Nullable
-    private static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent<?> event, @Nullable ICapabilityProvider parent) {
-        event.post();
-        return !event.getCapabilities().isEmpty() || parent != null ? new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent) : null;
     }
 
     public static boolean fireSleepingLocationCheck(LivingEntity player, BlockPos sleepingLocation) {

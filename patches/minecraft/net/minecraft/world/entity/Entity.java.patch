@@ -28,14 +28,6 @@
      private final Set<TagKey<Fluid>> fluidOnEyes = new HashSet<>();
      public int invulnerableTime;
      protected boolean firstTick = true;
-@@ -251,6 +_,7 @@
-     private final LongSet visitedBlocks = new LongOpenHashSet();
- 
-     public Entity(EntityType<?> p_19870_, Level p_19871_) {
-+        super(Entity.class);
-         this.type = p_19870_;
-         this.level = p_19871_;
-         this.dimensions = p_19870_.getDimensions();
 @@ -270,6 +_,8 @@
          this.entityData = synchedentitydata$builder.build();
          this.setPos(0.0, 0.0, 0.0);
@@ -451,12 +443,10 @@
      }
  
      public void checkDespawn() {
-@@ -3672,6 +_,100 @@
-         float f1 = (float)Mth.lerp(d0, (double)this.getXRot(), p_298926_);
-         this.setPos(d1, d2, d3);
+@@ -3674,6 +_,100 @@
          this.setRot(f, f1);
-+    }
-+
+     }
+ 
 +    private boolean canUpdate = true;
 +    @Override
 +    public void canUpdate(boolean value) {
@@ -549,6 +539,19 @@
 +    @Override
 +    public net.minecraftforge.fluids.FluidType getMaxHeightFluidType() {
 +        return this.forgeFluidTypeHeight.object2DoubleEntrySet().stream().max(java.util.Comparator.comparingDouble(Object2DoubleMap.Entry::getDoubleValue)).map(Object2DoubleMap.Entry::getKey).orElseGet(net.minecraftforge.common.ForgeMod.EMPTY_TYPE);
-     }
- 
++    }
++
      public RandomSource getRandom() {
+         return this.random;
+     }
+@@ -3753,4 +_,10 @@
+             return this.save;
+         }
+     }
++
++    // FORGE START
++    protected final net.minecraftforge.event.AttachCapabilitiesEvent<?> postEvent(Entity provider) {
++        return net.minecraftforge.event.AttachCapabilitiesEvent.EntityEvent.BUS.fire(new net.minecraftforge.event.AttachCapabilitiesEvent.EntityEvent(provider));
++    }
++    // FORGE END
+ }

@@ -13,7 +13,7 @@
      }
  
      private ItemStack(ItemLike p_331826_, int p_332766_, PatchedDataComponentMap p_333722_) {
-+        super(ItemStack.class, true);
++        super(true);
          this.item = p_331826_.asItem();
          this.count = p_332766_;
          this.components = p_333722_;
@@ -22,7 +22,7 @@
      }
  
      private ItemStack(@Nullable Void p_282703_) {
-+        super(ItemStack.class, false);
++        super(false);
          this.item = null;
          this.components = new PatchedDataComponentMap(DataComponentMap.EMPTY);
      }
@@ -110,3 +110,14 @@
      public void onDestroyed(ItemEntity p_150925_) {
          this.getItem().onDestroyed(p_150925_);
      }
+@@ -1119,4 +_,10 @@
+         Repairable repairable = this.get(DataComponents.REPAIRABLE);
+         return repairable != null && repairable.isValidRepairItem(p_368140_);
+     }
++
++    // FORGE START
++    protected net.minecraftforge.event.AttachCapabilitiesEvent<?> postEvent(ItemStack provider) {
++        return net.minecraftforge.event.AttachCapabilitiesEvent.ItemStackEvent.BUS.fire(new net.minecraftforge.event.AttachCapabilitiesEvent.ItemStackEvent(provider));
++    }
++    // FORGE END
+ }
