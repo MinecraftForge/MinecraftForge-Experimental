@@ -13,7 +13,6 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
@@ -103,8 +102,6 @@ public abstract class RenderLivingEvent<T extends LivingEntity, S extends Living
      * @param <M> the model for the living entity
      */
     public static class Pre<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLivingEvent<T, S, M> implements Cancellable {
-        public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
-
         // Todo: [Forge][Event] Not sure how the generics should be handled for this with EventBus v7
         @ApiStatus.Internal
         public Pre(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
@@ -124,8 +121,6 @@ public abstract class RenderLivingEvent<T extends LivingEntity, S extends Living
      * @param <M> the model for the living entity
      */
     public static class Post<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLivingEvent<T, S, M> {
-        public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
         // Todo: [Forge][Event] Not sure how the generics should be handled for this with EventBus v7
         @ApiStatus.Internal
         public Post(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {

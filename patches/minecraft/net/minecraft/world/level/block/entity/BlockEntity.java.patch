@@ -9,7 +9,12 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private final BlockEntityType<?> type;
      @Nullable
-@@ -41,6 +_,7 @@
+@@ -37,10 +_,12 @@
+     private DataComponentMap components = DataComponentMap.EMPTY;
+ 
+     public BlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
++        super(BlockEntity.class);
+         this.type = p_155228_;
          this.worldPosition = p_155229_.immutable();
          this.validateBlockState(p_155230_);
          this.blockState = p_155230_;
@@ -56,14 +61,3 @@
      }
  
      public void clearRemoved() {
-@@ -315,4 +_,10 @@
- 
-         <T> T getOrDefault(DataComponentType<? extends T> p_330702_, T p_330858_);
-     }
-+
-+    // FORGE START
-+    protected final net.minecraftforge.event.AttachCapabilitiesEvent<?> postEvent(BlockEntity provider) {
-+        return net.minecraftforge.event.AttachCapabilitiesEvent.BlockEntityEvent.BUS.fire(new net.minecraftforge.event.AttachCapabilitiesEvent.BlockEntityEvent(provider));
-+    }
-+    // FORGE END
- }

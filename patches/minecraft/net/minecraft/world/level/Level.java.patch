@@ -21,6 +21,14 @@
  
      protected Level(
          WritableLevelData p_270739_,
+@@ -127,6 +_,7 @@
+         long p_270248_,
+         int p_270466_
+     ) {
++        super(Level.class);
+         this.levelData = p_270739_;
+         this.dimensionTypeRegistration = p_270240_;
+         final DimensionType dimensiontype = p_270240_.value();
 @@ -216,11 +_,35 @@
          } else {
              LevelChunk levelchunk = this.getChunkAt(p_46605_);
@@ -173,10 +181,11 @@
                      }
                  }
              }
-@@ -1045,6 +_,20 @@
+@@ -1044,6 +_,20 @@
+     }
  
      public abstract PotionBrewing potionBrewing();
- 
++
 +    private double maxEntityRadius = 2.0D;
 +
 +    @Override
@@ -190,18 +199,6 @@
 +          maxEntityRadius = value;
 +       return maxEntityRadius;
 +    }
-+
+ 
      public abstract FuelValues fuelValues();
  
-     public static enum ExplosionInteraction implements StringRepresentable {
-@@ -1066,4 +_,10 @@
-             return this.id;
-         }
-     }
-+
-+    // FORGE START
-+    protected final net.minecraftforge.event.AttachCapabilitiesEvent<?> postEvent(Level provider) {
-+        return net.minecraftforge.event.AttachCapabilitiesEvent.LevelEvent.BUS.fire(new net.minecraftforge.event.AttachCapabilitiesEvent.LevelEvent(provider));
-+    }
-+    // FORGE END
- }

@@ -33,12 +33,40 @@ import org.jetbrains.annotations.ApiStatus;
  */
 public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
 
+    interface Factory<T> {
+        AttachCapabilitiesEvent<T> create(T obj);
+    }
+
+    private static final Map<Class<?>, Factory<?>> factoryMap = new HashMap<>();
+
+    private static <T> void register(Class<T> tClass, Factory<T> factory) {
+        factoryMap.put(tClass, factory);
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> AttachCapabilitiesEvent<T> create(Class<? extends T> tClass, T provider) {
+        return ((Factory<T>) factoryMap.get(tClass)).create(provider);
+    }
+
+    static {
+        register(Entity.class, EntityEvent::new);
+        register(BlockEntity.class, BlockEntityEvent::new);
+        register(ItemStack.class, ItemStackEvent::new);
+        register(Level.class, LevelEvent::new);
+        register(LevelChunk.class, LevelChunkEvent::new);
+    }
+
     public static final class EntityEvent extends AttachCapabilitiesEvent<Entity> {
         public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
 
         @ApiStatus.Internal
-        public EntityEvent(Entity obj) {
+        EntityEvent(Entity obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -46,8 +74,13 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<BlockEntityEvent> BUS = EventBus.create(BlockEntityEvent.class);
 
         @ApiStatus.Internal
-        public BlockEntityEvent(BlockEntity obj) {
+        BlockEntityEvent(BlockEntity obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -55,8 +88,13 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<ItemStackEvent> BUS = EventBus.create(ItemStackEvent.class);
 
         @ApiStatus.Internal
-        public ItemStackEvent(ItemStack obj) {
+        ItemStackEvent(ItemStack obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -64,8 +102,13 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
 
         @ApiStatus.Internal
-        public LevelEvent(Level obj) {
+        LevelEvent(Level obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -73,8 +116,13 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
         public static final EventBus<LevelChunkEvent> BUS = EventBus.create(LevelChunkEvent.class);
 
         @ApiStatus.Internal
-        public LevelChunkEvent(LevelChunk obj) {
+        LevelChunkEvent(LevelChunk obj) {
             super(obj);
+        }
+
+        @Override
+        void post() {
+            BUS.post(this);
         }
     }
 
@@ -136,4 +184,6 @@ public sealed abstract class AttachCapabilitiesEvent<T> extends MutableEvent {
     {
         return this.listenersView;
     }
+
+    abstract void post();
 }

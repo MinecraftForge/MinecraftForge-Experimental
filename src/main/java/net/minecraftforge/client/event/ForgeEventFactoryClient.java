@@ -213,12 +213,14 @@ public final class ForgeEventFactoryClient {
 
     public static <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> boolean onRenderLivingPre(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
         // Todo: [Forge][EventFactoryClient] Fix posting this
-        return RenderLivingEvent.Pre.BUS.post(new RenderLivingEvent.Pre<T, S, M>(state, renderer, poseStack, multiBufferSource, packedLight));
+        return false;
+//        return post(new RenderLivingEvent.Pre<T, S, M>(state, renderer, poseStack, multiBufferSource, packedLight));
     }
 
     public static <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> boolean onRenderLivingPost(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
         // Todo: [Forge][EventFactoryClient] Fix posting this
-        return RenderLivingEvent.Post.BUS.post(new RenderLivingEvent.Post<T, S, M>(state, renderer, poseStack, multiBufferSource, packedLight));
+        return false;
+//        return post(new RenderLivingEvent.Post<T, S, M>(state, renderer, poseStack, multiBufferSource, packedLight));
     }
 
     public static boolean onRenderPlayerPre(PlayerRenderState player, PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
