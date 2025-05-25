@@ -587,6 +587,8 @@ public final class ForgeEventFactory {
         post(new PlayerBrewedPotionEvent(player, stack));
     }
 
+    /** @deprecated Trying to phase out GenericEvent, and thus the generic AttachCapabilitiesEvent. I am still working on a proper replacement. Until then use the variant with the parent argument */
+    @Deprecated(forRemoval = true, since = "1.21.5")
     @Nullable
     public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider) {
         return gatherCapabilities(type, provider, null);

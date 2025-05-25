@@ -28,6 +28,7 @@ plugins {
     id 'net.minecraftforge.gradleutils'
     id 'net.minecraftforge.gradle.patcher'
     id 'net.minecraftforge.gradlejarsigner'
+    alias libs.plugins.apt
 }
 
 Util.init() //Init all our extension methods!
@@ -147,6 +148,31 @@ dependencies {
 
     runtimeOnly(libs.bootstrap)
     runtimeOnly(libs.bootstrap.dev)
+
+    implementation project(':forge-annotation-processor')
+    annotationProcessor project(':forge-annotation-processor')
+}
+
+
+// Hack eclipse to add the annotation processors in TODO: Upstream this to com.diffplug.eclipse.apt ?
+eclipse {
+    synchronizationTasks(eclipseFactorypath, eclipseJdt, eclipseJdtApt)
+    classpath {
+        file {
+        	beforeMerged {
+	            file('.apt_generated').mkdirs()
+	            def generated = new org.gradle.plugins.ide.eclipse.model.SourceFolder('.apt_generated', 'bin/main')
+	            generated.entryAttributes['ignore_optional_problems'] = true
+	            entries << generated
+            }
+            whenMerged {
+	            for (entry in entries) {
+	                if (entry.path == 'src/main/java')
+	            		entry.entryAttributes['ignore_optional_problems'] = true
+	            }
+            }
+        }
+    }
 }
 
 tasks.named('extractRangeMap').configure {

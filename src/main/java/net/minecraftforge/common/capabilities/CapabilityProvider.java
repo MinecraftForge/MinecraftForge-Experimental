@@ -12,7 +12,9 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.chunk.LevelChunk;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -63,8 +65,17 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     }
 
     private void doGatherCapabilities(@Nullable ICapabilityProvider parent) {
-        this.capabilities = ForgeEventFactory.gatherCapabilities(baseClass, getProvider(), parent);
+        var event = makeAttachCapabilitiesEvent();
+        if (event.getClass() != AttachCapabilitiesEvent.class)
+            System.out.println("Attach: " + getClass() + " " + event.getClass());
+        MinecraftForge.EVENT_BUS.post(event);
+        if (!event.getCapabilities().isEmpty() || parent != null)
+            this.capabilities = new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent);
         this.initialized = true;
+    }
+
+    protected AttachCapabilitiesEvent<B> makeAttachCapabilitiesEvent() {
+        return new AttachCapabilitiesEvent<>(baseClass, getProvider());
     }
 
     @SuppressWarnings("unchecked")

@@ -23,7 +23,7 @@ plugins {
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            plugin('apt', 'com.diffplug.eclipse.apt').version('4.2.0')
+            plugin('apt', 'com.diffplug.eclipse.apt').version('4.3.0')
 
             library('forgespi', 'net.minecraftforge:forgespi:7.1.5') // Needs modlauncher
             library('modlauncher', 'net.minecraftforge:modlauncher:10.2.4') // Needs securemodules
@@ -110,6 +110,7 @@ dependencyResolutionManagement {
 
 rootProject.name = 'ForgeRoot'
 
+include 'forge-annotation-processor'
 include 'fmlloader'
 include 'fmlcore'
 include 'mclanguage'
