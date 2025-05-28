@@ -159,17 +159,17 @@ eclipse {
     synchronizationTasks(eclipseFactorypath, eclipseJdt, eclipseJdtApt)
     classpath {
         file {
-        	beforeMerged {
-	            file('.apt_generated').mkdirs()
-	            def generated = new org.gradle.plugins.ide.eclipse.model.SourceFolder('.apt_generated', 'bin/main')
-	            generated.entryAttributes['ignore_optional_problems'] = true
-	            entries << generated
+            beforeMerged {
+                file('.apt_generated').mkdirs()
+                def generated = new org.gradle.plugins.ide.eclipse.model.SourceFolder('.apt_generated', 'bin/main')
+                generated.entryAttributes['ignore_optional_problems'] = true
+                entries << generated
             }
             whenMerged {
-	            for (entry in entries) {
-	                if (entry.path == 'src/main/java')
-	            		entry.entryAttributes['ignore_optional_problems'] = true
-	            }
+                for (entry in entries) {
+                    if (entry.path == 'src/main/java')
+                        entry.entryAttributes['ignore_optional_problems'] = true
+                }
             }
         }
     }
