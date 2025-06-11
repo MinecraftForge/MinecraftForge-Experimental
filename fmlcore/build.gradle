@@ -1,67 +1,71 @@
-import net.minecraftforge.gradleutils.PomUtils
-
 plugins {
     id 'java-library'
     id 'maven-publish'
-    id 'net.minecraftforge.licenser'
-    id 'net.minecraftforge.gradleutils'
+    alias libs.plugins.licenser
+    alias libs.plugins.gradleutils
+    alias libs.plugins.gitversion
+    id 'net.minecraftforge.forge.build.convention'
 }
 
-apply from: rootProject.file('build_shared.gradle')
+gradleutils.displayName = 'FML'
+final vendor = 'Forge Development LLC'
+description = 'Modifications to Minecraft to enable mod developers.'
 
 dependencies {
-    compileOnly(libs.nulls)
+    compileOnly libs.nulls
 
-    api(libs.eventbus)
+    api libs.eventbus
 
-    implementation(project(':fmlloader'))
-    implementation(libs.commons.io)
+    implementation projects.fmlloader
+    implementation libs.commons.io
 }
 
 java {
-    toolchain.languageVersion = JavaLanguageVersion.of(JAVA_VERSION)
+    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
     withSourcesJar()
-}
-
-tasks.named('jar', Jar).configure {
-    manifest {
-        attributes([
-            'Automatic-Module-Name': 'net.minecraftforge.fmlcore',
-            'FMLModType': 'LIBRARY'
-        ] as LinkedHashMap)
-        attributes([
-            'Specification-Title':      'FML',
-            'Specification-Vendor':     'Forge Development LLC',
-            'Specification-Version':    '1',
-            'Implementation-Title':     'FML',
-            'Implementation-Version':   '1.0',
-            'Implementation-Vendor':    'Forge Development LLC'
-        ] as LinkedHashMap, 'net/minecraftforge/fml/')
-    }
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << '-Xlint:-unchecked'
 }
 
 license {
     header = rootProject.file('LICENSE-header.txt')
 }
 
-publishing {
-    publications.register('mavenJava', MavenPublication).configure {
-        from components.java
-        artifactId = 'fmlcore'
-        pom {
-            name = project.name
-            description = 'Modifactions to Minecraft to enable mod developers.'
-            url = 'https://github.com/MinecraftForge/MinecraftForge'
-            PomUtils.setGitHubDetails(pom, 'MinecraftForge')
-            license PomUtils.Licenses.LGPLv2_1
-        }
+tasks.withType(JavaCompile).configureEach {
+    options.compilerArgs << '-Xlint:-unchecked'
+}
+
+tasks.named('jar', Jar) {
+    manifest {
+        attributes([
+            'Automatic-Module-Name': 'net.minecraftforge.fmlcore',
+            'FMLModType'           : 'LIBRARY'
+        ])
+        attributes([
+            'Specification-Title'   : gradleutils.displayName.get(),
+            'Specification-Vendor'  : vendor,
+            'Specification-Version' : '1',
+            'Implementation-Title'  : gradleutils.displayName.get(),
+            'Implementation-Version': '1.0',
+            'Implementation-Vendor' : vendor
+        ], 'net/minecraftforge/fml/')
     }
-    
+}
+
+publishing {
     repositories {
         maven gradleutils.publishingForgeMaven
+    }
+
+    publications.register('mavenJava', MavenPublication) {
+        from components.java
+
+        pom {
+            description = project.description
+
+            gradleutils.pom.addRemoteDetails(pom)
+
+            licenses {
+                license gradleutils.pom.licenses.LGPLv2_1
+            }
+        }
     }
 }
