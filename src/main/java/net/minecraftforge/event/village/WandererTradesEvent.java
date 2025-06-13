@@ -9,12 +9,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.Util;
 import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;
 
 /**
@@ -23,7 +25,9 @@ import net.minecraftforge.event.server.ServerAboutToStartEvent;
  * The wandering merchant picks {@link Pool#rolls} from each {@link Pool}
  * To add trades to the merchant, simply add new trades to the list. {@link BasicItemListing} provides a default implementation.
 */
-public class WandererTradesEvent extends Event {
+public class WandererTradesEvent extends MutableEvent implements InheritableEvent {
+    public static final EventBus<WandererTradesEvent> BUS = EventBus.create(WandererTradesEvent.class);
+
     protected List<Pool> pools;
 
     public WandererTradesEvent(List<Pair<ItemListing[], Integer>> pools) {

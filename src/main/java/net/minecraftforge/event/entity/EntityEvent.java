@@ -8,7 +8,9 @@ package net.minecraftforge.event.entity;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * EntityEvent is fired when an event involving any Entity occurs.<br>
@@ -19,7 +21,9 @@ import net.minecraftforge.eventbus.api.Event;
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public class EntityEvent extends Event {
+public class EntityEvent extends MutableEvent implements InheritableEvent {
+    public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
+
     private final Entity entity;
 
     public EntityEvent(Entity entity) {
@@ -41,6 +45,8 @@ public class EntityEvent extends Event {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static final class EntityConstructing extends EntityEvent {
+        public static final EventBus<EntityConstructing> BUS = EventBus.create(EntityConstructing.class);
+
         public EntityConstructing(Entity entity) {
             super(entity);
         }
@@ -59,6 +65,8 @@ public class EntityEvent extends Event {
      * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS}.<br>
      **/
     public static final class EnteringSection extends EntityEvent {
+        public static final EventBus<EnteringSection> BUS = EventBus.create(EnteringSection.class);
+
         private final long packedOldPos;
         private final long packedNewPos;
 

@@ -11,8 +11,8 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ObjectiveArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -34,14 +34,14 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see net.minecraftforge.event.RegisterCommandsEvent
  */
-public final class RegisterClientCommandsEvent extends Event
-{
+public final class RegisterClientCommandsEvent extends MutableEvent {
+    public static final EventBus<RegisterClientCommandsEvent> BUS = EventBus.create(RegisterClientCommandsEvent.class);
+
     private final CommandDispatcher<CommandSourceStack> dispatcher;
     private final CommandBuildContext context;
 
     @ApiStatus.Internal
-    public RegisterClientCommandsEvent(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context)
-    {
+    public RegisterClientCommandsEvent(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext context) {
         this.dispatcher = dispatcher;
         this.context = context;
     }
@@ -49,16 +49,14 @@ public final class RegisterClientCommandsEvent extends Event
     /**
      * {@return the command dispatcher for registering commands to be executed on the client}
      */
-    public CommandDispatcher<CommandSourceStack> getDispatcher()
-    {
+    public CommandDispatcher<CommandSourceStack> getDispatcher() {
         return dispatcher;
     }
 
     /**
      * {@return the context to build the commands for}
      */
-    public CommandBuildContext getBuildContext()
-    {
+    public CommandBuildContext getBuildContext() {
         return context;
     }
 }

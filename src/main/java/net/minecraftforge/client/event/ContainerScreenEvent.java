@@ -8,8 +8,9 @@ package net.minecraftforge.client.event;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -23,7 +24,9 @@ import org.jetbrains.annotations.ApiStatus;
  * @see Render.Foreground
  * @see Render.Background
  */
-public abstract sealed class ContainerScreenEvent extends Event {
+public abstract sealed class ContainerScreenEvent extends MutableEvent implements InheritableEvent {
+    public static final EventBus<ContainerScreenEvent> BUS = EventBus.create(ContainerScreenEvent.class);
+
     private final AbstractContainerScreen<?> containerScreen;
 
     @ApiStatus.Internal
@@ -49,6 +52,8 @@ public abstract sealed class ContainerScreenEvent extends Event {
      * @see Background
      */
     public static abstract sealed class Render extends ContainerScreenEvent {
+        public static final EventBus<Render> BUS = EventBus.create(Render.class);
+
         private final GuiGraphics guiGraphics;
         private final int mouseX;
         private final int mouseY;
@@ -95,6 +100,8 @@ public abstract sealed class ContainerScreenEvent extends Event {
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         public static final class Foreground extends Render {
+            public static final EventBus<Foreground> BUS = EventBus.create(Foreground.class);
+
             @ApiStatus.Internal
             public Foreground(AbstractContainerScreen<?> guiContainer, GuiGraphics guiGraphics, int mouseX, int mouseY) {
                 super(guiContainer, guiGraphics, mouseX, mouseY);
@@ -111,6 +118,8 @@ public abstract sealed class ContainerScreenEvent extends Event {
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         public static final class Background extends Render {
+            public static final EventBus<Background> BUS = EventBus.create(Background.class);
+
             @ApiStatus.Internal
             public Background(AbstractContainerScreen<?> guiContainer, GuiGraphics guiGraphics, int mouseX, int mouseY) {
                 super(guiContainer, guiGraphics, mouseX, mouseY);

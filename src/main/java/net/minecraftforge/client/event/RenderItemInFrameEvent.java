@@ -11,8 +11,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.ItemFrameRenderer;
 import net.minecraft.client.renderer.entity.state.ItemFrameRenderState;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -28,8 +29,9 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see ItemFrameRenderer
  */
-@Cancelable
-public final class RenderItemInFrameEvent extends Event {
+public final class RenderItemInFrameEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderItemInFrameEvent> BUS = CancellableEventBus.create(RenderItemInFrameEvent.class);
+
     private final ItemFrameRenderState state;
     private final ItemFrameRenderer<?> renderer;
     private final PoseStack poseStack;

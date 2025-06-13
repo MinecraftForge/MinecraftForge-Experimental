@@ -9,8 +9,8 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -27,13 +27,15 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public final class RegisterClientReloadListenersEvent extends Event implements IModBusEvent
-{
+public final class RegisterClientReloadListenersEvent implements IModBusEvent {
+    public static EventBus<RegisterClientReloadListenersEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, RegisterClientReloadListenersEvent.class);
+    }
+
     private final ReloadableResourceManager resourceManager;
 
     @ApiStatus.Internal
-    public RegisterClientReloadListenersEvent(ReloadableResourceManager resourceManager)
-    {
+    public RegisterClientReloadListenersEvent(ReloadableResourceManager resourceManager) {
         this.resourceManager = resourceManager;
     }
 
@@ -42,8 +44,7 @@ public final class RegisterClientReloadListenersEvent extends Event implements I
      *
      * @param reloadListener the reload listener
      */
-    public void registerReloadListener(PreparableReloadListener reloadListener)
-    {
+    public void registerReloadListener(PreparableReloadListener reloadListener) {
         resourceManager.registerReloadListener(reloadListener);
     }
 }

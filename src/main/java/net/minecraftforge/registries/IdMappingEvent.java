@@ -11,6 +11,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 import java.util.Comparator;
 import java.util.List;
@@ -28,8 +30,9 @@ import java.util.Map;
  * <p>
  * Fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS forge bus}.
  */
-public final class IdMappingEvent extends Event
-{
+public final class IdMappingEvent extends MutableEvent {
+    public static final EventBus<IdMappingEvent> BUS = EventBus.create(IdMappingEvent.class);
+
     public static final class ModRemapping
     {
         public final ResourceLocation registry;

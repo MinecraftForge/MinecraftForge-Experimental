@@ -20,7 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -49,6 +49,8 @@ import org.jetbrains.annotations.Nullable;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
 public final class PlayerDestroyItemEvent extends PlayerEvent {
+    public static final EventBus<PlayerDestroyItemEvent> BUS = EventBus.create(PlayerDestroyItemEvent.class);
+
     @NotNull
     private final ItemStack original;
     @Nullable
@@ -69,5 +71,4 @@ public final class PlayerDestroyItemEvent extends PlayerEvent {
     public EquipmentSlot getSlot() {
         return this.slot;
     }
-
 }

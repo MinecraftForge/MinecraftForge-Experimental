@@ -9,8 +9,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.client.IItemDecorator;
 
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -28,22 +28,22 @@ import java.util.Map;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public final class RegisterItemDecorationsEvent extends Event implements IModBusEvent
-{
+public final class RegisterItemDecorationsEvent implements IModBusEvent {
+    public static EventBus<RegisterItemDecorationsEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, RegisterItemDecorationsEvent.class);
+    }
 
     private final Map<Item, List<IItemDecorator>> decorators;
 
     @ApiStatus.Internal
-    public RegisterItemDecorationsEvent(Map<Item, List<IItemDecorator>> decorators)
-    {
+    public RegisterItemDecorationsEvent(Map<Item, List<IItemDecorator>> decorators) {
         this.decorators = decorators;
     }
 
     /**
      * Register an ItemDecorator to an Item
      */
-    public void register(ItemLike itemLike, IItemDecorator decorator)
-    {
+    public void register(ItemLike itemLike, IItemDecorator decorator) {
         List<IItemDecorator> itemDecoratorList = decorators.computeIfAbsent(itemLike.asItem(), item -> new ArrayList<>());
         itemDecoratorList.add(decorator);
     }

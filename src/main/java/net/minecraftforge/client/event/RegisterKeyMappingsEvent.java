@@ -7,8 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Options;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -23,21 +23,22 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public final class RegisterKeyMappingsEvent extends Event implements IModBusEvent
-{
+public final class RegisterKeyMappingsEvent implements IModBusEvent {
+    public static EventBus<RegisterKeyMappingsEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, RegisterKeyMappingsEvent.class);
+    }
+
     private final Options options;
 
     @ApiStatus.Internal
-    public RegisterKeyMappingsEvent(Options options)
-    {
+    public RegisterKeyMappingsEvent(Options options) {
         this.options = options;
     }
 
     /**
      * Registers a new key mapping.
      */
-    public void register(KeyMapping key)
-    {
+    public void register(KeyMapping key) {
         options.keyMappings = ArrayUtils.add(options.keyMappings, key);
     }
 }

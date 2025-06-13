@@ -5,12 +5,13 @@
 
 package net.minecraftforge.fml.event.config;
 
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.IModBusEvent;
 
-public sealed class ModConfigEvent extends Event implements IModBusEvent, IConfigEvent {
+public sealed class ModConfigEvent implements IModBusEvent, IConfigEvent {
     private final ModConfig config;
 
     ModConfigEvent(final ModConfig config) {
@@ -27,6 +28,10 @@ public sealed class ModConfigEvent extends Event implements IModBusEvent, IConfi
      * Any Config objects associated with this will be valid and can be queried directly.
      */
     public static final class Loading extends ModConfigEvent {
+        public static EventBus<Loading> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, Loading.class);
+        }
+
         public Loading(final ModConfig config) {
             super(config);
         }
@@ -39,6 +44,10 @@ public sealed class ModConfigEvent extends Event implements IModBusEvent, IConfi
      * any resultant changes.
      */
     public static final class Reloading extends ModConfigEvent {
+        public static EventBus<Reloading> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, Reloading.class);
+        }
+
         public Reloading(final ModConfig config) {
             super(config);
         }
@@ -51,6 +60,10 @@ public sealed class ModConfigEvent extends Event implements IModBusEvent, IConfi
      * The config file will be saved after this event has fired.
      */
     public static final class Unloading extends ModConfigEvent {
+        public static EventBus<Unloading> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, Unloading.class);
+        }
+
         public Unloading(final ModConfig config) {
             super(config);
         }

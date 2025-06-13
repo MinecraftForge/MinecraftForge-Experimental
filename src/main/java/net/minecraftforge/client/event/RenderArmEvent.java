@@ -10,8 +10,9 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -26,8 +27,9 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-@Cancelable
-public final class RenderArmEvent extends Event {
+public final class RenderArmEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderArmEvent> BUS = CancellableEventBus.create(RenderArmEvent.class);
+
     private final PoseStack poseStack;
     private final MultiBufferSource multiBufferSource;
     private final int packedLight;

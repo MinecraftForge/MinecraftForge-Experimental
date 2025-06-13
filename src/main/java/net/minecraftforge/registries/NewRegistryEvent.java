@@ -14,7 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -22,7 +23,11 @@ import org.slf4j.Logger;
 /**
  * Register new registries when you receive this event through {@link RegistryBuilder} and {@link #create(RegistryBuilder)}.
  */
-public final class NewRegistryEvent extends Event implements IModBusEvent {
+public final class NewRegistryEvent implements IModBusEvent {
+    public static EventBus<NewRegistryEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, NewRegistryEvent.class);
+    }
+
     private static final Logger LOGGER = LogUtils.getLogger();
     private final List<RegistryData<?>> registries = new ArrayList<>();
 

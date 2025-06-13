@@ -29,8 +29,8 @@ import net.minecraft.world.level.block.SkullBlock.Type;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.client.ForgeHooksClient;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,7 +53,7 @@ import java.util.function.Supplier;
  * @see EntityRenderersEvent.RegisterRenderers
  * @see EntityRenderersEvent.AddLayers
  */
-public abstract sealed class EntityRenderersEvent extends Event implements IModBusEvent {
+public abstract sealed class EntityRenderersEvent implements IModBusEvent {
     @ApiStatus.Internal
     protected EntityRenderersEvent() {}
 
@@ -66,6 +66,10 @@ public abstract sealed class EntityRenderersEvent extends Event implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class RegisterLayerDefinitions extends EntityRenderersEvent {
+        public static EventBus<RegisterLayerDefinitions> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, RegisterLayerDefinitions.class);
+        }
+
         @ApiStatus.Internal
         public RegisterLayerDefinitions() {}
 
@@ -94,6 +98,10 @@ public abstract sealed class EntityRenderersEvent extends Event implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class RegisterRenderers extends EntityRenderersEvent {
+        public static EventBus<RegisterRenderers> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, RegisterRenderers.class);
+        }
+
         @ApiStatus.Internal
         public RegisterRenderers() {}
 
@@ -128,6 +136,10 @@ public abstract sealed class EntityRenderersEvent extends Event implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class AddLayers extends EntityRenderersEvent {
+        public static EventBus<AddLayers> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, AddLayers.class);
+        }
+
         private final Map<EntityType<?>, EntityRenderer<?, ?>> renderers;
         private final Map<PlayerSkin.Model, EntityRenderer<? extends Player, ?>> skinMap;
         private final EntityRendererProvider.Context context;
@@ -202,6 +214,10 @@ public abstract sealed class EntityRenderersEvent extends Event implements IModB
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class CreateSkullModels extends EntityRenderersEvent {
+        public static EventBus<CreateSkullModels> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, CreateSkullModels.class);
+        }
+
         private final ImmutableMap.Builder<Type, Function<EntityModelSet, SkullModelBase>> builder;
 
         @ApiStatus.Internal

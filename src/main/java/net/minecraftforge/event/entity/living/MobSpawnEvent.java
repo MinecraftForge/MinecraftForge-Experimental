@@ -6,6 +6,12 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.*;
+import net.minecraftforge.common.util.HasResult;
+import net.minecraftforge.common.util.Result;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,8 +27,6 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.LogicalSide;
 
 /**
@@ -37,6 +41,8 @@ import net.minecraftforge.fml.LogicalSide;
  * {@link AllowDespawn} is not related to the mob spawn event flow, as it fires when a despawn is attempted.
  */
 public abstract sealed class MobSpawnEvent extends EntityEvent {
+    public static final EventBus<MobSpawnEvent> BUS = EventBus.create(MobSpawnEvent.class);
+
     private final ServerLevelAccessor level;
     private final double x;
     private final double y;
@@ -103,14 +109,16 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
      * @apiNote If your modifications are for a single entity, and do not vary at runtime, use {@link SpawnPlacementRegisterEvent}.
      * @see SpawnPlacementRegisterEvent
      */
-    @HasResult
-    public static final class SpawnPlacementCheck extends Event {
+    public static final class SpawnPlacementCheck extends MutableEvent implements HasResult {
+        public static final EventBus<SpawnPlacementCheck> BUS = EventBus.create(SpawnPlacementCheck.class);
+
         private final EntityType<?> entityType;
         private final ServerLevelAccessor level;
         private final EntitySpawnReason spawnReason;
         private final BlockPos pos;
         private final RandomSource random;
         private final boolean defaultResult;
+        private Result result = Result.DEFAULT;
 
         /**
          * Internal.
@@ -171,6 +179,16 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
         public boolean getDefaultResult() {
             return this.defaultResult;
         }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
+        }
     }
 
     /**
@@ -200,11 +218,13 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
      * @see {@link SpawnPlacementRegisterEvent} To modify spawn placements statically at startup.
      * @see {@link SpawnPlacementCheck} To modify the result of spawn placements at runtime.
      */
-    @HasResult
-    public static final class PositionCheck extends MobSpawnEvent {
+    public static final class PositionCheck extends MobSpawnEvent implements HasResult {
+        public static final EventBus<PositionCheck> BUS = EventBus.create(PositionCheck.class);
+
         @Nullable
         private final BaseSpawner spawner;
         private final EntitySpawnReason spawnReason;
+        private Result result = Result.DEFAULT;
 
         public PositionCheck(Mob mob, ServerLevelAccessor level, EntitySpawnReason spawnReason, @Nullable BaseSpawner spawner) {
             super(mob, level, mob.getX(), mob.getY(), mob.getZ());
@@ -230,6 +250,16 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
         public EntitySpawnReason getSpawnReason() {
             return this.spawnReason;
         }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
+        }
     }
 
     /**
@@ -244,8 +274,9 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
      * @see ForgeEventFactory#onFinalizeSpawn
      * @apiNote Callers do not need to check if the entity's spawn was cancelled, as the spawn will be blocked by Forge.
      */
-    @Cancelable
-    public static final class FinalizeSpawn extends MobSpawnEvent {
+    public static final class FinalizeSpawn extends MobSpawnEvent implements Cancellable {
+        public static final CancellableEventBus<FinalizeSpawn> BUS = CancellableEventBus.create(FinalizeSpawn.class);
+
         private final EntitySpawnReason spawnReason;
         @Nullable
         private final BaseSpawner spawner;
@@ -382,10 +413,23 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
      */
     // TODO: 1.20 Move to standalone class, as it is unrelated to the complex mob spawning flow.
     // Such a refactor will allow the BaseSpawner and MobSpawnType params to be hoisted to MobSpawnEvent.
-    @HasResult
-    public static final class AllowDespawn extends MobSpawnEvent {
+    public static final class AllowDespawn extends MobSpawnEvent implements HasResult {
+        public static final EventBus<AllowDespawn> BUS = EventBus.create(AllowDespawn.class);
+
+        private Result result = Result.DEFAULT;
+
         public AllowDespawn(Mob mob, ServerLevelAccessor level) {
             super(mob, level, mob.getX(), mob.getY(), mob.getZ());
+        }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 }

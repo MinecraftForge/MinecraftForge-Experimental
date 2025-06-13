@@ -7,8 +7,8 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -25,21 +25,22 @@ import java.util.Map;
  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public final class RegisterEntitySpectatorShadersEvent extends Event implements IModBusEvent
-{
+public final class RegisterEntitySpectatorShadersEvent implements IModBusEvent {
+    public static EventBus<RegisterEntitySpectatorShadersEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, RegisterEntitySpectatorShadersEvent.class);
+    }
+
     private final Map<EntityType<?>, ResourceLocation> shaders;
 
     @ApiStatus.Internal
-    public RegisterEntitySpectatorShadersEvent(Map<EntityType<?>, ResourceLocation> shaders)
-    {
+    public RegisterEntitySpectatorShadersEvent(Map<EntityType<?>, ResourceLocation> shaders) {
         this.shaders = shaders;
     }
 
     /**
      * Registers a spectator shader for a given entity type.
      */
-    public void register(EntityType<?> entityType, ResourceLocation shader)
-    {
+    public void register(EntityType<?> entityType, ResourceLocation shader) {
         shaders.put(entityType, shader);
     }
 }

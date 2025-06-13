@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -28,9 +28,9 @@ import java.util.Map;
 /**
  * Houses events related to models.
  */
-public abstract sealed class ModelEvent extends Event {
+public abstract sealed class ModelEvent {
     @ApiStatus.Internal
-    protected ModelEvent() { }
+    protected ModelEvent() {}
 
     /**
      * Fired while the {@link ModelManager} is reloading models, after the model registry is set up, but before it's
@@ -49,6 +49,10 @@ public abstract sealed class ModelEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class ModifyBakingResult extends ModelEvent implements IModBusEvent {
+        public static EventBus<ModifyBakingResult> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, ModifyBakingResult.class);
+        }
+
         private final ModelBakery modelBakery;
         private final ModelBakery.BakingResult results;
 
@@ -85,6 +89,10 @@ public abstract sealed class ModelEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class BakingCompleted extends ModelEvent implements IModBusEvent {
+        public static EventBus<BakingCompleted> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, BakingCompleted.class);
+        }
+
         private final ModelManager modelManager;
         private final ModelBakery modelBakery;
 
@@ -119,6 +127,10 @@ public abstract sealed class ModelEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class RegisterModelStateDefinitions extends ModelEvent implements IModBusEvent {
+        public static EventBus<RegisterModelStateDefinitions> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, RegisterModelStateDefinitions.class);
+        }
+
         private final Map<ResourceLocation, StateDefinition<Block, BlockState>> states = new HashMap<>();
         private final Map<ResourceLocation, StateDefinition<Block, BlockState>> view = Collections.unmodifiableMap(states);
 
@@ -149,6 +161,10 @@ public abstract sealed class ModelEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent {
+        public static EventBus<RegisterGeometryLoaders> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, RegisterGeometryLoaders.class);
+        }
+
         private final Map<ResourceLocation, IGeometryLoader> loaders;
 
         @ApiStatus.Internal

@@ -7,7 +7,8 @@ package net.minecraftforge.event;
 
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -17,7 +18,9 @@ import java.util.List;
  * before tags and crafting recipes are sent to the client. Send datapack data
  * to clients when this event fires.
  */
-public final class OnDatapackSyncEvent extends Event {
+public final class OnDatapackSyncEvent extends MutableEvent {
+    public static final EventBus<OnDatapackSyncEvent> BUS = EventBus.create(OnDatapackSyncEvent.class);
+
     private final PlayerList playerList;
 
     @Nullable

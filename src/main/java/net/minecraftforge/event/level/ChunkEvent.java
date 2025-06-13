@@ -11,6 +11,7 @@ import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -23,6 +24,8 @@ import org.jetbrains.annotations.ApiStatus;
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
 public class ChunkEvent extends LevelEvent {
+    public static final EventBus<ChunkEvent> BUS = EventBus.create(ChunkEvent.class);
+
     private final ChunkAccess chunk;
 
     public ChunkEvent(ChunkAccess chunk) {
@@ -53,6 +56,8 @@ public class ChunkEvent extends LevelEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static final class Load extends ChunkEvent {
+        public static final EventBus<ChunkEvent.Load> BUS = EventBus.create(ChunkEvent.Load.class);
+
         private final boolean newChunk;
 
         @ApiStatus.Internal
@@ -85,6 +90,8 @@ public class ChunkEvent extends LevelEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static final class Unload extends ChunkEvent {
+        public static final EventBus<ChunkEvent.Unload> BUS = EventBus.create(ChunkEvent.Unload.class);
+
         public Unload(ChunkAccess chunk) {
             super(chunk);
         }
@@ -104,6 +111,8 @@ public class ChunkEvent extends LevelEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/
     public static final class LightingCalculated extends ChunkEvent {
+        public static final EventBus<ChunkEvent.LightingCalculated> BUS = EventBus.create(ChunkEvent.LightingCalculated.class);
+
         public LightingCalculated(ChunkAccess chunk) {
             super(chunk);
         }

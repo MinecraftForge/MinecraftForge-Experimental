@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.LevelCallback;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 
 /**
  * This event is fired whenever an {@link Entity} leaves a {@link Level}.
@@ -21,6 +21,8 @@ import net.minecraftforge.eventbus.api.Cancelable;
  * on both logical sides.
  **/
 public final class EntityLeaveLevelEvent extends EntityEvent {
+    public static final EventBus<EntityLeaveLevelEvent> BUS = EventBus.create(EntityLeaveLevelEvent.class);
+
     private final Level level;
 
     public EntityLeaveLevelEvent(Entity entity, Level level) {

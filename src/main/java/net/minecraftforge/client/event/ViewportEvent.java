@@ -11,8 +11,11 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.joml.Vector4f;
@@ -30,7 +33,9 @@ import org.joml.Vector4f;
  * @see ComputeCameraAngles
  * @see ComputeFov
  */
-public abstract sealed class ViewportEvent extends Event {
+public abstract sealed class ViewportEvent extends MutableEvent implements InheritableEvent {
+    public static final EventBus<ViewportEvent> BUS = EventBus.create(ViewportEvent.class);
+
     private final GameRenderer renderer;
     private final Camera camera;
     private final double partialTick;
@@ -72,8 +77,9 @@ public abstract sealed class ViewportEvent extends Event {
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    @Cancelable
-    public static final class RenderFog extends ViewportEvent {
+    public static final class RenderFog extends ViewportEvent implements Cancellable {
+        public static final CancellableEventBus<RenderFog> BUS = CancellableEventBus.create(RenderFog.class);
+
         private final FogType type;
         private final FogData data;
         private final Vector4f color;
@@ -164,6 +170,8 @@ public abstract sealed class ViewportEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class ComputeFogColor extends ViewportEvent {
+        public static final EventBus<ComputeFogColor> BUS = EventBus.create(ComputeFogColor.class);
+
         private float red;
         private float green;
         private float blue;
@@ -236,6 +244,8 @@ public abstract sealed class ViewportEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class ComputeCameraAngles extends ViewportEvent {
+        public static final EventBus<ComputeCameraAngles> BUS = EventBus.create(ComputeCameraAngles.class);
+
         private float yaw;
         private float pitch;
         private float roll;
@@ -309,6 +319,8 @@ public abstract sealed class ViewportEvent extends Event {
      * @see ComputeFovModifierEvent
      */
     public static final class ComputeFov extends ViewportEvent {
+        public static final EventBus<ComputeFov> BUS = EventBus.create(ComputeFov.class);
+
         private final boolean usedConfiguredFov;
         private float fov;
 

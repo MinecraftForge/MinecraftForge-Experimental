@@ -8,8 +8,8 @@ package net.minecraftforge.client.event;
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.world.level.GameType;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -21,15 +21,15 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
-public final class ClientPlayerChangeGameTypeEvent extends Event
-{
+public final class ClientPlayerChangeGameTypeEvent extends MutableEvent {
+    public static final EventBus<ClientPlayerChangeGameTypeEvent> BUS = EventBus.create(ClientPlayerChangeGameTypeEvent.class);
+
     private final PlayerInfo info;
     private final GameType currentGameType;
     private final GameType newGameType;
 
     @ApiStatus.Internal
-    public ClientPlayerChangeGameTypeEvent(PlayerInfo info, GameType currentGameType, GameType newGameType)
-    {
+    public ClientPlayerChangeGameTypeEvent(PlayerInfo info, GameType currentGameType, GameType newGameType) {
         this.info = info;
         this.currentGameType = currentGameType;
         this.newGameType = newGameType;
@@ -38,24 +38,21 @@ public final class ClientPlayerChangeGameTypeEvent extends Event
     /**
      * {@return the client player information}
      */
-    public PlayerInfo getInfo()
-    {
+    public PlayerInfo getInfo() {
         return info;
     }
 
     /**
      * {@return the current game type of the player}
      */
-    public GameType getCurrentGameType()
-    {
+    public GameType getCurrentGameType() {
         return currentGameType;
     }
 
     /**
      * {@return the new game type of the player}
      */
-    public GameType getNewGameType()
-    {
+    public GameType getNewGameType() {
         return newGameType;
     }
 }

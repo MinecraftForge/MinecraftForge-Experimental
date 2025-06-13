@@ -11,6 +11,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.lwjgl.glfw.GLFW;
@@ -24,7 +29,9 @@ import org.lwjgl.glfw.GLFW;
  * @see Key
  * @see InteractionKeyMappingTriggered
  */
-public abstract sealed class InputEvent extends Event {
+public abstract sealed class InputEvent extends MutableEvent implements InheritableEvent {
+    public static final EventBus<InputEvent> BUS = EventBus.create(InputEvent.class);
+
     @ApiStatus.Internal
     protected InputEvent() {}
 
@@ -39,6 +46,8 @@ public abstract sealed class InputEvent extends Event {
      * @see Post
      */
     public static abstract sealed class MouseButton extends InputEvent {
+        public static final EventBus<MouseButton> BUS = EventBus.create(MouseButton.class);
+
         private final int button;
         private final int action;
         private final int modifiers;
@@ -96,8 +105,9 @@ public abstract sealed class InputEvent extends Event {
          *
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
-        @Cancelable
-        public static final class Pre extends MouseButton {
+        public static final class Pre extends MouseButton implements Cancellable {
+            public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
+
             @ApiStatus.Internal
             public Pre(int button, int action, int modifiers) {
                 super(button, action, modifiers);
@@ -115,6 +125,8 @@ public abstract sealed class InputEvent extends Event {
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
         public static final class Post extends MouseButton {
+            public static final EventBus<Post> BUS = EventBus.create(Post.class);
+
             @ApiStatus.Internal
             public Post(int button, int action, int modifiers) {
                 super(button, action, modifiers);
@@ -134,8 +146,9 @@ public abstract sealed class InputEvent extends Event {
      *
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
      */
-    @Cancelable
-    public static final class MouseScrollingEvent extends InputEvent {
+    public static final class MouseScrollingEvent extends InputEvent implements Cancellable {
+        public static final CancellableEventBus<MouseScrollingEvent> BUS = CancellableEventBus.create(MouseScrollingEvent.class);
+
         private final double deltaX;
         private final double deltaY;
         private final double mouseX;
@@ -214,6 +227,8 @@ public abstract sealed class InputEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class Key extends InputEvent {
+        public static final EventBus<Key> BUS = EventBus.create(Key.class);
+
         private final int key;
         private final int scanCode;
         private final int action;
@@ -296,8 +311,9 @@ public abstract sealed class InputEvent extends Event {
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     // TODO: Change the 'button' to sub events. - Lex 0422202
-    @Cancelable
-    public static final class InteractionKeyMappingTriggered extends InputEvent {
+    public static final class InteractionKeyMappingTriggered extends InputEvent implements Cancellable {
+        public static final CancellableEventBus<InteractionKeyMappingTriggered> BUS = CancellableEventBus.create(InteractionKeyMappingTriggered.class);
+
         private final int button;
         private final KeyMapping keyMapping;
         private final InteractionHand hand;

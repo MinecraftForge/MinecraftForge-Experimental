@@ -8,7 +8,7 @@ package net.minecraftforge.client.event.sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -27,16 +27,16 @@ import org.jetbrains.annotations.Nullable;
  * @see PlaySoundSourceEvent
  * @see PlayStreamingSourceEvent
  */
-public final class PlaySoundEvent extends SoundEvent
-{
+public final class PlaySoundEvent extends SoundEvent {
+    public static final EventBus<PlaySoundEvent> BUS = EventBus.create(PlaySoundEvent.class);
+
     private final String name;
     private final SoundInstance originalSound;
     @Nullable
     private SoundInstance sound;
 
     @ApiStatus.Internal
-    public PlaySoundEvent(SoundEngine manager, SoundInstance sound)
-    {
+    public PlaySoundEvent(SoundEngine manager, SoundInstance sound) {
         super(manager);
         this.originalSound = sound;
         this.name = sound.getLocation().getPath();
@@ -46,16 +46,14 @@ public final class PlaySoundEvent extends SoundEvent
     /**
      * {@return the name of the original sound} This is equivalent to the path of the location of the original sound.
      */
-    public String getName()
-    {
+    public String getName() {
         return name;
     }
 
     /**
      * {@return the original sound that was to be played}
      */
-    public SoundInstance getOriginalSound()
-    {
+    public SoundInstance getOriginalSound() {
         return originalSound;
     }
 
@@ -63,8 +61,7 @@ public final class PlaySoundEvent extends SoundEvent
      * {@return the sound to be played, or {@code null} if no sound will be played}
      */
     @Nullable
-    public SoundInstance getSound()
-    {
+    public SoundInstance getSound() {
         return sound;
     }
 
@@ -73,8 +70,7 @@ public final class PlaySoundEvent extends SoundEvent
      *
      * @param newSound the new sound to be played, or {@code null} for no sound
      */
-    public void setSound(@Nullable SoundInstance newSound)
-    {
+    public void setSound(@Nullable SoundInstance newSound) {
         this.sound = newSound;
     }
 }

@@ -10,7 +10,8 @@ import net.minecraft.DetectedVersion;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.event.IModBusEvent;
 
@@ -25,15 +26,17 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public final class GatherDataEvent extends Event implements IModBusEvent
-{
+public final class GatherDataEvent implements IModBusEvent {
+    public static EventBus<GatherDataEvent> getBus(BusGroup modBusGroup) {
+        return IModBusEvent.getBus(modBusGroup, GatherDataEvent.class);
+    }
+
     private final DataGenerator dataGenerator;
     private final DataGeneratorConfig config;
     private final ExistingFileHelper existingFileHelper;
     private final ModContainer modContainer;
 
-    public GatherDataEvent(final ModContainer mc, final DataGenerator dataGenerator, final DataGeneratorConfig dataGeneratorConfig, ExistingFileHelper existingFileHelper)
-    {
+    public GatherDataEvent(final ModContainer mc, final DataGenerator dataGenerator, final DataGeneratorConfig dataGeneratorConfig, ExistingFileHelper existingFileHelper) {
         this.modContainer = mc;
         this.dataGenerator = dataGenerator;
         this.config = dataGeneratorConfig;

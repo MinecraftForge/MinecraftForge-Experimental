@@ -11,8 +11,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -27,9 +28,9 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @see RenderArmEvent
  */
-@Cancelable
-public final class RenderHandEvent extends Event
-{
+public final class RenderHandEvent extends MutableEvent implements Cancellable {
+    public static final CancellableEventBus<RenderHandEvent> BUS = CancellableEventBus.create(RenderHandEvent.class);
+
     private final InteractionHand hand;
     private final PoseStack poseStack;
     private final MultiBufferSource multiBufferSource;
@@ -59,24 +60,21 @@ public final class RenderHandEvent extends Event
     /**
      * {@return the hand being rendered}
      */
-    public InteractionHand getHand()
-    {
+    public InteractionHand getHand() {
         return hand;
     }
 
     /**
      * {@return the pose stack used for rendering}
      */
-    public PoseStack getPoseStack()
-    {
+    public PoseStack getPoseStack() {
         return poseStack;
     }
 
     /**
      * {@return the source of rendering buffers}
      */
-    public MultiBufferSource getMultiBufferSource()
-    {
+    public MultiBufferSource getMultiBufferSource() {
         return multiBufferSource;
     }
 
@@ -85,48 +83,42 @@ public final class RenderHandEvent extends Event
      *
      * @see LightTexture
      */
-    public int getPackedLight()
-    {
+    public int getPackedLight() {
         return packedLight;
     }
 
     /**
      * {@return the partial tick}
      */
-    public float getPartialTick()
-    {
+    public float getPartialTick() {
         return partialTick;
     }
 
     /**
      * {@return the interpolated pitch of the player entity}
      */
-    public float getInterpolatedPitch()
-    {
+    public float getInterpolatedPitch() {
         return interpolatedPitch;
     }
 
     /**
      * {@return the swing progress of the hand being rendered}
      */
-    public float getSwingProgress()
-    {
+    public float getSwingProgress() {
         return swingProgress;
     }
 
     /**
      * {@return the progress of the equip animation, from {@code 0.0} to {@code 1.0}}
      */
-    public float getEquipProgress()
-    {
+    public float getEquipProgress() {
         return equipProgress;
     }
 
     /**
      * {@return the item stack to be rendered}
      */
-    public ItemStack getItemStack()
-    {
+    public ItemStack getItemStack() {
         return stack;
     }
 }
