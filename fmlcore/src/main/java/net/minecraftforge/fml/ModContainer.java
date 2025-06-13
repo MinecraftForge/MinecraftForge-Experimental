@@ -162,5 +162,5 @@ public abstract class ModContainer {
      * Accept an arbitrary event for processing by the mod. Probably posted to an event bus in the lower level container.
      * @param e Event to accept
      */
-    protected <T extends Event & IModBusEvent> void acceptEvent(T e) {}
+    protected <T extends IModBusEvent> void acceptEvent(T e) {}
 }

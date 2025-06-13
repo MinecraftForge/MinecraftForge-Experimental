@@ -111,6 +111,7 @@ public sealed class TickEvent extends MutableEvent implements InheritableEvent {
 
         public static final class Pre extends ClientTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
+            public static final Pre INSTANCE = new Pre();
 
             public Pre() {
                 super(Phase.START);
@@ -119,6 +120,7 @@ public sealed class TickEvent extends MutableEvent implements InheritableEvent {
 
         public static final class Post extends ClientTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
+            public static final Post INSTANCE = new Post();
 
             public Post() {
                 super(Phase.END);

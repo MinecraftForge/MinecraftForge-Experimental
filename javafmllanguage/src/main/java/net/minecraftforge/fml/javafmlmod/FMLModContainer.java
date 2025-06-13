@@ -178,7 +178,7 @@ public class FMLModContainer extends ModContainer {
     }
 
     @Override
-    protected <T extends Event & IModBusEvent> void acceptEvent(final T e) {
+    protected <T extends IModBusEvent> void acceptEvent(final T e) {
         try {
             LOGGER.trace(LOADING, "Firing event for modid {} : {}", this.getModId(), e);
             this.eventBus.post(e);

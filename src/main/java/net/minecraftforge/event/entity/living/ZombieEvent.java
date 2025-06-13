@@ -61,6 +61,8 @@ public sealed class ZombieEvent extends EntityEvent {
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static final class SummonAidEvent extends ZombieEvent implements HasResult {
+        public static final EventBus<SummonAidEvent> BUS = EventBus.create(SummonAidEvent.class);
+
         private Zombie customSummonedAid;
 
         private final Level level;
