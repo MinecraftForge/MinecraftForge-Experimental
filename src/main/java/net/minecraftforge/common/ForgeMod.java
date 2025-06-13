@@ -61,12 +61,14 @@ import net.minecraftforge.common.world.ForgeBiomeModifiers.RemoveSpawnsBiomeModi
 import net.minecraftforge.common.world.NoneBiomeModifier;
 import net.minecraftforge.common.world.NoneStructureModifier;
 import net.minecraftforge.common.world.StructureModifier;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.event.network.GatherLoginConfigurationTasksEvent;
+import net.minecraftforge.event.server.ServerAboutToStartEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.*;
@@ -381,33 +383,37 @@ public class ForgeMod {
         CrashReportCallables.registerCrashCallable("FML", ForgeVersion::getSpec);
         CrashReportCallables.registerCrashCallable("Forge", ()->ForgeVersion.getGroup()+":"+ForgeVersion.getVersion());
 
-        final IEventBus modEventBus = context.getModEventBus();
+        BusGroup modBusGroup = context.getModBusGroup();
         // Forge-provided datapack registries
-        modEventBus.addListener((DataPackRegistryEvent.NewRegistry event) -> {
+        DataPackRegistryEvent.NewRegistry.getBus(modBusGroup).addListener(event -> {
             event.dataPackRegistry(ForgeRegistries.Keys.BIOME_MODIFIERS, BiomeModifier.DIRECT_CODEC);
             event.dataPackRegistry(ForgeRegistries.Keys.STRUCTURE_MODIFIERS, StructureModifier.DIRECT_CODEC);
         });
-        modEventBus.addListener(this::preInit);
-        modEventBus.addListener(this::gatherData);
-        modEventBus.addListener(this::registerFluids);
-        modEventBus.addListener(this::registerVanillaDisplayContexts);
-        modEventBus.addListener(this::onRegisterAttributes);
-        ForgeDeferredRegistriesSetup.setup(modEventBus);
+        FMLCommonSetupEvent.getBus(modBusGroup).addListener(ForgeMod::preInit);
+        GatherDataEvent.getBus(modBusGroup).addListener(ForgeMod::gatherData);
+        var registerEventBus = RegisterEvent.getBus(modBusGroup);
+        registerEventBus.addListener(ForgeMod::registerFluids);
+        registerEventBus.addListener(ForgeMod::registerVanillaDisplayContexts);
+        EntityAttributeModificationEvent.getBus(modBusGroup).addListener(ForgeMod::onRegisterAttributes);
+        ForgeDeferredRegistriesSetup.setup(modBusGroup);
         for (var reg : registries)
-            reg.register(modEventBus);
+            reg.register(modBusGroup);
 
         context.registerConfig(ModConfig.Type.CLIENT, ForgeConfig.clientSpec);
         context.registerConfig(ModConfig.Type.SERVER, ForgeConfig.serverSpec);
         context.registerConfig(ModConfig.Type.COMMON, ForgeConfig.commonSpec);
-        modEventBus.register(ForgeConfig.class);
+        if (ForgeConfig.LOGGER.isDebugEnabled()) {
+            ModConfigEvent.Loading.getBus(modBusGroup).addListener(ForgeConfig::onLoad);
+            ModConfigEvent.Reloading.getBus(modBusGroup).addListener(ForgeConfig::onFileChange);
+        }
 
         // Forge does not display problems when the remote is not matching.
         context.registerDisplayTest(IExtensionPoint.DisplayTest.IGNORE_ALL_VERSION);
         StartupMessageManager.addModMessage("Forge version "+ForgeVersion.getVersion());
 
-        MinecraftForge.EVENT_BUS.addListener(VillagerTradingManager::loadTrades);
-        MinecraftForge.EVENT_BUS.register(MinecraftForge.INTERNAL_HANDLER);
-        MinecraftForge.EVENT_BUS.register(new ForgeNetworkConfigurationHandler());
+        ServerAboutToStartEvent.BUS.addListener(VillagerTradingManager::loadTrades);
+        ForgeInternalHandler.register();
+        GatherLoginConfigurationTasksEvent.BUS.addListener(ForgeNetworkConfigurationHandler::gatherInit);
 
         ForgeRegistries.ITEMS.tags().addOptionalTagDefaults(Tags.Items.ENCHANTING_FUELS, Set.of(ForgeRegistries.ITEMS.getDelegateOrThrow(Items.LAPIS_LAZULI)));
 
@@ -416,21 +422,19 @@ public class ForgeMod {
         addAlias(ForgeRegistries.ATTRIBUTES, ResourceLocation.fromNamespaceAndPath("forge", "attack_range"), ResourceLocation.fromNamespaceAndPath("forge", "entity_reach"));
     }
 
-    public void preInit(FMLCommonSetupEvent evt) {
+    private static void preInit(FMLCommonSetupEvent evt) {
         VersionChecker.startVersionCheck();
         //VanillaPacketSplitter.register();
     }
 
-
-    @SubscribeEvent
-    public void onRegisterAttributes(EntityAttributeModificationEvent event) {
+    private static void onRegisterAttributes(EntityAttributeModificationEvent event) {
         for (var type : event.getTypes()) {
             event.add(type, ForgeMod.SWIM_SPEED.getHolder().get());
             event.add(type, ForgeMod.NAMETAG_DISTANCE.getHolder().get());
         }
     }
 
-    public void gatherData(GatherDataEvent event) {
+    private static void gatherData(GatherDataEvent event) {
         DataGenerator gen = event.getGenerator();
         PackOutput packOutput = gen.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
@@ -459,7 +463,7 @@ public class ForgeMod {
     }
 
     // done in an event instead of deferred to only enable if a mod requests it
-    public void registerFluids(RegisterEvent event) {
+    private static void registerFluids(RegisterEvent event) {
         if (enableMilkFluid) {
             // register milk fill, empty sounds (delegates to water fill, empty sounds)
             event.register(ForgeRegistries.Keys.SOUND_EVENTS, helper -> {
@@ -503,7 +507,7 @@ public class ForgeMod {
         }
     }
 
-    public void registerVanillaDisplayContexts(RegisterEvent event) {
+    private static void registerVanillaDisplayContexts(RegisterEvent event) {
         if (event.getRegistryKey().equals(ForgeRegistries.Keys.DISPLAY_CONTEXTS)) {
             IForgeRegistryInternal<ItemDisplayContext> forgeRegistry = (IForgeRegistryInternal<ItemDisplayContext>) event.<ItemDisplayContext>getForgeRegistry();
             if (forgeRegistry == null)
