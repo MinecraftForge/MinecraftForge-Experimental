@@ -1,28 +1,27 @@
 --- a/net/minecraft/client/renderer/ItemBlockRenderTypes.java
 +++ b/net/minecraft/client/renderer/ItemBlockRenderTypes.java
-@@ -18,6 +_,7 @@
+@@ -19,6 +_,7 @@
  
  @OnlyIn(Dist.CLIENT)
  public class ItemBlockRenderTypes {
 +    @Deprecated
-     private static final Map<Block, RenderType> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_389364_ -> {
-         RenderType rendertype = RenderType.tripwire();
-         p_389364_.put(Blocks.TRIPWIRE, rendertype);
-@@ -352,6 +_,7 @@
-         p_389364_.put(Blocks.BUBBLE_COLUMN, rendertype3);
-         p_389364_.put(Blocks.TINTED_GLASS, rendertype3);
+     private static final Map<Block, ChunkSectionLayer> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_389364_ -> {
+         ChunkSectionLayer chunksectionlayer = ChunkSectionLayer.TRIPWIRE;
+         p_389364_.put(Blocks.TRIPWIRE, chunksectionlayer);
+@@ -353,12 +_,15 @@
+         p_389364_.put(Blocks.BUBBLE_COLUMN, chunksectionlayer3);
+         p_389364_.put(Blocks.TINTED_GLASS, chunksectionlayer3);
      });
 +    @Deprecated
-     private static final Map<Fluid, RenderType> TYPE_BY_FLUID = Util.make(Maps.newHashMap(), p_109290_ -> {
-         RenderType rendertype = RenderType.translucent();
-         p_109290_.put(Fluids.FLOWING_WATER, rendertype);
-@@ -359,6 +_,8 @@
+     private static final Map<Fluid, ChunkSectionLayer> LAYER_BY_FLUID = Util.make(Maps.newHashMap(), p_404902_ -> {
+         p_404902_.put(Fluids.FLOWING_WATER, ChunkSectionLayer.TRANSLUCENT);
+         p_404902_.put(Fluids.WATER, ChunkSectionLayer.TRANSLUCENT);
      });
      private static boolean renderCutout;
  
 +    /** @deprecated Forge: Use {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)}. */
 +    @Deprecated // Note: this method does NOT support model-based render types
-     public static RenderType getChunkRenderType(BlockState p_109283_) {
+     public static ChunkSectionLayer getChunkRenderType(BlockState p_109283_) {
          Block block = p_109283_.getBlock();
          if (block instanceof LeavesBlock) {
 @@ -369,6 +_,8 @@
@@ -34,30 +33,30 @@
      public static RenderType getMovingBlockRenderType(BlockState p_109294_) {
          Block block = p_109294_.getBlock();
          if (block instanceof LeavesBlock) {
-@@ -383,11 +_,14 @@
+@@ -389,11 +_,14 @@
          }
      }
  
 +    /** @deprecated Forge: Use {@link net.minecraftforge.client.RenderTypeHelper#getEntityRenderType(RenderType)} while iterating through {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)}. */
 +    @Deprecated // Note: this method does NOT support model-based render types
      public static RenderType getRenderType(BlockState p_364446_) {
-         RenderType rendertype = getChunkRenderType(p_364446_);
-         return rendertype == RenderType.translucent() ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
+         ChunkSectionLayer chunksectionlayer = getChunkRenderType(p_364446_);
+         return chunksectionlayer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
      }
  
 +    /* Forge: Use {@link net.minecraft.client.resources.model.BakedModel#getRenderPasses(ItemStack, boolean)} and {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(ItemStack, boolean)}. */
      public static RenderType getRenderType(ItemStack p_363859_) {
          if (p_363859_.getItem() instanceof BlockItem blockitem) {
              Block block = blockitem.getBlock();
-@@ -397,12 +_,81 @@
+@@ -403,12 +_,80 @@
          }
      }
  
 +    // Note: this method does NOT support model-based render types
-     public static RenderType getRenderLayer(FluidState p_109288_) {
--        RenderType rendertype = TYPE_BY_FLUID.get(p_109288_.getType());
-+        RenderType rendertype = FLUID_RENDER_TYPES.get(net.minecraftforge.registries.ForgeRegistries.FLUIDS.getDelegateOrThrow(p_109288_.getType()));
-         return rendertype != null ? rendertype : RenderType.solid();
+     public static ChunkSectionLayer getRenderLayer(FluidState p_109288_) {
+-        ChunkSectionLayer chunksectionlayer = LAYER_BY_FLUID.get(p_109288_.getType());
++        var chunksectionlayer = FLUID_RENDER_TYPES.get(net.minecraftforge.registries.ForgeRegistries.FLUIDS.getDelegateOrThrow(p_109288_.getType()));
+         return chunksectionlayer != null ? chunksectionlayer : ChunkSectionLayer.SOLID;
      }
  
      public static void setFancy(boolean p_109292_) {
@@ -73,13 +72,13 @@
 +    private static final net.minecraftforge.client.ChunkRenderTypeSet SOLID = net.minecraftforge.client.ChunkRenderTypeSet.of(RenderType.solid());
 +    private static final Map<net.minecraft.core.Holder.Reference<Block>, net.minecraftforge.client.ChunkRenderTypeSet> BLOCK_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_BLOCK.size(), 0.5F), map -> {
 +       map.defaultReturnValue(SOLID);
-+       for(Map.Entry<Block, RenderType> entry : TYPE_BY_BLOCK.entrySet()) {
++       for(Map.Entry<Block, ChunkSectionLayer> entry : TYPE_BY_BLOCK.entrySet()) {
 +          map.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(entry.getKey()), net.minecraftforge.client.ChunkRenderTypeSet.of(entry.getValue()));
 +       }
 +    });
-+    private static final Map<net.minecraft.core.Holder.Reference<Fluid>, RenderType> FLUID_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_FLUID.size(), 0.5F), map -> {
++    private static final Map<net.minecraft.core.Holder.Reference<Fluid>, ChunkSectionLayer> FLUID_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_FLUID.size(), 0.5F), map -> {
 +       map.defaultReturnValue(RenderType.solid());
-+       for(Map.Entry<Fluid, RenderType> entry : TYPE_BY_FLUID.entrySet()) {
++       for(Map.Entry<Fluid, RenderType> entry : FLUID_RENDER_TYPES.entrySet()) {
 +          map.put(net.minecraftforge.registries.ForgeRegistries.FLUIDS.getDelegateOrThrow(entry.getKey()), entry.getValue());
 +       }
 +    });
@@ -104,7 +103,7 @@
 +
 +    /** @deprecated Set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) or override {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)} */
 +    @Deprecated(forRemoval = true, since = "1.21.4")
-+    public static synchronized void setRenderLayer(Block block, java.util.function.Predicate<RenderType> predicate) {
++    public static synchronized void setRenderLayer(Block block, java.util.function.Predicate<ChunkSectionLayer> predicate) {
 +       setRenderLayer(block, createSetFromPredicate(predicate));
 +    }
 +
@@ -115,8 +114,7 @@
 +       BLOCK_RENDER_TYPES.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(block), layers);
 +    }
 +
-+    public static synchronized void setRenderLayer(Fluid fluid, RenderType type) {
-+       com.google.common.base.Preconditions.checkArgument(type.getChunkLayerId() >= 0, "The argument must be a valid chunk render type returned by RenderType#chunkBufferLayers().");
++    public static synchronized void setRenderLayer(Fluid fluid, ChunkSectionLayer type) {
 +       checkClientLoading();
 +       FLUID_RENDER_TYPES.put(net.minecraftforge.registries.ForgeRegistries.FLUIDS.getDelegateOrThrow(fluid), type);
 +    }

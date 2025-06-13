@@ -20,7 +20,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.data.tags.ItemTagsProvider;
+import net.minecraft.data.tags.VanillaItemTagsProvider;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceKey;
@@ -237,9 +237,9 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
         public void addTags(HolderLookup.Provider lookup) { }
     }
 
-    private static class ItemTagsGen extends ItemTagsProvider {
+    private static class ItemTagsGen extends VanillaItemTagsProvider {
         public ItemTagsGen(PackOutput out, CompletableFuture<HolderLookup.Provider> lookup, BlockTagsProvider blocks, ExistingFileHelper existing) {
-            super(out, lookup, blocks.contentsGetter(), MODID, existing);
+            super(out, lookup, /*blocks.contentsGetter(),*/ MODID, existing);
         }
 
         @Override

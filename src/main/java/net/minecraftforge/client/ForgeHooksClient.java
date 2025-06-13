@@ -18,6 +18,7 @@ import com.mojang.math.Transformation;
 
 import net.minecraft.FileUtil;
 import net.minecraft.client.Camera;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColors;
@@ -40,12 +41,11 @@ import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.player.ClientInput;
-import net.minecraft.client.renderer.FogParameters;
-import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -144,6 +144,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -196,7 +197,7 @@ public class ForgeHooksClient {
             guiLayers.push(minecraft.screen);
         minecraft.screen = Objects.requireNonNull(screen);
         screen.init(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
-        minecraft.getNarrator().sayNow(screen.getNarrationMessage());
+        minecraft.getNarrator().saySystemNow(screen.getNarrationMessage());
     }
 
     public static void popGuiLayer(Minecraft minecraft) {
@@ -207,7 +208,7 @@ public class ForgeHooksClient {
 
         popGuiLayerInternal(minecraft);
         if (minecraft.screen != null)
-            minecraft.getNarrator().sayNow(minecraft.screen.getNarrationMessage());
+            minecraft.getNarrator().saySystemNow(minecraft.screen.getNarrationMessage());
     }
 
     public static float getGuiFarPlane() {
@@ -298,14 +299,14 @@ public class ForgeHooksClient {
     }
 
     public static void drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         for (Screen layer : guiLayers) {
             // Prevent the background layers from thinking the mouse is over their controls and showing them as highlighted.
             drawScreenInternal(layer, guiGraphics, Integer.MAX_VALUE, Integer.MAX_VALUE, partialTick);
-            guiGraphics.pose().translate(0, 0, 10000);
+            //guiGraphics.pose().translate(0, 0, 10000);
         }
         drawScreenInternal(screen, guiGraphics, mouseX, mouseY, partialTick);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -328,22 +329,15 @@ public class ForgeHooksClient {
         return fluidFogColor;
     }
 
-    public static FogParameters getFogParameters(FogRenderer.FogMode mode, FogType type, Camera camera, float partialTick, float renderDistance, FogParameters original) {
-        var ret = original;
+    public static Vector4f setupFog(FogType type, Camera camera, DeltaTracker delta, FogData data, Vector4f color) {
         // Modify fog rendering depending on the fluid
         FluidState state = camera.getEntity().level().getFluidState(camera.getBlockPosition());
         if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(camera.getEntity().level(), camera.getBlockPosition())))
-            ret = IClientFluidTypeExtensions.of(state).modifyFogRender(camera, mode, renderDistance, partialTick, ret);
+            IClientFluidTypeExtensions.of(state).modifyFogRender(camera, type, delta.getRealtimeDeltaTicks(), data, color);
 
-        var event = new ViewportEvent.RenderFog(mode, type, camera, partialTick, ret.start(), ret.end(), ret.shape());
-        if (MinecraftForge.EVENT_BUS.post(event)) {
-            return new FogParameters(
-                event.getNearPlaneDistance(), event.getFarPlaneDistance(), event.getFogShape(),
-                ret.red(), ret.green(), ret.blue(), ret.alpha()
-            );
-        }
-
-        return ret;
+        var event = new ViewportEvent.RenderFog(type, camera, delta.getRealtimeDeltaTicks(), data, color);
+        MinecraftForge.EVENT_BUS.post(event);
+        return color;
     }
 
     public static void onModifyBakingResult(ModelBakery modelBakery, ModelBakery.BakingResult results) {
@@ -395,11 +389,11 @@ public class ForgeHooksClient {
         var minecraft = Minecraft.getInstance();
         var evt = new CustomizeGuiOverlayEvent.Chat(window, guiGraphics, minecraft.getDeltaTracker().getRealtimeDeltaTicks(), 0, chat.getHeight() - 40);
         MinecraftForge.EVENT_BUS.post(evt);
-        guiGraphics.pose().pushPose();
+        guiGraphics.pose().pushMatrix();
         // We give the absolute Y position of the chat component in the event and account for the chat component's own offsetting here.
         guiGraphics.pose().translate(evt.getPosX(), (evt.getPosY() - chat.getHeight() + 40) / chat.getScale(), 0.0D);
         chat.render(guiGraphics, tickCount, mouseX, mouseY, false);
-        guiGraphics.pose().popPose();
+        guiGraphics.pose().popMatrix();
     }
 
     public static void onCustomizeDebugEvent(GuiGraphics guiGraphics, Window window, float partialTick, List<String> text, boolean isLeft) {

@@ -158,7 +158,7 @@
                      T t = p_261885_.tryCast(enderdragonpart);
                      if (t != null && p_261688_.test(t)) {
                          p_262071_.add(t);
-@@ -942,17 +_,16 @@
+@@ -946,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
      public void updateNeighbourForOutputSignal(BlockPos p_46718_, Block p_46719_) {
@@ -181,7 +181,7 @@
                      }
                  }
              }
-@@ -1054,6 +_,20 @@
+@@ -1058,6 +_,20 @@
      }
  
      public abstract PotionBrewing potionBrewing();

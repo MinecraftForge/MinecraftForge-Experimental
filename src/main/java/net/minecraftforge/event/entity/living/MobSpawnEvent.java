@@ -10,12 +10,12 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.WorldGenRegion;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.storage.ValueInput;
 import net.minecraftforge.common.ForgeInternalHandler;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -254,13 +254,13 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
         @Nullable
         private SpawnGroupData spawnData;
         @Nullable
-        private CompoundTag spawnTag;
+        private ValueInput spawnTag;
 
         /**
          * @apiNote Do not construct directly. Access via {@link ForgeEventFactory#onFinalizeSpawn} / {@link ForgeEventFactory#onFinalizeSpawnSpawner}.
          */
         @ApiStatus.Internal
-        public FinalizeSpawn(Mob entity, ServerLevelAccessor level, double x, double y, double z, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData spawnData, @Nullable CompoundTag spawnTag, @Nullable BaseSpawner spawner) {
+        public FinalizeSpawn(Mob entity, ServerLevelAccessor level, double x, double y, double z, DifficultyInstance difficulty, EntitySpawnReason spawnReason, @Nullable SpawnGroupData spawnData, @Nullable ValueInput spawnTag, @Nullable BaseSpawner spawner) {
             super(entity, level, x, y, z);
             this.difficulty = difficulty;
             this.spawnReason = spawnReason;
@@ -320,7 +320,7 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
          * @return The spawn data this entity was or will be loaded from, if any.
          */
         @Nullable
-        public CompoundTag getSpawnTag() {
+        public ValueInput getSpawnTag() {
             return this.spawnTag;
         }
 
@@ -329,7 +329,7 @@ public abstract sealed class MobSpawnEvent extends EntityEvent {
          * The only vanilla mob known to use this tag for anything in finalize is tropical fish for setting the variant when spawned via bucket.
          * @param tag The new spawn tag
          */
-        public void setSpawnTag(@Nullable CompoundTag tag) {
+        public void setSpawnTag(@Nullable ValueInput tag) {
             this.spawnTag = tag;
         }
 

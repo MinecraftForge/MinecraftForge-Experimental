@@ -45,6 +45,7 @@ public interface IForgeBlockStateModel {
      * By default, defers query to {@link ItemBlockRenderTypes}.
      */
     @SuppressWarnings("removal")
+    // TODO: [Forge][Rendering] change this to return an EnumMap<ChunkSectionLayer> or something more efficient? We can maybe get rid of/rename ChunkRenderTypeSet
     default ChunkRenderTypeSet getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
         return ItemBlockRenderTypes.getRenderLayers(state);
     }
