@@ -7,6 +7,7 @@ package net.minecraftforge.event;
 
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -20,6 +21,6 @@ import org.jspecify.annotations.NullMarked;
  * @author Curle
  */
 @NullMarked
-public record GameShuttingDownEvent() implements RecordEvent {
+public record GameShuttingDownEvent() implements SelfDestructing, RecordEvent {
     public static final EventBus<GameShuttingDownEvent> BUS = EventBus.create(GameShuttingDownEvent.class);
 }

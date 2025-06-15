@@ -7,6 +7,7 @@ package net.minecraftforge.fml.event.lifecycle;
 
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.ModContainer;
 import net.minecraftforge.fml.ModLoadingStage;
 import net.minecraftforge.fml.event.IModBusEvent;
@@ -25,7 +26,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
  *
  * This is a parallel dispatch event.
  */
-public final class FMLClientSetupEvent extends ParallelDispatchEvent {
+public final class FMLClientSetupEvent extends ParallelDispatchEvent implements SelfDestructing {
     public static EventBus<FMLClientSetupEvent> getBus(BusGroup modBusGroup) {
         return IModBusEvent.getBus(modBusGroup, FMLClientSetupEvent.class);
     }
