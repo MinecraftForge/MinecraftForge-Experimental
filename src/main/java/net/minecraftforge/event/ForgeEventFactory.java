@@ -570,20 +570,19 @@ public final class ForgeEventFactory {
         PlayerBrewedPotionEvent.BUS.post(new PlayerBrewedPotionEvent(player, stack));
     }
 
-    @Nullable
-    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider) {
-        return gatherCapabilities(type, provider, null);
-    }
+//    @Nullable
+//    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider) {
+//        return gatherCapabilities(type, provider, null);
+//    }
 
-    @SuppressWarnings("unchecked")
-    @Nullable
-    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider, @Nullable ICapabilityProvider parent) {
-        return gatherCapabilities(new AttachCapabilitiesEvent<T>((Class<T>) type, provider), parent);
-    }
+//    @SuppressWarnings("unchecked")
+//    @Nullable
+//    public static <T extends ICapabilityProvider> CapabilityDispatcher gatherCapabilities(Class<? extends T> type, T provider, @Nullable ICapabilityProvider parent) {
+//        return gatherCapabilities(new AttachCapabilitiesEvent<T>((Class<T>) type, provider), parent);
+//    }
 
     @Nullable
-    private static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent<?> event, @Nullable ICapabilityProvider parent) {
-        post(event);
+    public static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent<?> event, @Nullable ICapabilityProvider parent) {
         return !event.getCapabilities().isEmpty() || parent != null ? new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent) : null;
     }
 

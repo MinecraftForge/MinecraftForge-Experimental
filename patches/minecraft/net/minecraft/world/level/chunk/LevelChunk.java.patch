@@ -104,7 +104,7 @@
          return new LevelChunk.BoundTickingBlockEntity<>(p_156376_, p_156377_);
      }
  
-+    private final net.minecraftforge.common.capabilities.CapabilityProvider.AsField<LevelChunk> capProvider = new net.minecraftforge.common.capabilities.CapabilityProvider.AsField<>(LevelChunk.class, this);
++    private final net.minecraftforge.common.capabilities.CapabilityProvider.AsField.LevelChunk capProvider = new net.minecraftforge.common.capabilities.CapabilityProvider.AsField.LevelChunk(this);
 +
 +    @org.jetbrains.annotations.NotNull
 +    @Override

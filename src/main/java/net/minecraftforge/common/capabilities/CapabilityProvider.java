@@ -13,6 +13,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,22 +27,120 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     @VisibleForTesting
     static boolean SUPPORTS_LAZY_CAPABILITIES = true;
 
-    private final @NotNull Class<B> baseClass;
     private @Nullable CapabilityDispatcher capabilities;
     private boolean valid = true;
 
-    private boolean                       isLazy             = false;
+    private final boolean                 isLazy;
     private Supplier<ICapabilityProvider> lazyParentSupplier = null;
     private CompoundTag                   lazyData           = null;
     private HolderLookup.Provider         registryAccess     = null;
     private boolean initialized = false;
 
-    protected CapabilityProvider(Class<B> baseClass) {
-        this(baseClass, false);
+    public static class Entity extends CapabilityProvider<net.minecraft.world.entity.Entity> {
+        protected Entity() {
+            super(false);
+        }
+
+        protected Entity(boolean isLazy) {
+            super(isLazy);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<net.minecraft.world.entity.Entity> fireAttachCapabilitiesEvent(net.minecraft.world.entity.Entity provider) {
+            return AttachCapabilitiesEvent.Entity.BUS.fire(new AttachCapabilitiesEvent.Entity(provider));
+        }
+
+        @Override
+        protected boolean shouldFireAttachCapabilitiesEvent() {
+            return AttachCapabilitiesEvent.Entity.BUS.hasListeners();
+        }
     }
 
-    protected CapabilityProvider(final Class<B> baseClass, final boolean isLazy) {
-        this.baseClass = baseClass;
+    public static class BlockEntity extends CapabilityProvider<net.minecraft.world.level.block.entity.BlockEntity> {
+        protected BlockEntity() {
+            super(false);
+        }
+
+        protected BlockEntity(boolean isLazy) {
+            super(isLazy);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<net.minecraft.world.level.block.entity.BlockEntity> fireAttachCapabilitiesEvent(net.minecraft.world.level.block.entity.BlockEntity provider) {
+            return AttachCapabilitiesEvent.BlockEntity.BUS.fire(new AttachCapabilitiesEvent.BlockEntity(provider));
+        }
+
+        @Override
+        protected boolean shouldFireAttachCapabilitiesEvent() {
+            return AttachCapabilitiesEvent.BlockEntity.BUS.hasListeners();
+        }
+    }
+
+    public static class ItemStack extends CapabilityProvider<net.minecraft.world.item.ItemStack> {
+        protected ItemStack() {
+            super(false);
+        }
+
+        protected ItemStack(boolean isLazy) {
+            super(isLazy);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<net.minecraft.world.item.ItemStack> fireAttachCapabilitiesEvent(net.minecraft.world.item.ItemStack provider) {
+            return AttachCapabilitiesEvent.ItemStack.BUS.fire(new AttachCapabilitiesEvent.ItemStack(provider));
+        }
+
+        @Override
+        protected boolean shouldFireAttachCapabilitiesEvent() {
+            return AttachCapabilitiesEvent.ItemStack.BUS.hasListeners();
+        }
+    }
+
+    public static class Level extends CapabilityProvider<net.minecraft.world.level.Level> {
+        protected Level() {
+            super(false);
+        }
+
+        protected Level(boolean isLazy) {
+            super(isLazy);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<net.minecraft.world.level.Level> fireAttachCapabilitiesEvent(net.minecraft.world.level.Level provider) {
+            return AttachCapabilitiesEvent.Level.BUS.fire(new AttachCapabilitiesEvent.Level(provider));
+        }
+
+        @Override
+        protected boolean shouldFireAttachCapabilitiesEvent() {
+            return AttachCapabilitiesEvent.Level.BUS.hasListeners();
+        }
+    }
+
+    public static class LevelChunk extends CapabilityProvider<net.minecraft.world.level.chunk.LevelChunk> {
+        protected LevelChunk() {
+            super(false);
+        }
+
+        protected LevelChunk(boolean isLazy) {
+            super(isLazy);
+        }
+
+        @Override
+        protected AttachCapabilitiesEvent<net.minecraft.world.level.chunk.LevelChunk> fireAttachCapabilitiesEvent(net.minecraft.world.level.chunk.LevelChunk provider) {
+            return AttachCapabilitiesEvent.LevelChunk.BUS.fire(new AttachCapabilitiesEvent.LevelChunk(provider));
+        }
+
+        @Override
+        protected boolean shouldFireAttachCapabilitiesEvent() {
+            return AttachCapabilitiesEvent.LevelChunk.BUS.hasListeners();
+        }
+    }
+
+    protected CapabilityProvider() {
+        this.isLazy = false;
+    }
+
+    protected CapabilityProvider(boolean isLazy) {
         this.isLazy = SUPPORTS_LAZY_CAPABILITIES && isLazy;
     }
 
@@ -50,10 +149,20 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     }
 
     protected final void gatherCapabilities(@Nullable ICapabilityProvider parent) {
+        if (!shouldFireAttachCapabilitiesEvent()) {
+            this.initialized = true;
+            return;
+        }
+
         gatherCapabilities(() -> parent);
     }
 
     protected final void gatherCapabilities(@Nullable Supplier<ICapabilityProvider> parent) {
+        if (!shouldFireAttachCapabilitiesEvent()) {
+            this.initialized = true;
+            return;
+        }
+
         if (isLazy && !initialized) {
             lazyParentSupplier = parent == null ? () -> null : parent;
             return;
@@ -62,8 +171,11 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         doGatherCapabilities(parent == null ? null : parent.get());
     }
 
+    protected abstract AttachCapabilitiesEvent<?> fireAttachCapabilitiesEvent(B provider);
+    protected abstract boolean shouldFireAttachCapabilitiesEvent();
+
     private void doGatherCapabilities(@Nullable ICapabilityProvider parent) {
-        this.capabilities = ForgeEventFactory.gatherCapabilities(baseClass, getProvider(), parent);
+        this.capabilities = ForgeEventFactory.gatherCapabilities(fireAttachCapabilitiesEvent(getProvider()), parent);
         this.initialized = true;
     }
 
@@ -144,16 +256,16 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
      * Special implementation for cases which have a superclass and can't extend CapabilityProvider directly.
      * See {@link LevelChunk}
      */
-    public static class AsField<B extends ICapabilityProviderImpl<B>> extends CapabilityProvider<B> {
+    public static abstract class AsField<B extends ICapabilityProviderImpl<B>> extends CapabilityProvider<B> {
         private final B owner;
 
-        public AsField(Class<B> baseClass, B owner) {
-            super(baseClass);
+        public AsField(B owner) {
+            super();
             this.owner = owner;
         }
 
-        public AsField(Class<B> baseClass, B owner, boolean isLazy) {
-            super(baseClass, isLazy);
+        public AsField(B owner, boolean isLazy) {
+            super(isLazy);
             this.owner = owner;
         }
 
@@ -175,6 +287,26 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         B getProvider() {
             return owner;
         }
-    };
+
+        public static class LevelChunk extends AsField<net.minecraft.world.level.chunk.LevelChunk> {
+            public LevelChunk(net.minecraft.world.level.chunk.LevelChunk owner) {
+                super(owner);
+            }
+
+            public LevelChunk(net.minecraft.world.level.chunk.LevelChunk owner, boolean isLazy) {
+                super(owner, isLazy);
+            }
+
+            @Override
+            protected AttachCapabilitiesEvent<net.minecraft.world.level.chunk.LevelChunk> fireAttachCapabilitiesEvent(net.minecraft.world.level.chunk.LevelChunk provider) {
+                return AttachCapabilitiesEvent.LevelChunk.BUS.fire(new AttachCapabilitiesEvent.LevelChunk(provider));
+            }
+
+            @Override
+            protected boolean shouldFireAttachCapabilitiesEvent() {
+                return AttachCapabilitiesEvent.LevelChunk.BUS.hasListeners();
+            }
+        }
+    }
 
 }

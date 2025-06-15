@@ -5,7 +5,7 @@
  import org.slf4j.Logger;
  
 -public abstract class BlockEntity {
-+public abstract class BlockEntity extends net.minecraftforge.common.capabilities.CapabilityProvider<BlockEntity> implements net.minecraftforge.common.extensions.IForgeBlockEntity {
++public abstract class BlockEntity extends net.minecraftforge.common.capabilities.CapabilityProvider.BlockEntity implements net.minecraftforge.common.extensions.IForgeBlockEntity {
      private static final Codec<BlockEntityType<?>> TYPE_CODEC = BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec();
      private static final Logger LOGGER = LogUtils.getLogger();
      private final BlockEntityType<?> type;
@@ -13,7 +13,7 @@
      private DataComponentMap components = DataComponentMap.EMPTY;
  
      public BlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
-+        super(BlockEntity.class);
++        super();
          this.type = p_155228_;
          this.worldPosition = p_155229_.immutable();
          this.validateBlockState(p_155230_);
