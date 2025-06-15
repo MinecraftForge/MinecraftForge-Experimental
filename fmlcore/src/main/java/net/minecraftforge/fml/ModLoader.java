@@ -6,7 +6,6 @@
 package net.minecraftforge.fml;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
