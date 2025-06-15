@@ -13,7 +13,7 @@
      @Override
      public boolean causeFallDamage(double p_391990_, float p_149499_, DamageSource p_149501_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, p_391990_, p_149499_);
-+        if (event.isCanceled()) return false;
++        if (event == null) return false;
 +        p_391990_ = event.getDistance();
 +        p_149499_ = event.getDamageMultiplier();
 +

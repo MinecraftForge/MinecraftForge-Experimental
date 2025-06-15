@@ -153,6 +153,7 @@ import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.CriticalHitEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.living.LivingGetProjectileEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.event.level.ChunkEvent;
@@ -257,8 +258,8 @@ public final class ForgeHooks {
     }
 
     public static InteractionResult onInteractEntityAt(Entity entity, Player player, Vec3 vec3d, InteractionHand hand) {
-        var ret = ForgeEventFactory.onEntityInteractSpecific(player, entity, hand, vec3d);
-        if (ret.isCanceled())
+        var ret = new PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, vec3d);
+        if (PlayerInteractEvent.EntityInteractSpecific.BUS.post(ret))
             return ret.getCancellationResult();
         return entity.interactAt(player, vec3d, hand);
     }
@@ -436,10 +437,10 @@ public final class ForgeHooks {
 
         var event = new BlockEvent.BreakEvent(level, pos, state, entityPlayer);
         event.setCanceled(preCancelEvent);
-        MinecraftForge.EVENT_BUS.post(event);
+        var eventIsCancelled = BlockEvent.BreakEvent.BUS.post(event);
 
-        // Handle if the event is canceled
-        if (event.isCanceled()) {
+        // Handle if the event is cancelled
+        if (eventIsCancelled) {
             // Let the client know the block still exists
             entityPlayer.connection.send(new ClientboundBlockUpdatePacket(level, pos));
 
@@ -451,7 +452,7 @@ public final class ForgeHooks {
                     entityPlayer.connection.send(pkt);
             }
         }
-        return event.isCanceled() ? -1 : event.getExpToDrop();
+        return eventIsCancelled ? -1 : event.getExpToDrop();
     }
 
     public static InteractionResult onPlaceItemIntoWorld(@NotNull UseOnContext context) {
@@ -579,8 +580,8 @@ public final class ForgeHooks {
     }
 
     public static InteractionResult onItemRightClick(Player player, InteractionHand hand) {
-        var evt = ForgeEventFactory.onRightClickItem(player, hand);
-        return evt.isCanceled() ? evt.getCancellationResult() : null;
+        var evt = new PlayerInteractEvent.RightClickItem(player, hand);
+        return PlayerInteractEvent.RightClickItem.BUS.post(evt) ? evt.getCancellationResult() : null;
     }
 
     public static GameType onChangeGameType(Player player, GameType currentGameType, GameType newGameType) {
@@ -1026,8 +1027,8 @@ public final class ForgeHooks {
             entity.setAirSupply(entity.getAirSupply() - breatheEvent.getConsumeAirAmount());
 
         if (entity.getAirSupply() <= -20) {
-            var drownEvent = ForgeEventFactory.onLivingDrown(entity, entity.getAirSupply() <= -20, 2.0F, 8);
-            if (!drownEvent.isCanceled() && drownEvent.isDrowning()) {
+            var drownEvent = new LivingDrownEvent(entity, entity.getAirSupply() <= -20, 2.0F, 8);
+            if (!LivingDrownEvent.BUS.post(drownEvent) && drownEvent.isDrowning()) {
                 entity.setAirSupply(0);
                 Vec3 vec3 = entity.getDeltaMovement();
 

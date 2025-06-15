@@ -151,10 +151,6 @@ public final class ForgeEventFactoryClient {
         PlayStreamingSourceEvent.BUS.post(new PlayStreamingSourceEvent(engine, sound, channel));
     }
 
-    public static ScreenshotEvent onScreenshot(NativeImage image, File screenshotFile) {
-        return ScreenshotEvent.BUS.fire(new ScreenshotEvent(image, screenshotFile));
-    }
-
     public static boolean onScreenKeyPressedPre(Screen screen, int keyCode, int scanCode, int modifiers) {
         return ScreenEvent.KeyPressed.Pre.BUS.post(new ScreenEvent.KeyPressed.Pre(screen, keyCode, scanCode, modifiers));
     }
@@ -181,6 +177,11 @@ public final class ForgeEventFactoryClient {
 
     public static InputEvent.InteractionKeyMappingTriggered onClickInput(int button, KeyMapping keyBinding, InteractionHand hand) {
         return InputEvent.InteractionKeyMappingTriggered.BUS.fire(new InputEvent.InteractionKeyMappingTriggered(button, keyBinding, hand));
+    }
+
+    public static boolean onClickInputPickBlock(KeyMapping keyBinding) {
+        var event = new InputEvent.InteractionKeyMappingTriggered(2, keyBinding, InteractionHand.MAIN_HAND);
+        return InputEvent.InteractionKeyMappingTriggered.BUS.post(event);
     }
 
     public static void onContainerRenderBackground(AbstractContainerScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY) {
@@ -240,7 +241,7 @@ public final class ForgeEventFactoryClient {
     }
 
     public static void onRenderScreenBackground(Screen screen, GuiGraphics guiGraphics) {
-        ScreenEvent.BackgroundRendered.BUS.fire(new ScreenEvent.BackgroundRendered(screen, guiGraphics));
+        ScreenEvent.BackgroundRendered.BUS.post(new ScreenEvent.BackgroundRendered(screen, guiGraphics));
     }
 
     public static void onRenderTickStart(DeltaTracker timer) {
@@ -259,8 +260,9 @@ public final class ForgeEventFactoryClient {
         return ToastAddEvent.BUS.post(new ToastAddEvent(toast));
     }
 
-    public static ScreenEvent.RenderInventoryMobEffects onScreenEffectSize(Screen screen, int availableSpace, boolean compact, int horizontalOffset) {
-        return ScreenEvent.RenderInventoryMobEffects.BUS.fire(new ScreenEvent.RenderInventoryMobEffects(screen, availableSpace, compact, horizontalOffset));
+    public static @Nullable ScreenEvent.RenderInventoryMobEffects onScreenEffectSize(Screen screen, int availableSpace, boolean compact, int horizontalOffset) {
+        var event = new ScreenEvent.RenderInventoryMobEffects(screen, availableSpace, compact, horizontalOffset);
+        return ScreenEvent.RenderInventoryMobEffects.BUS.post(event) ? null : event;
     }
 
     public static void onRecipesUpdated(ClientRecipeBook book) {

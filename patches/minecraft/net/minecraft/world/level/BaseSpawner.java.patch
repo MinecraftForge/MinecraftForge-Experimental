@@ -14,7 +14,7 @@
 -                                    ((Mob)entity).finalizeSpawn(p_151312_, p_151312_.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.SPAWNER, null);
 +                                // Forge: Patch in FinalizeSpawn for spawners so it may be fired unconditionally, instead of only when vanilla normally would trigger it.
 +                                var event = net.minecraftforge.event.ForgeEventFactory.onFinalizeSpawnSpawner(mob, p_151312_, p_151312_.getCurrentDifficultyAt(entity.blockPosition()), null, valueinput, this);
-+                                if (!event.isCanceled() && flag1) {
++                                if (event != null && flag1) {
 +                                    mob.finalizeSpawn(p_151312_, event.getDifficulty(), EntitySpawnReason.SPAWNER, null);
                                  }
  

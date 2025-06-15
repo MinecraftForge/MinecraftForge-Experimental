@@ -295,7 +295,7 @@ public class ForgeHooksClient {
 
     @Nullable
     public static SoundInstance playSound(SoundEngine manager, SoundInstance sound) {
-        return MinecraftForge.EVENT_BUS.fire(new PlaySoundEvent(manager, sound)).getSound();
+        return PlaySoundEvent.BUS.fire(new PlaySoundEvent(manager, sound)).getSound();
     }
 
     public static void drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
@@ -378,10 +378,10 @@ public class ForgeHooksClient {
         return from.getItem().shouldCauseReequipAnimation(from, to, changed);
     }
 
-    public static CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphics guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
+    public static @Nullable CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphics guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
         var evt = new CustomizeGuiOverlayEvent.BossEventProgress(window, guiGraphics,
                 Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false), bossInfo, x, y, increment);
-        return CustomizeGuiOverlayEvent.BossEventProgress.BUS.fire(evt);
+        return CustomizeGuiOverlayEvent.BossEventProgress.BUS.post(evt) ? null : evt;
     }
 
     public static void onCustomizeChatEvent(GuiGraphics guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount) {
@@ -628,9 +628,9 @@ public class ForgeHooksClient {
         return stackFont == null ? fallbackFont : stackFont;
     }
 
-    public static RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner) {
+    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner) {
         var preEvent = new RenderTooltipEvent.Pre(stack, graphics, x, y, screenWidth, screenHeight, getTooltipFont(stack, fallbackFont), components, positioner);
-        return RenderTooltipEvent.Pre.BUS.fire(preEvent);
+        return RenderTooltipEvent.Pre.BUS.post(preEvent) ? null : preEvent;
     }
 
     public static List<ClientTooltipComponent> gatherTooltipComponents(ItemStack stack, List<? extends FormattedText> textElements, int mouseX, int screenWidth, int screenHeight, Font fallbackFont) {

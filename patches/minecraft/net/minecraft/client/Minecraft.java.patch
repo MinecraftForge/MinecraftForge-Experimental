@@ -349,7 +349,7 @@
  
      private void pickBlock() {
          if (this.hitResult != null && this.hitResult.getType() != HitResult.Type.MISS) {
-+            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onClickInput(2, this.options.keyPickItem, InteractionHand.MAIN_HAND).isCanceled()) return;
++            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onClickInputPickBlock(this.options.keyPickItem)) return;
              boolean flag = Screen.hasControlDown();
              switch (this.hitResult) {
                  case BlockHitResult blockhitresult:

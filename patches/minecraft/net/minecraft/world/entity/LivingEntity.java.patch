@@ -172,7 +172,7 @@
  
                          float f = blocksattacks.resolveBlockedDamage(p_392511_, p_394545_, d0);
 +                        var ev = net.minecraftforge.event.ForgeEventFactory.onShieldBlock(this, p_392511_, f, itemstack);
-+                        if (ev.isCanceled()) return 0.0F;
++                        if (ev == null) return 0.0F;
 +                        f = ev.getBlockedDamage();
 +                        if (ev.shieldTakesDamage())
                          blocksattacks.hurtBlockingItem(this.level(), itemstack, this, this.getUsedItemHand(), f);
@@ -252,7 +252,7 @@
  
      public void knockback(double p_147241_, double p_147242_, double p_147243_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingKnockBack(this, (float) p_147241_, p_147242_, p_147243_);
-+        if (event.isCanceled()) return;
++        if (event == null) return;
 +        p_147241_ = event.getStrength();
 +        p_147242_ = event.getRatioX();
 +        p_147243_ = event.getRatioZ();
@@ -278,7 +278,7 @@
      @Override
      public boolean causeFallDamage(double p_393354_, float p_147187_, DamageSource p_147189_) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, p_393354_, p_147187_);
-+        if (event.isCanceled()) return false;
++        if (event == null) return false;
 +        p_393354_ = event.getDistance();
 +        p_147187_ = event.getDamageMultiplier();
          boolean flag = super.causeFallDamage(p_393354_, p_147187_, p_147189_);
@@ -343,7 +343,7 @@
 -        this.setItemSlot(EquipmentSlot.OFFHAND, this.getItemBySlot(EquipmentSlot.MAINHAND));
 -        this.setItemSlot(EquipmentSlot.MAINHAND, itemstack);
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingSwapHandItems(this);
-+        if (event.isCanceled()) return;
++        if (event == null) return;
 +        this.setItemSlot(EquipmentSlot.OFFHAND, event.getItemSwappedToOffHand());
 +        this.setItemSlot(EquipmentSlot.MAINHAND, event.getItemSwappedToMainHand());
      }

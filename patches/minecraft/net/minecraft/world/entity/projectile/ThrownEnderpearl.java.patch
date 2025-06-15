@@ -5,7 +5,7 @@
                  if (entity instanceof ServerPlayer serverplayer) {
                      if (serverplayer.connection.isAcceptingMessages()) {
 +                        var event = net.minecraftforge.event.ForgeEventFactory.onEnderPearlLand(serverplayer, this.getX(), this.getY(), this.getZ(), this, 5.0F, p_37504_);
-+                        if (event.isCanceled()) {
++                        if (event == null) {
 +                            this.discard();
 +                            return;
 +                        }

@@ -5,7 +5,7 @@
          if (!collection.isEmpty() && j >= 32) {
              boolean flag = j >= 120;
 +            var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenEffectSize(this.screen, j, !flag, i);
-+            if (event.isCanceled()) return;
++            if (event == null) return;
 +            flag = !event.isCompact();
 +            i = event.getHorizontalOffset();
              int k = 33;

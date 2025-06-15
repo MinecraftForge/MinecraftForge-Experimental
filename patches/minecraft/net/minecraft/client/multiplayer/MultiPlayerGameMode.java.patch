@@ -75,7 +75,7 @@
  
                  this.destroyTicks++;
                  this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, p_105284_, blockstate, Mth.clamp(this.destroyProgress, 0.0F, 1.0F));
-+                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, p_105284_, p_105285_).getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY) return true;
++                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, p_105284_, p_105285_).getUseItem().isDenied()) return true;
                  if (this.destroyProgress >= 1.0F) {
                      this.isDestroying = false;
                      this.startPrediction(this.minecraft.level, p_233739_ -> {

@@ -332,7 +332,8 @@ public final class ForgeEventFactory {
      */
     @Nullable
     public static MobSpawnEvent.FinalizeSpawn onFinalizeSpawnSpawner(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable SpawnGroupData spawnData, @Nullable ValueInput spawnTag, BaseSpawner spawner) {
-        return MobSpawnEvent.FinalizeSpawn.BUS.fire(new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, EntitySpawnReason.SPAWNER, spawnData, spawnTag, spawner));
+        var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, EntitySpawnReason.SPAWNER, spawnData, spawnTag, spawner);
+        return MobSpawnEvent.FinalizeSpawn.BUS.post(event) ? null : event;
     }
 
     public static Result canEntityDespawn(Mob entity, ServerLevelAccessor level) {
@@ -459,12 +460,14 @@ public final class ForgeEventFactory {
         return null;
     }
 
-    public static PlayLevelSoundEvent.AtEntity onPlaySoundAtEntity(Level level, Entity entity, Holder<SoundEvent> name, SoundSource category, float volume, float pitch) {
-        return PlayLevelSoundEvent.AtEntity.BUS.fire(new PlayLevelSoundEvent.AtEntity(level, entity, name, category, volume, pitch));
+    public static @Nullable PlayLevelSoundEvent.AtEntity onPlaySoundAtEntity(Level level, Entity entity, Holder<SoundEvent> name, SoundSource category, float volume, float pitch) {
+        var event = new PlayLevelSoundEvent.AtEntity(level, entity, name, category, volume, pitch);
+        return PlayLevelSoundEvent.AtEntity.BUS.post(event) ? null : event;
     }
 
     public static PlayLevelSoundEvent.AtPosition onPlaySoundAtPosition(Level level, double x, double y, double z, Holder<SoundEvent> name, SoundSource category, float volume, float pitch) {
-        return PlayLevelSoundEvent.AtPosition.BUS.fire(new PlayLevelSoundEvent.AtPosition(level, new Vec3(x, y, z), name, category, volume, pitch));
+        var event = new PlayLevelSoundEvent.AtPosition(level, new Vec3(x, y, z), name, category, volume, pitch);
+        return PlayLevelSoundEvent.AtPosition.BUS.post(event) ? null : event;
     }
 
     public static int onItemExpire(ItemEntity entity, @NotNull ItemStack item) {
@@ -639,7 +642,7 @@ public final class ForgeEventFactory {
     }
 
     public static Optional<PortalShape> onTrySpawnPortal(LevelAccessor level, BlockPos pos, Optional<PortalShape> size) {
-        if (!size.isPresent()) return size;
+        if (size.isEmpty()) return size;
         return !BlockEvent.PortalSpawnEvent.BUS.post(new BlockEvent.PortalSpawnEvent(level, pos, level.getBlockState(pos), size.get())) ? size : Optional.empty();
     }
 
@@ -718,20 +721,23 @@ public final class ForgeEventFactory {
         return BabyEntitySpawnEvent.BUS.fire(new BabyEntitySpawnEvent(parentA, parentB, proposedChild));
     }
 
-    public static EntityTeleportEvent.TeleportCommand onEntityTeleportCommand(Entity entity, double targetX, double targetY, double targetZ) {
-        return EntityTeleportEvent.TeleportCommand.BUS.fire(new EntityTeleportEvent.TeleportCommand(entity, targetX, targetY, targetZ));
+    public static @Nullable EntityTeleportEvent.TeleportCommand onEntityTeleportCommand(Entity entity, double targetX, double targetY, double targetZ) {
+        var event = new EntityTeleportEvent.TeleportCommand(entity, targetX, targetY, targetZ);
+        return EntityTeleportEvent.TeleportCommand.BUS.post(event) ? null : event;
     }
 
-    public static EntityTeleportEvent.SpreadPlayersCommand onEntityTeleportSpreadPlayersCommand(Entity entity, double targetX, double targetY, double targetZ) {
-        return EntityTeleportEvent.SpreadPlayersCommand.BUS.fire(new EntityTeleportEvent.SpreadPlayersCommand(entity, targetX, targetY, targetZ));
+    public static @Nullable EntityTeleportEvent.SpreadPlayersCommand onEntityTeleportSpreadPlayersCommand(Entity entity, double targetX, double targetY, double targetZ) {
+        var event = new EntityTeleportEvent.SpreadPlayersCommand(entity, targetX, targetY, targetZ);
+        return EntityTeleportEvent.SpreadPlayersCommand.BUS.post(event) ? null : event;
     }
 
     public static EntityTeleportEvent.EnderEntity onEnderTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
         return EntityTeleportEvent.EnderEntity.BUS.fire(new EntityTeleportEvent.EnderEntity(entity, targetX, targetY, targetZ));
     }
 
-    public static EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
-        return EntityTeleportEvent.EnderPearl.BUS.fire(new EntityTeleportEvent.EnderPearl(entity, targetX, targetY, targetZ, pearlEntity, attackDamage, hitResult));
+    public static @Nullable EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
+        var event = new EntityTeleportEvent.EnderPearl(entity, targetX, targetY, targetZ, pearlEntity, attackDamage, hitResult);
+        return EntityTeleportEvent.EnderPearl.BUS.post(event) ? null : event;
     }
 
     public static EntityTeleportEvent.ChorusFruit onChorusFruitTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
@@ -886,12 +892,14 @@ public final class ForgeEventFactory {
         ChannelRegistrationChangeEvent.BUS.post(new ChannelRegistrationChangeEvent(connection, changeType, changed));
     }
 
-    public static LivingSwapItemsEvent.Hands onLivingSwapHandItems(LivingEntity entity) {
-        return LivingSwapItemsEvent.Hands.BUS.fire(new LivingSwapItemsEvent.Hands(entity));
+    public static @Nullable LivingSwapItemsEvent.Hands onLivingSwapHandItems(LivingEntity entity) {
+        var event = new LivingSwapItemsEvent.Hands(entity);
+        return LivingSwapItemsEvent.Hands.BUS.post(event) ? null : event;
     }
 
-    public static ShieldBlockEvent onShieldBlock(LivingEntity blocker, DamageSource source, float blocked, ItemStack blockedWith) {
-        return ShieldBlockEvent.BUS.fire(new ShieldBlockEvent(blocker, source, blocked, blockedWith));
+    public static @Nullable ShieldBlockEvent onShieldBlock(LivingEntity blocker, DamageSource source, float blocked, ItemStack blockedWith) {
+        var event = new ShieldBlockEvent(blocker, source, blocked, blockedWith);
+        return ShieldBlockEvent.BUS.post(event) ? null : event;
     }
 
     public static void onEntityEnterSection(Entity entity, long packedOldPos, long packedNewPos) {
@@ -902,8 +910,9 @@ public final class ForgeEventFactory {
         return LivingEvent.LivingTickEvent.BUS.post(new LivingEvent.LivingTickEvent(entity));
     }
 
-    public static LivingFallEvent onLivingFall(LivingEntity entity, double distance, float damageMultiplier) {
-        return LivingFallEvent.BUS.fire(new LivingFallEvent(entity, distance, damageMultiplier));
+    public static @Nullable LivingFallEvent onLivingFall(LivingEntity entity, double distance, float damageMultiplier) {
+        var event = new LivingFallEvent(entity, distance, damageMultiplier);
+        return LivingFallEvent.BUS.post(event) ? null : event;
     }
 
     public static LivingBreatheEvent onLivingBreathe(LivingEntity entity, boolean canBreathe, int consumeAirAmount, int refillAirAmount, boolean canRefillAir) {
@@ -914,8 +923,9 @@ public final class ForgeEventFactory {
         return LivingDrownEvent.BUS.fire(new LivingDrownEvent(entity, isDrowning, damageAmount, bubbleCount));
     }
 
-    public static LivingKnockBackEvent onLivingKnockBack(LivingEntity target, float strength, double ratioX, double ratioZ) {
-        return LivingKnockBackEvent.BUS.fire(new LivingKnockBackEvent(target, strength, ratioX, ratioZ));
+    public static @Nullable LivingKnockBackEvent onLivingKnockBack(LivingEntity target, float strength, double ratioX, double ratioZ) {
+        var event = new LivingKnockBackEvent(target, strength, ratioX, ratioZ);
+        return LivingKnockBackEvent.BUS.post(event) ? null : event;
     }
 
     public static boolean onLivingDeath(LivingEntity entity, DamageSource src) {
@@ -1011,44 +1021,50 @@ public final class ForgeEventFactory {
     }
 
     public static void onLivingEquipmentChange(LivingEntity entity, EquipmentSlot slot, ItemStack from, ItemStack to) {
-        LivingEquipmentChangeEvent.BUS.fire(new LivingEquipmentChangeEvent(entity, slot, from, to));
+        LivingEquipmentChangeEvent.BUS.post(new LivingEquipmentChangeEvent(entity, slot, from, to));
     }
 
-    public static LivingChangeTargetEvent onLivingChangeTargetMob(LivingEntity entity, LivingEntity originalTarget) {
-        return LivingChangeTargetEvent.BUS.fire(new LivingChangeTargetEvent(entity, originalTarget, LivingChangeTargetEvent.LivingTargetType.MOB_TARGET));
+    public static @Nullable LivingChangeTargetEvent onLivingChangeTargetMob(LivingEntity entity, LivingEntity originalTarget) {
+        var event = new LivingChangeTargetEvent(entity, originalTarget, LivingChangeTargetEvent.LivingTargetType.MOB_TARGET);
+        return LivingChangeTargetEvent.BUS.post(event) ? null : event;
     }
 
-    public static LivingChangeTargetEvent onLivingChangeTargetBehavior(LivingEntity entity, LivingEntity originalTarget) {
-        return LivingChangeTargetEvent.BUS.fire(new LivingChangeTargetEvent(entity, originalTarget, LivingChangeTargetEvent.LivingTargetType.BEHAVIOR_TARGET));
+    public static @Nullable LivingChangeTargetEvent onLivingChangeTargetBehavior(LivingEntity entity, LivingEntity originalTarget) {
+        var event = new LivingChangeTargetEvent(entity, originalTarget, LivingChangeTargetEvent.LivingTargetType.BEHAVIOR_TARGET);
+        return LivingChangeTargetEvent.BUS.post(event) ? null : event;
     }
 
     public static ItemFishedEvent onPlayerFishedItem(List<ItemStack> stacks, int rodDamage, FishingHook hook) {
         return ItemFishedEvent.BUS.fire(new ItemFishedEvent(stacks, rodDamage, hook));
     }
 
-    public static PlayerXpEvent.XpChange onPlayerXpChange(Player player, int xp) {
-        return PlayerXpEvent.XpChange.BUS.fire(new PlayerXpEvent.XpChange(player, xp));
+    public static @Nullable PlayerXpEvent.XpChange onPlayerXpChange(Player player, int xp) {
+        var event = new PlayerXpEvent.XpChange(player, xp);
+        return PlayerXpEvent.XpChange.BUS.post(event) ? null : event;
     }
 
-    public static PlayerXpEvent.LevelChange onPlayerLevelChange(Player player, int levels) {
-        return PlayerXpEvent.LevelChange.BUS.fire(new PlayerXpEvent.LevelChange(player, levels));
+    public static @Nullable PlayerXpEvent.LevelChange onPlayerLevelChange(Player player, int levels) {
+        var event = new PlayerXpEvent.LevelChange(player, levels);
+        return PlayerXpEvent.LevelChange.BUS.post(event) ? null : event;
     }
 
 
-    public static GrindstoneEvent.OnPlaceItem onGrindstoneChange(@NotNull ItemStack top, @NotNull ItemStack bottom, Container outputSlot, int xp) {
-        return GrindstoneEvent.OnPlaceItem.BUS.fire(new GrindstoneEvent.OnPlaceItem(top, bottom, xp));
+    public static @Nullable GrindstoneEvent.OnPlaceItem onGrindstoneChange(@NotNull ItemStack top, @NotNull ItemStack bottom, Container outputSlot, int xp) {
+        var event = new GrindstoneEvent.OnPlaceItem(top, bottom, xp);
+        return GrindstoneEvent.OnPlaceItem.BUS.post(event) ? null : event;
     }
 
     public static void onBrewingRecipeRegister(Builder builder, FeatureFlagSet features) {
-        BrewingRecipeRegisterEvent.BUS.fire(new BrewingRecipeRegisterEvent(builder, features));
+        BrewingRecipeRegisterEvent.BUS.post(new BrewingRecipeRegisterEvent(builder, features));
     }
 
     public static boolean onItemStackedOn(ItemStack carriedItem, ItemStack stackedOnItem, Slot slot, ClickAction action, Player player, SlotAccess carriedSlotAccess) {
         return ItemStackedOnOtherEvent.BUS.post(new ItemStackedOnOtherEvent(carriedItem, stackedOnItem, slot, action, player, carriedSlotAccess));
     }
 
-    public static NoteBlockEvent.Play onNotePlay(Level world, BlockPos pos, BlockState state, int note, NoteBlockInstrument instrument) {
-        return NoteBlockEvent.Play.BUS.fire(new NoteBlockEvent.Play(world, pos, state, note, instrument));
+    public static @Nullable NoteBlockEvent.Play onNotePlay(Level world, BlockPos pos, BlockState state, int note, NoteBlockInstrument instrument) {
+        var event = new NoteBlockEvent.Play(world, pos, state, note, instrument);
+        return NoteBlockEvent.Play.BUS.post(event) ? null : event;
     }
 
     public static AnvilRepairEvent onAnvilRepair(Player player, @NotNull ItemStack output, @NotNull ItemStack left, @NotNull ItemStack right) {

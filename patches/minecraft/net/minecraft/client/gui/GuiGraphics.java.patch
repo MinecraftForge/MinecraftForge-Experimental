@@ -87,7 +87,7 @@
          @Nullable ResourceLocation p_409298_
      ) {
 +        var preEvent = net.minecraftforge.client.ForgeHooksClient.onRenderTooltipPre(this.tooltipStack, this, p_283678_, p_281696_, guiWidth(), guiHeight(), p_282716_, p_283128_, p_409451_);
-+        if (preEvent.isCanceled()) return;
++        if (preEvent == null) return;
          int i = 0;
          int j = p_282716_.size() == 1 ? -2 : 0;
  
