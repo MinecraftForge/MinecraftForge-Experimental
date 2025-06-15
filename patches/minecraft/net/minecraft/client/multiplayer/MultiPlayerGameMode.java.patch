@@ -38,11 +38,11 @@
                  this.startPrediction(this.minecraft.level, p_233728_ -> {
                      boolean flag = !blockstate1.isAir();
                      if (flag && this.destroyProgress == 0.0F) {
-+                        if (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY)
++                        if (!event.getUseBlock().isDenied())
                          blockstate1.attack(this.minecraft.level, p_105270_, this.minecraft.player);
                      }
  
-+                    if (event.getUseItem() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++                    if (!event.getUseItem().isDenied()) {
                      if (flag && blockstate1.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), p_105270_) >= 1.0F) {
                          this.destroyBlock(p_105270_);
                      } else {
@@ -92,8 +92,8 @@
      private InteractionResult performUseItemOn(LocalPlayer p_233747_, InteractionHand p_233748_, BlockHitResult p_233749_) {
          BlockPos blockpos = p_233749_.getBlockPos();
          ItemStack itemstack = p_233747_.getItemInHand(p_233748_);
-+        var event = net.minecraftforge.event.ForgeEventFactory.onRightClickBlock(p_233747_, p_233748_, blockpos, p_233749_);
-+        if (event.isCanceled()) {
++        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p_233747_, p_233748_, blockpos, p_233749_);
++        if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock.BUS.post(event)) {
 +            return event.getCancellationResult();
 +        }
          if (this.localPlayerMode == GameType.SPECTATOR) {
@@ -101,7 +101,7 @@
          } else {
 -            boolean flag = !p_233747_.getMainHandItem().isEmpty() || !p_233747_.getOffhandItem().isEmpty();
 +            UseOnContext useoncontext = new UseOnContext(p_233747_, p_233748_, p_233749_);
-+            if (event.getUseItem() != net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (!event.getUseItem().isDenied()) {
 +               InteractionResult result = itemstack.onItemUseFirst(useoncontext);
 +               if (result != InteractionResult.PASS) {
 +                  return result;
@@ -110,7 +110,7 @@
 +            boolean flag = !p_233747_.getMainHandItem().doesSneakBypassUse(p_233747_.level(), blockpos, p_233747_) || !p_233747_.getOffhandItem().doesSneakBypassUse(p_233747_.level(), blockpos, p_233747_);
              boolean flag1 = p_233747_.isSecondaryUseActive() && flag;
 -            if (!flag1) {
-+            if (event.getUseBlock() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (event.getUseBlock() != net.minecraftforge.eventbus.api.Event.Result.DENY && !flag1)) {
++            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !flag1)) {
                  BlockState blockstate = this.minecraft.level.getBlockState(blockpos);
                  if (!this.connection.isFeatureEnabled(blockstate.getBlock().requiredFeatures())) {
                      return InteractionResult.FAIL;
@@ -120,10 +120,10 @@
  
 -            if (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack)) {
 -                UseOnContext useoncontext = new UseOnContext(p_233747_, p_233748_, p_233749_);
-+            if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.DENY) {
++            if (event.getUseItem().isDenied()) {
 +               return InteractionResult.PASS;
 +            }
-+            if (event.getUseItem() == net.minecraftforge.eventbus.api.Event.Result.ALLOW || (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack))) {
++            if (event.getUseItem().isAllowed() || (!itemstack.isEmpty() && !p_233747_.getCooldowns().isOnCooldown(itemstack))) {
                  InteractionResult interactionresult2;
                  if (p_233747_.hasInfiniteMaterials()) {
                      int i = itemstack.getCount();
@@ -131,8 +131,8 @@
                          mutableobject.setValue(InteractionResult.PASS);
                          return serverbounduseitempacket;
                      } else {
-+                        var event = net.minecraftforge.event.ForgeEventFactory.onRightClickItem(p_233722_, p_233723_);
-+                        if (event.isCanceled()) {
++                        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem(p_233722_, p_233723_);
++                        if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem.BUS.post(event)) {
 +                           mutableobject.setValue(event.getCancellationResult());
 +                           return serverbounduseitempacket;
 +                        }
@@ -154,8 +154,8 @@
          this.ensureHasSentCarriedItem();
          this.connection.send(ServerboundInteractPacket.createInteractionPacket(p_105228_, p_105227_.isShiftKeyDown(), p_105229_));
 +        if (this.localPlayerMode != GameType.SPECTATOR) {
-+            var event = net.minecraftforge.event.ForgeEventFactory.onEntityInteract(p_105227_, p_105228_, p_105229_);
-+            if (event.isCanceled()) return event.getCancellationResult();
++            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(p_105227_, p_105229_, p_105228_);
++            if (net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract.BUS.post(event)) return event.getCancellationResult();
 +        }
          return (InteractionResult)(this.localPlayerMode == GameType.SPECTATOR ? InteractionResult.PASS : p_105227_.interactOn(p_105228_, p_105229_));
      }
@@ -165,8 +165,8 @@
          Vec3 vec3 = p_105233_.getLocation().subtract(p_105232_.getX(), p_105232_.getY(), p_105232_.getZ());
          this.connection.send(ServerboundInteractPacket.createInteractionPacket(p_105232_, p_105231_.isShiftKeyDown(), p_105234_, vec3));
 +        if (this.localPlayerMode != GameType.SPECTATOR) {
-+            var event = net.minecraftforge.event.ForgeEventFactory.onEntityInteractSpecific(p_105231_, p_105232_, p_105234_, vec3);
-+            if (event.isCanceled()) return event.getCancellationResult();
++            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific(p_105231_, p_105234_, p_105232_, vec3);
++            if (net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific.BUS.post(event)) return event.getCancellationResult();
 +        }
          return (InteractionResult)(this.localPlayerMode == GameType.SPECTATOR ? InteractionResult.PASS : p_105232_.interactAt(p_105231_, vec3, p_105234_));
      }

@@ -29,8 +29,8 @@
          boolean flag = blockstate.blocksMotion();
          boolean flag1 = blockstate.getFluidState().is(FluidTags.WATER);
          if (flag && !flag1) {
-+            net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity event = net.minecraftforge.event.ForgeEventFactory.onEnderTeleport(this, p_32544_, p_32545_, p_32546_);
-+            if (event.isCanceled()) return false;
++            var event = net.minecraftforge.event.ForgeEventFactory.onEnderManTeleport(this, p_32544_, p_32545_, p_32546_);
++            if (event == null) return false;
              Vec3 vec3 = this.position();
 -            boolean flag2 = this.randomTeleport(p_32544_, p_32545_, p_32546_, true);
 +            boolean flag2 = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);

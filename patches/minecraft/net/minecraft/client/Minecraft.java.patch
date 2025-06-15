@@ -194,8 +194,8 @@
                  BlockPos blockpos = blockhitresult.getBlockPos();
 -                if (!this.level.getBlockState(blockpos).isAir()) {
 +                if (!this.level.isEmptyBlock(blockpos)) {
-+                    var inputEvent = net.minecraftforge.client.event.ForgeEventFactoryClient.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
-+                    if (inputEvent.isCanceled()) {
++                    var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
++                    if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
 +                       if (inputEvent.shouldSwingHand()) {
 +                          this.particleEngine.addBlockHitEffects(blockpos, blockhitresult);
 +                          this.player.swing(InteractionHand.MAIN_HAND);
@@ -214,8 +214,8 @@
                  return false;
              } else {
                  boolean flag = false;
-+                var inputEvent = net.minecraftforge.client.event.ForgeEventFactoryClient.onClickInput(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
-+                if (!inputEvent.isCanceled())
++                var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
++                if (!net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent))
                  switch (this.hitResult.getType()) {
                      case ENTITY:
                          this.gameMode.attack(this.player, ((EntityHitResult)this.hitResult).getEntity());
@@ -243,8 +243,8 @@
                  }
  
                  for (InteractionHand interactionhand : InteractionHand.values()) {
-+                    var inputEvent = net.minecraftforge.client.event.ForgeEventFactoryClient.onClickInput(1, this.options.keyUse, interactionhand);
-+                    if (inputEvent.isCanceled()) {
++                    var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(1, this.options.keyUse, interactionhand);
++                    if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
 +                       if (inputEvent.shouldSwingHand()) this.player.swing(interactionhand);
 +                       return;
 +                    }

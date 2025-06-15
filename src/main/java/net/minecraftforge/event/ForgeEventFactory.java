@@ -642,7 +642,7 @@ public final class ForgeEventFactory {
 
     public static Optional<PortalShape> onTrySpawnPortal(LevelAccessor level, BlockPos pos, Optional<PortalShape> size) {
         if (size.isEmpty()) return size;
-        return !BlockEvent.PortalSpawnEvent.BUS.post(new BlockEvent.PortalSpawnEvent(level, pos, level.getBlockState(pos), size.get())) ? size : Optional.empty();
+        return BlockEvent.PortalSpawnEvent.BUS.post(new BlockEvent.PortalSpawnEvent(level, pos, level.getBlockState(pos), size.get())) ? Optional.empty() : size;
     }
 
     public static int onEnchantmentLevelSet(Level level, BlockPos pos, int enchantRow, int power, ItemStack itemStack, int enchantmentLevel) {
@@ -730,8 +730,9 @@ public final class ForgeEventFactory {
         return EntityTeleportEvent.SpreadPlayersCommand.BUS.post(event) ? null : event;
     }
 
-    public static EntityTeleportEvent.EnderEntity onEnderTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
-        return EntityTeleportEvent.EnderEntity.BUS.fire(new EntityTeleportEvent.EnderEntity(entity, targetX, targetY, targetZ));
+    public static @Nullable EntityTeleportEvent.EnderEntity onEnderManTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
+        var event = new EntityTeleportEvent.EnderEntity(entity, targetX, targetY, targetZ);
+        return EntityTeleportEvent.EnderEntity.BUS.post(event) ? null : event;
     }
 
     public static @Nullable EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
@@ -947,20 +948,8 @@ public final class ForgeEventFactory {
         return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD));
     }
 
-    public static PlayerInteractEvent.RightClickBlock onRightClickBlock(Player player, InteractionHand hand, BlockPos pos, BlockHitResult hitVec) {
-        return PlayerInteractEvent.RightClickBlock.BUS.fire(new PlayerInteractEvent.RightClickBlock(player, hand, pos, hitVec));
-    }
-
-    public static PlayerInteractEvent.RightClickItem onRightClickItem(Player player, InteractionHand hand) {
-        return PlayerInteractEvent.RightClickItem.BUS.fire(new PlayerInteractEvent.RightClickItem(player, hand));
-    }
-
     public static PlayerInteractEvent.EntityInteract onEntityInteract(Player player, Entity entity, InteractionHand hand) {
         return PlayerInteractEvent.EntityInteract.BUS.fire(new PlayerInteractEvent.EntityInteract(player, hand, entity));
-    }
-
-    public static PlayerInteractEvent.EntityInteractSpecific onEntityInteractSpecific(Player player, Entity entity, InteractionHand hand, Vec3 vec3d) {
-        return PlayerInteractEvent.EntityInteractSpecific.BUS.fire(new PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, vec3d));
     }
 
     public static void onRightClickEmpty(Player player, InteractionHand hand) {

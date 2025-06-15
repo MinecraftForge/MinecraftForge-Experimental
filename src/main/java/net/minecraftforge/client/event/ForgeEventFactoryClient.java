@@ -175,10 +175,6 @@ public final class ForgeEventFactoryClient {
         return ScreenEvent.CharacterTyped.Post.BUS.post(new ScreenEvent.CharacterTyped.Post(screen, codePoint, modifiers));
     }
 
-    public static InputEvent.InteractionKeyMappingTriggered onClickInput(int button, KeyMapping keyBinding, InteractionHand hand) {
-        return InputEvent.InteractionKeyMappingTriggered.BUS.fire(new InputEvent.InteractionKeyMappingTriggered(button, keyBinding, hand));
-    }
-
     public static boolean onClickInputPickBlock(KeyMapping keyBinding) {
         var event = new InputEvent.InteractionKeyMappingTriggered(2, keyBinding, InteractionHand.MAIN_HAND);
         return InputEvent.InteractionKeyMappingTriggered.BUS.post(event);
