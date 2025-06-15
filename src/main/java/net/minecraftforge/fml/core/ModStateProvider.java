@@ -6,6 +6,7 @@
 package net.minecraftforge.fml.core;
 
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.IModLoadingState;
 import net.minecraftforge.fml.IModStateProvider;
 import net.minecraftforge.fml.ModContainer;
@@ -22,6 +23,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.event.lifecycle.InterModProcessEvent;
 import net.minecraftforge.fml.event.lifecycle.ParallelDispatchEvent;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLPaths;
 
@@ -135,7 +137,8 @@ public class ModStateProvider implements IModStateProvider {
      *
      * @see ModLoadingStage#DONE
      */
-    public static final ModLoadingState DONE = ModLoadingState.of("DONE", ModLoadingPhase.DONE).empty();
+    public static final ModLoadingState DONE = ModLoadingState.of("DONE", ModLoadingPhase.DONE)
+            .withInline(ml -> BusGroup.DEFAULT.trim());
 
     @Override
     public List<IModLoadingState> getAllStates() {
