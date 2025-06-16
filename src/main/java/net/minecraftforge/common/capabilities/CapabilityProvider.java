@@ -11,6 +11,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -36,103 +40,83 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
     private HolderLookup.Provider         registryAccess     = null;
     private boolean initialized = false;
 
-    public static class Entity extends CapabilityProvider<net.minecraft.world.entity.Entity> {
-        protected Entity() {
+    public static class Entities extends CapabilityProvider<Entity> {
+        protected Entities() {
             super(false);
         }
 
-        protected Entity(boolean isLazy) {
+        protected Entities(boolean isLazy) {
             super(isLazy);
         }
 
         @Override
-        protected AttachCapabilitiesEvent<net.minecraft.world.entity.Entity> fireAttachCapabilitiesEvent(net.minecraft.world.entity.Entity provider) {
-            return AttachCapabilitiesEvent.Entity.BUS.fire(new AttachCapabilitiesEvent.Entity(provider));
+        protected AttachCapabilitiesEvent<Entity> fireAttachCapabilitiesEvent(Entity provider) {
+            return AttachCapabilitiesEvent.Entities.BUS.fire(new AttachCapabilitiesEvent.Entities(provider));
         }
 
         @Override
         protected boolean shouldFireAttachCapabilitiesEvent() {
-            return AttachCapabilitiesEvent.Entity.BUS.hasListeners();
+            return AttachCapabilitiesEvent.Entities.BUS.hasListeners();
         }
     }
 
-    public static class BlockEntity extends CapabilityProvider<net.minecraft.world.level.block.entity.BlockEntity> {
-        protected BlockEntity() {
+    public static class BlockEntities extends CapabilityProvider<BlockEntity> {
+        protected BlockEntities() {
             super(false);
         }
 
-        protected BlockEntity(boolean isLazy) {
+        protected BlockEntities(boolean isLazy) {
             super(isLazy);
         }
 
         @Override
-        protected AttachCapabilitiesEvent<net.minecraft.world.level.block.entity.BlockEntity> fireAttachCapabilitiesEvent(net.minecraft.world.level.block.entity.BlockEntity provider) {
-            return AttachCapabilitiesEvent.BlockEntity.BUS.fire(new AttachCapabilitiesEvent.BlockEntity(provider));
+        protected AttachCapabilitiesEvent<BlockEntity> fireAttachCapabilitiesEvent(BlockEntity provider) {
+            return AttachCapabilitiesEvent.BlockEntities.BUS.fire(new AttachCapabilitiesEvent.BlockEntities(provider));
         }
 
         @Override
         protected boolean shouldFireAttachCapabilitiesEvent() {
-            return AttachCapabilitiesEvent.BlockEntity.BUS.hasListeners();
+            return AttachCapabilitiesEvent.BlockEntities.BUS.hasListeners();
         }
     }
 
-    public static class ItemStack extends CapabilityProvider<net.minecraft.world.item.ItemStack> {
-        protected ItemStack() {
+    public static class ItemStacks extends CapabilityProvider<ItemStack> {
+        protected ItemStacks() {
             super(false);
         }
 
-        protected ItemStack(boolean isLazy) {
+        protected ItemStacks(boolean isLazy) {
             super(isLazy);
         }
 
         @Override
-        protected AttachCapabilitiesEvent<net.minecraft.world.item.ItemStack> fireAttachCapabilitiesEvent(net.minecraft.world.item.ItemStack provider) {
-            return AttachCapabilitiesEvent.ItemStack.BUS.fire(new AttachCapabilitiesEvent.ItemStack(provider));
+        protected AttachCapabilitiesEvent<ItemStack> fireAttachCapabilitiesEvent(ItemStack provider) {
+            return AttachCapabilitiesEvent.ItemStacks.BUS.fire(new AttachCapabilitiesEvent.ItemStacks(provider));
         }
 
         @Override
         protected boolean shouldFireAttachCapabilitiesEvent() {
-            return AttachCapabilitiesEvent.ItemStack.BUS.hasListeners();
+            return AttachCapabilitiesEvent.ItemStacks.BUS.hasListeners();
         }
     }
 
-    public static class Level extends CapabilityProvider<net.minecraft.world.level.Level> {
-        protected Level() {
+    public static class Levels extends CapabilityProvider<Level> {
+        protected Levels() {
             super(false);
         }
 
-        protected Level(boolean isLazy) {
+        protected Levels(boolean isLazy) {
             super(isLazy);
         }
 
         @Override
-        protected AttachCapabilitiesEvent<net.minecraft.world.level.Level> fireAttachCapabilitiesEvent(net.minecraft.world.level.Level provider) {
-            return AttachCapabilitiesEvent.Level.BUS.fire(new AttachCapabilitiesEvent.Level(provider));
+        protected AttachCapabilitiesEvent<Level> fireAttachCapabilitiesEvent(Level provider) {
+            return AttachCapabilitiesEvent.Levels.BUS.fire(new AttachCapabilitiesEvent.Levels(provider));
         }
 
         @Override
         protected boolean shouldFireAttachCapabilitiesEvent() {
-            return AttachCapabilitiesEvent.Level.BUS.hasListeners();
-        }
-    }
-
-    public static class LevelChunk extends CapabilityProvider<net.minecraft.world.level.chunk.LevelChunk> {
-        protected LevelChunk() {
-            super(false);
-        }
-
-        protected LevelChunk(boolean isLazy) {
-            super(isLazy);
-        }
-
-        @Override
-        protected AttachCapabilitiesEvent<net.minecraft.world.level.chunk.LevelChunk> fireAttachCapabilitiesEvent(net.minecraft.world.level.chunk.LevelChunk provider) {
-            return AttachCapabilitiesEvent.LevelChunk.BUS.fire(new AttachCapabilitiesEvent.LevelChunk(provider));
-        }
-
-        @Override
-        protected boolean shouldFireAttachCapabilitiesEvent() {
-            return AttachCapabilitiesEvent.LevelChunk.BUS.hasListeners();
+            return AttachCapabilitiesEvent.Levels.BUS.hasListeners();
         }
     }
 
@@ -288,23 +272,23 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
             return owner;
         }
 
-        public static class LevelChunk extends AsField<net.minecraft.world.level.chunk.LevelChunk> {
-            public LevelChunk(net.minecraft.world.level.chunk.LevelChunk owner) {
+        public static class LevelChunks extends AsField<LevelChunk> {
+            public LevelChunks(LevelChunk owner) {
                 super(owner);
             }
 
-            public LevelChunk(net.minecraft.world.level.chunk.LevelChunk owner, boolean isLazy) {
+            public LevelChunks(LevelChunk owner, boolean isLazy) {
                 super(owner, isLazy);
             }
 
             @Override
-            protected AttachCapabilitiesEvent<net.minecraft.world.level.chunk.LevelChunk> fireAttachCapabilitiesEvent(net.minecraft.world.level.chunk.LevelChunk provider) {
-                return AttachCapabilitiesEvent.LevelChunk.BUS.fire(new AttachCapabilitiesEvent.LevelChunk(provider));
+            protected AttachCapabilitiesEvent<LevelChunk> fireAttachCapabilitiesEvent(LevelChunk provider) {
+                return AttachCapabilitiesEvent.LevelChunks.BUS.fire(new AttachCapabilitiesEvent.LevelChunks(provider));
             }
 
             @Override
             protected boolean shouldFireAttachCapabilitiesEvent() {
-                return AttachCapabilitiesEvent.LevelChunk.BUS.hasListeners();
+                return AttachCapabilitiesEvent.LevelChunks.BUS.hasListeners();
             }
         }
     }

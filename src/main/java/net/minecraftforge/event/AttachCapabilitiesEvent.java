@@ -12,6 +12,11 @@ import java.util.List;
 import java.util.Map;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
@@ -25,11 +30,11 @@ import org.jspecify.annotations.NullMarked;
  * Please note that as this is fired for ALL object creations efficient code is recommended.
  * And if possible use one of the sub-classes to filter your intended objects.
  *
- * @see Entity
- * @see BlockEntity
- * @see ItemStack
- * @see Level
- * @see LevelChunk
+ * @see Entities
+ * @see BlockEntities
+ * @see ItemStacks
+ * @see Levels
+ * @see LevelChunks
  */
 @NullMarked
 public abstract class AttachCapabilitiesEvent<T> extends MutableEvent implements InheritableEvent {
@@ -39,42 +44,42 @@ public abstract class AttachCapabilitiesEvent<T> extends MutableEvent implements
     private final List<Runnable> listeners = new ArrayList<>();
     private final List<Runnable> listenersView = Collections.unmodifiableList(listeners);
 
-    public static class Entity extends AttachCapabilitiesEvent<net.minecraft.world.entity.Entity> {
-        public static final EventBus<Entity> BUS = EventBus.create(Entity.class);
+    public static class Entities extends AttachCapabilitiesEvent<Entity> {
+        public static final EventBus<Entities> BUS = EventBus.create(Entities.class);
 
-        public Entity(net.minecraft.world.entity.Entity obj) {
+        public Entities(Entity obj) {
             super(obj);
         }
     }
 
-    public static class BlockEntity extends AttachCapabilitiesEvent<net.minecraft.world.level.block.entity.BlockEntity> {
-        public static final EventBus<BlockEntity> BUS = EventBus.create(BlockEntity.class);
+    public static class BlockEntities extends AttachCapabilitiesEvent<BlockEntity> {
+        public static final EventBus<BlockEntities> BUS = EventBus.create(BlockEntities.class);
 
-        public BlockEntity(net.minecraft.world.level.block.entity.BlockEntity obj) {
+        public BlockEntities(BlockEntity obj) {
             super(obj);
         }
     }
 
-    public static class ItemStack extends AttachCapabilitiesEvent<net.minecraft.world.item.ItemStack> {
-        public static final EventBus<ItemStack> BUS = EventBus.create(ItemStack.class);
+    public static class ItemStacks extends AttachCapabilitiesEvent<ItemStack> {
+        public static final EventBus<ItemStacks> BUS = EventBus.create(ItemStacks.class);
 
-        public ItemStack(net.minecraft.world.item.ItemStack obj) {
+        public ItemStacks(ItemStack obj) {
             super(obj);
         }
     }
 
-    public static class Level extends AttachCapabilitiesEvent<net.minecraft.world.level.Level> {
-        public static final EventBus<Level> BUS = EventBus.create(Level.class);
+    public static class Levels extends AttachCapabilitiesEvent<Level> {
+        public static final EventBus<Levels> BUS = EventBus.create(Levels.class);
 
-        public Level(net.minecraft.world.level.Level obj) {
+        public Levels(Level obj) {
             super(obj);
         }
     }
 
-    public static class LevelChunk extends AttachCapabilitiesEvent<net.minecraft.world.level.chunk.LevelChunk> {
-        public static final EventBus<LevelChunk> BUS = EventBus.create(LevelChunk.class);
+    public static class LevelChunks extends AttachCapabilitiesEvent<LevelChunk> {
+        public static final EventBus<LevelChunks> BUS = EventBus.create(LevelChunks.class);
 
-        public LevelChunk(net.minecraft.world.level.chunk.LevelChunk obj) {
+        public LevelChunks(LevelChunk obj) {
             super(obj);
         }
     }
