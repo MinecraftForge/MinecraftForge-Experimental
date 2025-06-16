@@ -25,7 +25,7 @@ import org.jetbrains.annotations.ApiStatus;
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see RegisterColorHandlersEvent.Block
- * @see RegisterColorHandlersEvent.Item
+ * @see RegisterColorHandlersEvent.ColorResolvers
  */
 public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent {
     @ApiStatus.Internal

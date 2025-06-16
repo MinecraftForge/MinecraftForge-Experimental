@@ -7,11 +7,11 @@ package net.minecraftforge.client.event.sound;
 
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
-import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Fired when a sound is about to be played by the sound engine. This fires before the sound is played and before any
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
  * others). This can be used to change or prevent (by passing {@code null)} a sound from being played through
  * {@link #setSound(SoundInstance)}).
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
+ * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
  *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
@@ -32,8 +32,7 @@ public final class PlaySoundEvent extends SoundEvent {
 
     private final String name;
     private final SoundInstance originalSound;
-    @Nullable
-    private SoundInstance sound;
+    private @Nullable SoundInstance sound;
 
     @ApiStatus.Internal
     public PlaySoundEvent(SoundEngine manager, SoundInstance sound) {
