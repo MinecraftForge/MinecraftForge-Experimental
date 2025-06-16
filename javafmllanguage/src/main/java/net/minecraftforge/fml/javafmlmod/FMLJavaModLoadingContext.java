@@ -37,7 +37,13 @@ public class FMLJavaModLoadingContext extends ModLoadingContext {
      * Helper to get the right instance from the {@link ModLoadingContext} correctly.
      * @return The FMLJavaMod language specific extension from the ModLoadingContext
      *
-     * @deprecated use {@link FMLJavaModLoadingContext} in your mod constructor
+     * @deprecated use {@link FMLJavaModLoadingContext} in your mod constructor. For example: {@snippet :
+     * @Mod("examplemod")
+     * public final class ExampleMod {
+     *     public ExampleMod(FMLJavaModLoadingContext context) {
+     *          // Use context from the param instead of FMLJavaModLoadingContext.get() or ModLoadingContext.get()
+     *     }
+     * }}
      */
     @Deprecated(forRemoval = true, since = "1.21.1")
     public static FMLJavaModLoadingContext get() {
