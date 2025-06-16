@@ -229,9 +229,11 @@ public final class ForgeHooks {
     }
 
     public static Brain<?> onLivingMakeBrain(LivingEntity entity, Brain<?> originalBrain, Dynamic<?> dynamic) {
+        if (!LivingMakeBrainEvent.BUS.hasListeners())
+            return originalBrain;
+
         BrainBuilder<?> brainBuilder = originalBrain.createBuilder();
-        LivingMakeBrainEvent event = new LivingMakeBrainEvent(entity, brainBuilder);
-        MinecraftForge.EVENT_BUS.post(event);
+        LivingMakeBrainEvent.BUS.post(new LivingMakeBrainEvent(entity, brainBuilder));
         return brainBuilder.makeBrain(dynamic);
     }
 
@@ -495,7 +497,7 @@ public final class ForgeHooks {
             if (eventResult) {
                 ret = InteractionResult.FAIL; // cancel placement
                 // revert back all captured blocks
-                for (BlockSnapshot blocksnapshot : Lists.reverse(blockSnapshots)) {
+                for (BlockSnapshot blocksnapshot : blockSnapshots.reversed()) {
                     level.restoringBlockSnapshots = true;
                     blocksnapshot.restore(true, false);
                     level.restoringBlockSnapshots = false;

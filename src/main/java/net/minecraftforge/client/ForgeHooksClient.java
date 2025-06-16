@@ -237,10 +237,10 @@ public class ForgeHooksClient {
         switch (target.getType()) {
             case BLOCK:
                 if (!(target instanceof BlockHitResult blockTarget)) return false;
-                return MinecraftForge.EVENT_BUS.post(new RenderHighlightEvent.Block(context, camera, blockTarget, partialTick, poseStack, bufferSource));
+                return RenderHighlightEvent.Block.BUS.post(new RenderHighlightEvent.Block(context, camera, blockTarget, partialTick, poseStack, bufferSource));
             case ENTITY:
                 if (!(target instanceof EntityHitResult entityTarget)) return false;
-                return MinecraftForge.EVENT_BUS.post(new RenderHighlightEvent.Entity(context, camera, entityTarget, partialTick, poseStack, bufferSource));
+                return RenderHighlightEvent.Entity.BUS.post(new RenderHighlightEvent.Entity(context, camera, entityTarget, partialTick, poseStack, bufferSource));
             default:
                 return false; // NO-OP - This doesn't even get called for anything other than blocks and entities
         }
@@ -310,9 +310,9 @@ public class ForgeHooksClient {
     }
 
     private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        if (!MinecraftForge.EVENT_BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
+        if (!ScreenEvent.Render.Pre.BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
             screen.renderWithTooltip(guiGraphics, mouseX, mouseY, partialTick);
-        MinecraftForge.EVENT_BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
+        ScreenEvent.Render.Post.BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
     public static Vector3f getFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance, float darkenWorldAmount, float fogRed, float fogGreen, float fogBlue) {
@@ -322,8 +322,7 @@ public class ForgeHooksClient {
         if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(level, camera.getBlockPosition())))
             fluidFogColor = IClientFluidTypeExtensions.of(state).modifyFogColor(camera, partialTick, level, renderDistance, darkenWorldAmount, fluidFogColor);
 
-        ViewportEvent.ComputeFogColor event = new ViewportEvent.ComputeFogColor(camera, partialTick, fluidFogColor.x(), fluidFogColor.y(), fluidFogColor.z());
-        MinecraftForge.EVENT_BUS.post(event);
+        var event = ViewportEvent.ComputeFogColor.BUS.fire(new ViewportEvent.ComputeFogColor(camera, partialTick, fluidFogColor.x(), fluidFogColor.y(), fluidFogColor.z()));
 
         fluidFogColor.set(event.getRed(), event.getGreen(), event.getBlue());
         return fluidFogColor;
@@ -335,8 +334,7 @@ public class ForgeHooksClient {
         if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(camera.getEntity().level(), camera.getBlockPosition())))
             IClientFluidTypeExtensions.of(state).modifyFogRender(camera, type, delta.getRealtimeDeltaTicks(), data, color);
 
-        var event = new ViewportEvent.RenderFog(type, camera, delta.getRealtimeDeltaTicks(), data, color);
-        MinecraftForge.EVENT_BUS.post(event);
+        ViewportEvent.RenderFog.BUS.post(new ViewportEvent.RenderFog(type, camera, delta.getRealtimeDeltaTicks(), data, color));
         return color;
     }
 
@@ -743,7 +741,7 @@ public class ForgeHooksClient {
     }
 
     public static boolean renderBlockOverlay(Player player, PoseStack mat, RenderBlockScreenEffectEvent.OverlayType type, BlockState block, BlockPos pos) {
-        return MinecraftForge.EVENT_BUS.post(new RenderBlockScreenEffectEvent(player, mat, type, block, pos));
+        return RenderBlockScreenEffectEvent.BUS.post(new RenderBlockScreenEffectEvent(player, mat, type, block, pos));
     }
 
     public static int getMaxMipmapLevel(int width, int height) {

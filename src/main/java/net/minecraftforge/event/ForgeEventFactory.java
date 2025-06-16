@@ -716,10 +716,6 @@ public final class ForgeEventFactory {
         LivingConversionEvent.Post.BUS.post(new LivingConversionEvent.Post(entity, outcome));
     }
 
-    public static BabyEntitySpawnEvent onBabySpawn(Mob parentA, Mob parentB, @Nullable AgeableMob proposedChild) {
-        return BabyEntitySpawnEvent.BUS.fire(new BabyEntitySpawnEvent(parentA, parentB, proposedChild));
-    }
-
     public static @Nullable EntityTeleportEvent.TeleportCommand onEntityTeleportCommand(Entity entity, double targetX, double targetY, double targetZ) {
         var event = new EntityTeleportEvent.TeleportCommand(entity, targetX, targetY, targetZ);
         return EntityTeleportEvent.TeleportCommand.BUS.post(event) ? null : event;
@@ -944,12 +940,13 @@ public final class ForgeEventFactory {
         return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action)));
     }
 
-    public static PlayerInteractEvent.LeftClickBlock onLeftClickBlockHold(Player player, BlockPos pos, Direction face) {
-        return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD));
+    public static @Nullable PlayerInteractEvent.LeftClickBlock onServerPlayerLeftClickBlock(ServerPlayer player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
+        var event = new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action));
+        return PlayerInteractEvent.LeftClickBlock.BUS.post(event) ? null : event;
     }
 
-    public static PlayerInteractEvent.EntityInteract onEntityInteract(Player player, Entity entity, InteractionHand hand) {
-        return PlayerInteractEvent.EntityInteract.BUS.fire(new PlayerInteractEvent.EntityInteract(player, hand, entity));
+    public static PlayerInteractEvent.LeftClickBlock onLeftClickBlockHold(Player player, BlockPos pos, Direction face) {
+        return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD));
     }
 
     public static void onRightClickEmpty(Player player, InteractionHand hand) {
