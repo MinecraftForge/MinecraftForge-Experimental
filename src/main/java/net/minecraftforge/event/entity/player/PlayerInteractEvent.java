@@ -272,15 +272,6 @@ public sealed class PlayerInteractEvent extends PlayerEvent {
             this.useItem = triggerItem;
         }
 
-        @Override
-        public void setCanceled(boolean canceled) {
-            super.setCanceled(canceled);
-            if (canceled) {
-                useBlock = Result.DENY;
-                useItem = Result.DENY;
-            }
-        }
-
         public enum Action {
             /**
              * When the player first left clicks a block

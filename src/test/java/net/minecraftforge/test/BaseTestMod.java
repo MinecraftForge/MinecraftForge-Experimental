@@ -47,7 +47,7 @@ import net.minecraftforge.registries.RegisterEvent;
 import net.minecraftforge.unsafe.UnsafeHacks;
 
 public abstract class BaseTestMod {
-    private List<Function<HolderLookup.Provider, ItemStack>> testItems = new ArrayList<>();
+    private final List<Function<HolderLookup.Provider, ItemStack>> testItems = new ArrayList<>();
     protected final BusGroup modBus;
 
     protected final List<Map<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>> dataRegistries = new ArrayList<>();
