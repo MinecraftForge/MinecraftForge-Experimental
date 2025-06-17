@@ -124,7 +124,7 @@ public sealed class PlayerInteractEvent extends PlayerEvent {
      * This event is fired on both sides whenever the player right clicks while targeting a block. <br>
      * This event controls which of {@link Item#onItemUseFirst}, {@link Block#use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)},
      * and {@link Item#useOn(UseOnContext)} will be called. <br>
-     * Canceling the event will cause none of the above three to be called. <br>
+     * Cancelling the event will cause none of the above three to be called. <br>
      * <br>
      * Let result be the first non-pass return value of the above three methods, or pass, if they all pass. <br>
      * Or {@link #cancellationResult} if the event is cancelled. <br>
@@ -183,15 +183,6 @@ public sealed class PlayerInteractEvent extends PlayerEvent {
          */
         public void setUseItem(Result triggerItem) {
             this.useItem = triggerItem;
-        }
-
-        @Override
-        public void setCanceled(boolean canceled) {
-            super.setCanceled(canceled);
-            if (canceled) {
-                useBlock = Result.DENY;
-                useItem = Result.DENY;
-            }
         }
     }
 
