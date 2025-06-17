@@ -1024,10 +1024,6 @@ public final class ForgeEventFactory {
         return LivingChangeTargetEvent.BUS.post(event) ? null : event;
     }
 
-    public static ItemFishedEvent onPlayerFishedItem(List<ItemStack> stacks, int rodDamage, FishingHook hook) {
-        return ItemFishedEvent.BUS.fire(new ItemFishedEvent(stacks, rodDamage, hook));
-    }
-
     public static @Nullable PlayerXpEvent.XpChange onPlayerXpChange(Player player, int xp) {
         var event = new PlayerXpEvent.XpChange(player, xp);
         return PlayerXpEvent.XpChange.BUS.post(event) ? null : event;

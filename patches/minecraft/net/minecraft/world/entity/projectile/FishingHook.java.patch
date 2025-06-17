@@ -36,8 +36,8 @@
                      .create(LootContextParamSets.FISHING);
                  LootTable loottable = this.level().getServer().reloadableRegistries().getLootTable(BuiltInLootTables.FISHING);
                  List<ItemStack> list = loottable.getRandomItems(lootparams);
-+                event = net.minecraftforge.event.ForgeEventFactory.onPlayerFishedItem(list, this.onGround() ? 2 : 1, this);
-+                if (event.isCanceled()) {
++                event = new net.minecraftforge.event.entity.player.ItemFishedEvent(list, this.onGround() ? 2 : 1, this);
++                if (net.minecraftforge.event.entity.player.ItemFishedEvent.BUS.post(event)) {
 +                    this.discard();
 +                    return event.getRodDamage();
 +                }
