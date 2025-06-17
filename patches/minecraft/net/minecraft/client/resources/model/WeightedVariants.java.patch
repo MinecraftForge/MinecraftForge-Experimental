@@ -30,7 +30,7 @@
 +    }
 +
 +    @Override
-+    public void collectParts(RandomSource random, List<BlockModelPart> dest, net.minecraftforge.client.model.data.ModelData data, net.minecraft.client.renderer.RenderType renderType) {
++    public void collectParts(RandomSource random, List<BlockModelPart> dest, net.minecraftforge.client.model.data.ModelData data, net.minecraft.client.renderer.chunk.ChunkSectionLayer renderType) {
 +        this.list.getRandomOrThrow(random).collectParts(random, dest, data, renderType);
      }
  

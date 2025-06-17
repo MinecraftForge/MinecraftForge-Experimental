@@ -164,7 +164,7 @@ public class ModListScreen extends Screen {
         @Override
         protected void drawPanel(GuiGraphics guiGraphics, int entryRight, int relativeY, int mouseX, int mouseY) {
             if (logoPath != null) {
-                RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+                //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 // Draw the logo image inscribed in a rectangle with width entryWidth (minus some padding) and height 50
                 int headerHeight = 50;
                 guiGraphics.blitInscribed(logoPath, left + PADDING, relativeY, width - (PADDING * 2), headerHeight, logoDims.width(), logoDims.height(), false, true);

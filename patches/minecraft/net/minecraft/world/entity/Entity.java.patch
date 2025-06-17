@@ -6,7 +6,7 @@
  
 -public abstract class Entity implements SyncedDataHolder, Nameable, EntityAccess, ScoreHolder, DataComponentGetter {
 +public abstract class Entity extends net.minecraftforge.common.capabilities.CapabilityProvider.Entities implements SyncedDataHolder, Nameable, EntityAccess, ScoreHolder, DataComponentGetter, net.minecraftforge.common.extensions.IForgeEntity {
-     private static final Logger LOGGER = LogUtils.getLogger();
+     public static final Logger LOGGER = LogUtils.getLogger();
      public static final String TAG_ID = "id";
      public static final String TAG_UUID = "UUID";
 @@ -185,6 +_,7 @@

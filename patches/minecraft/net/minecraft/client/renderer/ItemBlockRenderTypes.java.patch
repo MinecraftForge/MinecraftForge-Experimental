@@ -48,7 +48,7 @@
      public static RenderType getRenderType(ItemStack p_363859_) {
          if (p_363859_.getItem() instanceof BlockItem blockitem) {
              Block block = blockitem.getBlock();
-@@ -403,12 +_,80 @@
+@@ -403,12 +_,71 @@
          }
      }
  
@@ -68,24 +68,21 @@
 +        return renderCutout;
 +    }
 +
-+    private static final net.minecraftforge.client.ChunkRenderTypeSet CUTOUT_MIPPED = net.minecraftforge.client.ChunkRenderTypeSet.of(RenderType.cutoutMipped());
-+    private static final net.minecraftforge.client.ChunkRenderTypeSet SOLID = net.minecraftforge.client.ChunkRenderTypeSet.of(RenderType.solid());
-+    private static final Map<net.minecraft.core.Holder.Reference<Block>, net.minecraftforge.client.ChunkRenderTypeSet> BLOCK_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_BLOCK.size(), 0.5F), map -> {
++    private static final java.util.Collection<ChunkSectionLayer> CUTOUT_MIPPED = java.util.EnumSet.of(ChunkSectionLayer.CUTOUT_MIPPED);
++    private static final java.util.Collection<ChunkSectionLayer> SOLID = java.util.EnumSet.of(ChunkSectionLayer.SOLID);
++    private static final Map<net.minecraft.core.Holder.Reference<Block>, java.util.Collection<ChunkSectionLayer>> BLOCK_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_BLOCK.size(), 0.5F), map -> {
 +       map.defaultReturnValue(SOLID);
-+       for(Map.Entry<Block, ChunkSectionLayer> entry : TYPE_BY_BLOCK.entrySet()) {
-+          map.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(entry.getKey()), net.minecraftforge.client.ChunkRenderTypeSet.of(entry.getValue()));
-+       }
++       for(Map.Entry<Block, ChunkSectionLayer> entry : TYPE_BY_BLOCK.entrySet())
++          map.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(entry.getKey()), java.util.EnumSet.of(entry.getValue()));
 +    });
-+    private static final Map<net.minecraft.core.Holder.Reference<Fluid>, ChunkSectionLayer> FLUID_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_FLUID.size(), 0.5F), map -> {
-+       map.defaultReturnValue(RenderType.solid());
-+       for(Map.Entry<Fluid, RenderType> entry : FLUID_RENDER_TYPES.entrySet()) {
++    private static final Map<net.minecraft.core.Holder.Reference<Fluid>, ChunkSectionLayer> FLUID_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(LAYER_BY_FLUID.size(), 0.5F), map -> {
++       map.defaultReturnValue(ChunkSectionLayer.SOLID);
++       for(var entry : LAYER_BY_FLUID.entrySet())
 +          map.put(net.minecraftforge.registries.ForgeRegistries.FLUIDS.getDelegateOrThrow(entry.getKey()), entry.getValue());
-+       }
 +    });
 +
 +    /** @deprecated Use {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)}. */
-+    @Deprecated(forRemoval = true, since = "1.21.4")
-+    public static net.minecraftforge.client.ChunkRenderTypeSet getRenderLayers(BlockState state) {
++    public static java.util.Collection<ChunkSectionLayer> getRenderLayers(BlockState state) {
 +       Block block = state.getBlock();
 +       if (block instanceof LeavesBlock) {
 +          return renderCutout ? CUTOUT_MIPPED : SOLID;
@@ -94,24 +91,22 @@
 +       }
 +    }
 +
-+    /** @deprecated Set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) or override {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)} */
-+    @Deprecated(forRemoval = true, since = "1.21.4")
-+    public static void setRenderLayer(Block block, RenderType type) {
-+       com.google.common.base.Preconditions.checkArgument(type.getChunkLayerId() >= 0, "The argument must be a valid chunk render type returned by RenderType#chunkBufferLayers().");
-+       setRenderLayer(block, net.minecraftforge.client.ChunkRenderTypeSet.of(type));
-+    }
-+
-+    /** @deprecated Set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) or override {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)} */
-+    @Deprecated(forRemoval = true, since = "1.21.4")
-+    public static synchronized void setRenderLayer(Block block, java.util.function.Predicate<ChunkSectionLayer> predicate) {
-+       setRenderLayer(block, createSetFromPredicate(predicate));
-+    }
-+
-+    /** @deprecated Set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) or override {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)} */
-+    @Deprecated(forRemoval = true, since = "1.21.4")
-+    public static synchronized void setRenderLayer(Block block, net.minecraftforge.client.ChunkRenderTypeSet layers) {
++    /**
++     * It is recommended to set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) so that it can be data driven.
++     * But if you want to set it in code feel free to set it here like vanilla does.
++     */
++    public static void setRenderLayer(Block block, ChunkSectionLayer type) {
 +       checkClientLoading();
-+       BLOCK_RENDER_TYPES.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(block), layers);
++       BLOCK_RENDER_TYPES.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(block), java.util.EnumSet.of(type));
++    }
++
++    /**
++     * It is recommended to set your render type in your block model's JSON (eg. {@code "render_type": "cutout"}) so that it can be data driven.
++     * But if you want to set it in code feel free to set it here like vanilla does.
++     */
++    public static synchronized void setRenderLayer(Block block, ChunkSectionLayer first, ChunkSectionLayer... others) {
++       checkClientLoading();
++       BLOCK_RENDER_TYPES.put(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(block), java.util.EnumSet.of(first, others));
 +    }
 +
 +    public static synchronized void setRenderLayer(Fluid fluid, ChunkSectionLayer type) {
@@ -124,9 +119,5 @@
 +               "Render layers can only be set during client loading! " +
 +                       "This might ideally be done from `FMLClientSetupEvent`."
 +       );
-+    }
-+
-+    private static net.minecraftforge.client.ChunkRenderTypeSet createSetFromPredicate(java.util.function.Predicate<RenderType> predicate) {
-+       return net.minecraftforge.client.ChunkRenderTypeSet.of(RenderType.chunkBufferLayers().stream().filter(predicate).toArray(RenderType[]::new));
      }
  }

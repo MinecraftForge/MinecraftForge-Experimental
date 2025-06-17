@@ -17,7 +17,7 @@
      }
  
 +    @Override
-+    public void collectParts(RandomSource rand, List<BlockModelPart> dest, net.minecraftforge.client.model.data.ModelData extraData, net.minecraft.client.renderer.RenderType renderType) {
++    public void collectParts(RandomSource rand, List<BlockModelPart> dest, net.minecraftforge.client.model.data.ModelData extraData, net.minecraft.client.renderer.chunk.ChunkSectionLayer renderType) {
 +        if (this.models == null) {
 +            this.models = this.shared.selectModels(this.blockState);
 +        }

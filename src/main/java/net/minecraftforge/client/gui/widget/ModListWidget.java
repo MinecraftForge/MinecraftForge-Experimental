@@ -85,7 +85,7 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
             guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(version, listWidth - 6 - barOffset))), left + 3, top + 2 + font.lineHeight, 0xCCCCCC, false);
             if (vercheck.status().shouldDraw()) {
                 //TODO: [Forge][ModList] Consider adding more icons for visualization
-                RenderSystem.setShaderColor(1, 1, 1, 1);
+                //RenderSystem.setShaderColor(1, 1, 1, 1);
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VERSION_CHECK_ICONS, getX() + width - 12 - barOffset, top + entryHeight / 4, vercheck.status().getSheetOffset() * 8, (vercheck.status().isAnimated() && ((System.currentTimeMillis() / 800 & 1)) == 1) ? 8 : 0, 8, 8, 64, 16);
                 guiGraphics.pose().popMatrix();
