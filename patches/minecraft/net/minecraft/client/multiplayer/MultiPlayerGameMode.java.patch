@@ -23,7 +23,7 @@
                  BlockState blockstate = this.minecraft.level.getBlockState(p_105270_);
                  this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, p_105270_, blockstate, 1.0F);
                  this.startPrediction(this.minecraft.level, p_233757_ -> {
-+                    if (!net.minecraftforge.event.ForgeEventFactory.onLeftClickBlock(this.minecraft.player, p_105270_, p_105271_, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK).isCanceled())
++                    if (!net.minecraftforge.event.ForgeEventFactory.isLeftClickBlockCancelled(this.minecraft.player, p_105270_, p_105271_, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK))
                      this.destroyBlock(p_105270_);
                      return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, p_105270_, p_105271_, p_233757_);
                  });
@@ -38,11 +38,11 @@
                  this.startPrediction(this.minecraft.level, p_233728_ -> {
                      boolean flag = !blockstate1.isAir();
                      if (flag && this.destroyProgress == 0.0F) {
-+                        if (!event.getUseBlock().isDenied())
++                        if (event != null && !event.getUseBlock().isDenied())
                          blockstate1.attack(this.minecraft.level, p_105270_, this.minecraft.player);
                      }
  
-+                    if (!event.getUseItem().isDenied()) {
++                    if (event != null && !event.getUseItem().isDenied()) {
                      if (flag && blockstate1.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), p_105270_) >= 1.0F) {
                          this.destroyBlock(p_105270_);
                      } else {
@@ -58,7 +58,7 @@
              BlockState blockstate1 = this.minecraft.level.getBlockState(p_105284_);
              this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, p_105284_, blockstate1, 1.0F);
              this.startPrediction(this.minecraft.level, p_233753_ -> {
-+                if (!net.minecraftforge.event.ForgeEventFactory.onLeftClickBlock(this.minecraft.player, p_105284_, p_105285_, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK).isCanceled())
++                if (!net.minecraftforge.event.ForgeEventFactory.isLeftClickBlockCancelled(this.minecraft.player, p_105284_, p_105285_, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK))
                  this.destroyBlock(p_105284_);
                  return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, p_105284_, p_105285_, p_233753_);
              });

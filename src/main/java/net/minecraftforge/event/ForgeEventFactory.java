@@ -936,17 +936,22 @@ public final class ForgeEventFactory {
         PlayerInteractEvent.LeftClickEmpty.BUS.post(new PlayerInteractEvent.LeftClickEmpty(player));
     }
 
-    public static PlayerInteractEvent.LeftClickBlock onLeftClickBlock(Player player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
-        return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action)));
-    }
-
-    public static @Nullable PlayerInteractEvent.LeftClickBlock onServerPlayerLeftClickBlock(ServerPlayer player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
+    public static @Nullable PlayerInteractEvent.LeftClickBlock onLeftClickBlock(Player player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
         var event = new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action));
         return PlayerInteractEvent.LeftClickBlock.BUS.post(event) ? null : event;
     }
 
+    public static boolean isLeftClickBlockCancelled(Player player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
+        return PlayerInteractEvent.LeftClickBlock.BUS.post(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action)));
+    }
+
     public static PlayerInteractEvent.LeftClickBlock onLeftClickBlockHold(Player player, BlockPos pos, Direction face) {
-        return PlayerInteractEvent.LeftClickBlock.BUS.fire(new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD));
+        var event = new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.CLIENT_HOLD);
+        if (PlayerInteractEvent.LeftClickBlock.BUS.post(event)) {
+            event.setUseBlock(Result.DENY);
+            event.setUseItem(Result.DENY);
+        }
+        return event;
     }
 
     public static void onRightClickEmpty(Player player, InteractionHand hand) {
