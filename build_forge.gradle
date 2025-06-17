@@ -148,7 +148,7 @@ dependencies {
     runtimeOnly(libs.bootstrap)
     runtimeOnly(libs.bootstrap.dev)
 
-    annotationProcessor(libs.eventbus.validator)
+    //annotationProcessor(libs.eventbus.validator)
 }
 
 tasks.named('extractRangeMap').configure {
