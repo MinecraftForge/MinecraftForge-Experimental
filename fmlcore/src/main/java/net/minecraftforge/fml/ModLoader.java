@@ -154,11 +154,13 @@ public class ModLoader {
             loadingStateValid = false;
             throw new LoadingFailedException(loadingExceptions);
         }
-        List<? extends ForgeFeature.Bound> failedBounds = loadingModList.getMods().stream()
-                .map(ModInfo::getForgeFeatures)
-                .flatMap(List::stream)
-                .filter(bound -> !ForgeFeature.testFeature(FMLEnvironment.dist, bound))
-                .toList();
+        var failedBounds = new ArrayList<ForgeFeature.Bound>();
+        for (var mod : loadingModList.getMods()) {
+            for (var feature : mod.getForgeFeatures()) {
+                if (!ForgeFeature.testFeature(FMLEnvironment.dist, feature))
+                    failedBounds.add(feature);
+            }
+        }
 
         if (!failedBounds.isEmpty()) {
             LOGGER.fatal(CORE, "Failed to validate feature bounds for mods: {}", failedBounds);

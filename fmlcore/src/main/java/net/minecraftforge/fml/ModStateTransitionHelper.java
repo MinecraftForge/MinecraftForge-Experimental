@@ -71,7 +71,9 @@ class ModStateTransitionHelper {
         for (var future : futures) {
             int i = list.size();
             list.add(null);
-            results[i] = future.whenComplete((result, exception) -> list.set(i, new FutureResult<>(result, exception)));
+            @SuppressWarnings("unchecked") // Bypass a weird javac error with generic by forcing it to be the exact type we want.
+            var raw = ((CompletableFuture<V>)future);
+            results[i] = raw.whenComplete((result, exception) -> list.set(i, new FutureResult<>(result, exception)));
         }
 
         return CompletableFuture.allOf(results).handle((r, th)->null).thenApply(res -> list);
