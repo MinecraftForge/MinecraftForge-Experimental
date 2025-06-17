@@ -8,7 +8,6 @@ package net.minecraftforge.event.furnace;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -23,11 +22,7 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * This event is fired from {@link ForgeEventFactory#getItemBurnTime(ItemStack, int, RecipeType)}.<br>
  * <br>
- * This event is {@link Cancelable} to prevent later handlers from changing the value.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is {@link Cancellable} to prevent later handlers from changing the value.
  **/
 public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<FurnaceFuelBurnTimeEvent> BUS = CancellableEventBus.create(FurnaceFuelBurnTimeEvent.class);
@@ -38,8 +33,7 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
     private final RecipeType<?> recipeType;
     private int burnTime;
 
-    public FurnaceFuelBurnTimeEvent(@NotNull ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType)
-    {
+    public FurnaceFuelBurnTimeEvent(@NotNull ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
         this.itemStack = itemStack;
         this.burnTime = burnTime;
         this.recipeType = recipeType;
@@ -49,8 +43,7 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
      * Get the ItemStack "fuel" in question.
      */
     @NotNull
-    public ItemStack getItemStack()
-    {
+    public ItemStack getItemStack() {
         return itemStack;
     }
 
@@ -59,8 +52,7 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
      * Get the recipe type for which to obtain the burn time, if known.
      */
     @Nullable
-    public RecipeType<?> getRecipeType()
-    {
+    public RecipeType<?> getRecipeType() {
         return recipeType;
     }
 
@@ -68,12 +60,9 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
      * Set the burn time for the given ItemStack.
      * Setting it to 0 will prevent the item from being used as fuel, overriding vanilla's decision.
      */
-    public void setBurnTime(int burnTime)
-    {
-        if (burnTime >= 0)
-        {
+    public void setBurnTime(int burnTime) {
+        if (burnTime >= 0) {
             this.burnTime = burnTime;
-            setCanceled(true);
         }
     }
 
@@ -81,8 +70,7 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
      * The resulting value of this event, the burn time for the ItemStack.
      * A value of 0 will prevent the item from being used as fuel, overriding vanilla's decision.
      */
-    public int getBurnTime()
-    {
+    public int getBurnTime() {
         return burnTime;
     }
 }
