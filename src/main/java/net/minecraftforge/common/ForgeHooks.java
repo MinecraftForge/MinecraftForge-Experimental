@@ -437,12 +437,11 @@ public final class ForgeHooks {
             level.sendBlockUpdated(pos, state, state, 3);
         }
 
-        var event = new BlockEvent.BreakEvent(level, pos, state, entityPlayer);
-        event.setCanceled(preCancelEvent);
-        var eventIsCancelled = BlockEvent.BreakEvent.BUS.post(event);
+        var event = new BlockEvent.BreakEvent(level, pos, state, entityPlayer, preCancelEvent ? Result.DENY : Result.DEFAULT);
+        var eventIsDenied = BlockEvent.BreakEvent.BUS.fire(event).getResult().isDenied();
 
         // Handle if the event is cancelled
-        if (eventIsCancelled) {
+        if (eventIsDenied) {
             // Let the client know the block still exists
             entityPlayer.connection.send(new ClientboundBlockUpdatePacket(level, pos));
 
@@ -454,7 +453,7 @@ public final class ForgeHooks {
                     entityPlayer.connection.send(pkt);
             }
         }
-        return eventIsCancelled ? -1 : event.getExpToDrop();
+        return eventIsDenied ? -1 : event.getExpToDrop();
     }
 
     public static InteractionResult onPlaceItemIntoWorld(@NotNull UseOnContext context) {

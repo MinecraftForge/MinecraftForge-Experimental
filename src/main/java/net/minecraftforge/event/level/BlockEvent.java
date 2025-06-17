@@ -69,18 +69,20 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
 
     /**
      * Event that is fired when an Block is about to be broken by a player
-     * Canceling this event will prevent the Block from being broken.
+     * Setting the result to {@link Result#DENY} will prevent the Block from being broken.
      */
-    public static final class BreakEvent extends BlockEvent implements Cancellable {
+    public static final class BreakEvent extends BlockEvent implements Cancellable, HasResult {
         public static final CancellableEventBus<BreakEvent> BUS = CancellableEventBus.create(BreakEvent.class);
 
         /** Reference to the Player who broke the block. If no player is available, use a EntityFakePlayer */
         private final Player player;
         private int exp;
+        private Result result;
 
-        public BreakEvent(Level level, BlockPos pos, BlockState state, Player player) {
+        public BreakEvent(Level level, BlockPos pos, BlockState state, Player player, Result result) {
             super(level, pos, state);
             this.player = player;
+            this.result = result;
 
             if (state == null || !ForgeHooks.isCorrectToolForDrops(state, player)) { // Handle empty block or player unable to break block scenario
                 this.exp = 0;
@@ -100,10 +102,10 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
         /**
          * Get the experience dropped by the block after the event has processed
          *
-         * @return The experience to drop or 0 if the event was canceled
+         * @return The experience to drop or 0 if the event was denied
          */
         public int getExpToDrop() {
-            return this.isCanceled() ? 0 : exp;
+            return this.getResult().isDenied() ? 0 : exp;
         }
 
         /**
@@ -113,6 +115,16 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
          */
         public void setExpToDrop(int exp) {
             this.exp = exp;
+        }
+
+        @Override
+        public Result getResult() {
+            return this.result;
+        }
+
+        @Override
+        public void setResult(Result result) {
+            this.result = result;
         }
     }
 
