@@ -214,7 +214,7 @@
  
 +            p_409187_.putBoolean("CanUpdate", canUpdate);
 +            p_409187_.storeNullable("ForgeCaps", net.minecraft.nbt.CompoundTag.CODEC, serializeCaps(this.registryAccess()));
-+            p_409187_.storeNullable("ForgeData", net.minecraft.nbt.CompoundTag.CODEC, persistentData.copy());
++            p_409187_.storeNullable("ForgeData", net.minecraft.nbt.CompoundTag.CODEC, persistentData);
 +
              if (!this.tags.isEmpty()) {
                  p_409187_.store("Tags", TAG_LIST_CODEC, List.copyOf(this.tags));

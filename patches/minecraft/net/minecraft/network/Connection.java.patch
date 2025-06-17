@@ -61,17 +61,17 @@
                  this.setupOutboundProtocol(p_328134_);
              });
          }
-@@ -342,10 +_,11 @@
+@@ -342,10 +_,13 @@
          if (p_405953_ != null) {
              ChannelFuture channelfuture = p_299937_ ? this.channel.writeAndFlush(p_243260_) : this.channel.write(p_243260_);
              channelfuture.addListener(p_405953_);
 +            channelfuture.addListener(f -> packetLogger.send(p_243260_));
          } else if (p_299937_) {
--            this.channel.writeAndFlush(p_243260_, this.channel.voidPromise());
-+            this.channel.writeAndFlush(p_243260_, this.channel.voidPromise()).addListener(f -> packetLogger.send(p_243260_));
+             this.channel.writeAndFlush(p_243260_, this.channel.voidPromise());
++            packetLogger.send(p_243260_);
          } else {
--            this.channel.write(p_243260_, this.channel.voidPromise());
-+            this.channel.write(p_243260_, this.channel.voidPromise()).addListener(f -> packetLogger.send(p_243260_));
+             this.channel.write(p_243260_, this.channel.voidPromise());
++            packetLogger.send(p_243260_);
          }
      }
  

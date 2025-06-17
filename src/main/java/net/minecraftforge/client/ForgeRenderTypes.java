@@ -488,7 +488,7 @@ public enum ForgeRenderTypes {
             GpuDevice gpu = RenderSystem.getDevice();
             this.texture = gpu.createTexture(LOADING_TEXTURE.toString(), 5, TextureFormat.RGBA8,
                     window.context().width(), window.context().height(),
-                    0, window.getFramebufferTextureId());
+                    1, window.getFramebufferTextureId());
             this.textureView = gpu.createTextureView(this.texture);
 
             this.setupState = () -> {
