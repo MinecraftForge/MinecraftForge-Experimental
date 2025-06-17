@@ -721,6 +721,13 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             }
 
             @Override
+            public TagAppender<Block, Block> remove(Block value) {
+                tag.remove(value);
+                old.remove(value);
+                return this;
+            }
+
+            @Override
             public String getSourceName() {
                 return tag.getSourceName();
             }

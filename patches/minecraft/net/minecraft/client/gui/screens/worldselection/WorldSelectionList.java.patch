@@ -26,11 +26,11 @@
 +        private void renderExperimentalWarning(GuiGraphics guiGraphics, int mouseX, int mouseY, int top, int left) {
 +           if (this.summary.isLifecycleExperimental()) {
 +              int leftStart = left + WorldSelectionList.this.getRowWidth();
-+              guiGraphics.blit(RenderType::guiTextured, WorldSelectionList.FORGE_EXPERIMENTAL_WARNING_ICON, leftStart - 36, top, 0.0F, 0.0F, 32, 32, 32, 32);
++              guiGraphics.blit(RenderPipelines.GUI_TEXTURED, WorldSelectionList.FORGE_EXPERIMENTAL_WARNING_ICON, leftStart - 36, top, 0.0F, 0.0F, 32, 32, 32, 32);
 +              if (WorldSelectionList.this.getEntryAtPosition(mouseX, mouseY) == this && mouseX > leftStart - 36 && mouseX < leftStart) {
 +                 var font = Minecraft.getInstance().font;
 +                 List<net.minecraft.util.FormattedCharSequence> tooltip = font.split(Component.translatable("forge.experimentalsettings.tooltip"), 200);
-+                 guiGraphics.renderTooltip(font, tooltip, mouseX, mouseY);
++                 guiGraphics.setTooltipForNextFrame(font, tooltip, mouseX, mouseY);
 +              }
 +           }
          }

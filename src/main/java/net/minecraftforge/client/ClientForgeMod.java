@@ -34,6 +34,6 @@ public class ClientForgeMod {
 
     @SubscribeEvent
     public static void onRegisterNamedRenderTypes(RegisterNamedRenderTypesEvent event) {
-        event.register("item_unlit", RenderType.translucent(), ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get());
+        event.register("item_unlit", RenderType.translucentMovingBlock(), ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get());
     }
 }

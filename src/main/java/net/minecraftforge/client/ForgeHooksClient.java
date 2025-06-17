@@ -43,6 +43,7 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
@@ -126,7 +127,6 @@ import net.minecraftforge.client.textures.ForgeTextureMetadata;
 import net.minecraftforge.client.textures.TextureAtlasSpriteLoaderManager;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
@@ -388,7 +388,7 @@ public class ForgeHooksClient {
         CustomizeGuiOverlayEvent.Chat.BUS.post(evt);
         guiGraphics.pose().pushMatrix();
         // We give the absolute Y position of the chat component in the event and account for the chat component's own offsetting here.
-        guiGraphics.pose().translate(evt.getPosX(), (evt.getPosY() - chat.getHeight() + 40) / chat.getScale(), 0.0D);
+        guiGraphics.pose().translate(evt.getPosX(), (float) ((evt.getPosY() - chat.getHeight() + 40) / chat.getScale()));
         chat.render(guiGraphics, tickCount, mouseX, mouseY, false);
         guiGraphics.pose().popMatrix();
     }
@@ -567,13 +567,13 @@ public class ForgeHooksClient {
                 tooltip = ForgeI18n.parseMessage("fml.menu.multiplayer.unknown", target.forgeData.type());
         }
 
-        guiGraphics.blit(RenderType::guiTextured, ICON_SHEET, x + width - 18, y + 10, 16, 16, 0, idx, 16, 16, 256, 256);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, ICON_SHEET, x + width - 18, y + 10, 16, 16, 0, idx, 16, 16, 256, 256);
 
         if(relativeMouseX > width - 15 && relativeMouseX < width && relativeMouseY > 10 && relativeMouseY < 26) {
             //this is not the most proper way to do it,
             //but works best here and has the least maintenance overhead
             var lines = Arrays.stream(tooltip.split("\n")).map(Component::literal).toList();
-            gui.setTooltipForNextRenderPass(Lists.transform(lines, Component::getVisualOrderText));
+            guiGraphics.setTooltipForNextFrame(Lists.transform(lines, Component::getVisualOrderText), relativeMouseX + x, relativeMouseY + y);
         }
     }
 

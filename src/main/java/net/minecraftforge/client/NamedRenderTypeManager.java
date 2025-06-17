@@ -48,7 +48,7 @@ public final class NamedRenderTypeManager {
         // Generally entity/item rendering shouldn't use mipmaps, so cutout_mipped has them off by default. To enforce them, use cutout_mipped_all.
         blockRenderTypes.put(rl("cutout_mipped"), new RenderTypeGroup(RenderType.cutoutMipped(), ForgeRenderTypes.ITEM_LAYERED_CUTOUT.get()));
         blockRenderTypes.put(rl("cutout_mipped_all"), new RenderTypeGroup(RenderType.cutoutMipped(), ForgeRenderTypes.ITEM_LAYERED_CUTOUT_MIPPED.get()));
-        blockRenderTypes.put(rl("translucent"), new RenderTypeGroup(RenderType.translucent(), ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
+        blockRenderTypes.put(rl("translucent_moving_block"), new RenderTypeGroup(RenderType.translucentMovingBlock(), ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
         blockRenderTypes.put(rl("tripwire"), new RenderTypeGroup(RenderType.tripwire(), ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
     }
 

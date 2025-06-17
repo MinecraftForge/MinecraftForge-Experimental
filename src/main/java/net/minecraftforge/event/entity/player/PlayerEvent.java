@@ -17,7 +17,6 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -34,8 +33,6 @@ import org.jetbrains.annotations.Nullable;
  * PlayerEvent is fired whenever an event involving a {@link Player} occurs. <br>
  * If a method utilizes this {@link net.minecraftforge.eventbus.api.Event} as its parameter, the method will
  * receive every child event of this class.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
 public class PlayerEvent extends LivingEvent {
     public static final EventBus<PlayerEvent> BUS = EventBus.create(PlayerEvent.class);
@@ -61,12 +58,6 @@ public class PlayerEvent extends LivingEvent {
      * <br>
      * {@link #state} contains the {@link BlockState} that is being checked for harvesting. <br>
      * {@link #success} contains the boolean value for whether the Block will be successfully harvested. <br>
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static final class HarvestCheck extends PlayerEvent {
         public static final EventBus<HarvestCheck> BUS = EventBus.create(HarvestCheck.class);
@@ -97,12 +88,7 @@ public class PlayerEvent extends LivingEvent {
      * {@link #newSpeed} contains the newSpeed at which the player will break the block. <br>
      * {@link #pos} contains the coordinates at which this event is occurring. Optional value.<br>
      * <br>
-     * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
      * If it is canceled, the player is unable to break the block.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static final class BreakSpeed extends PlayerEvent implements Cancellable {
         public static final CancellableEventBus<BreakSpeed> BUS = CancellableEventBus.create(BreakSpeed.class);
@@ -137,12 +123,6 @@ public class PlayerEvent extends LivingEvent {
      * <br>
      * {@link #username} contains the username of the player.
      * {@link #displayname} contains the display name of the player.
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.
-     * <br>
-     * This event does not have a result. {@link HasResult}
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static final class NameFormat extends PlayerEvent {
         public static final EventBus<NameFormat> BUS = EventBus.create(NameFormat.class);
@@ -177,12 +157,6 @@ public class PlayerEvent extends LivingEvent {
      * This event is fired via the {@link ForgeEventFactory#getPlayerTabListDisplayName(Player)}.<br>
      * <br>
      * {@link #getDisplayName()} contains the display name of the player or null if the client should determine the display name itself.
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.
-     * <br>
-     * This event does not have a result. {@link HasResult}
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
     public static final class TabListNameFormat extends PlayerEvent {
         public static final EventBus<TabListNameFormat> BUS = EventBus.create(TabListNameFormat.class);

@@ -8,9 +8,6 @@ package net.minecraftforge.client.event;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
@@ -38,8 +35,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
     /**
      * Fired when a mouse button is pressed/released. Sub-events get fired {@link Pre before} and {@link Post after} this happens.
      *
-     * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
      * @see Pre
@@ -97,11 +93,9 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
         /**
          * Fired when a mouse button is pressed/released, <b>before</b> being processed by vanilla.
          *
-         * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
-         * If the event is cancelled, then the mouse event will not be processed by vanilla (e.g. keymappings and screens) </p>
+         * <p>If the event is cancelled, then the mouse event will not be processed by vanilla (e.g. keymappings and screens) </p>
          *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-         * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+         * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          *
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
@@ -117,10 +111,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
         /**
          * Fired when a mouse button is pressed/released, <b>after</b> processing.
          *
-         * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-         *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-         * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+         * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          *
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
@@ -138,11 +129,9 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      * Fired when a mouse scroll wheel is used outside of a screen and a player is loaded, <b>before</b> being
      * processed by vanilla.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
-     * If the event is cancelled, then the mouse scroll event will not be processed further.</p>
+     * <p>If the event is cancelled, then the mouse scroll event will not be processed further.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
      */
@@ -221,10 +210,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
     /**
      * Fired when a keyboard key input occurs, such as pressing, releasing, or repeating a key.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class Key extends InputEvent {
         public static final EventBus<Key> BUS = EventBus.create(Key.class);
@@ -303,12 +289,10 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      *     <li><b>Attack</b> - defaults to <em>right mouse click</em></li>
      * </ul>
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
-     * If this event is cancelled, then the keymapping's action is not processed further, and the hand will be swung
+     * <p>If this event is cancelled, then the keymapping's action is not processed further, and the hand will be swung
      * according to {@link #shouldSwingHand()}.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     // TODO: Change the 'button' to sub events. - Lex 0422202
     public static final class InteractionKeyMappingTriggered extends InputEvent implements Cancellable {

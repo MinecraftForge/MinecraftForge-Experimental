@@ -150,7 +150,7 @@
  
              return InteractionResult.PASS;
          } else {
-+            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(this, p_36158_, p_36159_);
++            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract(this, p_36159_, p_36158_);
 +            if (net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteract.BUS.post(event)) {
 +                return event.getCancellationResult();
 +            }

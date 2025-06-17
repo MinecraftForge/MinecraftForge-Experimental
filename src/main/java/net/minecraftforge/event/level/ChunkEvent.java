@@ -9,8 +9,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -96,10 +94,10 @@ public class ChunkEvent extends LevelEvent {
             super(chunk);
         }
     }
-    
+
     /**
      * ChunkEvent.LightingCalculated is fired when MinecraftForge flags that lighting is correct in a chunk.<br>
-     * This event is fired during light propagation in ThreadedLevelLightEngine.CompletableFuture(), specifically upon setting 
+     * This event is fired during light propagation in ThreadedLevelLightEngine.CompletableFuture(), specifically upon setting
      * the ChunkAccess isLightCorrect to true.<br>
      * <br>
      * The game test for this event is lighting_event_test in net.minecraftforge.debug.chunk<br>

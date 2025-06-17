@@ -93,7 +93,7 @@
 +
 +        //Copy over a section of the Entity Data from the old player.
 +        //Allows mods to specify data that persists after players respawn.
-+        CompoundTag old = p_9016_.getPersistentData();
++        var old = p_9016_.getPersistentData();
 +        if (old.contains(PERSISTED_NBT_TAG))
 +            getPersistentData().put(PERSISTED_NBT_TAG, old.get(PERSISTED_NBT_TAG));
 +        net.minecraftforge.event.ForgeEventFactory.onPlayerClone(this, p_9016_, !p_9017_);

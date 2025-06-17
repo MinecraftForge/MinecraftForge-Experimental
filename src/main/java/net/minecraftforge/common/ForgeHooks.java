@@ -326,7 +326,7 @@ public final class ForgeHooks {
             return null;
 
         if (!player.level().isClientSide)
-            player.getCommandSenderWorld().addFreshEntity(event.getEntity());
+            player.level().addFreshEntity(event.getEntity());
         return event.getEntity();
     }
 
@@ -1126,7 +1126,7 @@ public final class ForgeHooks {
 
         // Should we always fire this, even if the channel consumed the packet?
         if (!event.getSource().getPacketHandled()) {
-            MinecraftForge.EVENT_BUS.post(event);
+            CustomPayloadEvent.BUS.fire(event);
             return event.getSource().getPacketHandled();
         }
 

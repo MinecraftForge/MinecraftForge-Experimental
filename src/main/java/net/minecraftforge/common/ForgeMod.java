@@ -5,7 +5,7 @@
 
 package net.minecraftforge.common;
 
-import net.minecraft.DetectedVersion;
+import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -443,13 +443,13 @@ public class ForgeMod {
         gen.addProvider(true, new PackMetadataGenerator(packOutput)
             .add(PackMetadataSection.TYPE, new PackMetadataSection(
                 Component.translatable("pack.forge.description"),
-                DetectedVersion.BUILT_IN.getPackVersion(PackType.SERVER_DATA),
+                SharedConstants.getCurrentVersion().packVersion(PackType.SERVER_DATA),
                 Optional.empty() //Arrays.stream(PackType.values()).collect(Collectors.toMap(Function.identity(), DetectedVersion.BUILT_IN::getPackVersion))
             ))
         );
         ForgeBlockTagsProvider blockTags = new ForgeBlockTagsProvider(packOutput, lookupProvider, existingFileHelper);
         gen.addProvider(event.includeServer(), blockTags);
-        gen.addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, blockTags.contentsGetter(), existingFileHelper));
+        gen.addProvider(event.includeServer(), new ForgeItemTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeEnchantmentTagsProvider(packOutput, lookupProvider, existingFileHelper));

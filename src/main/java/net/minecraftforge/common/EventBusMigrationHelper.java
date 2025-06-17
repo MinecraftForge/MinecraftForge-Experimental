@@ -7,8 +7,10 @@ package net.minecraftforge.common;
 
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.listener.EventListener;
+import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.unsafe.UnsafeHacks;
 
+import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodHandles.Lookup;
 import java.util.Collection;
 
@@ -19,9 +21,13 @@ import java.util.Collection;
  * migrating your mod to the new system.
  */
 public final class EventBusMigrationHelper {
-    private EventBusMigrationHelper() {}
+    public static final EventBusMigrationHelper INSTANCE = new EventBusMigrationHelper(BusGroup.DEFAULT);
 
-    static final EventBusMigrationHelper INSTANCE = new EventBusMigrationHelper();
+    private final BusGroup group;
+
+    public EventBusMigrationHelper(BusGroup group) {
+        this.group = group;
+    }
 
     /**
      * A version of {@link BusGroup#register(Lookup, Class)} that doesn't require a lookup. It is strongly recommended
@@ -33,7 +39,7 @@ public final class EventBusMigrationHelper {
      * @see BusGroup#register(Lookup, Class)
      */
     public Collection<EventListener> register(Class<?> clazz) {
-        return registerListeners(clazz);
+        return registerListeners(group, clazz);
     }
 
     /**
@@ -46,10 +52,10 @@ public final class EventBusMigrationHelper {
      * @see BusGroup#register(Lookup, Object)
      */
     public Collection<EventListener> register(Object instance) {
-        return registerListeners(instance);
+        return registerListeners(group, instance);
     }
 
-    private static Collection<EventListener> registerListeners(Object instance) {
+    private static Collection<EventListener> registerListeners(BusGroup group, Object instance) {
         final class DodgyLookup {
             private DodgyLookup() {}
             private static final Lookup INSTANCE;
@@ -65,9 +71,56 @@ public final class EventBusMigrationHelper {
         }
 
         if (instance.getClass() == Class.class) {
-            return BusGroup.DEFAULT.register(DodgyLookup.INSTANCE, (Class<?>) instance);
+            return group.register(DodgyLookup.INSTANCE, (Class<?>) instance);
         } else {
-            return BusGroup.DEFAULT.register(DodgyLookup.INSTANCE, instance);
+            return group.register(DodgyLookup.INSTANCE, instance);
         }
+    }
+
+
+    /**
+     * The unique name of this BusGroup.
+     */
+    public String name() {
+        return group.name();
+    }
+
+    /**
+     * Registers all static methods annotated with {@link SubscribeEvent} in the given class.
+     *
+     * @param callerLookup {@code MethodHandles.lookup()} from the class containing listeners
+     * @param utilityClassWithStaticListeners the class containing the static listeners
+     * @return A collection of the registered listeners, which can be used to optionally unregister them later
+     *
+     * @apiNote This method only registers static listeners.
+     *          <p>If you want to register both instance and static methods, use
+     *          {@link BusGroup#register(MethodHandles.Lookup, Object)} instead.</p>
+     */
+    public Collection<EventListener> register(MethodHandles.Lookup callerLookup, Class<?> utilityClassWithStaticListeners) {
+        return group.register(callerLookup, utilityClassWithStaticListeners);
+    }
+
+    /**
+     * Registers all methods annotated with {@link SubscribeEvent} in the given object.
+     *
+     * @param callerLookup {@code MethodHandles.lookup()} from the class containing the listeners
+     * @param listener the object containing the static and/or instance listeners
+     * @return A collection of the registered listeners, which can be used to optionally unregister them later
+     *
+     * @apiNote If you know all the listeners are static methods, use
+     *          {@link BusGroup#register(MethodHandles.Lookup, Class)} instead for better registration performance.
+     */
+    public Collection<EventListener> register(MethodHandles.Lookup callerLookup, Object listener) {
+        return group.register(callerLookup, listener);
+    }
+
+    /**
+     * Unregisters the given listeners from this BusGroup.
+     * @param listeners A collection of listeners to unregister, obtained from
+     *                  {@link #register(Class)} or {@link #register(Object)}
+     *                  {@link #register(MethodHandles.Lookup, Class)} or {@link #register(MethodHandles.Lookup, Object)}
+     */
+    public void unregister(Collection<EventListener> listeners) {
+        group.unregister(listeners);
     }
 }

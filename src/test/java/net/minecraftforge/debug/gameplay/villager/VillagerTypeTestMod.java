@@ -39,7 +39,7 @@ public class VillagerTypeTestMod extends BaseTestMod {
 
     public VillagerTypeTestMod(FMLJavaModLoadingContext context) {
         super(context);
-        context.getModEventBus().addListener(this::onCommonSetup);
+        FMLCommonSetupEvent.getBus(this.modBus).addListener(this::onCommonSetup);
     }
 
     private void onCommonSetup(final FMLCommonSetupEvent event) {

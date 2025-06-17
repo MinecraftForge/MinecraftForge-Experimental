@@ -18,7 +18,7 @@ public interface IForgeTagAppender<E, T> {
 
     /**
      * Gets the backing TagBuilder, will throw an exception if its not set.
-     * This is only avalible during data generation, and if they use TagAppender.forBuilder
+     * This is only available during data generation, and if they use TagAppender.forBuilder
      */
     default TagBuilder getInternalBuilder() {
         throw new IllegalStateException("Could not determine internal tag builder");
@@ -27,6 +27,31 @@ public interface IForgeTagAppender<E, T> {
     default String getSourceName() {
         return "unknown";
     }
+
+    /**
+     * Adds a registry entry to the tag json's remove list. Callable during datageneration.
+     *
+     * @param entry The entry to remove
+     * @return The builder for chaining
+     */
+    default TagAppender<E, T> remove(final E entry) {
+        throw new UnsupportedOperationException("TagAppender.remove is not implemented in class: " + this.getClass());
+    }
+
+    /**
+     * Adds multiple registry entries to the tag json's remove list. Callable during datageneration.
+     *
+     * @param entries The entries to remove
+     * @return The builder for chaining
+     */
+    @SuppressWarnings("unchecked")
+    default TagAppender<E, T> remove(final E first, final E...entries) {
+        this.remove(first);
+        for (E entry : entries)
+            this.remove(entry);
+        return self();
+    }
+
 
     @SuppressWarnings("unchecked")
     default TagAppender<E, T> addTags(TagKey<T>... values) {
@@ -85,20 +110,6 @@ public interface IForgeTagAppender<E, T> {
      */
     default TagAppender<E, T> remove(final ResourceKey<T> resourceKey) {
         this.remove(resourceKey.location());
-        return self();
-    }
-
-    /**
-     * Adds multiple resource keys to the tag json's remove list. Only available during data generation.
-     *
-     * @param resourceKeys The resource keys of the elements to remove
-     * @return The appender for chaining
-     */
-    @SuppressWarnings("unchecked")
-    default TagAppender<E, T> remove(final ResourceKey<T> firstResourceKey, final ResourceKey<T>... resourceKeys) {
-        this.remove(firstResourceKey.location());
-        for (var resourceKey : resourceKeys)
-            this.remove(resourceKey.location());
         return self();
     }
 

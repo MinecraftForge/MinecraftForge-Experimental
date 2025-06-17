@@ -20,7 +20,7 @@
          return new TagAppender<ResourceKey<T>, T>() {
              public TagAppender<ResourceKey<T>, T> add(ResourceKey<T> p_406023_) {
                  p_407840_.addElement(p_406023_.location());
-@@ -54,6 +_,16 @@
+@@ -54,6 +_,21 @@
                  p_407840_.addOptionalTag(p_407223_.location());
                  return this;
              }
@@ -34,13 +34,19 @@
 +            public String getSourceName() {
 +                return source;
 +            }
++
++            @Override
++            public TagAppender<ResourceKey<T>, T> remove(ResourceKey<T> value) {
++                return this.remove(value.location());
++            }
          };
      }
  
-@@ -82,6 +_,16 @@
+@@ -81,6 +_,22 @@
+             @Override
              public TagAppender<U, T> addOptionalTag(TagKey<T> p_409695_) {
                  tagappender.addOptionalTag(p_409695_);
-                 return this;
++                return this;
 +            }
 +
 +            @Override
@@ -51,6 +57,11 @@
 +            @Override
 +            public String getSourceName() {
 +                return tagappender.getSourceName();
++            }
++
++            @Override
++            public TagAppender<U, T> remove(U value) {
++                tagappender.remove(p_409081_.apply(value));
+                 return this;
              }
          };
-     }

@@ -61,7 +61,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
     }
 
     public static RenderTypeGroup getLayerRenderTypes(boolean unlit) {
-        return new RenderTypeGroup(RenderType.translucent(), unlit ? ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get() : ForgeRenderTypes.ITEM_UNSORTED_TRANSLUCENT.get());
+        return new RenderTypeGroup(RenderType.translucentMovingBlock(), unlit ? ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get() : ForgeRenderTypes.ITEM_UNSORTED_TRANSLUCENT.get());
     }
 
     @SuppressWarnings("deprecation")

@@ -12,7 +12,6 @@ import java.lang.annotation.Target;
 import java.util.function.Supplier;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.Bindings;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;

@@ -12,7 +12,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.eventbus.api.Cancelable;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
@@ -30,10 +29,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * {@link #ratioX} contains the x ratio of the knock back. <br>
  * {@link #ratioZ} contains the z ratio of the knock back. <br>
  * <br>
- * This event is {@link Cancelable}.<br>
  * If this event is canceled, the entity is not knocked back.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
  *<br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/

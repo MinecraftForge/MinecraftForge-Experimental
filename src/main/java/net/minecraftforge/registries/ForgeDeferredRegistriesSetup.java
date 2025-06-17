@@ -8,8 +8,6 @@ package net.minecraftforge.registries;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import org.jetbrains.annotations.ApiStatus;
 
-import net.minecraftforge.eventbus.api.IEventBus;
-
 @ApiStatus.Internal
 public class ForgeDeferredRegistriesSetup {
     private static boolean setup = false;
