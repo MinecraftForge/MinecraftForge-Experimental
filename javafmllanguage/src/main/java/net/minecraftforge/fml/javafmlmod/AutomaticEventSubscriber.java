@@ -388,10 +388,12 @@ public class AutomaticEventSubscriber {
             }
 
             try {
-                var mh = DodgyLookup.INSTANCE.unreflect(callback);
+                var callbackDeclaredClass = callback.getDeclaringClass();
+                var lookup = DodgyLookup.INSTANCE.in(callbackDeclaredClass);
+                var mh = lookup.unreflect(callback);
 
                 return LambdaMetafactory.metafactory(
-                        DodgyLookup.INSTANCE, fiMethodName, factoryReturnType, fiMethodType, mh, mh.type()
+                        lookup, fiMethodName, factoryReturnType, fiMethodType, mh, mh.type()
                 ).getTarget();
             } catch (Exception e) {
                 throw makeRuntimeException(callback, e);

@@ -185,6 +185,7 @@ public class FMLModContainer extends ModContainer {
     }
 
     @Override
+    @SuppressWarnings({"rawtypes", "unchecked"})
     public void dispatchConfigEvent(IConfigEvent event) {
         var eventBus = (EventBus) EventBus.create(eventBusGroup, event.self().getClass());
         eventBus.post(event.self());

@@ -71,9 +71,10 @@ public final class EventBusMigrationHelper {
         }
 
         if (instance.getClass() == Class.class) {
-            return group.register(DodgyLookup.INSTANCE, (Class<?>) instance);
+            Class<?> clazz = (Class<?>) instance;
+            return group.register(DodgyLookup.INSTANCE.in(clazz), clazz);
         } else {
-            return group.register(DodgyLookup.INSTANCE, instance);
+            return group.register(DodgyLookup.INSTANCE.in(instance.getClass()), instance);
         }
     }
 
