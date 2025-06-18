@@ -14,7 +14,6 @@ import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
@@ -40,7 +39,7 @@ import java.util.function.Consumer;
  * @see MouseInput
  * @see KeyInput
  */
-public abstract sealed class ScreenEvent extends MutableEvent implements InheritableEvent {
+public abstract sealed class ScreenEvent extends MutableEvent {
     public static final EventBus<ScreenEvent> BUS = EventBus.create(ScreenEvent.class);
 
     private final Screen screen;
@@ -69,8 +68,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see Init.Post
      */
     public static abstract sealed class Init extends ScreenEvent {
-        public static final EventBus<Init> BUS = EventBus.create(Init.class);
-
         private final Consumer<GuiEventListener> add;
         private final Consumer<GuiEventListener> remove;
 
@@ -154,8 +151,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see Render.Post
      */
     public static abstract sealed class Render extends ScreenEvent {
-        public static final EventBus<Render> BUS = EventBus.create(Render.class);
-
         private final GuiGraphics guiGraphics;
         private final int mouseX;
         private final int mouseY;
@@ -341,8 +336,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see MouseScrolled
      */
     private static abstract sealed class MouseInput extends ScreenEvent {
-        public static final EventBus<MouseInput> BUS = EventBus.create(MouseInput.class);
-
         private final double mouseX;
         private final double mouseY;
 
@@ -376,8 +369,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see MouseButtonPressed.Post
      */
     public static abstract sealed class MouseButtonPressed extends MouseInput {
-        public static final EventBus<MouseButtonPressed> BUS = EventBus.create(MouseButtonPressed.class);
-
         private final int button;
 
         @ApiStatus.Internal
@@ -469,8 +460,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see MouseButtonReleased.Post
      */
     public static abstract sealed class MouseButtonReleased extends MouseInput {
-        public static final EventBus<MouseButtonReleased> BUS = EventBus.create(MouseButtonReleased.class);
-
         private final int button;
 
         @ApiStatus.Internal
@@ -562,8 +551,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see MouseDragged.Post
      */
     public static abstract sealed class MouseDragged extends MouseInput {
-        public static final EventBus<MouseDragged> BUS = EventBus.create(MouseDragged.class);
-
         private final int mouseButton;
         private final double dragX;
         private final double dragY;
@@ -647,8 +634,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see MouseScrolled.Post
      */
     public static abstract sealed class MouseScrolled extends MouseInput {
-        public static final EventBus<MouseScrolled> BUS = EventBus.create(MouseScrolled.class);
-
         private final double deltaX;
         private final double deltaY;
 
@@ -722,8 +707,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_key" target="_top">the online GLFW documentation</a>
      */
     private static abstract sealed class KeyInput extends ScreenEvent {
-        public static final EventBus<KeyInput> BUS = EventBus.create(KeyInput.class);
-
         private final int keyCode;
         private final int scanCode;
         private final int modifiers;
@@ -784,8 +767,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see KeyPressed.Post
      */
     public static abstract sealed class KeyPressed extends KeyInput {
-        public static final EventBus<KeyPressed> BUS = EventBus.create(KeyPressed.class);
-
         @ApiStatus.Internal
         public KeyPressed(Screen screen, int keyCode, int scanCode, int modifiers) {
             super(screen, keyCode, scanCode, modifiers);
@@ -838,8 +819,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see KeyReleased.Post
      */
     public static abstract sealed class KeyReleased extends KeyInput {
-        public static final EventBus<KeyReleased> BUS = EventBus.create(KeyReleased.class);
-
         @ApiStatus.Internal
         public KeyReleased(Screen screen, int keyCode, int scanCode, int modifiers) {
             super(screen, keyCode, scanCode, modifiers);
@@ -893,8 +872,6 @@ public abstract sealed class ScreenEvent extends MutableEvent implements Inherit
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_char" target="_top">the online GLFW documentation</a>
      */
     public static sealed class CharacterTyped extends ScreenEvent {
-        public static final EventBus<CharacterTyped> BUS = EventBus.create(CharacterTyped.class);
-
         private final char codePoint;
         private final int modifiers;
 
