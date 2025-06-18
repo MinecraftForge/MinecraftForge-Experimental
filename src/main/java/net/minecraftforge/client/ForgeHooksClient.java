@@ -44,7 +44,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.texture.SpriteContents;
@@ -713,7 +713,7 @@ public class ForgeHooksClient {
 
     public static boolean isBlockInSolidLayer(BlockState state) {
         var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        return model.getRenderTypes(state, RandomSource.create(), ModelData.EMPTY).contains(RenderType.solid());
+        return model.getRenderTypes(state, RandomSource.create(), ModelData.EMPTY).contains(ChunkSectionLayer.SOLID);
     }
 
     public static void createWorldConfirmationScreen(Runnable doConfirmedWorldLoad) {
