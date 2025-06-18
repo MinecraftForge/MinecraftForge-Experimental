@@ -24,8 +24,6 @@ import net.minecraftforge.client.gui.widget.ScrollPanel;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -38,6 +36,7 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.Util;
@@ -173,7 +172,7 @@ public class ModListScreen extends Screen {
 
             for (FormattedCharSequence line : lines) {
                 if (line != null)
-                    guiGraphics.drawString(ModListScreen.this.font, line, left + PADDING, relativeY, 0xFFFFFF);
+                    guiGraphics.drawString(ModListScreen.this.font, line, left + PADDING, relativeY, ARGB.white(1));
                 relativeY += font.lineHeight;
             }
 

@@ -9,7 +9,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
@@ -19,8 +18,6 @@ import net.minecraftforge.versions.forge.ForgeVersion;
 import net.minecraftforge.common.util.MavenVersionStringHelper;
 import net.minecraftforge.fml.VersionChecker;
 import net.minecraftforge.forgespi.language.IModInfo;
-
-import com.mojang.blaze3d.systems.RenderSystem;
 
 public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
     private static String stripControlCodes(String value) { return net.minecraft.util.StringUtil.stripColor(value); }
@@ -81,11 +78,10 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
             VersionChecker.CheckResult vercheck = VersionChecker.getResult(modInfo);
             Font font = this.parent.getFontRenderer();
             var barOffset = ModListWidget.this.scrollbarVisible() ? 6 : 0;
-            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(name,    listWidth - 6 - barOffset))), left + 3, top + 2, 0xFFFFFF, false);
-            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(version, listWidth - 6 - barOffset))), left + 3, top + 2 + font.lineHeight, 0xCCCCCC, false);
+            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(name,    listWidth - 6 - barOffset))), left + 3, top + 2, 0xFFFFFFFF, false);
+            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(version, listWidth - 6 - barOffset))), left + 3, top + 2 + font.lineHeight, 0xFFCCCCCC, false);
             if (vercheck.status().shouldDraw()) {
                 //TODO: [Forge][ModList] Consider adding more icons for visualization
-                //RenderSystem.setShaderColor(1, 1, 1, 1);
                 guiGraphics.pose().pushMatrix();
                 guiGraphics.blit(RenderPipelines.GUI_TEXTURED, VERSION_CHECK_ICONS, getX() + width - 12 - barOffset, top + entryHeight / 4, vercheck.status().getSheetOffset() * 8, (vercheck.status().isAnimated() && ((System.currentTimeMillis() / 800 & 1)) == 1) ? 8 : 0, 8, 8, 64, 16);
                 guiGraphics.pose().popMatrix();

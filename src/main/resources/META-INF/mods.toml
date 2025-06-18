@@ -11,7 +11,7 @@ updateJSONURL="https://files.minecraftforge.net/net/minecraftforge/forge/promoti
 displayURL="https://minecraftforge.net/"
 displayName="Forge"
 credits="Anyone who has contributed on Github and supports our development"
-authors="LexManos,cpw"
+authors="LexManos and the community"
 description='''
 Forge, a broad compatibility API.
 '''
