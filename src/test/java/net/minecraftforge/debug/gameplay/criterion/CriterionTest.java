@@ -30,7 +30,6 @@ import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ForgeAdvancementProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.gametest.GameTest;
@@ -51,7 +50,8 @@ public final class CriterionTest extends BaseTestMod {
     public static final ResourceLocation TEST_ADVANCEMENT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
 
     public CriterionTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, true);
+        GatherDataEvent.getBus(modBus).addListener(this::gatherData);
         BlockEvent.BreakEvent.BUS.addListener(this::onBlockBreak);
     }
 
@@ -100,8 +100,7 @@ public final class CriterionTest extends BaseTestMod {
         }
     }
 
-    @SubscribeEvent
-    public void onGatherData(GatherDataEvent event) {
+    private void gatherData(GatherDataEvent event) {
         var tag = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "fish"));
 
         event.getGenerator().addProvider(true, new VanillaItemTagsProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), MOD_ID, event.getExistingFileHelper()) {

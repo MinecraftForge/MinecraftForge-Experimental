@@ -49,10 +49,10 @@ public class ConditionalRecipeTest extends BaseTestMod {
     static final String MODID = "conditional_recipe";
 
     public ConditionalRecipeTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
+        GatherDataEvent.getBus(modBus).addListener(this::gatherData);
     }
 
-    @SubscribeEvent
     public void gatherData(GatherDataEvent event) {
         var gen = event.getGenerator();
         gen.addProvider(event.includeServer(), new Recipes.Runner(gen.getPackOutput(), event.getLookupProvider()));

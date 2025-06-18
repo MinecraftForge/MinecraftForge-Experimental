@@ -128,7 +128,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
     }
 
     public PlantTypePlacementTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
     }
 
     // Tests to make sure that we know about all plants in vanilla

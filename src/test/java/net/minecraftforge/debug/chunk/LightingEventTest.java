@@ -29,7 +29,7 @@ public class LightingEventTest extends BaseTestMod {
     private static final int MAX_CHUNK_LOCATION_ATTEMPTS = 5;
 
     public LightingEventTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
     }
 
     @GameTest

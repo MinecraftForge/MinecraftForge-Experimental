@@ -33,7 +33,7 @@ public final class ShieldDisablingTest extends BaseTestMod {
     public static final String MOD_ID = "shield_disabling";
 
     public ShieldDisablingTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
     }
 
     @GameTest

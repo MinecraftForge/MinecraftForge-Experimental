@@ -49,7 +49,7 @@ public class PreventItemDamageTest extends BaseTestMod {
     private static final RegistryObject<FakeShieldItem> FAKE_SHIELD = ITEMS.register("fake_shield", FakeShieldItem::new);
 
     public PreventItemDamageTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, true);
         this.testItem(lookup -> FAKE_SHIELD.get().getDefaultInstance());
     }
 

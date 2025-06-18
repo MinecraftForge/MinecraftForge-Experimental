@@ -56,49 +56,45 @@ public abstract class BaseTestMod {
     protected final Map<ResourceLocation, ForgeGameTestHooks.TestReference> tests;
 
     public BaseTestMod(FMLJavaModLoadingContext context) {
-        this(context, true);
+        this(context, true, true);
     }
 
-    public BaseTestMod(FMLJavaModLoadingContext context, boolean register) {
+    public BaseTestMod(FMLJavaModLoadingContext context, boolean registerSelf, boolean registerDeferred) {
         this.modBus = context.getModBusGroup();
 
-        if (!register) {
-            this.tests = Collections.emptyMap();
-            return;
-        }
-
-        var lookup = LookupHelper.INSTANCE;
-
-        modBus.register(lookup, this);
+        if (registerSelf)
+            modBus.register(LookupHelper.INSTANCE.in(this.getClass()), this);
 
         tests = ForgeGameTestHooks.gatherTests(getClass(), this);
 
-        Class<?> cls = getClass();
-        while (cls != BaseTestMod.class) {
-            var data = new LinkedHashMap<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>();
-            for (var field : cls.getDeclaredFields()) {
-                if (!Modifier.isStatic(field.getModifiers()))
-                    continue;
+        if (registerDeferred) {
+            Class<?> cls = getClass();
+            while (cls != BaseTestMod.class) {
+                var data = new LinkedHashMap<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>();
+                for (var field : cls.getDeclaredFields()) {
+                    if (!Modifier.isStatic(field.getModifiers()))
+                        continue;
 
-                if (field.getType() == DeferredRegister.class) {
-                    DeferredRegister<?> dr = getField(field, null);
-                    dr.register(modBus);
-                } else if (field.getType() == DeferredRegisterData.class) {
-                    DeferredRegisterData<?> dr = getField(field, null);
-                    data.put(dr.getRegistryKey(), dr);
-                    if (cls == getClass())
-                        myDataRegistries.add(dr);
+                    if (field.getType() == DeferredRegister.class) {
+                        DeferredRegister<?> dr = getField(field, null);
+                        dr.register(modBus);
+                    } else if (field.getType() == DeferredRegisterData.class) {
+                        DeferredRegisterData<?> dr = getField(field, null);
+                        data.put(dr.getRegistryKey(), dr);
+                        if (cls == getClass())
+                            myDataRegistries.add(dr);
+                    }
                 }
+
+                if (!data.isEmpty())
+                    dataRegistries.addFirst(data);
+
+                cls = cls.getSuperclass();
             }
 
-            if (!data.isEmpty())
-                dataRegistries.addFirst(data);
-
-            cls = cls.getSuperclass();
+            if (!myDataRegistries.isEmpty())
+                GatherDataEvent.getBus(modBus).addListener(this::generateDataRegistries);
         }
-
-        if (!myDataRegistries.isEmpty())
-            GatherDataEvent.getBus(modBus).addListener(this::generateDataRegistries);
 
         if (!tests.isEmpty()) {
             RegisterEvent.getBus(modBus).addListener(this::registerTestFunctions);

@@ -22,7 +22,7 @@ public class GatherComponentsEventTest extends BaseTestMod {
     public static final String MOD_ID = "gather_components_test_event";
 
     public GatherComponentsEventTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
         GatherComponentsEvent.Item.BUS.addListener(this::onItem);
     }
 

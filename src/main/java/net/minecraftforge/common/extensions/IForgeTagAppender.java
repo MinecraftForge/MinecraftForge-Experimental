@@ -62,6 +62,11 @@ public interface IForgeTagAppender<E, T> {
         return builder;
     }
 
+    default TagAppender<E, T> addOptional(ResourceLocation location) {
+        self().getInternalBuilder().addOptionalElement(location);
+        return self();
+    }
+
     @SuppressWarnings("unchecked")
     default TagAppender<E, T>addOptionalTags(TagKey<T>... values) {
         var builder = self();

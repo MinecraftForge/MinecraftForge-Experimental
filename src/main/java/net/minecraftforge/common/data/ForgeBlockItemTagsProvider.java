@@ -25,8 +25,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
     @Override
     @SuppressWarnings({ "unchecked", "removal" })
     protected void run() {
-        super.run();
-        tag(Tags.Blocks.BARRELS, Tags.Items.BARRELS, Legacy.Blocks.BARRELS, Legacy.Items.BARRELS)
+        tag(Tags.Blocks.BARRELS, Tags.Items.BARRELS)
             .addTag(Tags.Blocks.BARRELS_WOODEN)
             .addOptionalTag(Legacy.Blocks.BARRELS);
         tag(Tags.Blocks.BARRELS_WOODEN, Tags.Items.BARRELS_WOODEN, Legacy.Blocks.BARRELS_WOODEN, Legacy.Items.BARRELS_WOODEN)
@@ -43,7 +42,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(Blocks.LARGE_AMETHYST_BUD);
         tag(Tags.Blocks.CHAINS, Tags.Items.CHAINS)
             .add(Blocks.CHAIN);
-        tag(Tags.Blocks.CHESTS, Tags.Items.CHESTS, Legacy.Blocks.CHESTS, Legacy.Items.CHESTS)
+        tag(Tags.Blocks.CHESTS, Tags.Items.CHESTS)
             .addTags(
                 Tags.Blocks.CHESTS_ENDER,
                 Tags.Blocks.CHESTS_TRAPPED,
@@ -164,7 +163,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.ROSE_BUSH,
                 Blocks.PITCHER_PLANT
             )
-            .addOptionalTag(tagKey("tall_flowers"));
+            .addOptionalTag(tagKey("tall_flowers")); //This is old vanilla tag, should it be removed?
         tag(Tags.Blocks.FLOWERS, Tags.Items.FLOWERS)
             .add(
                 Blocks.FLOWERING_AZALEA_LEAVES,
@@ -305,7 +304,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             );
         tag(Tags.Blocks.ORE_RATES_SPARSE, Tags.Items.ORE_RATES_SPARSE)
             .add(Blocks.NETHER_GOLD_ORE);
-        tag(Tags.Blocks.ORES, Tags.Items.ORES, Legacy.Blocks.ORES, Legacy.Items.ORES)
+        tag(Tags.Blocks.ORES, Tags.Items.ORES)
             .addTags(
                 Tags.Blocks.ORES_COAL,
                 Tags.Blocks.ORES_COPPER,
@@ -333,14 +332,14 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .addTag(BlockTags.IRON_ORES); // forge:ores/iron
         tag(Tags.Blocks.ORES_LAPIS, Tags.Items.ORES_LAPIS)
             .addTag(BlockTags.LAPIS_ORES); // forge:ores/lapis
-        tag(Tags.Blocks.ORES_QUARTZ, Tags.Items.ORES_QUARTZ, Legacy.Blocks.QUARTZ_ORES, Legacy.Items.QUARTZ_ORES)
+        tag(Tags.Blocks.ORES_QUARTZ, Tags.Items.ORES_QUARTZ, Legacy.Blocks.ORES_QUARTZ, Legacy.Items.QUARTZ_ORES)
             .add(Blocks.NETHER_QUARTZ_ORE)
-            .addOptionalTag(Legacy.Blocks.QUARTZ_ORES);
+            .addOptionalTag(Legacy.Blocks.ORES_QUARTZ);
         tag(Tags.Blocks.ORES_REDSTONE, Tags.Items.ORES_REDSTONE)
             .addTag(BlockTags.REDSTONE_ORES); // forge:ores/redstone
-        tag(Tags.Blocks.ORES_NETHERITE_SCRAP, Tags.Items.ORES_NETHERITE_SCRAP, Legacy.Blocks.ORES_NEHTERITE_SCRAP, Legacy.Items.ORES_NEHTERITE_SCRAP)
+        tag(Tags.Blocks.ORES_NETHERITE_SCRAP, Tags.Items.ORES_NETHERITE_SCRAP, Legacy.Blocks.ORES_NETHERITE_SCRAP, Legacy.Items.ORES_NEHTERITE_SCRAP)
             .add(Blocks.ANCIENT_DEBRIS)
-            .addOptionalTag(Legacy.Blocks.ORES_NEHTERITE_SCRAP);
+            .addOptionalTag(Legacy.Blocks.ORES_NETHERITE_SCRAP);
         tag(Tags.Blocks.ORES_IN_GROUND_DEEPSLATE, Tags.Items.ORES_IN_GROUND_DEEPSLATE)
             .add(
                 Blocks.DEEPSLATE_COAL_ORE,
@@ -394,7 +393,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(Blocks.SAND);
         tag(Tags.Blocks.SAND_RED, Tags.Items.SAND_RED) // forge:sand/red
             .add(Blocks.RED_SAND);
-        tag(Tags.Blocks.SANDSTONE_BLOCKS, Tags.Items.SANDSTONE_BLOCKS, Legacy.Blocks.SANDSTONE, Legacy.Items.SANDSTONE)
+        tag(Tags.Blocks.SANDSTONE_BLOCKS, Tags.Items.SANDSTONE_BLOCKS)
             .addTags(
                 Tags.Blocks.SANDSTONE_RED_BLOCKS,
                 Tags.Blocks.SANDSTONE_UNCOLORED_BLOCKS
@@ -564,6 +563,15 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
 
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
         // TODO: [Forge][Tags][Old] Remove backwards compat tag entries in 1.22
+        tag(Legacy.Blocks.BARRELS, Legacy.Items.BARRELS)
+            .addTag(Legacy.Blocks.BARRELS_WOODEN);
+
+        tag(Legacy.Blocks.CHESTS, Legacy.Items.CHESTS)
+            .addTags(
+                Tags.Blocks.CHESTS_ENDER,
+                Tags.Blocks.CHESTS_TRAPPED,
+                Legacy.Blocks.CHESTS_WOODEN
+            );
 
         //copy(forgeBlockTagKey("glass/tinted"), forgeItemTagKey("glass/tinted"));
         addColored(tag(Tags.Blocks.STAINED_GLASS, Tags.Items.STAINED_GLASS)::add, Tags.Blocks.GLASS, "{color}_stained_glass");
@@ -578,11 +586,9 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             );
         tag(Tags.Blocks.GLASS_COLORLESS, Tags.Items.GLASS_COLORLESS)
             .add(Blocks.GLASS);
-
-
         tag(Legacy.Blocks.GLASS_PANES, Legacy.Items.GLASS_PANES)
             .addTags(
-                Legacy.Blocks.GLASS_PANES,
+                Legacy.Blocks.GLASS_PANES_COLORLESS,
                 Tags.Blocks.STAINED_GLASS_PANES
             );
         tag(Legacy.Blocks.GLASS_PANES_COLORLESS, Legacy.Items.GLASS_PANES_COLORLESS)
@@ -591,7 +597,30 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(Blocks.TINTED_GLASS);
         tag(Legacy.Blocks.OBSIDIAN, Legacy.Items.OBSIDIAN)
             .add(Blocks.OBSIDIAN);
-
+        tag(Legacy.Blocks.ORES, Legacy.Items.ORES)
+            .addTags(
+                Tags.Blocks.ORES_COAL,
+                Tags.Blocks.ORES_COPPER,
+                Tags.Blocks.ORES_DIAMOND,
+                Tags.Blocks.ORES_EMERALD,
+                Tags.Blocks.ORES_GOLD,
+                Tags.Blocks.ORES_IRON,
+                Tags.Blocks.ORES_LAPIS,
+                Tags.Blocks.ORES_REDSTONE,
+                Legacy.Blocks.ORES_QUARTZ,
+                Legacy.Blocks.ORES_NETHERITE_SCRAP
+            );
+        tag(Legacy.Blocks.SANDSTONE, Legacy.Items.SANDSTONE)
+            .add(
+                Blocks.SANDSTONE,
+                Blocks.CUT_SANDSTONE,
+                Blocks.CHISELED_SANDSTONE,
+                Blocks.SMOOTH_SANDSTONE,
+                Blocks.RED_SANDSTONE,
+                Blocks.CUT_RED_SANDSTONE,
+                Blocks.CHISELED_RED_SANDSTONE,
+                Blocks.SMOOTH_RED_SANDSTONE
+            );
         tag(Legacy.Blocks.STONE, Legacy.Items.STONE)
             .add(
                 Blocks.ANDESITE,
@@ -620,6 +649,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Legacy.Blocks.STORAGE_BLOCKS_LAPIS,
                 Tags.Blocks.STORAGE_BLOCKS_QUARTZ,
                 Legacy.Blocks.STORAGE_BLOCKS_RAW_COPPER,
+                Legacy.Blocks.STORAGE_BLOCKS_RAW_GOLD,
                 Legacy.Blocks.STORAGE_BLOCKS_RAW_IRON,
                 Legacy.Blocks.STORAGE_BLOCKS_REDSTONE,
                 Legacy.Blocks.STORAGE_BLOCKS_NETHERITE
@@ -753,8 +783,8 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             public static final TagKey<Block> GLASS_TINTED = tag("glass/tinted");
             public static final TagKey<Block> OBSIDIAN = tag("obsidian");
             public static final TagKey<Block> ORES = tag("ores");
-            public static final TagKey<Block> QUARTZ_ORES = tag("ores/quartz");
-            public static final TagKey<Block> ORES_NEHTERITE_SCRAP = tag("ores/netherite_scrap");
+            public static final TagKey<Block> ORES_QUARTZ = tag("ores/quartz");
+            public static final TagKey<Block> ORES_NETHERITE_SCRAP = tag("ores/netherite_scrap");
             public static final TagKey<Block> SANDSTONE = tag("sandstone");
             public static final TagKey<Block> STONE = tag("stone");
             public static final TagKey<Block> STORAGE_BLOCKS = tag("storage_blocks");

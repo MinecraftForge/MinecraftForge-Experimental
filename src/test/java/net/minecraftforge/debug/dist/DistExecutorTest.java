@@ -21,7 +21,7 @@ public class DistExecutorTest extends BaseTestMod {
     static final String MOD_ID = "dist_executor";
 
     public DistExecutorTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, false);
     }
 
     @GameTest

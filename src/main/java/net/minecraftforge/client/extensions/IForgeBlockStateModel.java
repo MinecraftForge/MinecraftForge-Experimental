@@ -30,7 +30,6 @@ public interface IForgeBlockStateModel {
         return (BlockStateModel)this;
     }
 
-
     default @NotNull ModelData getModelData(@NotNull BlockAndTintGetter level, @NotNull BlockPos pos, @NotNull BlockState state, @NotNull ModelData modelData) {
         return modelData;
     }

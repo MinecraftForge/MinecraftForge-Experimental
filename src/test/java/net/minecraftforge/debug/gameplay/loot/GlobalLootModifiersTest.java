@@ -109,8 +109,9 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     private static final RegistryObject<Item> TEST_ITEM = ITEMS.register("test", () -> new BlockItem(TEST_BLOCK.get(), name(MODID, "test", new Item.Properties())));
 
     public GlobalLootModifiersTest(FMLJavaModLoadingContext context) {
-        super(context);
+        super(context, false, true);
         testItem(lookup -> getSmelterAxe(lookup.lookup(Registries.ENCHANTMENT).get(), true));
+        GatherDataEvent.getBus(modBus).addListener(this::runData);
     }
 
     private static ItemStack getSmelterAxe(HolderLookup<Enchantment> lookup, boolean enchanted) {
@@ -124,7 +125,6 @@ public class GlobalLootModifiersTest extends BaseTestMod {
         return item;
     }
 
-    @SubscribeEvent
     public void runData(GatherDataEvent event) {
         var out = event.getGenerator().getPackOutput();
         var lookup = event.getLookupProvider();

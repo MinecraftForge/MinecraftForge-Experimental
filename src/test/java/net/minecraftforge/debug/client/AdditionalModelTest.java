@@ -80,14 +80,8 @@ public class AdditionalModelTest extends BaseTestMod {
     private static final RegistryObject<Item> PIG_HEAD_ITEM = ITEMS.register("pig_head", () -> new Item(new Item.Properties().setId(ITEMS.key("pig_head"))));
 
     public AdditionalModelTest(FMLJavaModLoadingContext context) {
-        super(context, false);
-
+        super(context, false, FMLLoader.getLaunchHandler().isData());
         modBus.register(MethodHandles.lookup(), this);
-
-        if (FMLLoader.getLaunchHandler().isData()) {
-            BLOCKS.register(modBus);
-            ITEMS.register(modBus);
-        }
     }
 
     @SubscribeEvent
@@ -95,7 +89,6 @@ public class AdditionalModelTest extends BaseTestMod {
         var out = event.getGenerator().getPackOutput();
         event.getGenerator().addProvider(event.includeClient(), new ModelProvider(out));
     }
-
 
     @SubscribeEvent
     public void onRegisterAdditional(ModelEvent.RegisterModelStateDefinitions event) {
