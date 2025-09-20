@@ -8,63 +8,38 @@ package net.minecraftforge.event.level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * ChunkEvent is fired when an event involving a chunk occurs.
- * <br>
- * {@link #chunk} contains the Chunk this event is affecting.<br>
  **/
-public non-sealed abstract class ChunkEvent implements LevelEvent {
-    public static final EventBus<ChunkEvent> BUS = EventBus.create(ChunkEvent.class);
-
-    private final LevelAccessor level;
-    private final ChunkAccess chunk;
-
-    protected ChunkEvent(ChunkAccess chunk) {
-        this.level = chunk.getWorldForge();
-        this.chunk = chunk;
-    }
-
-    protected ChunkEvent(ChunkAccess chunk, LevelAccessor level) {
-        this.level = level;
-        this.chunk = chunk;
-    }
+public sealed interface ChunkEvent extends LevelEvent
+        permits ChunkEvent.Load, ChunkEvent.Unload, ChunkEvent.LightingCalculated, ChunkDataEvent {
+    EventBus<ChunkEvent> BUS = EventBus.create(ChunkEvent.class);
 
     @Override
-    public LevelAccessor getLevel() {
-        return level;
+    default LevelAccessor getLevel() {
+        return getChunk().getWorldForge();
     }
 
-    public ChunkAccess getChunk() {
-        return chunk;
-    }
+    /**
+     * @return the Chunk this event is affecting.
+     */
+    ChunkAccess getChunk();
 
     /**
      * ChunkEvent.Load is fired when vanilla Minecraft attempts to load a Chunk into the level.<br>
      * This event is fired during chunk loading in <br>
      *
      * Chunk.onChunkLoad(). <br>
-     * <strong>Note:</strong> This event may be called before the underlying {@link LevelChunk} is promoted to {@link ChunkStatus#FULL}. You will cause chunk loading deadlocks if you don't delay your level interactions.<br>
-     * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult} <br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     **/
-    public static final class Load extends ChunkEvent {
+     * <strong>Note:</strong> This event may be called before the underlying {@link LevelChunk} is promoted to {@link ChunkStatus#FULL}. You will cause chunk loading deadlocks if you don't delay your level interactions.
+     */
+    record Load(ChunkAccess getChunk, boolean isNewChunk) implements ChunkEvent {
         public static final EventBus<ChunkEvent.Load> BUS = EventBus.create(ChunkEvent.Load.class);
 
-        private final boolean newChunk;
-
         @ApiStatus.Internal
-        public Load(ChunkAccess chunk, boolean newChunk) {
-            super(chunk);
-            this.newChunk = newChunk;
-        }
+        public Load {}
 
         /**
          * Check whether the Chunk is newly generated, and being loaded for the first time.
@@ -74,27 +49,17 @@ public non-sealed abstract class ChunkEvent implements LevelEvent {
          * @return whether the Chunk is newly generated
          */
         public boolean isNewChunk() {
-            return newChunk;
+            return isNewChunk;
         }
     }
 
     /**
      * ChunkEvent.Unload is fired when vanilla Minecraft attempts to unload a Chunk from the level.<br>
      * This event is fired during chunk unloading in <br>
-     * Chunk.onChunkUnload(). <br>
-     * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult} <br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     **/
-    public static final class Unload extends ChunkEvent {
+     * Chunk.onChunkUnload().
+     */
+    record Unload(ChunkAccess getChunk) implements ChunkEvent {
         public static final EventBus<ChunkEvent.Unload> BUS = EventBus.create(ChunkEvent.Unload.class);
-
-        public Unload(ChunkAccess chunk) {
-            super(chunk);
-        }
     }
 
     /**
@@ -103,18 +68,8 @@ public non-sealed abstract class ChunkEvent implements LevelEvent {
      * the ChunkAccess isLightCorrect to true.<br>
      * <br>
      * The game test for this event is lighting_event_test in net.minecraftforge.debug.chunk<br>
-     * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult} <br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     **/
-    public static final class LightingCalculated extends ChunkEvent {
+     */
+    record LightingCalculated(ChunkAccess getChunk) implements ChunkEvent {
         public static final EventBus<ChunkEvent.LightingCalculated> BUS = EventBus.create(ChunkEvent.LightingCalculated.class);
-
-        public LightingCalculated(ChunkAccess chunk) {
-            super(chunk);
-        }
     }
 }
