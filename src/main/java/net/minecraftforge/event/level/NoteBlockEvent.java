@@ -13,12 +13,13 @@ import net.minecraft.world.level.Level;
 import com.google.common.base.Preconditions;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * Base class for Noteblock Events
  */
-public sealed abstract class NoteBlockEvent extends BlockEvent {
+public sealed abstract class NoteBlockEvent extends BlockEvent implements InheritableEvent {
     public static final EventBus<NoteBlockEvent> BUS = EventBus.create(NoteBlockEvent.class);
 
     private int noteId;

@@ -27,7 +27,7 @@ public abstract sealed class PistonEvent extends BlockEvent {
      * @param pos - The position of the piston
      * @param direction - The move direction of the piston
      */
-    public PistonEvent(Level world, BlockPos pos, Direction direction, PistonMoveType moveType) {
+    protected PistonEvent(Level world, BlockPos pos, Direction direction, PistonMoveType moveType) {
         super(world, pos, world.getBlockState(pos));
         this.direction = direction;
         this.moveType = moveType;

@@ -33,23 +33,20 @@ import net.minecraftforge.common.util.Result;
 import com.google.common.collect.ImmutableList;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<BlockEvent> BUS = EventBus.create(BlockEvent.class);
-
+public abstract class BlockEvent extends MutableEvent {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("forge.debugBlockEvent", "false"));
 
     private final LevelAccessor level;
     private final BlockPos pos;
     private final BlockState state;
 
-    public BlockEvent(LevelAccessor level, BlockPos pos, BlockState state) {
+    protected BlockEvent(LevelAccessor level, BlockPos pos, BlockState state) {
         this.pos = pos;
         this.level = level;
         this.state = state;
@@ -307,8 +304,6 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
          * {@link Result#ALLOW} will force the plant to advance a growth stage.<br>
          * {@link Result#DENY} will prevent the plant from advancing a growth stage.<br>
          * <br>
-         * This event is not {@link Cancelable}.<br>
-         * <br>
          */
         public static final class Pre extends CropGrowEvent implements HasResult {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
@@ -334,10 +329,6 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
          * Fired when "growing age" blocks (for example cacti, chorus plants, or crops
          * in vanilla) have successfully grown. The block's original state is available,
          * in addition to its new state.<br>
-         * <br>
-         * This event is not {@link Cancelable}.<br>
-         * <br>
-         * This event does not have a result. {@link HasResult}<br>
          */
         public static final class Post extends CropGrowEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
@@ -356,8 +347,7 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
     }
 
     /**
-     * Fired when when farmland gets trampled
-     * This event is {@link Cancelable}
+     * Fired when farmland gets trampled
      */
     public static final class FarmlandTrampleEvent extends BlockEvent implements Cancellable {
         public static final CancellableEventBus<FarmlandTrampleEvent> BUS = CancellableEventBus.create(FarmlandTrampleEvent.class);
@@ -383,7 +373,7 @@ public class BlockEvent extends MutableEvent implements InheritableEvent {
 
     /** Fired when an attempt is made to spawn a nether portal from
      * {@link BaseFireBlock#onPlace(BlockState, Level, BlockPos, BlockState, boolean)}.
-     *
+     * <br>
      * If cancelled, the portal will not be spawned.
      */
     public static final class PortalSpawnEvent extends BlockEvent implements Cancellable {
