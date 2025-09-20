@@ -9,7 +9,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
@@ -17,44 +16,37 @@ import net.minecraftforge.fml.LogicalSide;
 /**
  * Fired when an Entity attempts to use a totem to prevent its death.
  *
- * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * <p>This event is {@linkplain Cancellable cancellable}.
  * If this event is cancelled, the totem will not prevent the entity's death.</p>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS Forge event bus},
- * only on the {@linkplain LogicalSide#SERVER logical server}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.</p>
  */
-public final class LivingUseTotemEvent extends LivingEvent implements Cancellable {
+public record LivingUseTotemEvent(
+        LivingEntity getEntity,
+        DamageSource getSource,
+        ItemStack getTotem,
+        InteractionHand getHandHolding
+) implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingUseTotemEvent> BUS = CancellableEventBus.create(LivingUseTotemEvent.class);
-
-    private final DamageSource source;
-    private final ItemStack totem;
-    private final InteractionHand hand;
-
-    public LivingUseTotemEvent(LivingEntity entity, DamageSource source, ItemStack totem, InteractionHand hand) {
-        super(entity);
-        this.source = source;
-        this.totem = totem;
-        this.hand = hand;
-    }
 
     /**
      * {@return the damage source that caused the entity to die}
      */
     public DamageSource getSource() {
-        return source;
+        return getSource;
     }
 
     /**
      * {@return the totem of undying being used from the entity's inventory}
      */
     public ItemStack getTotem() {
-        return totem;
+        return getTotem;
     }
 
     /**
      * {@return the hand holding the totem}
      */
     public InteractionHand getHandHolding() {
-        return hand;
+        return getHandHolding;
     }
 }

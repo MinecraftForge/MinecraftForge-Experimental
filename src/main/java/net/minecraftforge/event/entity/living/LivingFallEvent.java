@@ -27,16 +27,22 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public final class LivingFallEvent extends LivingEvent implements Cancellable {
+public final class LivingFallEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingFallEvent> BUS = CancellableEventBus.create(LivingFallEvent.class);
 
+    private final LivingEntity entity;
     private double distance;
     private float damageMultiplier;
 
     public LivingFallEvent(LivingEntity entity, double distance, float damageMultiplier) {
-        super(entity);
+        this.entity = entity;
         this.distance = distance;
         this.damageMultiplier = damageMultiplier;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     public double getDistance() { return this.distance; }

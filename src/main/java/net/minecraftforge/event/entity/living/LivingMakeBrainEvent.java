@@ -31,14 +31,20 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public final class LivingMakeBrainEvent extends LivingEvent {
+public final class LivingMakeBrainEvent implements LivingEvent {
     public static final EventBus<LivingMakeBrainEvent> BUS = EventBus.create(LivingMakeBrainEvent.class);
 
+    private final LivingEntity entity;
     private final BrainBuilder<?> brainBuilder;
 
     public LivingMakeBrainEvent(LivingEntity entity, BrainBuilder<?> brainBuilder) {
-        super(entity);
+        this.entity = entity;
         this.brainBuilder = brainBuilder;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     @SuppressWarnings("unchecked")

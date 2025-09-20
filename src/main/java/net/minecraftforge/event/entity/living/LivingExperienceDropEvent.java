@@ -18,19 +18,24 @@ import org.jspecify.annotations.Nullable;
  * by canceling the event.
  */
 @NullMarked
-public final class LivingExperienceDropEvent extends LivingEvent implements Cancellable {
+public final class LivingExperienceDropEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingExperienceDropEvent> BUS = CancellableEventBus.create(LivingExperienceDropEvent.class);
 
+    private final LivingEntity entity;
     private final @Nullable Player attackingPlayer;
     private final int originalExperiencePoints;
 
     private int droppedExperiencePoints;
 
     public LivingExperienceDropEvent(LivingEntity entity, @Nullable Player attackingPlayer, int originalExperience) {
-        super(entity);
-
+        this.entity = entity;
         this.attackingPlayer = attackingPlayer;
         this.originalExperiencePoints = this.droppedExperiencePoints = originalExperience;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     public int getDroppedExperience() {

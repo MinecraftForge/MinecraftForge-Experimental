@@ -22,14 +22,20 @@ import org.jspecify.annotations.NullMarked;
  * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity is not healed.
  **/
 @NullMarked
-public final class LivingHealEvent extends LivingEvent implements Cancellable {
+public final class LivingHealEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingHealEvent> BUS = CancellableEventBus.create(LivingHealEvent.class);
 
+    private final LivingEntity entity;
     private float amount;
 
     public LivingHealEvent(LivingEntity entity, float amount) {
-        super(entity);
+        this.entity = entity;
         this.setAmount(amount);
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     public float getAmount() {

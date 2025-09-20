@@ -13,13 +13,19 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
-public sealed class LivingSwapItemsEvent extends LivingEvent {
+public sealed abstract class LivingSwapItemsEvent implements LivingEvent {
     public static final EventBus<LivingSwapItemsEvent> EVENT_BUS = EventBus.create(LivingSwapItemsEvent.class);
 
+    private final LivingEntity entity;
+
     @ApiStatus.Internal
-    public LivingSwapItemsEvent(LivingEntity entity)
-    {
-        super(entity);
+    protected LivingSwapItemsEvent(LivingEntity entity) {
+        this.entity = entity;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     /**

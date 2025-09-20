@@ -33,19 +33,25 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *<br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public class LivingKnockBackEvent extends LivingEvent implements Cancellable {
+public class LivingKnockBackEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingKnockBackEvent> BUS = CancellableEventBus.create(LivingKnockBackEvent.class);
 
+    private final LivingEntity target;
     protected float strength;
     protected double ratioX, ratioZ;
     protected final float originalStrength;
     protected final double originalRatioX, originalRatioZ;
 
     public LivingKnockBackEvent(LivingEntity target, float strength, double ratioX, double ratioZ) {
-        super(target);
+        this.target = target;
         this.strength = this.originalStrength = strength;
         this.ratioX = this.originalRatioX = ratioX;
         this.ratioZ = this.originalRatioZ = ratioZ;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return target;
     }
 
     public float getStrength() {return this.strength;}

@@ -17,9 +17,10 @@ import net.minecraftforge.common.MinecraftForge;
  * <br>
  * This event is fired via {@link ForgeHooks#onLivingBreathe(LivingEntity, int, int)}.<br>
  */
-public final class LivingBreatheEvent extends LivingEvent {
+public final class LivingBreatheEvent implements LivingEvent {
     public static final EventBus<LivingBreatheEvent> BUS = EventBus.create(LivingBreatheEvent.class);
 
+    private final LivingEntity entity;
     private boolean canBreathe;
     private boolean canRefillAir;
     private int consumeAirAmount;
@@ -27,11 +28,16 @@ public final class LivingBreatheEvent extends LivingEvent {
 
     @ApiStatus.Internal
     public LivingBreatheEvent(LivingEntity entity, boolean canBreathe, int consumeAirAmount, int refillAirAmount, boolean canRefillAir) {
-        super(entity);
+        this.entity = entity;
         this.canBreathe = canBreathe;
         this.canRefillAir = canRefillAir;
         this.consumeAirAmount = Math.max(consumeAirAmount, 0);
         this.refillAirAmount = Math.max(refillAirAmount, 0);
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     /**

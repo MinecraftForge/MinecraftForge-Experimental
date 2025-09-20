@@ -30,12 +30,8 @@ import java.util.function.IntConsumer;
  *     <li>Mushroom Cow -> Cow when sheared</li>
  * </ul>
  */
-public sealed abstract class LivingConversionEvent extends LivingEvent implements InheritableEvent {
-    public static final EventBus<LivingConversionEvent> BUS = EventBus.create(LivingConversionEvent.class);
-
-    protected LivingConversionEvent(LivingEntity entity) {
-        super(entity);
-    }
+public sealed interface LivingConversionEvent extends LivingEvent, InheritableEvent {
+    EventBus<LivingConversionEvent> BUS = EventBus.create(LivingConversionEvent.class);
 
     /**
      * LivingConversionEvent.Pre is triggered when an entity is trying
@@ -47,16 +43,22 @@ public sealed abstract class LivingConversionEvent extends LivingEvent implement
      * <br>
      * This event is {@linkplain Cancellable}. If cancelled, the replacement will not occur
      */
-    public static final class Pre extends LivingConversionEvent implements Cancellable {
+    final class Pre implements Cancellable, LivingConversionEvent {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
+        private final LivingEntity entity;
         private final EntityType<? extends LivingEntity> outcome;
         private final IntConsumer timer;
 
         public Pre(LivingEntity entity, EntityType<? extends LivingEntity> outcome, IntConsumer timer) {
-            super(entity);
+            this.entity = entity;
             this.outcome = outcome;
             this.timer = timer;
+        }
+
+        @Override
+        public LivingEntity getEntity() {
+            return entity;
         }
 
         /**
@@ -85,24 +87,10 @@ public sealed abstract class LivingConversionEvent extends LivingEvent implement
      * LivingConversionEvent.Post is triggered when an entity is replacing
      * itself with another entity.
      * The old living entity is likely to be removed right after this event.
+     *
+     * @param getOutcome Gets the finalized new entity (with all data like potion effect and equipments set)
      */
-    public static final class Post extends LivingConversionEvent {
+    record Post(LivingEntity getEntity, LivingEntity getOutcome) implements LivingConversionEvent {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
-        private final LivingEntity outcome;
-
-        public Post(LivingEntity entity, LivingEntity outcome) {
-            super(entity);
-            this.outcome = outcome;
-        }
-
-        /**
-         * Gets the finalized new entity (with all data like potion
-         * effect and equipments set)
-         * @return the finalized new entity
-         */
-        public LivingEntity getOutcome() {
-            return outcome;
-        }
     }
 }

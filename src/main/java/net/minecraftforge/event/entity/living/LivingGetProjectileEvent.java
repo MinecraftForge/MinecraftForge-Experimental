@@ -21,16 +21,22 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * <p>
  * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS}.
  */
-public final class LivingGetProjectileEvent extends LivingEvent {
+public final class LivingGetProjectileEvent implements LivingEvent {
     public static final EventBus<LivingGetProjectileEvent> BUS = EventBus.create(LivingGetProjectileEvent.class);
 
+    private final LivingEntity entity;
     private final ItemStack projectileWeaponItemStack;
     private ItemStack projectileItemStack;
 
     public LivingGetProjectileEvent(LivingEntity livingEntity, ItemStack projectileWeaponItemStack, ItemStack ammo) {
-        super(livingEntity);
+        this.entity = livingEntity;
         this.projectileWeaponItemStack = projectileWeaponItemStack;
         this.projectileItemStack = ammo;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     /**

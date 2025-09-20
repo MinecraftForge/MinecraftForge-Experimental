@@ -30,16 +30,22 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event does not have a result. {@link HasResult}<br>
  * @see LivingHurtEvent
  **/
-public final class LivingDamageEvent extends LivingEvent implements Cancellable {
+public final class LivingDamageEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingDamageEvent> BUS = CancellableEventBus.create(LivingDamageEvent.class);
 
+    private final LivingEntity entity;
     private final DamageSource source;
     private float amount;
 
     public LivingDamageEvent(LivingEntity entity, DamageSource source, float amount) {
-        super(entity);
+        this.entity = entity;
         this.source = source;
         this.amount = amount;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     public DamageSource getSource() { return source; }

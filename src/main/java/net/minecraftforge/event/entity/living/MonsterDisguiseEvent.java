@@ -15,30 +15,14 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event is fired on the forge bus before an Monster detects that a player is looking at them.
  * It will not be fired if the detection is already prevented by {@link IForgeItem#isEnderMask}
  * <p>
- * This event is {@link Cancelable}.
- * If this event is canceled, the Monster will not target the player.
- * <p>
- * This event does not have a {@link Result}.
+ * This event is {@linkplain Cancellable cancellable}.
+ * If this event is cancelled, the Monster will not target the player.
+ *
+ * @param getPlayer The player that is being checked.
  */
-public final class MonsterDisguiseEvent extends LivingEvent implements Cancellable {
+public record MonsterDisguiseEvent(
+        Monster getEntity,
+        Player getPlayer
+) implements Cancellable, LivingEvent {
     public static final CancellableEventBus<MonsterDisguiseEvent> BUS = CancellableEventBus.create(MonsterDisguiseEvent.class);
-
-    private final Player player;
-
-    public MonsterDisguiseEvent(Monster monster, Player player) {
-        super(monster);
-        this.player = player;
-    }
-
-    /**
-     * The player that is being checked.
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    @Override
-    public Monster getEntity() {
-        return (Monster) super.getEntity();
-    }
 }

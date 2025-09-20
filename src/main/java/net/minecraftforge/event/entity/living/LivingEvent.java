@@ -17,26 +17,13 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * LivingEvent is fired whenever an event involving a {@link LivingEntity} occurs.<br>
- * If a method utilizes this {@link Event} as its parameter, the method will
- * receive every child event of this class.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
- **/
-public class LivingEvent extends EntityEvent {
-    public static final EventBus<LivingEvent> BUS = EventBus.create(LivingEvent.class);
-
-    private final LivingEntity livingEntity;
-
-    public LivingEvent(LivingEntity entity) {
-        super(entity);
-        livingEntity = entity;
-    }
+ * LivingEvent is fired whenever an event involving a {@link LivingEntity} occurs.
+ */
+public interface LivingEvent extends EntityEvent {
+    EventBus<LivingEvent> BUS = EventBus.create(LivingEvent.class);
 
     @Override
-    public LivingEntity getEntity() {
-        return livingEntity;
-    }
+    LivingEntity getEntity();
 
     /**
      * LivingUpdateEvent is fired when a LivingEntity is ticked in {@link LivingEntity#tick()}. <br>
@@ -50,10 +37,8 @@ public class LivingEvent extends EntityEvent {
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    public static final class LivingTickEvent extends LivingEvent implements Cancellable {
+    record LivingTickEvent(LivingEntity getEntity) implements Cancellable, LivingEvent {
         public static final CancellableEventBus<LivingTickEvent> BUS = CancellableEventBus.create(LivingTickEvent.class);
-
-        public LivingTickEvent(LivingEntity e) { super(e); }
     }
 
     /**
@@ -70,23 +55,27 @@ public class LivingEvent extends EntityEvent {
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/
-    public static final class LivingJumpEvent extends LivingEvent {
+    record LivingJumpEvent(LivingEntity getEntity) implements LivingEvent {
         public static final EventBus<LivingJumpEvent> BUS = EventBus.create(LivingJumpEvent.class);
-
-        public LivingJumpEvent(LivingEntity e) { super(e); }
     }
 
-    public static final class LivingVisibilityEvent extends LivingEvent {
+    final class LivingVisibilityEvent implements LivingEvent {
         public static final EventBus<LivingVisibilityEvent> BUS = EventBus.create(LivingVisibilityEvent.class);
 
+        private final LivingEntity livingEntity;
         private double visibilityModifier;
         @Nullable
         private final Entity lookingEntity;
 
         public LivingVisibilityEvent(LivingEntity livingEntity, @Nullable Entity lookingEntity, double originalMultiplier) {
-            super(livingEntity);
+            this.livingEntity = livingEntity;
             this.visibilityModifier = originalMultiplier;
             this.lookingEntity = lookingEntity;
+        }
+
+        @Override
+        public LivingEntity getEntity() {
+            return livingEntity;
         }
 
         /**

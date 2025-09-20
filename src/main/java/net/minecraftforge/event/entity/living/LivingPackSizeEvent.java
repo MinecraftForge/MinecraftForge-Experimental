@@ -12,14 +12,20 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class LivingPackSizeEvent extends LivingEvent implements HasResult {
+public final class LivingPackSizeEvent implements LivingEvent, HasResult {
     public static final EventBus<LivingPackSizeEvent> BUS = EventBus.create(LivingPackSizeEvent.class);
 
+    private final Mob entity;
     private int maxPackSize;
     private Result result = Result.DEFAULT;
     
     public LivingPackSizeEvent(Mob entity) {
-        super(entity);
+        this.entity = entity;
+    }
+
+    @Override
+    public Mob getEntity() {
+        return entity;
     }
 
     /**

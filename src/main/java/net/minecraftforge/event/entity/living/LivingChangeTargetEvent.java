@@ -34,18 +34,24 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-public final class LivingChangeTargetEvent extends LivingEvent implements Cancellable {
+public final class LivingChangeTargetEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingChangeTargetEvent> BUS = CancellableEventBus.create(LivingChangeTargetEvent.class);
 
+    private final LivingEntity entity;
     private final ILivingTargetType targetType;
     private final LivingEntity originalTarget;
     private LivingEntity newTarget;
 
     public LivingChangeTargetEvent(LivingEntity entity, LivingEntity originalTarget, ILivingTargetType targetType) {
-        super(entity);
+        this.entity = entity;
         this.originalTarget = originalTarget;
         this.newTarget = originalTarget;
         this.targetType = targetType;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     /**

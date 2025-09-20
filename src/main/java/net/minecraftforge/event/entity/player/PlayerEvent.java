@@ -34,13 +34,12 @@ import org.jetbrains.annotations.Nullable;
  * If a method utilizes this {@link net.minecraftforge.eventbus.api.Event} as its parameter, the method will
  * receive every child event of this class.<br>
  **/
-public class PlayerEvent extends LivingEvent {
+public class PlayerEvent implements LivingEvent {
     public static final EventBus<PlayerEvent> BUS = EventBus.create(PlayerEvent.class);
 
     private final Player player;
 
     public PlayerEvent(Player player) {
-        super(player);
         this.player = player;
     }
 

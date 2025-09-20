@@ -8,7 +8,6 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,41 +17,15 @@ import org.jetbrains.annotations.NotNull;
  * This also includes entities joining the World, as well as being cloned. <br>
  * This event is fired on server-side only. <br>
  * <br>
- * {@link #slot} contains the affected {@link EquipmentSlot}. <br>
- * {@link #from} contains the {@link ItemStack} that was equipped previously. <br>
- * {@link #to} contains the {@link ItemStack} that is equipped now. <br>
- * <br>
- * This event is not {@link Cancelable}. <br>
- * <br>
- * This event does not have a result. {@link HasResult} <br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
- **/
-public final class LivingEquipmentChangeEvent extends LivingEvent {
+ * @param getSlot contains the affected {@link EquipmentSlot}.
+ * @param getFrom contains the {@link ItemStack} that was equipped previously.
+ * @param getTo contains the {@link ItemStack} that is equipped now.
+ */
+public record LivingEquipmentChangeEvent(
+        LivingEntity getEntity,
+        EquipmentSlot getSlot,
+        @NotNull ItemStack getFrom,
+        @NotNull ItemStack getTo
+) implements LivingEvent {
     public static final EventBus<LivingEquipmentChangeEvent> BUS = EventBus.create(LivingEquipmentChangeEvent.class);
-
-    private final EquipmentSlot slot;
-    private final ItemStack from;
-    private final ItemStack to;
-
-    public LivingEquipmentChangeEvent(LivingEntity entity, EquipmentSlot slot, @NotNull ItemStack from, @NotNull ItemStack to) {
-        super(entity);
-        this.slot = slot;
-        this.from = from;
-        this.to = to;
-    }
-
-    public EquipmentSlot getSlot() {
-        return this.slot;
-    }
-
-    @NotNull
-    public ItemStack getFrom() {
-        return this.from;
-    }
-
-    @NotNull
-    public ItemStack getTo() {
-        return this.to;
-    }
 }

@@ -31,18 +31,10 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *<br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public final class LivingAttackEvent extends LivingEvent implements Cancellable {
+public record LivingAttackEvent(
+        LivingEntity getEntity,
+        DamageSource getSource,
+        float getAmount
+) implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingAttackEvent> BUS = CancellableEventBus.create(LivingAttackEvent.class);
-
-    private final DamageSource source;
-    private final float amount;
-
-    public LivingAttackEvent(LivingEntity entity, DamageSource source, float amount) {
-        super(entity);
-        this.source = source;
-        this.amount = amount;
-    }
-
-    public DamageSource getSource() { return source; }
-    public float getAmount() { return amount; }
 }

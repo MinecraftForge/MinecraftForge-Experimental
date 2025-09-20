@@ -24,9 +24,10 @@ import net.minecraftforge.common.ForgeHooks;
  * a value of {@code false}.
  * <p>
  **/
-public final class LivingDrownEvent extends LivingEvent implements Cancellable {
+public final class LivingDrownEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingDrownEvent> BUS = CancellableEventBus.create(LivingDrownEvent.class);
 
+    private final LivingEntity entity;
     private boolean isDrowning;
     private float damageAmount;
     private int bubbleCount;
@@ -41,10 +42,15 @@ public final class LivingDrownEvent extends LivingEvent implements Cancellable {
      */
     @ApiStatus.Internal
     public LivingDrownEvent(LivingEntity entity, boolean isDrowning, float damageAmount, int bubbleCount) {
-        super(entity);
+        this.entity = entity;
         this.isDrowning = isDrowning;
         this.damageAmount = damageAmount;
         this.bubbleCount = bubbleCount;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     /**

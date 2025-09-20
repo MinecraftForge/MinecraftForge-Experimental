@@ -13,17 +13,23 @@ import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class LootingLevelEvent extends LivingEvent {
+public final class LootingLevelEvent implements LivingEvent {
     public static final EventBus<LootingLevelEvent> BUS = EventBus.create(LootingLevelEvent.class);
 
+    private final LivingEntity entity;
     private final @Nullable DamageSource damageSource;
 
     private int lootingLevel;
 
     public LootingLevelEvent(LivingEntity entity, @Nullable DamageSource damageSource, int lootingLevel) {
-        super(entity);
+        this.entity = entity;
         this.damageSource = damageSource;
         this.lootingLevel = lootingLevel;
+    }
+
+    @Override
+    public LivingEntity getEntity() {
+        return entity;
     }
 
     @Nullable
