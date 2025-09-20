@@ -5,7 +5,6 @@
 
 package net.minecraftforge.client.event;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.core.BlockPos;
@@ -31,10 +30,7 @@ import java.util.ArrayList;
  * @see RegisterColorHandlersEvent.Block
  * @see RegisterColorHandlersEvent.ColorResolvers
  */
-public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent {
-    @ApiStatus.Internal
-    protected RegisterColorHandlersEvent() {}
-
+public sealed interface RegisterColorHandlersEvent extends IModBusEvent {
     /**
      * Fired for registering block color handlers.
      *
@@ -43,17 +39,13 @@ public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent 
      * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Block extends RegisterColorHandlersEvent {
+    record Block(BlockColors getBlockColors) implements RegisterColorHandlersEvent {
         public static EventBus<Block> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, Block.class);
         }
 
-        private final BlockColors blockColors;
-
         @ApiStatus.Internal
-        public Block(BlockColors blockColors) {
-            this.blockColors = blockColors;
-        }
+        public Block {}
 
         /**
          * {@return the block colors registry}
@@ -61,7 +53,7 @@ public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent 
          * @see BlockColors#register(BlockColor, net.minecraft.world.level.block.Block...)
          */
         public BlockColors getBlockColors() {
-            return blockColors;
+            return getBlockColors;
         }
 
         /**
@@ -72,7 +64,7 @@ public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent 
          */
         @SuppressWarnings("deprecation")
         public void register(BlockColor blockColor, net.minecraft.world.level.block.Block... blocks) {
-            blockColors.register(blockColor, blocks);
+            getBlockColors.register(blockColor, blocks);
         }
     }
 
@@ -81,7 +73,7 @@ public abstract sealed class RegisterColorHandlersEvent implements IModBusEvent 
      * {@link net.minecraft.world.level.BlockAndTintGetter#getBlockTint(BlockPos, ColorResolver)}.
      */
     @NullMarked
-    public static final class ColorResolvers extends RegisterColorHandlersEvent implements SelfDestructing {
+    final class ColorResolvers implements RegisterColorHandlersEvent, SelfDestructing {
         public static EventBus<ColorResolvers> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, ColorResolvers.class);
         }
