@@ -15,15 +15,15 @@ import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
- * Fired when the ender dragon or wither attempts to destroy a block and when ever a zombie attempts to break a door. Basically a event version of {@link Block#canEntityDestroy(BlockState, BlockGetter, BlockPos, Entity)}<br>
+ * Fired when the ender dragon or wither attempts to destroy a block and when ever a zombie attempts to break a door.
+ * Basically an event version of {@link Block#canEntityDestroy(BlockState, BlockGetter, BlockPos, Entity)}<br>
  * <br>
- * This event is {@link Cancelable}.<br>
- * If this event is canceled, the block will not be destroyed.<br>
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the block will not be destroyed.
  **/
 public record LivingDestroyBlockEvent(
         LivingEntity getEntity,
-        BlockState getState,
-        BlockPos getPos
+        BlockPos getPos,
+        BlockState getState
 ) implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingDestroyBlockEvent> BUS = CancellableEventBus.create(LivingDestroyBlockEvent.class);
 }
