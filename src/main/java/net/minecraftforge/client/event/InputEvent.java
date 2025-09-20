@@ -10,8 +10,8 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.world.InteractionHand;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,12 +26,7 @@ import org.lwjgl.glfw.GLFW;
  * @see Key
  * @see InteractionKeyMappingTriggered
  */
-public abstract sealed class InputEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<InputEvent> BUS = EventBus.create(InputEvent.class);
-
-    @ApiStatus.Internal
-    protected InputEvent() {}
-
+public sealed interface InputEvent {
     /**
      * Fired when a mouse button is pressed/released. Sub-events get fired {@link Pre before} and {@link Post after} this happens.
      *
@@ -41,29 +36,14 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      * @see Pre
      * @see Post
      */
-    public static abstract sealed class MouseButton extends InputEvent {
-        public static final EventBus<MouseButton> BUS = EventBus.create(MouseButton.class);
-
-        private final int button;
-        private final int action;
-        private final int modifiers;
-
-        @ApiStatus.Internal
-        protected MouseButton(int button, int action, int modifiers) {
-            this.button = button;
-            this.action = action;
-            this.modifiers = modifiers;
-        }
-
+    sealed interface MouseButton extends InputEvent {
         /**
          * {@return the mouse button's input code}
          *
          * @see GLFW mouse constants starting with 'GLFW_MOUSE_BUTTON_'
          * @see <a href="https://www.glfw.org/docs/latest/group__buttons.html" target="_top">the online GLFW documentation</a>
          */
-        public int getButton() {
-            return this.button;
-        }
+        int getButton();
 
         /**
          * {@return the mouse button's action}
@@ -71,9 +51,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see InputConstants#PRESS
          * @see InputConstants#RELEASE
          */
-        public int getAction() {
-            return this.action;
-        }
+        int getAction();
 
         /**
          * {@return a bit field representing the active modifier keys}
@@ -86,9 +64,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see GLFW#GLFW_KEY_NUM_LOCK NUM LOCK modifier key bit
          * @see <a href="https://www.glfw.org/docs/latest/group__mods.html" target="_top">the online GLFW documentation</a>
          */
-        public int getModifiers() {
-            return this.modifiers;
-        }
+        int getModifiers();
 
         /**
          * Fired when a mouse button is pressed/released, <b>before</b> being processed by vanilla.
@@ -99,13 +75,11 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          *
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
-        public static final class Pre extends MouseButton implements Cancellable {
+        record Pre(int getButton, int getAction, int getModifiers) implements Cancellable, MouseButton, RecordEvent {
             public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
             @ApiStatus.Internal
-            public Pre(int button, int action, int modifiers) {
-                super(button, action, modifiers);
-            }
+            public Pre {}
         }
 
         /**
@@ -115,13 +89,11 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          *
          * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
          */
-        public static final class Post extends MouseButton {
+        record Post(int getButton, int getAction, int getModifiers) implements MouseButton, RecordEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
             @ApiStatus.Internal
-            public Post(int button, int action, int modifiers) {
-                super(button, action, modifiers);
-            }
+            public Post {}
         }
     }
 
@@ -134,77 +106,28 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see <a href="https://www.glfw.org/docs/latest/input_guide.html#input_mouse_button" target="_top">the online GLFW documentation</a>
+     *
+     * @param getDeltaX the amount of change / delta of the mouse scroll in the vertical direction
+     * @param getDeltaY the amount of change / delta of the mouse scroll in the horizontal direction
+     * @param isLeftDown {@code true} if the left mouse button is pressed
+     * @param isMiddleDown {@code true} if the middle mouse button is pressed
+     * @param isRightDown {@code true} if the right mouse button is pressed
+     * @param getMouseX the X position of the mouse cursor
+     * @param getMouseY the Y position of the mouse cursor
      */
-    public static final class MouseScrollingEvent extends InputEvent implements Cancellable {
+    record MouseScrollingEvent(
+            double getDeltaX,
+            double getDeltaY,
+            boolean isLeftDown,
+            boolean isMiddleDown,
+            boolean isRightDown,
+            double getMouseX,
+            double getMouseY
+    ) implements Cancellable, InputEvent, RecordEvent {
         public static final CancellableEventBus<MouseScrollingEvent> BUS = CancellableEventBus.create(MouseScrollingEvent.class);
 
-        private final double deltaX;
-        private final double deltaY;
-        private final double mouseX;
-        private final double mouseY;
-        private final boolean leftDown;
-        private final boolean middleDown;
-        private final boolean rightDown;
-
         @ApiStatus.Internal
-        public MouseScrollingEvent(double deltaX, double deltaY, boolean leftDown, boolean middleDown, boolean rightDown, double mouseX, double mouseY) {
-            this.deltaX = deltaX;
-            this.deltaY = deltaY;
-            this.leftDown = leftDown;
-            this.middleDown = middleDown;
-            this.rightDown = rightDown;
-            this.mouseX = mouseX;
-            this.mouseY = mouseY;
-        }
-
-        /**
-         * {@return the amount of change / delta of the mouse scroll in the vertical direction}
-         */
-        public double getDeltaX() {
-            return this.deltaX;
-        }
-
-        /**
-         * {@return the amount of change / delta of the mouse scroll in the horizontal direction}
-         */
-        public double getDeltaY() {
-            return this.deltaY;
-        }
-
-        /**
-         * {@return {@code true} if the left mouse button is pressed}
-         */
-        public boolean isLeftDown() {
-            return this.leftDown;
-        }
-
-        /**
-         * {@return {@code true} if the right mouse button is pressed}
-         */
-        public boolean isRightDown() {
-            return this.rightDown;
-        }
-
-        /**
-         * {@return  {@code true} if the middle mouse button is pressed}
-         */
-        public boolean isMiddleDown() {
-            return this.middleDown;
-        }
-
-        /**
-         * {@return the X position of the mouse cursor}
-         */
-        public double getMouseX() {
-            return this.mouseX;
-        }
-
-        /**
-         * {@return the Y position of the mouse cursor}
-         */
-        public double getMouseY() {
-            return this.mouseY;
-        }
+        public MouseScrollingEvent {}
     }
 
     /**
@@ -212,21 +135,11 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      *
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Key extends InputEvent {
+    record Key(int getKey, int getScanCode, int getAction, int getModifiers) implements RecordEvent, InputEvent {
         public static final EventBus<Key> BUS = EventBus.create(Key.class);
 
-        private final int key;
-        private final int scanCode;
-        private final int action;
-        private final int modifiers;
-
         @ApiStatus.Internal
-        public Key(int key, int scanCode, int action, int modifiers) {
-            this.key = key;
-            this.scanCode = scanCode;
-            this.action = action;
-            this.modifiers = modifiers;
-        }
+        public Key {}
 
         /**
          * {@return the {@code GLFW} (platform-agnostic) key code}
@@ -236,7 +149,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see <a href="https://www.glfw.org/docs/latest/group__keys.html" target="_top">the online GLFW documentation</a>
          */
         public int getKey() {
-            return this.key;
+            return getKey;
         }
 
         /**
@@ -249,7 +162,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see InputConstants#getKey(int, int)
          */
         public int getScanCode() {
-            return this.scanCode;
+            return getScanCode;
         }
 
         /**
@@ -260,7 +173,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see InputConstants#REPEAT
          */
         public int getAction() {
-            return this.action;
+            return getAction;
         }
 
         /**
@@ -275,7 +188,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
          * @see <a href="https://www.glfw.org/docs/latest/group__mods.html" target="_top">the online GLFW documentation</a>
          */
         public int getModifiers() {
-            return this.modifiers;
+            return getModifiers;
         }
     }
 
@@ -295,7 +208,7 @@ public abstract sealed class InputEvent extends MutableEvent implements Inherita
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     // TODO: Change the 'button' to sub events. - Lex 0422202
-    public static final class InteractionKeyMappingTriggered extends InputEvent implements Cancellable {
+    final class InteractionKeyMappingTriggered extends MutableEvent implements Cancellable, InputEvent {
         public static final CancellableEventBus<InteractionKeyMappingTriggered> BUS = CancellableEventBus.create(InteractionKeyMappingTriggered.class);
 
         private final int button;
