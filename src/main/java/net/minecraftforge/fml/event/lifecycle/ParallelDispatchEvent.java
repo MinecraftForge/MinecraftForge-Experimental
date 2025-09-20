@@ -13,10 +13,10 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-public class ParallelDispatchEvent extends ModLifecycleEvent {
+public abstract class ParallelDispatchEvent extends ModLifecycleEvent {
     private final ModLoadingStage modLoadingStage;
 
-    public ParallelDispatchEvent(final ModContainer container, final ModLoadingStage stage) {
+    protected ParallelDispatchEvent(final ModContainer container, final ModLoadingStage stage) {
         super(container);
         this.modLoadingStage = stage;
     }

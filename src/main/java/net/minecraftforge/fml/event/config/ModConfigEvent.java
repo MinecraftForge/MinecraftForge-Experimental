@@ -11,29 +11,14 @@ import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.IModBusEvent;
 
-public sealed class ModConfigEvent implements IModBusEvent, IConfigEvent {
-    private final ModConfig config;
-
-    ModConfigEvent(final ModConfig config) {
-        this.config = config;
-    }
-
-    @Override
-    public ModConfig getConfig() {
-        return config;
-    }
-
+public sealed interface ModConfigEvent extends IModBusEvent, IConfigEvent {
     /**
      * Fired during mod and server loading, depending on {@link ModConfig.Type} of config file.
      * Any Config objects associated with this will be valid and can be queried directly.
      */
-    public static final class Loading extends ModConfigEvent {
+    record Loading(ModConfig getConfig) implements ModConfigEvent {
         public static EventBus<Loading> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, Loading.class);
-        }
-
-        public Loading(final ModConfig config) {
-            super(config);
         }
     }
 
@@ -43,13 +28,9 @@ public sealed class ModConfigEvent implements IModBusEvent, IConfigEvent {
      * and may not even be on the server or client threads. Ensure you properly synchronize
      * any resultant changes.
      */
-    public static final class Reloading extends ModConfigEvent {
+    record Reloading(ModConfig getConfig) implements ModConfigEvent {
         public static EventBus<Reloading> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, Reloading.class);
-        }
-
-        public Reloading(final ModConfig config) {
-            super(config);
         }
     }
 
@@ -59,13 +40,9 @@ public sealed class ModConfigEvent implements IModBusEvent, IConfigEvent {
      * server goes away, though it will fire on the dedicated server as well.
      * The config file will be saved after this event has fired.
      */
-    public static final class Unloading extends ModConfigEvent {
+    record Unloading(ModConfig getConfig) implements ModConfigEvent {
         public static EventBus<Unloading> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, Unloading.class);
-        }
-
-        public Unloading(final ModConfig config) {
-            super(config);
         }
     }
 }

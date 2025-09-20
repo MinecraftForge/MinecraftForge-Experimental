@@ -39,6 +39,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+// Todo: Make BlockEvent a sealed interface and applicable children records
 public abstract class BlockEvent extends MutableEvent {
     private static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("forge.debugBlockEvent", "false"));
 
