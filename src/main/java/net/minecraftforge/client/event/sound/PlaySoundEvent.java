@@ -7,8 +7,8 @@ package net.minecraftforge.client.event.sound;
 
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
-import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
@@ -19,27 +19,30 @@ import org.jspecify.annotations.Nullable;
  * others). This can be used to change or prevent (by passing {@code null)} a sound from being played through
  * {@link #setSound(SoundInstance)}).
  *
- * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
- *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see PlaySoundSourceEvent
  * @see PlayStreamingSourceEvent
  */
-public final class PlaySoundEvent extends SoundEvent {
+public final class PlaySoundEvent extends MutableEvent implements SoundEvent {
     public static final EventBus<PlaySoundEvent> BUS = EventBus.create(PlaySoundEvent.class);
 
+    private final SoundEngine manager;
     private final String name;
     private final SoundInstance originalSound;
     private @Nullable SoundInstance sound;
 
     @ApiStatus.Internal
     public PlaySoundEvent(SoundEngine manager, SoundInstance sound) {
-        super(manager);
+        this.manager = manager;
         this.originalSound = sound;
         this.name = sound.getLocation().getPath();
         this.setSound(sound);
+    }
+
+    @Override
+    public SoundEngine getEngine() {
+        return manager;
     }
 
     /**

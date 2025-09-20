@@ -19,18 +19,20 @@ import org.jetbrains.annotations.ApiStatus;
  * (such as a file), and used for sounds of long length which are unsuitable to keep fully loaded in-memory in a buffer
  * (as is done for regular non-streaming sounds), such as background music or music discs.
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
- *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see PlayStreamingSourceEvent
  */
-public final class PlayStreamingSourceEvent extends SoundSourceEvent {
+public record PlayStreamingSourceEvent(SoundEngine getEngine, SoundInstance getSound, Channel getChannel, String getName)
+        implements SoundSourceEvent {
     public static final EventBus<PlayStreamingSourceEvent> BUS = EventBus.create(PlayStreamingSourceEvent.class);
 
     @ApiStatus.Internal
     public PlayStreamingSourceEvent(SoundEngine engine, SoundInstance sound, Channel channel) {
-        super(engine, sound, channel);
+        this(engine, sound, channel, sound.getLocation().getPath());
     }
+
+    @ApiStatus.Internal
+    public PlayStreamingSourceEvent {}
 }

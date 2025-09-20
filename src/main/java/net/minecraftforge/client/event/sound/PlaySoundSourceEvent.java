@@ -19,18 +19,20 @@ import org.jetbrains.annotations.ApiStatus;
  * in a buffer before being played, and used for most sounds of short length such as sound effects for clicking
  * buttons.
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
- *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see PlayStreamingSourceEvent
  */
-public final class PlaySoundSourceEvent extends SoundSourceEvent {
+public record PlaySoundSourceEvent(SoundEngine getEngine, SoundInstance getSound, Channel getChannel, String getName)
+        implements SoundSourceEvent {
     public static final EventBus<PlaySoundSourceEvent> BUS = EventBus.create(PlaySoundSourceEvent.class);
 
     @ApiStatus.Internal
     public PlaySoundSourceEvent(SoundEngine engine, SoundInstance sound, Channel channel) {
-        super(engine, sound, channel);
+        this(engine, sound, channel, sound.getLocation().getPath());
     }
+
+    @ApiStatus.Internal
+    public PlaySoundSourceEvent {}
 }

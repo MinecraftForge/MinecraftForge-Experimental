@@ -25,22 +25,11 @@ import org.jetbrains.annotations.ApiStatus;
  * @see PlaySoundEvent
  * @see SoundEngineLoadEvent
  */
-public abstract class SoundEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<SoundEvent> BUS = EventBus.create(SoundEvent.class);
-
-    private final SoundEngine engine;
-
-    @ApiStatus.Internal
-    protected SoundEvent(SoundEngine engine) {
-        this.engine = engine;
-    }
-
+public sealed interface SoundEvent permits PlaySoundEvent, SoundEngineLoadEvent, SoundEvent.SoundSourceEvent {
     /**
      * {@return the sound engine}
      */
-    public SoundEngine getEngine() {
-        return engine;
-    }
+    SoundEngine getEngine();
 
     /**
      * Superclass for when a sound has started to play on an audio channel.
@@ -51,40 +40,22 @@ public abstract class SoundEvent extends MutableEvent implements InheritableEven
      * @see PlaySoundSourceEvent
      * @see PlayStreamingSourceEvent
      */
-    public static abstract class SoundSourceEvent extends SoundEvent {
-        public static final EventBus<SoundSourceEvent> BUS = EventBus.create(SoundSourceEvent.class);
-
-        private final SoundInstance sound;
-        private final Channel channel;
-        private final String name;
-
-        @ApiStatus.Internal
-        protected SoundSourceEvent(SoundEngine engine, SoundInstance sound, Channel channel) {
-            super(engine);
-            this.name = sound.getLocation().getPath();
-            this.sound = sound;
-            this.channel = channel;
-        }
+    sealed interface SoundSourceEvent extends SoundEvent, InheritableEvent permits PlaySoundSourceEvent, PlayStreamingSourceEvent {
+        EventBus<SoundSourceEvent> BUS = EventBus.create(SoundSourceEvent.class);
 
         /**
          * {@return the sound being played}
          */
-        public SoundInstance getSound() {
-            return sound;
-        }
+        SoundInstance getSound();
 
         /**
          * {@return the audio channel on which the sound is playing on}
          */
-        public Channel getChannel() {
-            return channel;
-        }
+        Channel getChannel();
 
         /**
          * {@return the name of the sound being played} This is equivalent to the path of the location of the original sound.
          */
-        public String getName() {
-            return name;
-        }
+        String getName();
     }
 }
