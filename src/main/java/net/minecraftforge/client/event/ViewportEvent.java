@@ -13,8 +13,8 @@ import net.minecraft.world.level.material.FogType;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -33,40 +33,21 @@ import org.joml.Vector4f;
  * @see ComputeCameraAngles
  * @see ComputeFov
  */
-public abstract sealed class ViewportEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<ViewportEvent> BUS = EventBus.create(ViewportEvent.class);
-
-    private final GameRenderer renderer;
-    private final Camera camera;
-    private final double partialTick;
-
-    @ApiStatus.Internal
-    public ViewportEvent(GameRenderer renderer, Camera camera, double partialTick) {
-        this.renderer = renderer;
-        this.camera = camera;
-        this.partialTick = partialTick;
-    }
-
+public sealed interface ViewportEvent {
     /**
      * {@return the game renderer}
      */
-    public GameRenderer getRenderer() {
-        return renderer;
-    }
+    GameRenderer getRenderer();
 
     /**
      * {@return the camera information}
      */
-    public Camera getCamera() {
-        return camera;
-    }
+    Camera getCamera();
 
     /**
      * {@return the partial tick}
      */
-    public double getPartialTick() {
-        return partialTick;
-    }
+    float getPartialTick();
 
     /**
      * Fired for <b>rendering</b> custom fog. The plane distances are based on the player's render distance.
@@ -77,35 +58,30 @@ public abstract sealed class ViewportEvent extends MutableEvent implements Inher
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class RenderFog extends ViewportEvent implements Cancellable {
+    record RenderFog(
+            GameRenderer getRenderer,
+            Camera getCamera,
+            float getPartialTick,
+            FogType getType,
+            FogData getData,
+            Vector4f getColor
+    ) implements Cancellable, ViewportEvent, RecordEvent {
         public static final CancellableEventBus<RenderFog> BUS = CancellableEventBus.create(RenderFog.class);
-
-        private final FogType type;
-        private final FogData data;
-        private final Vector4f color;
 
         @SuppressWarnings("resource")
         @ApiStatus.Internal
         public RenderFog(FogType type, Camera camera, float partialTicks, FogData data, Vector4f color) {
-            super(Minecraft.getInstance().gameRenderer, camera, partialTicks);
-            this.type = type;
-            this.data = data;
-            this.color = color;
+            this(Minecraft.getInstance().gameRenderer, camera, partialTicks, type, data, color);
         }
 
-        public FogData getData() {
-            return data;
-        }
-
-        public Vector4f getColor() {
-            return color;
-        }
+        @ApiStatus.Internal
+        public RenderFog {}
 
         /**
          * {@return the type of fog being rendered}
          */
         public FogType getType() {
-            return type;
+            return getType;
         }
 
         /**
@@ -169,9 +145,12 @@ public abstract sealed class ViewportEvent extends MutableEvent implements Inher
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class ComputeFogColor extends ViewportEvent {
+    final class ComputeFogColor extends MutableEvent implements ViewportEvent {
         public static final EventBus<ComputeFogColor> BUS = EventBus.create(ComputeFogColor.class);
 
+        private final GameRenderer renderer;
+        private final Camera camera;
+        private final float partialTicks;
         private float red;
         private float green;
         private float blue;
@@ -179,10 +158,27 @@ public abstract sealed class ViewportEvent extends MutableEvent implements Inher
         @SuppressWarnings("resource")
         @ApiStatus.Internal
         public ComputeFogColor(Camera camera, float partialTicks, float red, float green, float blue) {
-            super(Minecraft.getInstance().gameRenderer, camera, partialTicks);
+            this.renderer = Minecraft.getInstance().gameRenderer;
+            this.camera = camera;
+            this.partialTicks = partialTicks;
             this.setRed(red);
             this.setGreen(green);
             this.setBlue(blue);
+        }
+
+        @Override
+        public GameRenderer getRenderer() {
+            return renderer;
+        }
+
+        @Override
+        public Camera getCamera() {
+            return camera;
+        }
+
+        @Override
+        public float getPartialTick() {
+            return partialTicks;
         }
 
         /**
@@ -243,19 +239,39 @@ public abstract sealed class ViewportEvent extends MutableEvent implements Inher
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class ComputeCameraAngles extends ViewportEvent {
+    final class ComputeCameraAngles extends MutableEvent implements ViewportEvent {
         public static final EventBus<ComputeCameraAngles> BUS = EventBus.create(ComputeCameraAngles.class);
 
+        private final GameRenderer renderer;
+        private final Camera camera;
+        private final float partialTicks;
         private float yaw;
         private float pitch;
         private float roll;
 
         @ApiStatus.Internal
-        public ComputeCameraAngles(GameRenderer renderer, Camera camera, double renderPartialTicks, float yaw, float pitch, float roll) {
-            super(renderer, camera, renderPartialTicks);
+        public ComputeCameraAngles(GameRenderer renderer, Camera camera, float renderPartialTicks, float yaw, float pitch, float roll) {
+            this.renderer = renderer;
+            this.camera = camera;
+            this.partialTicks = renderPartialTicks;
             this.setYaw(yaw);
             this.setPitch(pitch);
             this.setRoll(roll);
+        }
+
+        @Override
+        public GameRenderer getRenderer() {
+            return renderer;
+        }
+
+        @Override
+        public Camera getCamera() {
+            return camera;
+        }
+
+        @Override
+        public float getPartialTick() {
+            return partialTicks;
         }
 
         /**
@@ -318,17 +334,37 @@ public abstract sealed class ViewportEvent extends MutableEvent implements Inher
      *
      * @see ComputeFovModifierEvent
      */
-    public static final class ComputeFov extends ViewportEvent {
+    final class ComputeFov extends MutableEvent implements ViewportEvent {
         public static final EventBus<ComputeFov> BUS = EventBus.create(ComputeFov.class);
 
+        private final GameRenderer renderer;
+        private final Camera camera;
+        private final float partialTicks;
         private final boolean usedConfiguredFov;
         private float fov;
 
         @ApiStatus.Internal
-        public ComputeFov(GameRenderer renderer, Camera camera, double renderPartialTicks, float fov, boolean usedConfiguredFov) {
-            super(renderer, camera, renderPartialTicks);
+        public ComputeFov(GameRenderer renderer, Camera camera, float renderPartialTicks, float fov, boolean usedConfiguredFov) {
+            this.renderer = renderer;
+            this.camera = camera;
+            this.partialTicks = renderPartialTicks;
             this.usedConfiguredFov = usedConfiguredFov;
             this.setFOV(fov);
+        }
+
+        @Override
+        public GameRenderer getRenderer() {
+            return renderer;
+        }
+
+        @Override
+        public Camera getCamera() {
+            return camera;
+        }
+
+        @Override
+        public float getPartialTick() {
+            return partialTicks;
         }
 
         /**

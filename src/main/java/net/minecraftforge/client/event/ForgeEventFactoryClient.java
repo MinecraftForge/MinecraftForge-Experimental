@@ -202,7 +202,7 @@ public final class ForgeEventFactoryClient {
         ClientPlayerNetworkEvent.Clone.BUS.post(new ClientPlayerNetworkEvent.Clone(pc, oldPlayer, newPlayer, networkManager));
     }
 
-    public static ViewportEvent.ComputeFov fireComputeFov(GameRenderer renderer, Camera camera, double partialTick, float fov, boolean usedConfiguredFov) {
+    public static ViewportEvent.ComputeFov fireComputeFov(GameRenderer renderer, Camera camera, float partialTick, float fov, boolean usedConfiguredFov) {
         return ViewportEvent.ComputeFov.BUS.fire(new ViewportEvent.ComputeFov(renderer, camera, partialTick, fov, usedConfiguredFov));
     }
 
