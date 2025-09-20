@@ -12,47 +12,48 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
-import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 /**
  * Currently known conversions:
- *   Pig -> Zombie Piglin when struck by lightning
- *   Villager -> Zombie Villager when killed by a zombie
- *   Zombie -> Drowned when under water
- *   Husk -> Zombie when under water
- *   Zombie Villager -> Villager
- *   Hoglin -> Zogline when in overworld
- *   Piglin/Piglin Brute -> Zombie Pigman when in overworld
- *   Villager -> Witch when struck by lightning
- *   Skeleton -> Stray when sitting in snow
- *   Tadpole -> Frog when it grows up
- *   Mushroom Cow -> Cow when sheared
+ * <ul>
+ *     <li>Pig -> Zombie Piglin when struck by lightning</li>
+ *     <li>Villager -> Zombie Villager when killed by a zombie</li>
+ *     <li>Zombie -> Drowned when under water</li>
+ *     <li>Husk -> Zombie when under water</li>
+ *     <li>Zombie Villager -> Villager</li>
+ *     <li>Hoglin -> Zoglin when in overworld</li>
+ *     <li>Piglin/Piglin Brute -> Zombie Pigman when in overworld</li>
+ *     <li>Villager -> Witch when struck by lightning</li>
+ *     <li>Skeleton -> Stray when sitting in snow</li>
+ *     <li>Tadpole -> Frog when it grows up</li>
+ *     <li>Mushroom Cow -> Cow when sheared</li>
+ * </ul>
  */
-public sealed class LivingConversionEvent extends LivingEvent implements InheritableEvent {
+public sealed abstract class LivingConversionEvent extends LivingEvent implements InheritableEvent {
     public static final EventBus<LivingConversionEvent> BUS = EventBus.create(LivingConversionEvent.class);
 
-    public LivingConversionEvent(LivingEntity entity) {
+    protected LivingConversionEvent(LivingEntity entity) {
         super(entity);
     }
 
     /**
      * LivingConversionEvent.Pre is triggered when an entity is trying
      * to replace itself with another entity
-     *
+     * <br>
      * This event may trigger every tick even if it was cancelled last tick
      * for entities like Zombies and Hoglins. To prevent it, the conversion
      * timer needs to be changed or reset
-     *
-     * This event is {@link Cancelable}
-     * If cancelled, the replacement will not occur
+     * <br>
+     * This event is {@linkplain Cancellable}. If cancelled, the replacement will not occur
      */
     public static final class Pre extends LivingConversionEvent implements Cancellable {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
         private final EntityType<? extends LivingEntity> outcome;
-        private final Consumer<Integer> timer;
+        private final IntConsumer timer;
 
-        public Pre(LivingEntity entity, EntityType<? extends LivingEntity> outcome, Consumer<Integer> timer) {
+        public Pre(LivingEntity entity, EntityType<? extends LivingEntity> outcome, IntConsumer timer) {
             super(entity);
             this.outcome = outcome;
             this.timer = timer;

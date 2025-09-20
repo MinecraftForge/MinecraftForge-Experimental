@@ -11,9 +11,9 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
-import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * {@link FurnaceFuelBurnTimeEvent} is fired when determining the fuel value for an ItemStack. <br>
@@ -24,16 +24,15 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * This event is {@link Cancellable} to prevent later handlers from changing the value.
  **/
+@NullMarked
 public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<FurnaceFuelBurnTimeEvent> BUS = CancellableEventBus.create(FurnaceFuelBurnTimeEvent.class);
 
-    @NotNull
     private final ItemStack itemStack;
-    @Nullable
-    private final RecipeType<?> recipeType;
+    private final @org.jspecify.annotations.Nullable RecipeType<?> recipeType;
     private int burnTime;
 
-    public FurnaceFuelBurnTimeEvent(@NotNull ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
+    public FurnaceFuelBurnTimeEvent(ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
         this.itemStack = itemStack;
         this.burnTime = burnTime;
         this.recipeType = recipeType;
@@ -42,7 +41,6 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
     /**
      * Get the ItemStack "fuel" in question.
      */
-    @NotNull
     public ItemStack getItemStack() {
         return itemStack;
     }

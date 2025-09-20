@@ -11,6 +11,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * PlayerXpEvent is fired whenever an event involving player experience occurs. <br>
@@ -49,6 +50,7 @@ public sealed class PlayerXpEvent extends PlayerEvent {
      * This event is fired when the player's experience changes through the {@link Player#giveExperiencePoints(int)} method.
      * It can be cancelled, and no further processing will be done.
      */
+    @NullMarked
     public static final class XpChange extends PlayerXpEvent implements Cancellable {
         public static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
 
@@ -72,6 +74,7 @@ public sealed class PlayerXpEvent extends PlayerEvent {
      * This event is fired when the player's experience level changes through the {@link Player#giveExperienceLevels(int)} method.
      * It can be cancelled, and no further processing will be done.
      */
+    @NullMarked
     public static final class LevelChange extends PlayerXpEvent implements Cancellable {
         public static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
 

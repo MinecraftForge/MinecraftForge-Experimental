@@ -13,8 +13,9 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public sealed abstract class PotionBrewEvent extends MutableEvent implements InheritableEvent {
     public static final EventBus<PotionBrewEvent> BUS = EventBus.create(PotionBrewEvent.class);
 
@@ -24,13 +25,12 @@ public sealed abstract class PotionBrewEvent extends MutableEvent implements Inh
         this.stacks = stacks;
     }
 
-    @NotNull
     public ItemStack getItem(int index) {
         if (index < 0 || index >= stacks.size()) return ItemStack.EMPTY;
         return stacks.get(index);
     }
 
-    public void setItem(int index, @NotNull ItemStack stack) {
+    public void setItem(int index, ItemStack stack) {
         if (index < stacks.size()) {
             stacks.set(index, stack);
         }

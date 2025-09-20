@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.BooleanSupplier;
 import java.util.function.Consumer;
+import java.util.function.IntConsumer;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentMap;
@@ -703,7 +704,7 @@ public final class ForgeEventFactory {
         RegisterCommandsEvent.BUS.post(new RegisterCommandsEvent(dispatcher, environment, context));
     }
 
-    public static boolean canLivingConvert(LivingEntity entity, EntityType<? extends LivingEntity> outcome, Consumer<Integer> timer) {
+    public static boolean canLivingConvert(LivingEntity entity, EntityType<? extends LivingEntity> outcome, IntConsumer timer) {
         return !LivingConversionEvent.Pre.BUS.post(new LivingConversionEvent.Pre(entity, outcome, timer));
     }
 

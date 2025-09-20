@@ -7,12 +7,14 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This event is fired when the player is waking up.<br/>
  * This is merely for purposes of listening for this to happen.<br/>
  * There is nothing that can be manipulated with this event.
  */
+@NullMarked
 public final class PlayerWakeUpEvent extends PlayerEvent {
     public static final EventBus<PlayerWakeUpEvent> BUS = EventBus.create(PlayerWakeUpEvent.class);
 

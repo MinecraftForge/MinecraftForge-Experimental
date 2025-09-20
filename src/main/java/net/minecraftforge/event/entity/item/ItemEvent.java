@@ -15,7 +15,7 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * additional useful data from the firing method that isn't already contained
  * within the ItemEntity instance.
  */
-public sealed class ItemEvent extends EntityEvent permits ItemExpireEvent, ItemTossEvent {
+public sealed abstract class ItemEvent extends EntityEvent permits ItemExpireEvent, ItemTossEvent {
     public static final EventBus<ItemEvent> BUS = EventBus.create(ItemEvent.class);
 
     private final ItemEntity itemEntity;
@@ -25,7 +25,7 @@ public sealed class ItemEvent extends EntityEvent permits ItemExpireEvent, ItemT
      *
      * @param itemEntity The ItemEntity for this event
      */
-    public ItemEvent(ItemEntity itemEntity) {
+    protected ItemEvent(ItemEntity itemEntity) {
         super(itemEntity);
         this.itemEntity = itemEntity;
     }

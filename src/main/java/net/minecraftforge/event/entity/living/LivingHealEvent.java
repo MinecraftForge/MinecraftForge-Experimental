@@ -5,11 +5,11 @@
 
 package net.minecraftforge.event.entity.living;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * LivingHealEvent is fired when an Entity is set to be healed. <br>
@@ -19,13 +19,9 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * {@link #amount} contains the amount of healing done to the Entity that was healed. <br>
  * <br>
- * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
- * If this event is canceled, the Entity is not healed.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity is not healed.
  **/
+@NullMarked
 public final class LivingHealEvent extends LivingEvent implements Cancellable {
     public static final CancellableEventBus<LivingHealEvent> BUS = CancellableEventBus.create(LivingHealEvent.class);
 

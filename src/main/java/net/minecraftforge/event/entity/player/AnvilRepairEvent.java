@@ -8,7 +8,7 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired when the player removes a "repaired" item from the Anvil's Output slot.
@@ -17,18 +17,16 @@ import org.jetbrains.annotations.NotNull;
  *
  * ItemStacks are the inputs/output from the anvil. They cannot be edited.
  */
+@NullMarked
 public final class AnvilRepairEvent extends PlayerEvent {
     public static final EventBus<AnvilRepairEvent> BUS = EventBus.create(AnvilRepairEvent.class);
 
-    @NotNull
     private final ItemStack left; // The left side of the input
-    @NotNull
     private final ItemStack right; // The right side of the input
-    @NotNull
     private final ItemStack output; // Set this to set the output stack
     private float breakChance; // Anvil's chance to break (reduced by 1 durability) when this is complete. Default is 12% (0.12f)
 
-    public AnvilRepairEvent(Player player, @NotNull ItemStack left, @NotNull ItemStack right, @NotNull ItemStack output) {
+    public AnvilRepairEvent(Player player, ItemStack left, ItemStack right, ItemStack output) {
         super(player);
         this.output = output;
         this.left = left;
@@ -40,21 +38,18 @@ public final class AnvilRepairEvent extends PlayerEvent {
      * Get the output result from the anvil
      * @return the output
      */
-    @NotNull
     public ItemStack getOutput() { return output; }
 
     /**
      * Get the first item input into the anvil
      * @return the first input slot
      */
-    @NotNull
     public ItemStack getLeft() { return left; }
 
     /**
      * Get the second item input into the anvil
      * @return the second input slot
      */
-    @NotNull
     public ItemStack getRight() { return right; }
 
     public float getBreakChance() { return breakChance; }

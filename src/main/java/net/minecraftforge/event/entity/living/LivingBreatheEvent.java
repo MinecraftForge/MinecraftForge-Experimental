@@ -16,12 +16,6 @@ import net.minecraftforge.common.MinecraftForge;
  * LivingBreatheEvent is fired whenever a living entity ticks.<br>
  * <br>
  * This event is fired via {@link ForgeHooks#onLivingBreathe(LivingEntity, int, int)}.<br>
- * <br>
- * This event is not {@link Cancelable}.<br>
- * <br>
- * This event does not have a result. {@link HasResult}
- * <br>
- * This event is fired on {@link MinecraftForge#EVENT_BUS}
  */
 public final class LivingBreatheEvent extends LivingEvent {
     public static final EventBus<LivingBreatheEvent> BUS = EventBus.create(LivingBreatheEvent.class);
