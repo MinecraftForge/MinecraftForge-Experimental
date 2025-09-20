@@ -13,27 +13,29 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * ChunkEvent is fired when an event involving a chunk occurs.<br>
- * If a method utilizes this {@link Event} as its parameter, the method will
- * receive every child event of this class.<br>
+ * ChunkEvent is fired when an event involving a chunk occurs.
  * <br>
  * {@link #chunk} contains the Chunk this event is affecting.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public class ChunkEvent extends LevelEvent {
+public non-sealed abstract class ChunkEvent implements LevelEvent {
     public static final EventBus<ChunkEvent> BUS = EventBus.create(ChunkEvent.class);
 
+    private final LevelAccessor level;
     private final ChunkAccess chunk;
 
-    public ChunkEvent(ChunkAccess chunk) {
-        super(chunk.getWorldForge());
+    protected ChunkEvent(ChunkAccess chunk) {
+        this.level = chunk.getWorldForge();
         this.chunk = chunk;
     }
 
-    public ChunkEvent(ChunkAccess chunk, LevelAccessor level) {
-        super(level);
+    protected ChunkEvent(ChunkAccess chunk, LevelAccessor level) {
+        this.level = level;
         this.chunk = chunk;
+    }
+
+    @Override
+    public LevelAccessor getLevel() {
+        return level;
     }
 
     public ChunkAccess getChunk() {

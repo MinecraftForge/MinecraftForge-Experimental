@@ -30,46 +30,35 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This event is fired whenever an event involving a {@link LevelAccessor} occurs.
- * <p>
- * All children of this event are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}.
  */
-public class LevelEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
-
-    private final LevelAccessor level;
-
-    public LevelEvent(LevelAccessor level) {
-        this.level = level;
-    }
+@NullMarked
+public sealed interface LevelEvent extends InheritableEvent
+        permits LevelEvent.Load, LevelEvent.Unload, LevelEvent.Save, LevelEvent.CreateSpawnPosition,
+        LevelEvent.PotentialSpawns, ChunkEvent {
+    EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
 
     /**
      * {@return the level this event is affecting}
      */
-    public LevelAccessor getLevel() {
-        return level;
-    }
+    LevelAccessor getLevel();
 
     /**
      * This event is fired whenever a level loads.
      * This event is fired whenever a level loads in ClientLevel's constructor and
      * {@literal MinecraftServer#createLevels(ChunkProgressListener)}.
      * <p>
-     * This event is not {@linkplain Cancelable cancellable} and does not {@linkplain HasResult have a result}.
-     * <p>
      * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
      * on both logical sides.
      **/
-    public static final class Load extends LevelEvent {
+    record Load(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Load> BUS = EventBus.create(Load.class);
-
-        public Load(LevelAccessor level) { super(level); }
     }
 
     /**
@@ -79,15 +68,11 @@ public class LevelEvent extends MutableEvent implements InheritableEvent {
      * {@link MinecraftServer#stopServer()},
      * {@link Minecraft#clearClientLevel(Screen)}.
      * <p>
-     * This event is not {@linkplain Cancelable cancellable} and does not {@linkplain HasResult have a result}.
-     * <p>
      * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
      * on both logical sides.
      **/
-    public static final class Unload extends LevelEvent {
+    record Unload(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Unload> BUS = EventBus.create(Unload.class);
-
-        public Unload(LevelAccessor level) { super(level); }
     }
 
     /**
@@ -95,42 +80,27 @@ public class LevelEvent extends MutableEvent implements InheritableEvent {
      * This event is fired when a level is saved in
      * {@link ServerLevel#save(ProgressListener, boolean, boolean)}.
      * <p>
-     * This event is not {@linkplain Cancelable cancellable} and does not {@linkplain HasResult have a result}.
-     * <p>
      * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
      * only on the {@linkplain LogicalSide#SERVER logical server}.
      **/
-    public static final class Save extends LevelEvent {
+    record Save(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Save> BUS = EventBus.create(Save.class);
-
-        public Save(LevelAccessor level) { super(level); }
     }
 
     /**
      * This event fires whenever a {@link ServerLevel} is initialized for the first time
      * and a spawn position needs to be chosen.
      * <p>
-     * This event is {@linkplain Cancelable cancellable} and does not {@linkplain HasResult have a result}.
-     * If the event is canceled, the vanilla logic to choose a spawn position will be skipped.
+     * This event is {@linkplain Cancellable cancellable}.
+     * If the event is cancelled, the vanilla logic to choose a spawn position will be skipped.
      * <p>
      * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
      * only on the {@linkplain LogicalSide#SERVER logical server}.
      *
      * @see ServerLevelData#isInitialized()
      */
-    public static final class CreateSpawnPosition extends LevelEvent implements Cancellable {
+    record CreateSpawnPosition(LevelAccessor getLevel, ServerLevelData getSettings) implements Cancellable, LevelEvent {
         public static final CancellableEventBus<CreateSpawnPosition> BUS = CancellableEventBus.create(CreateSpawnPosition.class);
-
-        private final ServerLevelData settings;
-
-        public CreateSpawnPosition(LevelAccessor level, ServerLevelData settings) {
-            super(level);
-            this.settings = settings;
-        }
-
-        public ServerLevelData getSettings() {
-            return settings;
-        }
     }
 
     /**
@@ -141,19 +111,20 @@ public class LevelEvent extends MutableEvent implements InheritableEvent {
      * The event is called in {@link net.minecraft.world.level.NaturalSpawner#mobsAt(ServerLevel, StructureManager,
      * ChunkGenerator, MobCategory, BlockPos, Holder)}.</p>
      * 
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
-     * Canceling the event will result in an empty list, meaning no entity will be spawned.</p>
+     * <p>This event is {@linkplain Cancellable cancellable}.
+     * Cancelling the event will result in an empty list, meaning no entity will be spawned.</p>
      */
-    public static final class PotentialSpawns extends LevelEvent implements Cancellable {
+    final class PotentialSpawns implements Cancellable, LevelEvent {
         public static final CancellableEventBus<PotentialSpawns> BUS = CancellableEventBus.create(PotentialSpawns.class);
 
+        private final LevelAccessor level;
         private final MobCategory mobcategory;
         private final BlockPos pos;
         private final List<Weighted<MobSpawnSettings.SpawnerData>> list;
         private final @UnmodifiableView List<Weighted<MobSpawnSettings.SpawnerData>> view;
 
         public PotentialSpawns(LevelAccessor level, MobCategory category, BlockPos pos, WeightedList<MobSpawnSettings.SpawnerData> oldList) {
-            super(level);
+            this.level = level;
             this.pos = pos;
             this.mobcategory = category;
             if (!oldList.isEmpty())
@@ -162,6 +133,11 @@ public class LevelEvent extends MutableEvent implements InheritableEvent {
                 this.list = new ArrayList<>();
 
             this.view = Collections.unmodifiableList(list);
+        }
+
+        @Override
+        public LevelAccessor getLevel() {
+            return this.level;
         }
 
         /** @return the category of the mobs in the spawn list. */
