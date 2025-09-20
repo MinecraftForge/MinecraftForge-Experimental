@@ -24,7 +24,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  *
  */
-public final class EntityMountEvent extends EntityEvent implements Cancellable {
+public final class EntityMountEvent implements Cancellable, EntityEvent {
     public static final CancellableEventBus<EntityMountEvent> BUS = CancellableEventBus.create(EntityMountEvent.class);
 
     private final Entity entityMounting;
@@ -34,11 +34,15 @@ public final class EntityMountEvent extends EntityEvent implements Cancellable {
     private final boolean isMounting;
 
     public EntityMountEvent(Entity entityMounting, Entity entityBeingMounted, Level level, boolean isMounting) {
-        super(entityMounting);
         this.entityMounting = entityMounting;
         this.entityBeingMounted = entityBeingMounted;
         this.level = level;
         this.isMounting = isMounting;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return entityMounting;
     }
 
     public boolean isMounting() {

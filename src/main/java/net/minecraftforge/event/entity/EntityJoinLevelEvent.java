@@ -27,27 +27,22 @@ import net.minecraftforge.fml.LogicalSide;
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * on both logical sides.
  **/
-public final class EntityJoinLevelEvent extends EntityEvent implements Cancellable {
+public record EntityJoinLevelEvent(
+        Entity getEntity,
+        Level getLevel,
+        boolean loadedFromDisk
+) implements Cancellable, EntityEvent {
     public static final CancellableEventBus<EntityJoinLevelEvent> BUS = CancellableEventBus.create(EntityJoinLevelEvent.class);
-
-    private final Level level;
-    private final boolean loadedFromDisk;
 
     public EntityJoinLevelEvent(Entity entity, Level level) {
         this(entity, level, false);
-    }
-
-    public EntityJoinLevelEvent(Entity entity, Level level, boolean loadedFromDisk) {
-        super(entity);
-        this.level = level;
-        this.loadedFromDisk = loadedFromDisk;
     }
 
     /**
      * {@return the level that the entity is set to join}
      */
     public Level getLevel() {
-        return level;
+        return getLevel;
     }
 
     /**

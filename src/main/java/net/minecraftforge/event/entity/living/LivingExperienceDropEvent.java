@@ -9,17 +9,19 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Event for when an entity drops experience on its death, can be used to change
  * the amount of experience points dropped or completely prevent dropping of experience
  * by canceling the event.
  */
+@NullMarked
 public final class LivingExperienceDropEvent extends LivingEvent implements Cancellable {
     public static final CancellableEventBus<LivingExperienceDropEvent> BUS = CancellableEventBus.create(LivingExperienceDropEvent.class);
 
-    @Nullable private final Player attackingPlayer;
+    private final @Nullable Player attackingPlayer;
     private final int originalExperiencePoints;
 
     private int droppedExperiencePoints;

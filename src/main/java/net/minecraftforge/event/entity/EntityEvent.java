@@ -7,49 +7,26 @@ package net.minecraftforge.event.entity;
 
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
- * EntityEvent is fired when an event involving any Entity occurs.<br>
- * If a method utilizes this {@link net.minecraftforge.eventbus.api.Event} as its parameter, the method will
- * receive every child event of this class.<br>
- * <br>
- * {@link #entity} contains the entity that caused this event to occur.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
- **/
-public class EntityEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
-
-    private final Entity entity;
-
-    public EntityEvent(Entity entity) {
-        this.entity = entity;
-    }
-
-    public Entity getEntity() {
-        return entity;
-    }
+ * EntityEvent is fired when an event involving any Entity occurs.
+ */
+public interface EntityEvent extends InheritableEvent {
+    EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
 
     /**
-     * EntityConstructing is fired when an Entity is being created. <br>
-     * This event is fired within the constructor of the Entity.<br>
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     **/
-    public static final class EntityConstructing extends EntityEvent {
-        public static final EventBus<EntityConstructing> BUS = EventBus.create(EntityConstructing.class);
+     * @return the entity that caused this event to occur.
+     */
+    Entity getEntity();
 
-        public EntityConstructing(Entity entity) {
-            super(entity);
-        }
+    /**
+     * EntityConstructing is fired when an Entity is being created.
+     * <p>This event is fired within the constructor of the Entity.</p>
+     **/
+    record EntityConstructing(Entity getEntity) implements EntityEvent {
+        public static final EventBus<EntityConstructing> BUS = EventBus.create(EntityConstructing.class);
     }
 
     /**
@@ -57,24 +34,9 @@ public class EntityEvent extends MutableEvent implements InheritableEvent {
      * Sections are 16x16x16 block grids of the world.<br>
      * This event does not fire when a new entity is spawned, only when an entity moves from one section to another one.
      * Use {@link EntityJoinLevelEvent} to detect new entities joining the world.
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}
-     * <br>
-     * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS}.<br>
      **/
-    public static final class EnteringSection extends EntityEvent {
+    record EnteringSection(Entity getEntity, long getPackedOldPos, long getPackedNewPos) implements EntityEvent {
         public static final EventBus<EnteringSection> BUS = EventBus.create(EnteringSection.class);
-
-        private final long packedOldPos;
-        private final long packedNewPos;
-
-        public EnteringSection(Entity entity, long packedOldPos, long packedNewPos) {
-            super(entity);
-            this.packedOldPos = packedOldPos;
-            this.packedNewPos = packedNewPos;
-        }
 
         /**
          * A packed version of the old section's position. This is to be used with the various methods in {@link SectionPos},
@@ -82,7 +44,7 @@ public class EntityEvent extends MutableEvent implements InheritableEvent {
          * @return the packed position of the old section
          */
         public long getPackedOldPos() {
-            return packedOldPos;
+            return getPackedOldPos;
         }
 
         /**
@@ -91,21 +53,21 @@ public class EntityEvent extends MutableEvent implements InheritableEvent {
          * @return the packed position of the new section
          */
         public long getPackedNewPos() {
-            return packedNewPos;
+            return getPackedNewPos;
         }
 
         /**
          * @return the position of the old section
          */
         public SectionPos getOldPos() {
-            return SectionPos.of(packedOldPos);
+            return SectionPos.of(getPackedOldPos);
         }
 
         /**
          * @return the position of the new section
          */
         public SectionPos getNewPos() {
-            return SectionPos.of(packedNewPos);
+            return SectionPos.of(getPackedNewPos);
         }
 
         /**
@@ -113,7 +75,7 @@ public class EntityEvent extends MutableEvent implements InheritableEvent {
          * section has changed.
          */
         public boolean didChunkChange() {
-            return SectionPos.x(packedOldPos) != SectionPos.x(packedNewPos) || SectionPos.z(packedOldPos) != SectionPos.z(packedNewPos);
+            return SectionPos.x(getPackedOldPos) != SectionPos.x(getPackedNewPos) || SectionPos.z(getPackedOldPos) != SectionPos.z(getPackedNewPos);
         }
     }
 }

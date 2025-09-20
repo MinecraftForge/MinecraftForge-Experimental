@@ -20,20 +20,13 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * on both logical sides.
  **/
-public final class EntityLeaveLevelEvent extends EntityEvent {
+public record EntityLeaveLevelEvent(Entity getEntity, Level getLevel) implements EntityEvent {
     public static final EventBus<EntityLeaveLevelEvent> BUS = EventBus.create(EntityLeaveLevelEvent.class);
-
-    private final Level level;
-
-    public EntityLeaveLevelEvent(Entity entity, Level level) {
-        super(entity);
-        this.level = level;
-    }
 
     /**
      * {@return the level the entity is set to leave}
      */
     public Level getLevel() {
-        return level;
+        return getLevel;
     }
 }

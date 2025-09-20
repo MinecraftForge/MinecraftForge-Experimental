@@ -28,18 +28,24 @@ import org.jetbrains.annotations.Nullable;
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public sealed class EntityTeleportEvent extends EntityEvent implements Cancellable {
+public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
     public static final CancellableEventBus<EntityTeleportEvent> BUS = CancellableEventBus.create(EntityTeleportEvent.class);
 
+    private final Entity entity;
     protected double targetX;
     protected double targetY;
     protected double targetZ;
 
     public EntityTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
-        super(entity);
+        this.entity = entity;
         this.targetX = targetX;
         this.targetY = targetY;
         this.targetZ = targetZ;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return entity;
     }
 
     public double getTargetX() { return targetX; }

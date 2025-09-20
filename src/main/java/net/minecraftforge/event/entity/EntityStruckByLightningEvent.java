@@ -26,14 +26,20 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public final class EntityStruckByLightningEvent extends EntityEvent implements Cancellable {
+public final class EntityStruckByLightningEvent implements Cancellable, EntityEvent {
     public static final CancellableEventBus<EntityStruckByLightningEvent> BUS = CancellableEventBus.create(EntityStruckByLightningEvent.class);
 
+    private final Entity entity;
     private final LightningBolt lightning;
 
     public EntityStruckByLightningEvent(Entity entity, LightningBolt lightning) {
-        super(entity);
+        this.entity = entity;
         this.lightning = lightning;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return entity;
     }
 
     public LightningBolt getLightning() {

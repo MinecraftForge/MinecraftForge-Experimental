@@ -24,14 +24,20 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public final class EntityTravelToDimensionEvent extends EntityEvent implements Cancellable {
+public final class EntityTravelToDimensionEvent implements Cancellable, EntityEvent {
     public static final CancellableEventBus<EntityTravelToDimensionEvent> BUS = CancellableEventBus.create(EntityTravelToDimensionEvent.class);
 
+    private final Entity entity;
     private final ResourceKey<Level> dimension;
 
     public EntityTravelToDimensionEvent(Entity entity, ResourceKey<Level> dimension) {
-        super(entity);
+        this.entity = entity;
         this.dimension = dimension;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return entity;
     }
 
     public ResourceKey<Level> getDimension() {

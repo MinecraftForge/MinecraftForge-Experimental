@@ -23,13 +23,19 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * </ul>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-public final class EntityMobGriefingEvent extends EntityEvent implements HasResult {
+public final class EntityMobGriefingEvent implements EntityEvent, HasResult {
     public static final EventBus<EntityMobGriefingEvent> BUS = EventBus.create(EntityMobGriefingEvent.class);
 
+    private final Entity entity;
     private Result result = Result.DEFAULT;
 
     public EntityMobGriefingEvent(Entity entity) {
-        super(entity);
+        this.entity = entity;
+    }
+
+    @Override
+    public Entity getEntity() {
+        return entity;
     }
 
     @Override

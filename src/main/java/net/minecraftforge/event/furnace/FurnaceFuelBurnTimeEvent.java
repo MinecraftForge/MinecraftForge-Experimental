@@ -11,7 +11,7 @@ import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
-import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
