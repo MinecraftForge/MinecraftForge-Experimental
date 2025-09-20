@@ -13,13 +13,14 @@ import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * This event is fired when {@link net.minecraft.world.level.levelgen.feature.treedecorators.AlterGroundDecorator#placeBlockAt(TreeDecorator.Context, BlockPos)}
  * attempts to alter a ground block when generating a feature. An example of this would be large spruce trees converting grass blocks into podzol.
  * <p>
- * This event is not {@linkplain Cancelable cancellable}.
+ * This event is not {@linkplain Cancellable cancellable}.
  * <p>
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.

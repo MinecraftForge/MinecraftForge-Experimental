@@ -16,12 +16,13 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * This event is fired whenever a sapling, fungus, mushroom or azalea grows into a tree.
  * <p>
- * This event is not {@linkplain Cancelable cancellable} but does {@linkplain HasResult have a result}.
+ * This event is not {@linkplain Cancellable cancellable} but does {@linkplain HasResult have a result}.
  * {@linkplain Result#ALLOW ALLOW} and {@linkplain Result#DEFAULT DEFAULT} will allow the sapling to grow
  * using the features set on the event.
  * {@linkplain Result#DENY DENY} will prevent the sapling from growing.
@@ -31,9 +32,10 @@ import org.jetbrains.annotations.Nullable;
  */
 // TODO: Rename to BlockFeatureGrowEvent in 1.20
 @Deprecated(forRemoval = true, since = "1.21.1") // Dont remove, rename
-public final class SaplingGrowTreeEvent extends LevelEvent implements HasResult {
+public final class SaplingGrowTreeEvent implements LevelEvent, HasResult {
     public static final EventBus<SaplingGrowTreeEvent> BUS = EventBus.create(SaplingGrowTreeEvent.class);
 
+    private final LevelAccessor level;
     private final RandomSource randomSource;
     private final BlockPos pos;
     @Nullable
@@ -41,10 +43,15 @@ public final class SaplingGrowTreeEvent extends LevelEvent implements HasResult 
     private Result result = Result.DEFAULT;
 
     public SaplingGrowTreeEvent(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> feature) {
-        super(level);
+        this.level = level;
         this.randomSource = randomSource;
         this.pos = pos;
         this.feature = feature;
+    }
+
+    @Override
+    public LevelAccessor getLevel() {
+        return level;
     }
 
     /**
