@@ -9,6 +9,7 @@ import net.minecraftforge.common.ForgeHooks;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -24,13 +25,12 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * {@link #source} contains the DamageSource that caused this Entity to be hurt. <br>
  * {@link #amount} contains the final amount of damage that will be dealt to entity. <br>
  * <br>
- * This event is {@link Cancelable}.<br>
- * If this event is canceled, the Entity is not hurt. Used resources WILL NOT be restored.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
+ * This event is {@linkplain Cancellable cancellable}.<br>
+ * If this event is cancelled, the Entity is not hurt. Used resources WILL NOT be restored.<br>
+ *
  * @see LivingHurtEvent
  **/
-public final class LivingDamageEvent implements Cancellable, LivingEvent {
+public final class LivingDamageEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingDamageEvent> BUS = CancellableEventBus.create(LivingDamageEvent.class);
 
     private final LivingEntity entity;

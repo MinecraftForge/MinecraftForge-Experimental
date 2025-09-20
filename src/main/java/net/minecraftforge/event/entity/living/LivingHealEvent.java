@@ -8,6 +8,7 @@ package net.minecraftforge.event.entity.living;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 
@@ -22,7 +23,7 @@ import org.jspecify.annotations.NullMarked;
  * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity is not healed.
  **/
 @NullMarked
-public final class LivingHealEvent implements Cancellable, LivingEvent {
+public final class LivingHealEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingHealEvent> BUS = CancellableEventBus.create(LivingHealEvent.class);
 
     private final LivingEntity entity;

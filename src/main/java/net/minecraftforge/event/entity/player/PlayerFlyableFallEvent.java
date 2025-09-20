@@ -7,6 +7,7 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -14,7 +15,7 @@ import org.jspecify.annotations.NullMarked;
  * @author Mithion
  */
 @NullMarked
-public final class PlayerFlyableFallEvent implements PlayerEvent {
+public final class PlayerFlyableFallEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<PlayerFlyableFallEvent> BUS = EventBus.create(PlayerFlyableFallEvent.class);
 
     private final Player player;

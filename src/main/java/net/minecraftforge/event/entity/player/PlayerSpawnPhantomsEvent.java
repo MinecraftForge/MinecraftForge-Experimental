@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
  * See {@link #setResult} for documentation.<br>
  * @see PlayerSpawnPhantomsEvent#setResult for the effects of each result.
  */
-public final class PlayerSpawnPhantomsEvent implements PlayerEvent, HasResult {
+public final class PlayerSpawnPhantomsEvent extends MutableEvent implements PlayerEvent, HasResult {
     public static final EventBus<PlayerSpawnPhantomsEvent> BUS = EventBus.create(PlayerSpawnPhantomsEvent.class);
 
     private final Player player;

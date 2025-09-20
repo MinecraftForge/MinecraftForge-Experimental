@@ -10,17 +10,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.LevelCallback;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 /**
  * This event is fired whenever an {@link Entity} leaves a {@link Level}.
  * This event is fired whenever an entity is removed from the level in {@link LevelCallback#onTrackingEnd(Object)}.
  * <p>
- * This event is not {@linkplain Cancelable cancellable} and does not {@linkplain net.minecraftforge.eventbus.api.Event.HasResult have a result}.
- * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
- * on both logical sides.
+ * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus} on both logical sides.
  **/
-public record EntityLeaveLevelEvent(Entity getEntity, Level getLevel) implements EntityEvent {
+public record EntityLeaveLevelEvent(Entity getEntity, Level getLevel) implements RecordEvent, EntityEvent {
     public static final EventBus<EntityLeaveLevelEvent> BUS = EventBus.create(EntityLeaveLevelEvent.class);
 
     /**

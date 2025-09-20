@@ -7,6 +7,7 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -15,11 +16,8 @@ import org.jspecify.annotations.NullMarked;
  * There is nothing that can be manipulated with this event.
  */
 @NullMarked
-public record PlayerWakeUpEvent(
-        Player getEntity,
-        boolean wakeImmediately,
-        boolean updateLevel
-) implements PlayerEvent {
+public record PlayerWakeUpEvent(Player getEntity, boolean wakeImmediately, boolean updateLevel)
+        implements RecordEvent, PlayerEvent {
     public static final EventBus<PlayerWakeUpEvent> BUS = EventBus.create(PlayerWakeUpEvent.class);
 
     /**

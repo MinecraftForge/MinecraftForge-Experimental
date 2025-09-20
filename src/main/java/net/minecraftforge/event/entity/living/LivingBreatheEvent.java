@@ -6,18 +6,18 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 
 /**
  * LivingBreatheEvent is fired whenever a living entity ticks.<br>
  * <br>
  * This event is fired via {@link ForgeHooks#onLivingBreathe(LivingEntity, int, int)}.<br>
  */
-public final class LivingBreatheEvent implements LivingEvent {
+public final class LivingBreatheEvent extends MutableEvent implements LivingEvent {
     public static final EventBus<LivingBreatheEvent> BUS = EventBus.create(LivingBreatheEvent.class);
 
     private final LivingEntity entity;

@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Player.BedSleepingProblem;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 import java.util.Optional;
 
@@ -20,7 +21,7 @@ import java.util.Optional;
  * <br>
  * {@link #result} contains whether the player is able to sleep. <br>
  */
-public final class PlayerSleepInBedEvent implements PlayerEvent {
+public final class PlayerSleepInBedEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<PlayerSleepInBedEvent> BUS = EventBus.create(PlayerSleepInBedEvent.class);
 
     private final Player player;

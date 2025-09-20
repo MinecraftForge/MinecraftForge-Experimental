@@ -9,19 +9,21 @@ import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * This event is fired whenever a player attacks an Entity in
  * EntityPlayer#attackTargetEntityWithCurrentItem(Entity).<br>
- * <br>
- * This event is not {@link Cancelable}.<br>
  * <br>
  * This event has a result. {@link HasResult}<br>
  * DEFAULT: means the vanilla logic will determine if this a critical hit.<br>
  * DENY: it will not be a critical hit but the player still will attack<br>
  * ALLOW: this attack is forced to be critical
  **/
-public final class CriticalHitEvent implements PlayerEvent, HasResult {
+public final class CriticalHitEvent extends MutableEvent implements PlayerEvent, HasResult {
+    public static final EventBus<CriticalHitEvent> BUS = EventBus.create(CriticalHitEvent.class);
+
     private final Player player;
     private float damageModifier;
     private final float oldDamageModifier;

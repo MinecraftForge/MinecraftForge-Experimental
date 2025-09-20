@@ -7,7 +7,6 @@ package net.minecraftforge.event.entity.item;
 
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraftforge.event.entity.EntityEvent;
-import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -18,8 +17,6 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public sealed interface ItemEvent extends EntityEvent permits ItemExpireEvent, ItemTossEvent {
-    EventBus<ItemEvent> BUS = EventBus.create(ItemEvent.class);
-
     /**
      * The relevant {@link ItemEntity} for this event.
      */

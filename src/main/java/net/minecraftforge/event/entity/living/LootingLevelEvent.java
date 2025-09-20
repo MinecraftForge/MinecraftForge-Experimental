@@ -9,11 +9,12 @@ import net.minecraft.world.entity.LivingEntity;
 
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
 @NullMarked
-public final class LootingLevelEvent implements LivingEvent {
+public final class LootingLevelEvent extends MutableEvent implements LivingEvent {
     public static final EventBus<LootingLevelEvent> BUS = EventBus.create(LootingLevelEvent.class);
 
     private final LivingEntity entity;

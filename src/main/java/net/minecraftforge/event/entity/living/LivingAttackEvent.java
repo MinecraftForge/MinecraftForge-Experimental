@@ -7,10 +7,10 @@ package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -21,20 +21,13 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired via the {@link ForgeHooks#onLivingAttack(LivingEntity, DamageSource, float)}.<br>
  * <br>
- * {@link #source} contains the DamageSource of the attack. <br>
- * {@link #amount} contains the amount of damage dealt to the entity. <br>
- * <br>
- * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
- * If this event is canceled, the Entity does not take attack damage.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- *<br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
- **/
-public record LivingAttackEvent(
-        LivingEntity getEntity,
-        DamageSource getSource,
-        float getAmount
-) implements Cancellable, LivingEvent {
+ * This event is {@linkplain Cancellable cancellable}.<br>
+ * If this event is canceled, the Entity does not take attack damage.
+ *
+ * @param getSource the source of the attack
+ * @param getAmount the amount of damage dealt to the entity
+ */
+public record LivingAttackEvent(LivingEntity getEntity, DamageSource getSource, float getAmount)
+        implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingAttackEvent> BUS = CancellableEventBus.create(LivingAttackEvent.class);
 }

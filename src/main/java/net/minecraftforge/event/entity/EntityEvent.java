@@ -8,14 +8,12 @@ package net.minecraftforge.event.entity;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 /**
  * EntityEvent is fired when an event involving any Entity occurs.
  */
-public interface EntityEvent extends InheritableEvent {
-    EventBus<EntityEvent> BUS = EventBus.create(EntityEvent.class);
-
+public interface EntityEvent {
     /**
      * @return the entity that caused this event to occur.
      */
@@ -25,7 +23,7 @@ public interface EntityEvent extends InheritableEvent {
      * EntityConstructing is fired when an Entity is being created.
      * <p>This event is fired within the constructor of the Entity.</p>
      **/
-    record EntityConstructing(Entity getEntity) implements EntityEvent {
+    record EntityConstructing(Entity getEntity) implements RecordEvent, EntityEvent {
         public static final EventBus<EntityConstructing> BUS = EventBus.create(EntityConstructing.class);
     }
 
@@ -35,7 +33,8 @@ public interface EntityEvent extends InheritableEvent {
      * This event does not fire when a new entity is spawned, only when an entity moves from one section to another one.
      * Use {@link EntityJoinLevelEvent} to detect new entities joining the world.
      **/
-    record EnteringSection(Entity getEntity, long getPackedOldPos, long getPackedNewPos) implements EntityEvent {
+    record EnteringSection(Entity getEntity, long getPackedOldPos, long getPackedNewPos)
+            implements RecordEvent, EntityEvent {
         public static final EventBus<EnteringSection> BUS = EventBus.create(EnteringSection.class);
 
         /**

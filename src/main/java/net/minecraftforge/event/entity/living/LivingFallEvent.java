@@ -6,9 +6,9 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -20,14 +20,9 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * {@link #distance} contains the distance the Entity is to fall. If this event is canceled, this value is set to 0.0F.
  * <br>
- * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
- * If this event is canceled, the Entity does not fall.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is {@linkplain Cancellable cancellable}. If this event is canceled, the Entity does not fall.
  **/
-public final class LivingFallEvent implements Cancellable, LivingEvent {
+public final class LivingFallEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingFallEvent> BUS = CancellableEventBus.create(LivingFallEvent.class);
 
     private final LivingEntity entity;

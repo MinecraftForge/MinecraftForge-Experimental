@@ -8,39 +8,19 @@ package net.minecraftforge.event.entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
  * EntityTravelToDimensionEvent is fired before an Entity travels to a dimension.<br>
  * <br>
- * {@link #dimension} contains the id of the dimension the entity is traveling to.<br>
- * <br>
- * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
- * If this event is canceled, the Entity does not travel to the dimension.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
- **/
-public final class EntityTravelToDimensionEvent implements Cancellable, EntityEvent {
+ * This event is {@linkplain Cancellable cancellable}.<br>
+ * If this event is cancelled, the Entity does not travel to the dimension.
+ *
+ * @param getDimension the dimension the entity is travelling to
+ */
+public record EntityTravelToDimensionEvent(Entity getEntity, ResourceKey<Level> getDimension)
+        implements Cancellable, EntityEvent, RecordEvent {
     public static final CancellableEventBus<EntityTravelToDimensionEvent> BUS = CancellableEventBus.create(EntityTravelToDimensionEvent.class);
-
-    private final Entity entity;
-    private final ResourceKey<Level> dimension;
-
-    public EntityTravelToDimensionEvent(Entity entity, ResourceKey<Level> dimension) {
-        this.entity = entity;
-        this.dimension = dimension;
-    }
-
-    @Override
-    public Entity getEntity() {
-        return entity;
-    }
-
-    public ResourceKey<Level> getDimension() {
-        return dimension;
-    }
 }

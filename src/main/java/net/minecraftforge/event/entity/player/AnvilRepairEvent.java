@@ -8,6 +8,7 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -18,7 +19,7 @@ import org.jspecify.annotations.NullMarked;
  * ItemStacks are the inputs/output from the anvil. They cannot be edited.
  */
 @NullMarked
-public final class AnvilRepairEvent implements PlayerEvent {
+public final class AnvilRepairEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<AnvilRepairEvent> BUS = EventBus.create(AnvilRepairEvent.class);
 
     private final Player player;

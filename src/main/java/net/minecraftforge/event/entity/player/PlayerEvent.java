@@ -24,6 +24,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -35,8 +37,6 @@ import org.jspecify.annotations.NullMarked;
  * receive every child event of this class.<br>
  **/
 public interface PlayerEvent extends LivingEvent {
-    EventBus<PlayerEvent> BUS = EventBus.create(PlayerEvent.class);
-
     @Override
     Player getEntity();
 
@@ -50,7 +50,7 @@ public interface PlayerEvent extends LivingEvent {
      * {@link #state} contains the {@link BlockState} that is being checked for harvesting. <br>
      * {@link #success} contains the boolean value for whether the Block will be successfully harvested. <br>
      **/
-    final class HarvestCheck implements PlayerEvent {
+    final class HarvestCheck extends MutableEvent implements PlayerEvent {
         public static final EventBus<HarvestCheck> BUS = EventBus.create(HarvestCheck.class);
 
         private final Player player;
@@ -87,7 +87,7 @@ public interface PlayerEvent extends LivingEvent {
      * <br>
      * If it is cancelled, the player is unable to break the block.<br>
      **/
-    final class BreakSpeed implements Cancellable, PlayerEvent {
+    final class BreakSpeed extends MutableEvent implements Cancellable, PlayerEvent {
         public static final CancellableEventBus<BreakSpeed> BUS = CancellableEventBus.create(BreakSpeed.class);
 
         private final Player player;
@@ -126,7 +126,7 @@ public interface PlayerEvent extends LivingEvent {
      * {@link #username} contains the username of the player.
      * {@link #displayname} contains the display name of the player.
      **/
-    final class NameFormat implements PlayerEvent {
+    final class NameFormat extends MutableEvent implements PlayerEvent {
         public static final EventBus<NameFormat> BUS = EventBus.create(NameFormat.class);
 
         private final Player player;
@@ -166,7 +166,7 @@ public interface PlayerEvent extends LivingEvent {
      * <br>
      * {@link #getDisplayName()} contains the display name of the player or null if the client should determine the display name itself.
      **/
-    final class TabListNameFormat implements PlayerEvent {
+    final class TabListNameFormat extends MutableEvent implements PlayerEvent {
         public static final EventBus<TabListNameFormat> BUS = EventBus.create(TabListNameFormat.class);
 
         private final Player player;
@@ -200,7 +200,7 @@ public interface PlayerEvent extends LivingEvent {
      * @param getOriginal The old EntityPlayer that this new entity is a clone of.
      * @param isWasDeath True if this event was fired because the player died. False if it was fired because the entity switched dimensions.
      */
-    record Clone(Player getEntity, Player getOriginal, boolean isWasDeath) implements PlayerEvent {
+    record Clone(Player getEntity, Player getOriginal, boolean isWasDeath) implements RecordEvent, PlayerEvent {
         public static final EventBus<Clone> BUS = EventBus.create(Clone.class);
     }
 
@@ -209,7 +209,7 @@ public interface PlayerEvent extends LivingEvent {
      *
      * @param getTarget The entity now being tracked.
      */
-    record StartTracking(Player getEntity, Entity getTarget) implements PlayerEvent {
+    record StartTracking(Player getEntity, Entity getTarget) implements RecordEvent, PlayerEvent {
         public static final EventBus<StartTracking> BUS = EventBus.create(StartTracking.class);
     }
 
@@ -218,7 +218,7 @@ public interface PlayerEvent extends LivingEvent {
      *
      * @param getTarget The entity no longer being tracked.
      */
-    record StopTracking(Player getEntity, Entity getTarget) implements PlayerEvent {
+    record StopTracking(Player getEntity, Entity getTarget) implements RecordEvent, PlayerEvent {
         public static final EventBus<StopTracking> BUS = EventBus.create(StopTracking.class);
     }
 
@@ -228,7 +228,7 @@ public interface PlayerEvent extends LivingEvent {
      * allow mods to load an additional file from the players directory
      * containing additional mod related player data.
      */
-    record LoadFromFile(Player getEntity, File getPlayerDirectory, String getPlayerUUID) implements PlayerEvent {
+    record LoadFromFile(Player getEntity, File getPlayerDirectory, String getPlayerUUID) implements RecordEvent, PlayerEvent {
         public static final EventBus<LoadFromFile> BUS = EventBus.create(LoadFromFile.class);
 
         /**
@@ -269,7 +269,7 @@ public interface PlayerEvent extends LivingEvent {
      * <em>WARNING</em>: Do not overwrite the player's .dat file here. You will
      * corrupt the world state.
      */
-    record SaveToFile(Player getEntity, File getPlayerDirectory, String getPlayerUUID) implements PlayerEvent {
+    record SaveToFile(Player getEntity, File getPlayerDirectory, String getPlayerUUID) implements RecordEvent, PlayerEvent {
         public static final EventBus<SaveToFile> BUS = EventBus.create(SaveToFile.class);
 
         /**
@@ -302,28 +302,30 @@ public interface PlayerEvent extends LivingEvent {
      * @param getOriginalEntity Original EntityItem with current remaining stack size
      * @param getStack Clone item stack, containing the item and amount picked up
      */
-    record ItemPickupEvent(Player getEntity, ItemEntity getOriginalEntity, ItemStack getStack) implements PlayerEvent {
+    record ItemPickupEvent(Player getEntity, ItemEntity getOriginalEntity, ItemStack getStack)
+            implements RecordEvent, PlayerEvent {
         public static final EventBus<ItemPickupEvent> BUS = EventBus.create(ItemPickupEvent.class);
     }
 
-    record ItemCraftedEvent(Player getEntity, @NotNull ItemStack getCrafting, Container getContainer) implements PlayerEvent {
+    record ItemCraftedEvent(Player getEntity, @NotNull ItemStack getCrafting, Container getContainer)
+            implements RecordEvent, PlayerEvent {
         public static final EventBus<ItemCraftedEvent> BUS = EventBus.create(ItemCraftedEvent.class);
     }
 
     @NullMarked
-    record ItemSmeltedEvent(Player getEntity, ItemStack getSmelting) implements PlayerEvent {
+    record ItemSmeltedEvent(Player getEntity, ItemStack getSmelting) implements RecordEvent, PlayerEvent {
         public static final EventBus<ItemSmeltedEvent> BUS = EventBus.create(ItemSmeltedEvent.class);
     }
 
-    record PlayerLoggedInEvent(Player getEntity) implements PlayerEvent {
+    record PlayerLoggedInEvent(Player getEntity) implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerLoggedInEvent> BUS = EventBus.create(PlayerLoggedInEvent.class);
     }
 
-    record PlayerLoggedOutEvent(Player getEntity) implements PlayerEvent {
+    record PlayerLoggedOutEvent(Player getEntity) implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerLoggedOutEvent> BUS = EventBus.create(PlayerLoggedOutEvent.class);
     }
 
-    record PlayerRespawnEvent(Player getEntity, boolean isEndConquered) implements PlayerEvent {
+    record PlayerRespawnEvent(Player getEntity, boolean isEndConquered) implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerRespawnEvent> BUS = EventBus.create(PlayerRespawnEvent.class);
 
         /**
@@ -335,11 +337,8 @@ public interface PlayerEvent extends LivingEvent {
         }
     }
 
-    record PlayerChangedDimensionEvent(
-            Player getEntity,
-            ResourceKey<Level> getFrom,
-            ResourceKey<Level> getTo
-    ) implements PlayerEvent {
+    record PlayerChangedDimensionEvent(Player getEntity, ResourceKey<Level> getFrom, ResourceKey<Level> getTo)
+            implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerChangedDimensionEvent> BUS = EventBus.create(PlayerChangedDimensionEvent.class);
     }
 
@@ -347,7 +346,7 @@ public interface PlayerEvent extends LivingEvent {
      * Fired when the game type of a server player is changed to a different value than what it was previously. Eg Creative to Survival, not Survival to Survival.
      * If the event is cancelled the game mode of the player is not changed and the value of <code>newGameMode</code> is ignored.
      */
-    final class PlayerChangeGameModeEvent implements Cancellable, PlayerEvent {
+    final class PlayerChangeGameModeEvent extends MutableEvent implements Cancellable, PlayerEvent {
         public static final CancellableEventBus<PlayerChangeGameModeEvent> BUS = CancellableEventBus.create(PlayerChangeGameModeEvent.class);
 
         private final Player player;

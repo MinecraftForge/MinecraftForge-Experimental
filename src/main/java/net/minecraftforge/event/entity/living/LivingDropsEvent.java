@@ -12,6 +12,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -32,6 +33,6 @@ public record LivingDropsEvent(
         DamageSource getSource,
         Collection<ItemEntity> getDrops,
         boolean isRecentlyHit
-) implements Cancellable, LivingEvent {
+) implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingDropsEvent> BUS = CancellableEventBus.create(LivingDropsEvent.class);
 }

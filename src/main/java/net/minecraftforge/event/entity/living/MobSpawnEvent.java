@@ -40,9 +40,7 @@ import net.minecraftforge.fml.LogicalSide;
  * <p>
  * {@link AllowDespawn} is not related to the mob spawn event flow, as it fires when a despawn is attempted.
  */
-public abstract sealed class MobSpawnEvent implements EntityEvent {
-    public static final EventBus<MobSpawnEvent> BUS = EventBus.create(MobSpawnEvent.class);
-
+public abstract sealed class MobSpawnEvent extends MutableEvent implements EntityEvent {
     private final Mob entity;
     private final ServerLevelAccessor level;
     private final double x;

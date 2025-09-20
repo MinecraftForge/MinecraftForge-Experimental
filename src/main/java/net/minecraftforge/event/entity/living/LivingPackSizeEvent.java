@@ -9,10 +9,11 @@ import net.minecraftforge.common.util.HasResult;
 import net.minecraft.world.entity.Mob;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jspecify.annotations.NullMarked;
 
 @NullMarked
-public final class LivingPackSizeEvent implements LivingEvent, HasResult {
+public final class LivingPackSizeEvent extends MutableEvent implements LivingEvent, HasResult {
     public static final EventBus<LivingPackSizeEvent> BUS = EventBus.create(LivingPackSizeEvent.class);
 
     private final Mob entity;

@@ -10,6 +10,7 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -18,7 +19,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * Forge fires this event for applicable vanilla animals, mods need to fire it themselves.
  * This event is {@linkplain Cancellable cancellable}. If cancelled, taming the animal will fail.
  */
-public record AnimalTameEvent(Animal getAnimal, Player getTamer) implements Cancellable, LivingEvent {
+public record AnimalTameEvent(Animal getAnimal, Player getTamer) implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<AnimalTameEvent> BUS = CancellableEventBus.create(AnimalTameEvent.class);
 
     @Override

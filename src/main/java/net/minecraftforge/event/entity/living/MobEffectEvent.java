@@ -15,6 +15,7 @@ import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-public sealed interface MobEffectEvent extends LivingEvent {
+public sealed interface MobEffectEvent extends LivingEvent, InheritableEvent {
     EventBus<MobEffectEvent> BUS = EventBus.create(MobEffectEvent.class);
 
     @Nullable

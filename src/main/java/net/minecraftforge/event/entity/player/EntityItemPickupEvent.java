@@ -10,6 +10,7 @@ import net.minecraftforge.common.util.Result;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -22,7 +23,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *
  *  setResult(ALLOW) is the same as the old setHandled()
  */
-public final class EntityItemPickupEvent implements Cancellable, PlayerEvent, HasResult {
+public final class EntityItemPickupEvent extends MutableEvent implements Cancellable, PlayerEvent, HasResult {
     public static final CancellableEventBus<EntityItemPickupEvent> BUS = CancellableEventBus.create(EntityItemPickupEvent.class);
 
     private final Player player;

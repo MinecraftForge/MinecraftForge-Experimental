@@ -9,6 +9,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import org.jspecify.annotations.NullMarked;
 
 /**
@@ -16,6 +17,6 @@ import org.jspecify.annotations.NullMarked;
  * @param getStack The ItemStack of the potion.
  */
 @NullMarked
-public record PlayerBrewedPotionEvent(Player getEntity, ItemStack getStack) implements PlayerEvent {
+public record PlayerBrewedPotionEvent(Player getEntity, ItemStack getStack) implements RecordEvent, PlayerEvent {
     public static final EventBus<PlayerBrewedPotionEvent> BUS = EventBus.create(PlayerBrewedPotionEvent.class);
 }

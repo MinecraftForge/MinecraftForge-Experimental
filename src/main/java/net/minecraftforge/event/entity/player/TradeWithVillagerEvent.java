@@ -9,6 +9,7 @@ import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -24,7 +25,7 @@ public record TradeWithVillagerEvent(
         Player getEntity,
         MerchantOffer getMerchantOffer,
         AbstractVillager getAbstractVillager
-) implements PlayerEvent {
+) implements RecordEvent, PlayerEvent {
     public static final EventBus<TradeWithVillagerEvent> BUS = EventBus.create(TradeWithVillagerEvent.class);
 
     @ApiStatus.Internal

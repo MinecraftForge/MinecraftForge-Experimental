@@ -9,13 +9,11 @@ import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
-import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
-public sealed abstract class LivingSwapItemsEvent implements LivingEvent {
-    public static final EventBus<LivingSwapItemsEvent> EVENT_BUS = EventBus.create(LivingSwapItemsEvent.class);
-
+public sealed abstract class LivingSwapItemsEvent extends MutableEvent implements LivingEvent {
     private final LivingEntity entity;
 
     @ApiStatus.Internal
@@ -32,7 +30,7 @@ public sealed abstract class LivingSwapItemsEvent implements LivingEvent {
      * This event is fired when a living entity is about to swap the items in their main and offhand.
      * This event is executed in {@link ServerGamePacketListenerImpl#handlePlayerAction}
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      */
     public static final class Hands extends LivingSwapItemsEvent implements Cancellable {
         public static final CancellableEventBus<Hands> BUS = CancellableEventBus.create(Hands.class);

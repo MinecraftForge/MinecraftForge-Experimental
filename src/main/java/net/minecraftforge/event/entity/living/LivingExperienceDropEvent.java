@@ -8,6 +8,7 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -18,7 +19,7 @@ import org.jspecify.annotations.Nullable;
  * by canceling the event.
  */
 @NullMarked
-public final class LivingExperienceDropEvent implements Cancellable, LivingEvent {
+public final class LivingExperienceDropEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingExperienceDropEvent> BUS = CancellableEventBus.create(LivingExperienceDropEvent.class);
 
     private final LivingEntity entity;

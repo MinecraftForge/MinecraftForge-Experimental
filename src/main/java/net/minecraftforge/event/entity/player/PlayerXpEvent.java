@@ -10,6 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 
@@ -21,14 +23,12 @@ import org.jspecify.annotations.NullMarked;
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  */
 public sealed interface PlayerXpEvent extends PlayerEvent {
-    EventBus<PlayerXpEvent> BUS = EventBus.create(PlayerXpEvent.class);
-
     /**
      * This event is fired after the player collides with an experience orb, but before the player has been given the experience.
      * It can be cancelled, and no further processing will be done.
      */
     @NullMarked
-    record PickupXp(Player getEntity, ExperienceOrb getOrb) implements Cancellable, PlayerXpEvent {
+    record PickupXp(Player getEntity, ExperienceOrb getOrb) implements Cancellable, PlayerXpEvent, RecordEvent {
         public static final CancellableEventBus<PickupXp> BUS = CancellableEventBus.create(PickupXp.class);
     }
 
@@ -37,7 +37,7 @@ public sealed interface PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     @NullMarked
-    final class XpChange implements Cancellable, PlayerXpEvent {
+    final class XpChange extends MutableEvent implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
 
         private final Player player;
@@ -67,7 +67,7 @@ public sealed interface PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     @NullMarked
-    final class LevelChange implements Cancellable, PlayerXpEvent {
+    final class LevelChange extends MutableEvent implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
 
         private final Player player;

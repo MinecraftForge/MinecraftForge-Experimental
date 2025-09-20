@@ -6,10 +6,11 @@
 package net.minecraftforge.event.entity;
 
 import net.minecraft.world.entity.Entity;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * EntityMobGriefingEvent is fired when mob griefing is about to occur and allows an event listener to specify whether it should or not.<br>
@@ -21,9 +22,9 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  * <li>{@link Result#DEFAULT} means the {@code mobGriefing} game rule is used to determine the behaviour.</li>
  * <li>{@link Result#DENY} means this instance of mob griefing is not allowed.</li>
  * </ul>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-public final class EntityMobGriefingEvent implements EntityEvent, HasResult {
+@NullMarked
+public final class EntityMobGriefingEvent extends MutableEvent implements EntityEvent, HasResult {
     public static final EventBus<EntityMobGriefingEvent> BUS = EventBus.create(EntityMobGriefingEvent.class);
 
     private final Entity entity;

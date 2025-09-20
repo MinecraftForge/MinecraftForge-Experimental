@@ -28,6 +28,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 
@@ -42,7 +43,7 @@ import java.util.Objects;
  * All subclasses are fired on {@link MinecraftForge#EVENT_BUS}.
  * See the individual documentation on each subevent for more details.
  **/
-public sealed abstract class PlayerInteractEvent implements PlayerEvent {
+public sealed abstract class PlayerInteractEvent implements PlayerEvent, InheritableEvent {
     public static final EventBus<PlayerInteractEvent> BUS = EventBus.create(PlayerInteractEvent.class);
 
     private final Player player;

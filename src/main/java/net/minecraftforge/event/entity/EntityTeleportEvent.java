@@ -13,6 +13,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -20,15 +21,10 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * EntityTeleportEvent is fired when an event involving any teleportation of an Entity occurs.<br>
- * If a method utilizes this {@link Event} as its parameter, the method will
- * receive every child event of this class.<br>
- * <br>
  * {@link #getTarget()} contains the target destination.<br>
  * {@link #getPrev()} contains the entity's current position.<br>
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  **/
-public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
+public sealed abstract class EntityTeleportEvent implements Cancellable, EntityEvent, InheritableEvent {
     public static final CancellableEventBus<EntityTeleportEvent> BUS = CancellableEventBus.create(EntityTeleportEvent.class);
 
     private final Entity entity;
@@ -36,7 +32,7 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
     protected double targetY;
     protected double targetZ;
 
-    public EntityTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
+    protected EntityTeleportEvent(Entity entity, double targetX, double targetY, double targetZ) {
         this.entity = entity;
         this.targetX = targetX;
         this.targetY = targetY;
@@ -64,16 +60,9 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
      * EntityTeleportEvent.TeleportCommand is fired before a living entity is teleported
      * from use of {@link net.minecraft.server.commands.TeleportCommand}.
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If the event is not canceled, the entity will be teleported.
+     * This event is {@link Cancellable}. If the event is cancelled, the entity will not be teleported.
      * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     * <br>
-     * This event is only fired on the {@link LogicalSide#SERVER} side.<br>
-     * <br>
-     * If this event is canceled, the entity will not be teleported.
+     * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
     public static final class TeleportCommand extends EntityTeleportEvent {
         public static final CancellableEventBus<TeleportCommand> BUS = CancellableEventBus.create(TeleportCommand.class);
@@ -87,16 +76,9 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
      * EntityTeleportEvent.SpreadPlayersCommand is fired before a living entity is teleported
      * from use of {@link net.minecraft.server.commands.SpreadPlayersCommand}.
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If the event is not canceled, the entity will be teleported.
+     * This event is {@linkplain Cancellable cancellable}. If the event is cancelled, the entity will not be teleported.
      * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     * <br>
-     * This event is only fired on the {@link LogicalSide#SERVER} side.<br>
-     * <br>
-     * If this event is canceled, the entity will not be teleported.
+     * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
     public static final class SpreadPlayersCommand extends EntityTeleportEvent {
         public static final CancellableEventBus<SpreadPlayersCommand> BUS = CancellableEventBus.create(SpreadPlayersCommand.class);
@@ -109,16 +91,9 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
     /**
      * EntityTeleportEvent.EnderEntity is fired before an Enderman or Shulker randomly teleports.
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If the event is not canceled, the entity will be teleported.
+     * This event is {@linkplain Cancellable cancelable}. If the event is cancelled, the entity will not be teleported.
      * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     * <br>
-     * This event is only fired on the {@link LogicalSide#SERVER} side.<br>
-     * <br>
-     * If this event is canceled, the entity will not be teleported.
+     * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
     public static final class EnderEntity extends EntityTeleportEvent {
         public static final CancellableEventBus<EnderEntity> BUS = CancellableEventBus.create(EnderEntity.class);
@@ -138,16 +113,9 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
     /**
      * EntityTeleportEvent.EnderPearl is fired before an Entity is teleported from an EnderPearlEntity.
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If the event is not canceled, the entity will be teleported.
+     * This event is {@linkplain Cancellable cancellable}. If the event is cancelled, the entity will not be teleported.
      * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     * <br>
-     * This event is only fired on the {@link LogicalSide#SERVER} side.<br>
-     * <br>
-     * If this event is canceled, the entity will not be teleported.
+     * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
     public static final class EnderPearl extends EntityTeleportEvent {
         public static final CancellableEventBus<EnderPearl> BUS = CancellableEventBus.create(EnderPearl.class);
@@ -191,16 +159,9 @@ public sealed class EntityTeleportEvent implements Cancellable, EntityEvent {
     /**
      * EntityTeleportEvent.ChorusFruit is fired before a LivingEntity is teleported due to consuming Chorus Fruit.
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If the event is not canceled, the entity will be teleported.
+     * This event is {@linkplain Cancellable cancellable}. If the event is cancelled, the entity will not be teleported.
      * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
-     * <br>
-     * This event is only fired on the {@link LogicalSide#SERVER} side.<br>
-     * <br>
-     * If this event is canceled, the entity will not be teleported.
+     * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
     public static final class ChorusFruit extends EntityTeleportEvent {
         public static final CancellableEventBus<ChorusFruit> BUS = CancellableEventBus.create(ChorusFruit.class);

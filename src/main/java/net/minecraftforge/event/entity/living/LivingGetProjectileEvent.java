@@ -8,20 +8,15 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 
 /**
  * This event is fired when a living entity attempts to get a projectile with the
  * {@link LivingEntity#getProjectile(ItemStack)} method. The item stack given is usually the item stack of a
  * {@link net.minecraft.world.item.ProjectileWeaponItem} and the item stack returned is usually the item stack of a
  * {@link net.minecraft.world.entity.projectile.Projectile}.
- * <p>
- * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.
- * <p>
- * This event does not have a result. {@link net.minecraftforge.eventbus.api.Event.HasResult}
- * <p>
- * This event is fired on the {@link net.minecraftforge.common.MinecraftForge#EVENT_BUS}.
  */
-public final class LivingGetProjectileEvent implements LivingEvent {
+public final class LivingGetProjectileEvent extends MutableEvent implements LivingEvent {
     public static final EventBus<LivingGetProjectileEvent> BUS = EventBus.create(LivingGetProjectileEvent.class);
 
     private final LivingEntity entity;

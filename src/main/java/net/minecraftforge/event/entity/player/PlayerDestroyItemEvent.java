@@ -20,6 +20,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -45,10 +46,7 @@ import org.jspecify.annotations.Nullable;
  * @param getSlot May be null if this player destroys the item by any use besides holding it.
  **/
 @NullMarked
-public record PlayerDestroyItemEvent(
-        Player getEntity,
-        ItemStack getOriginal,
-        @Nullable EquipmentSlot getSlot
-) implements PlayerEvent {
+public record PlayerDestroyItemEvent(Player getEntity, ItemStack getOriginal, @Nullable EquipmentSlot getSlot)
+        implements PlayerEvent, RecordEvent {
     public static final EventBus<PlayerDestroyItemEvent> BUS = EventBus.create(PlayerDestroyItemEvent.class);
 }

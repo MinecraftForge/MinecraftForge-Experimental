@@ -11,18 +11,16 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.NotNull;
 
 /**
  * ArrowNockEvent is fired when a player begins using a bow.<br>
  * This event is fired whenever a player begins using a bow in
- * {@link BowItem#use(Level, Player, InteractionHand)}.<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * {@link BowItem#use(Level, Player, InteractionHand)}.
  **/
-public final class ArrowNockEvent implements PlayerEvent {
+public final class ArrowNockEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<ArrowNockEvent> BUS = EventBus.create(ArrowNockEvent.class);
 
     private final Player player;

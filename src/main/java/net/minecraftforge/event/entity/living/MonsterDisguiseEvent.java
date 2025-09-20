@@ -9,6 +9,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.extensions.IForgeItem;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -20,9 +21,6 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *
  * @param getPlayer The player that is being checked.
  */
-public record MonsterDisguiseEvent(
-        Monster getEntity,
-        Player getPlayer
-) implements Cancellable, LivingEvent {
+public record MonsterDisguiseEvent(Monster getEntity, Player getPlayer) implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<MonsterDisguiseEvent> BUS = CancellableEventBus.create(MonsterDisguiseEvent.class);
 }

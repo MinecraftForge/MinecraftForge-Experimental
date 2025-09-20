@@ -11,6 +11,7 @@ import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 import javax.annotation.Nonnegative;
@@ -22,7 +23,7 @@ import java.util.List;
  * This event is {@linkplain Cancellable cancellable}. If cancelled, the player will not receive any items, but the hook
  * will still take the damage specified
  */
-public final class ItemFishedEvent implements Cancellable, PlayerEvent {
+public final class ItemFishedEvent extends MutableEvent implements Cancellable, PlayerEvent {
     public static final CancellableEventBus<ItemFishedEvent> BUS = CancellableEventBus.create(ItemFishedEvent.class);
 
     private final Player player;

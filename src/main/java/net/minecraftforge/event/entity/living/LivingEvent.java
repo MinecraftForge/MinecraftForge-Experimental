@@ -7,12 +7,13 @@ package net.minecraftforge.event.entity.living;
 
 import net.minecraft.world.entity.Entity;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,8 +21,6 @@ import org.jetbrains.annotations.Nullable;
  * LivingEvent is fired whenever an event involving a {@link LivingEntity} occurs.
  */
 public interface LivingEvent extends EntityEvent {
-    EventBus<LivingEvent> BUS = EventBus.create(LivingEvent.class);
-
     @Override
     LivingEntity getEntity();
 
@@ -30,14 +29,9 @@ public interface LivingEvent extends EntityEvent {
      * <br>
      * This event is fired via the {@link ForgeEventFactory#onLivingTick(LivingEntity)}.<br>
      * <br>
-     * This event is {@link Cancelable}.<br>
-     * If this event is canceled, the Entity does not update.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
-     **/
-    record LivingTickEvent(LivingEntity getEntity) implements Cancellable, LivingEvent {
+     * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity does not update.
+     */
+    record LivingTickEvent(LivingEntity getEntity) implements Cancellable, LivingEvent, RecordEvent {
         public static final CancellableEventBus<LivingTickEvent> BUS = CancellableEventBus.create(LivingTickEvent.class);
     }
 
@@ -47,19 +41,13 @@ public interface LivingEvent extends EntityEvent {
      * {@code LivingEntity#jumpFromGround()}, {@code MagmaCube#jumpFromGround()},
      * and {@code Horse#jumpFromGround()}.<br>
      * <br>
-     * This event is fired via the {@link ForgeHooks#onLivingJump(LivingEntity)}.<br>
-     * <br>
-     * This event is not {@link Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
-     * <br>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+     * This event is fired via the {@link ForgeHooks#onLivingJump(LivingEntity)}.
      **/
-    record LivingJumpEvent(LivingEntity getEntity) implements LivingEvent {
+    record LivingJumpEvent(LivingEntity getEntity) implements LivingEvent, RecordEvent {
         public static final EventBus<LivingJumpEvent> BUS = EventBus.create(LivingJumpEvent.class);
     }
 
-    final class LivingVisibilityEvent implements LivingEvent {
+    final class LivingVisibilityEvent extends MutableEvent implements LivingEvent {
         public static final EventBus<LivingVisibilityEvent> BUS = EventBus.create(LivingVisibilityEvent.class);
 
         private final LivingEntity livingEntity;

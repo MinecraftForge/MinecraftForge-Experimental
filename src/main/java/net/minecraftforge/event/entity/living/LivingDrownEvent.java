@@ -6,6 +6,7 @@
 package net.minecraftforge.event.entity.living;
 
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -24,7 +25,7 @@ import net.minecraftforge.common.ForgeHooks;
  * a value of {@code false}.
  * <p>
  **/
-public final class LivingDrownEvent implements Cancellable, LivingEvent {
+public final class LivingDrownEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingDrownEvent> BUS = CancellableEventBus.create(LivingDrownEvent.class);
 
     private final LivingEntity entity;

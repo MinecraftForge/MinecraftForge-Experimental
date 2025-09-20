@@ -10,6 +10,7 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
 
 /**
@@ -18,8 +19,6 @@ import net.minecraftforge.fml.LogicalSide;
  * @see AdvancementProgressEvent
  */
 public sealed interface AdvancementEvent extends PlayerEvent {
-    EventBus<AdvancementEvent> BUS = EventBus.create(AdvancementEvent.class);
-
     AdvancementHolder getAdvancement();
 
     /**
@@ -32,7 +31,8 @@ public sealed interface AdvancementEvent extends PlayerEvent {
      *
      * @see AdvancementProgress#isDone()
      */
-    record AdvancementEarnEvent(Player getEntity, AdvancementHolder getAdvancement) implements AdvancementEvent {
+    record AdvancementEarnEvent(Player getEntity, AdvancementHolder getAdvancement)
+            implements RecordEvent, AdvancementEvent {
         public static final EventBus<AdvancementEarnEvent> BUS = EventBus.create(AdvancementEarnEvent.class);
     }
 
@@ -55,7 +55,7 @@ public sealed interface AdvancementEvent extends PlayerEvent {
             AdvancementProgress getAdvancementProgress,
             String getCriterionName,
             ProgressType getProgressType
-    ) implements AdvancementEvent {
+    ) implements RecordEvent, AdvancementEvent {
         public static final EventBus<AdvancementProgressEvent> BUS = EventBus.create(AdvancementProgressEvent.class);
 
         public enum ProgressType {

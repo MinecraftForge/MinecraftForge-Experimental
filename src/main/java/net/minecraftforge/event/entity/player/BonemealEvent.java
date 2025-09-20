@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,7 +28,7 @@ import org.jetbrains.annotations.Nullable;
  * setResult(ALLOW) is the same as the old setHandled()
  */
 // TODO: Redesign BonemealEvent the whole thing, it doens't make sense.
-public final class BonemealEvent implements Cancellable, PlayerEvent, HasResult {
+public final class BonemealEvent extends MutableEvent implements Cancellable, PlayerEvent, HasResult {
     public static final CancellableEventBus<BonemealEvent> BUS = CancellableEventBus.create(BonemealEvent.class);
 
     private final Player player;

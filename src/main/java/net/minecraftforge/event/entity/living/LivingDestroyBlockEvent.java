@@ -12,6 +12,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -20,10 +21,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the block will not be destroyed.
  **/
-public record LivingDestroyBlockEvent(
-        LivingEntity getEntity,
-        BlockPos getPos,
-        BlockState getState
-) implements Cancellable, LivingEvent {
+public record LivingDestroyBlockEvent(LivingEntity getEntity, BlockPos getPos, BlockState getState)
+        implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingDestroyBlockEvent> BUS = CancellableEventBus.create(LivingDestroyBlockEvent.class);
 }

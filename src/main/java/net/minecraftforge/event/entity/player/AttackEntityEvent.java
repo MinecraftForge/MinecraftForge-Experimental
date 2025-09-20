@@ -8,6 +8,7 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -19,6 +20,6 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the player does not attack the Entity.
  **/
-public record AttackEntityEvent(Player getEntity, Entity getTarget) implements Cancellable, PlayerEvent {
+public record AttackEntityEvent(Player getEntity, Entity getTarget) implements Cancellable, PlayerEvent, RecordEvent {
     public static final CancellableEventBus<AttackEntityEvent> BUS = CancellableEventBus.create(AttackEntityEvent.class);
 }

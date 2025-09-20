@@ -14,13 +14,14 @@ import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.eventbus.api.event.InheritableEvent;
 
 /**
  * ZombieEvent is fired whenever a zombie is spawned for aid.
  * If a method utilizes this event as its parameter, the method will
  * receive every child event of this class.
  **/
-public sealed abstract class ZombieEvent implements EntityEvent {
+public sealed abstract class ZombieEvent implements EntityEvent, InheritableEvent {
     public static final EventBus<ZombieEvent> BUS = EventBus.create(ZombieEvent.class);
 
     private final Zombie zombie;

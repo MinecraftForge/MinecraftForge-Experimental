@@ -11,6 +11,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.BlockPos;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * <p>
  * The event can be canceled, which will prevent the spawn point from being changed.
  */
-public final class PlayerSetSpawnEvent implements Cancellable, PlayerEvent {
+public final class PlayerSetSpawnEvent extends MutableEvent implements Cancellable, PlayerEvent {
     public static final CancellableEventBus<PlayerSetSpawnEvent> BUS = CancellableEventBus.create(PlayerSetSpawnEvent.class);
 
     private final Player player;

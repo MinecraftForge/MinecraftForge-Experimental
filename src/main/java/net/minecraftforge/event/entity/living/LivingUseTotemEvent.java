@@ -10,6 +10,7 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 
@@ -26,7 +27,7 @@ public record LivingUseTotemEvent(
         DamageSource getSource,
         ItemStack getTotem,
         InteractionHand getHandHolding
-) implements Cancellable, LivingEvent {
+) implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingUseTotemEvent> BUS = CancellableEventBus.create(LivingUseTotemEvent.class);
 
     /**

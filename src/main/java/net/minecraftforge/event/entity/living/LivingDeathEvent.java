@@ -11,6 +11,7 @@ import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
 /**
@@ -22,11 +23,11 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired via the {@link ForgeEventFactory#onLivingDeath(LivingEntity, DamageSource)}.<br>
  * <br>
- * {@link #source} contains the DamageSource that caused the entity to die. <br>
- * <br>
- * This event is {@link Cancelable}.<br>
- * If this event is canceled, the Entity does not die.
- **/
-public record LivingDeathEvent(LivingEntity getEntity, DamageSource getSource) implements Cancellable, LivingEvent {
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity does not die.
+ *
+ * @param getSource the source of the damage that caused the entity to die
+ */
+public record LivingDeathEvent(LivingEntity getEntity, DamageSource getSource)
+        implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingDeathEvent> BUS = CancellableEventBus.create(LivingDeathEvent.class);
 }
