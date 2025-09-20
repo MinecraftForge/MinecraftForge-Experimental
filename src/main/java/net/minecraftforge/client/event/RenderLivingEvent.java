@@ -15,8 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -35,66 +34,39 @@ import org.jetbrains.annotations.ApiStatus;
  * @see RenderPlayerEvent
  * @see LivingEntityRenderer
  */
-public abstract sealed class RenderLivingEvent<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends MutableEvent implements InheritableEvent {
-    public static final EventBus<RenderLivingEvent> BUS = EventBus.create(RenderLivingEvent.class);
-
-    private final S state;
-    private final LivingEntityRenderer<T, S, M> renderer;
-    private final PoseStack poseStack;
-    private final MultiBufferSource multiBufferSource;
-    private final int packedLight;
-
-    @ApiStatus.Internal
-    protected RenderLivingEvent(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-        this.state = state;
-        this.renderer = renderer;
-        this.poseStack = poseStack;
-        this.multiBufferSource = multiBufferSource;
-        this.packedLight = packedLight;
-    }
-
+public sealed interface RenderLivingEvent<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
     /**
      * @return the living entity being rendered
      */
-    public S getState() {
-        return state;
-    }
+    S getState();
 
     /**
      * @return the renderer for the living entity
      */
-    public LivingEntityRenderer<T, S, M> getRenderer() {
-        return renderer;
-    }
+    LivingEntityRenderer<T, S, M> getRenderer();
 
     /**
      * {@return the pose stack used for rendering}
      */
-    public PoseStack getPoseStack() {
-        return poseStack;
-    }
+    PoseStack getPoseStack();
 
     /**
      * {@return the source of rendering buffers}
      */
-    public MultiBufferSource getMultiBufferSource() {
-        return multiBufferSource;
-    }
+    MultiBufferSource getMultiBufferSource();
 
     /**
      * {@return the amount of packed (sky and block) light for rendering}
      *
      * @see LightTexture
      */
-    public int getPackedLight() {
-        return packedLight;
-    }
+    int getPackedLight();
 
     /**
      * Fired <b>before</b> an entity is rendered.
      * This can be used to render additional effects or suppress rendering.
      *
-     * <p>This event is {@linkplain Cancelable cancelable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancelable}.
      * If this event is cancelled, then the entity will not be rendered and the corresponding
      * {@link RenderLivingEvent.Post} will not be fired.</p>
      *
@@ -104,19 +76,21 @@ public abstract sealed class RenderLivingEvent<T extends LivingEntity, S extends
      * @param <T> the living entity that is being rendered
      * @param <M> the model for the living entity
      */
-    public static final class Pre<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLivingEvent<T, S, M> implements Cancellable {
+    record Pre<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>(
+            S getState,
+            LivingEntityRenderer<T, S, M> getRenderer,
+            PoseStack getPoseStack,
+            MultiBufferSource getMultiBufferSource,
+            int getPackedLight
+    ) implements Cancellable, RenderLivingEvent<T, S, M>, RecordEvent {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
         @ApiStatus.Internal
-        public Pre(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-            super(state, renderer, poseStack, multiBufferSource, packedLight);
-        }
+        public Pre {}
     }
 
     /**
      * Fired <b>after</b> an entity is rendered, if the corresponding {@link RenderLivingEvent.Post} is not cancelled.
-     *
-     * <p>This event is not {@linkplain Cancelable cancelable}, and does not {@linkplain HasResult have a result}.</p>
      *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
@@ -124,12 +98,16 @@ public abstract sealed class RenderLivingEvent<T extends LivingEntity, S extends
      * @param <T> the living entity that was rendered
      * @param <M> the model for the living entity
      */
-    public static final class Post<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> extends RenderLivingEvent<T, S, M> {
+    record Post<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>>(
+            S getState,
+            LivingEntityRenderer<T, S, M> getRenderer,
+            PoseStack getPoseStack,
+            MultiBufferSource getMultiBufferSource,
+            int getPackedLight
+    ) implements RecordEvent, RenderLivingEvent<T, S, M> {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
         @ApiStatus.Internal
-        public Post(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-            super(state, renderer, poseStack, multiBufferSource, packedLight);
-        }
+        public Post {}
     }
 }
