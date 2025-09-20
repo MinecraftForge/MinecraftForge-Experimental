@@ -18,7 +18,6 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Collections;
@@ -28,10 +27,7 @@ import java.util.Map;
 /**
  * Houses events related to models.
  */
-public abstract sealed class ModelEvent {
-    @ApiStatus.Internal
-    protected ModelEvent() {}
-
+public sealed interface ModelEvent {
     /**
      * Fired while the {@link ModelManager} is reloading models, after the model registry is set up, but before it's
      * passed to the {@link net.minecraft.client.renderer.block.BlockModelShaper} for caching.
@@ -43,38 +39,19 @@ public abstract sealed class ModelEvent {
      * must therefore not be accessed in this event.
      * </p>
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
-     * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * @param getModelBakery the model loader
+     * @param getResults the modifiable registry map of models and their model names
      */
-    public static final class ModifyBakingResult extends ModelEvent implements IModBusEvent {
+    record ModifyBakingResult(ModelBakery getModelBakery, ModelBakery.BakingResult getResults)
+            implements IModBusEvent, ModelEvent {
         public static EventBus<ModifyBakingResult> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, ModifyBakingResult.class);
         }
 
-        private final ModelBakery modelBakery;
-        private final ModelBakery.BakingResult results;
-
         @ApiStatus.Internal
-        public ModifyBakingResult(ModelBakery modelBakery, ModelBakery.BakingResult results) {
-            this.modelBakery = modelBakery;
-            this.results = results;
-        }
-
-        /**
-         * @return the modifiable registry map of models and their model names
-         */
-        public ModelBakery.BakingResult getResults() {
-            return results;
-        }
-
-        /**
-         * @return the model loader
-         */
-        public ModelBakery getModelBakery() {
-            return modelBakery;
-        }
+        public ModifyBakingResult {}
     }
 
     /**
@@ -83,38 +60,19 @@ public abstract sealed class ModelEvent {
      * The model registry given by this event is unmodifiable. To modify the model registry, use
      * {@link ModelEvent.ModifyBakingResult} instead.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
-     * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * @param getModelManager the model manager
+     * @param getModelBakery the model loader
      */
-    public static final class BakingCompleted extends ModelEvent implements IModBusEvent {
+    record BakingCompleted(ModelManager getModelManager, ModelBakery getModelBakery)
+            implements IModBusEvent, ModelEvent {
         public static EventBus<BakingCompleted> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, BakingCompleted.class);
         }
 
-        private final ModelManager modelManager;
-        private final ModelBakery modelBakery;
-
         @ApiStatus.Internal
-        public BakingCompleted(ModelManager modelManager, ModelBakery modelBakery) {
-            this.modelManager = modelManager;
-            this.modelBakery = modelBakery;
-        }
-
-        /**
-         * @return the model manager
-         */
-        public ModelManager getModelManager() {
-            return modelManager;
-        }
-
-        /**
-         * @return the model loader
-         */
-        public ModelBakery getModelBakery() {
-            return modelBakery;
-        }
+        public BakingCompleted {}
     }
 
     /**
@@ -123,10 +81,9 @@ public abstract sealed class ModelEvent {
      * This is designed to allow for extra models to be loaded in connection with a blockstates json file. This is not intended to allow
      * overriding or modification of StateDefinitions from registered Blocks
      *
-     * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class RegisterModelStateDefinitions extends ModelEvent implements IModBusEvent {
+    final class RegisterModelStateDefinitions implements IModBusEvent, ModelEvent {
         public static EventBus<RegisterModelStateDefinitions> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, RegisterModelStateDefinitions.class);
         }
@@ -155,12 +112,9 @@ public abstract sealed class ModelEvent {
     /**
      * Allows users to register their own {@link IGeometryLoader geometry loaders} for use in block/item models.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
-     * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class RegisterGeometryLoaders extends ModelEvent implements IModBusEvent {
+    final class RegisterGeometryLoaders implements IModBusEvent, ModelEvent {
         public static EventBus<RegisterGeometryLoaders> getBus(BusGroup modBusGroup) {
             return IModBusEvent.getBus(modBusGroup, RegisterGeometryLoaders.class);
         }
