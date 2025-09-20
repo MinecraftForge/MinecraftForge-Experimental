@@ -16,28 +16,11 @@ import org.jspecify.annotations.NullMarked;
  * stack of items outside the inventory GUI screens. Canceling the event will
  * stop the items from entering the world, but will not prevent them being
  * removed from the inventory - and thus removed from the system.
+ *
+ * @param getEntity The EntityItem being tossed.
+ * @param getPlayer The player tossing the item.
  */
 @NullMarked
-public final class ItemTossEvent extends ItemEvent implements Cancellable {
+public record ItemTossEvent(ItemEntity getEntity, Player getPlayer) implements Cancellable, ItemEvent {
     public static final CancellableEventBus<ItemTossEvent> BUS = CancellableEventBus.create(ItemTossEvent.class);
-
-    private final Player player;
-
-    /**
-     * Creates a new event for EntityItems tossed by a player.
-     * 
-     * @param entityItem The EntityItem being tossed.
-     * @param player The player tossing the item.
-     */
-    public ItemTossEvent(ItemEntity entityItem, Player player) {
-        super(entityItem);
-        this.player = player;
-    }
-
-    /**
-     * The player tossing the item.
-     */
-    public Player getPlayer() {
-        return player;
-    }
 }

@@ -17,9 +17,10 @@ import org.jspecify.annotations.NullMarked;
  * it will add more time to the entities life equal to extraLife.
  */
 @NullMarked
-public final class ItemExpireEvent extends ItemEvent implements Cancellable {
+public final class ItemExpireEvent implements Cancellable, ItemEvent {
     public static final CancellableEventBus<ItemExpireEvent> BUS = CancellableEventBus.create(ItemExpireEvent.class);
 
+    private final ItemEntity entityItem;
     private int extraLife;
 
     /**
@@ -29,8 +30,13 @@ public final class ItemExpireEvent extends ItemEvent implements Cancellable {
      * @param extraLife The amount of time to be added to this entities lifespan if the event is canceled.
      */
     public ItemExpireEvent(ItemEntity entityItem, int extraLife) {
-        super(entityItem);
+        this.entityItem = entityItem;
         this.setExtraLife(extraLife);
+    }
+
+    @Override
+    public ItemEntity getEntity() {
+        return entityItem;
     }
 
     public int getExtraLife() {

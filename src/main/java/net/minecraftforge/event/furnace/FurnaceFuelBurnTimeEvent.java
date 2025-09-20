@@ -29,7 +29,7 @@ public final class FurnaceFuelBurnTimeEvent extends MutableEvent implements Canc
     public static final CancellableEventBus<FurnaceFuelBurnTimeEvent> BUS = CancellableEventBus.create(FurnaceFuelBurnTimeEvent.class);
 
     private final ItemStack itemStack;
-    private final @org.jspecify.annotations.Nullable RecipeType<?> recipeType;
+    private final @Nullable RecipeType<?> recipeType;
     private int burnTime;
 
     public FurnaceFuelBurnTimeEvent(ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
