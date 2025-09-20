@@ -10,11 +10,9 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.entity.state.PlayerRenderState;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,92 +25,69 @@ import org.jetbrains.annotations.ApiStatus;
  * @see RenderPlayerEvent.Post
  * @see PlayerRenderer
  */
-public abstract sealed class RenderPlayerEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<RenderPlayerEvent> BUS = EventBus.create(RenderPlayerEvent.class);
-
-    private final PlayerRenderState state;
-    private final PlayerRenderer renderer;
-    private final PoseStack poseStack;
-    private final MultiBufferSource multiBufferSource;
-    private final int packedLight;
-
-    @ApiStatus.Internal
-    protected RenderPlayerEvent(PlayerRenderState state, PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-        this.state = state;
-        this.renderer = renderer;
-        this.poseStack = poseStack;
-        this.multiBufferSource = multiBufferSource;
-        this.packedLight = packedLight;
-    }
-
-    public PlayerRenderState getState() {
-        return this.state;
-    }
+public sealed interface RenderPlayerEvent {
+    PlayerRenderState getState();
 
     /**
      * {@return the player entity renderer}
      */
-    public PlayerRenderer getRenderer() {
-        return renderer;
-    }
+    PlayerRenderer getRenderer();
 
     /**
      * {@return the pose stack used for rendering}
      */
-    public PoseStack getPoseStack() {
-        return poseStack;
-    }
+    PoseStack getPoseStack();
 
     /**
      * {@return the source of rendering buffers}
      */
-    public MultiBufferSource getMultiBufferSource() {
-        return multiBufferSource;
-    }
+    MultiBufferSource getMultiBufferSource();
 
     /**
      * {@return the amount of packed (sky and block) light for rendering}
      *
      * @see LightTexture
      */
-    public int getPackedLight() {
-        return packedLight;
-    }
+    int getPackedLight();
 
     /**
      * Fired <b>before</b> the player is rendered.
      * This can be used for rendering additional effects or suppressing rendering.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the player will not be rendered and the corresponding
      * {@link RenderPlayerEvent.Post} will not be fired.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Pre extends RenderPlayerEvent implements Cancellable {
+    record Pre(
+            PlayerRenderState getState,
+            PlayerRenderer getRenderer,
+            PoseStack getPoseStack,
+            MultiBufferSource getMultiBufferSource,
+            int getPackedLight
+    ) implements Cancellable, RecordEvent, RenderPlayerEvent {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
         @ApiStatus.Internal
-        public Pre(PlayerRenderState state, PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-            super(state, renderer, poseStack, multiBufferSource, packedLight);
-        }
+        public Pre {}
     }
 
     /**
      * Fired <b>after</b> the player is rendered, if the corresponding {@link RenderPlayerEvent.Pre} is not cancelled.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Post extends RenderPlayerEvent {
+    record Post(
+            PlayerRenderState getState,
+            PlayerRenderer getRenderer,
+            PoseStack getPoseStack,
+            MultiBufferSource getMultiBufferSource,
+            int getPackedLight
+    ) implements RecordEvent, RenderPlayerEvent {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
         @ApiStatus.Internal
-        public Post(PlayerRenderState state, PlayerRenderer renderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
-            super(state, renderer, poseStack, multiBufferSource, packedLight);
-        }
+        public Post {}
     }
 }
