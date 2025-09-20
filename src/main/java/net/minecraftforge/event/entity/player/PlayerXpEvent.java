@@ -20,30 +20,16 @@ import org.jspecify.annotations.NullMarked;
  * <br>
  * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  */
-public sealed class PlayerXpEvent extends PlayerEvent {
-    public static final EventBus<PlayerXpEvent> BUS = EventBus.create(PlayerXpEvent.class);
-
-    public PlayerXpEvent(Player player) {
-        super(player);
-    }
+public sealed interface PlayerXpEvent extends PlayerEvent {
+    EventBus<PlayerXpEvent> BUS = EventBus.create(PlayerXpEvent.class);
 
     /**
      * This event is fired after the player collides with an experience orb, but before the player has been given the experience.
      * It can be cancelled, and no further processing will be done.
      */
-    public static final class PickupXp extends PlayerXpEvent implements Cancellable {
+    @NullMarked
+    record PickupXp(Player getEntity, ExperienceOrb getOrb) implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<PickupXp> BUS = CancellableEventBus.create(PickupXp.class);
-
-        private final ExperienceOrb orb;
-
-        public PickupXp(Player player, ExperienceOrb orb) {
-            super(player);
-            this.orb = orb;
-        }
-
-        public ExperienceOrb getOrb() {
-            return orb;
-        }
     }
 
     /**
@@ -51,14 +37,20 @@ public sealed class PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     @NullMarked
-    public static final class XpChange extends PlayerXpEvent implements Cancellable {
+    final class XpChange implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
 
+        private final Player player;
         private int amount;
 
         public XpChange(Player player, int amount) {
-            super(player);
+            this.player = player;
             this.amount = amount;
+        }
+
+        @Override
+        public Player getEntity() {
+            return this.player;
         }
 
         public int getAmount() {
@@ -75,14 +67,20 @@ public sealed class PlayerXpEvent extends PlayerEvent {
      * It can be cancelled, and no further processing will be done.
      */
     @NullMarked
-    public static final class LevelChange extends PlayerXpEvent implements Cancellable {
+    final class LevelChange implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
 
+        private final Player player;
         private int levels;
 
         public LevelChange(Player player, int levels) {
-            super(player);
+            this.player = player;
             this.levels = levels;
+        }
+
+        @Override
+        public Player getEntity() {
+            return this.player;
         }
 
         public int getLevels() {

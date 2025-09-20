@@ -6,6 +6,7 @@
 package net.minecraftforge.event.entity.player;
 
 import com.google.common.base.Preconditions;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.NonNullList;
@@ -17,23 +18,28 @@ import java.util.List;
 
 /**
  * This event is called when a player fishes an item.
- *
- * This event is {@link net.minecraftforge.eventbus.api.Cancelable}
- * Canceling the event will cause the player to receive no items at all.
- * The hook will still take the damage specified
+ * <br>
+ * This event is {@linkplain Cancellable cancellable}. If cancelled, the player will not receive any items, but the hook
+ * will still take the damage specified
  */
-public final class ItemFishedEvent extends PlayerEvent implements Cancellable {
+public final class ItemFishedEvent implements Cancellable, PlayerEvent {
     public static final CancellableEventBus<ItemFishedEvent> BUS = CancellableEventBus.create(ItemFishedEvent.class);
 
+    private final Player player;
     private final NonNullList<ItemStack> stacks = NonNullList.create();
     private final FishingHook hook;
     private int rodDamage;
 
     public ItemFishedEvent(List<ItemStack> stacks, int rodDamage, FishingHook hook) {
-        super(hook.getPlayerOwner());
+        this.player = hook.getPlayerOwner();
         this.stacks.addAll(stacks);
         this.rodDamage = rodDamage;
         this.hook = hook;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     /**

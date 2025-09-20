@@ -9,33 +9,16 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 
-public sealed class PlayerContainerEvent extends PlayerEvent {
-    public static final EventBus<PlayerContainerEvent> BUS = EventBus.create(PlayerContainerEvent.class);
+public sealed interface PlayerContainerEvent extends PlayerEvent {
+    EventBus<PlayerContainerEvent> BUS = EventBus.create(PlayerContainerEvent.class);
 
-    private final AbstractContainerMenu container;
+    AbstractContainerMenu getContainer();
 
-    public PlayerContainerEvent(Player player, AbstractContainerMenu container) {
-        super(player);
-        this.container = container;
-    }
-
-    public static final class Open extends PlayerContainerEvent {
+    record Open(Player getEntity, AbstractContainerMenu getContainer) implements PlayerContainerEvent {
         public static final EventBus<Open> BUS = EventBus.create(Open.class);
-
-        public Open(Player player, AbstractContainerMenu container) {
-            super(player, container);
-        }
     }
 
-    public static final class Close extends PlayerContainerEvent {
+    record Close(Player getEntity, AbstractContainerMenu getContainer) implements PlayerContainerEvent {
         public static final EventBus<Close> BUS = EventBus.create(Close.class);
-
-        public Close(Player player, AbstractContainerMenu container) {
-            super(player, container);
-        }
-    }
-
-    public AbstractContainerMenu getContainer() {
-        return container;
     }
 }

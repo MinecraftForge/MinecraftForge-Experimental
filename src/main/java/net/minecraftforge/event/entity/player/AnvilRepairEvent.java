@@ -18,20 +18,26 @@ import org.jspecify.annotations.NullMarked;
  * ItemStacks are the inputs/output from the anvil. They cannot be edited.
  */
 @NullMarked
-public final class AnvilRepairEvent extends PlayerEvent {
+public final class AnvilRepairEvent implements PlayerEvent {
     public static final EventBus<AnvilRepairEvent> BUS = EventBus.create(AnvilRepairEvent.class);
 
+    private final Player player;
     private final ItemStack left; // The left side of the input
     private final ItemStack right; // The right side of the input
     private final ItemStack output; // Set this to set the output stack
     private float breakChance; // Anvil's chance to break (reduced by 1 durability) when this is complete. Default is 12% (0.12f)
 
     public AnvilRepairEvent(Player player, ItemStack left, ItemStack right, ItemStack output) {
-        super(player);
+        this.player = player;
         this.output = output;
         this.left = left;
         this.right = right;
         this.setBreakChance(0.12f);
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     /**

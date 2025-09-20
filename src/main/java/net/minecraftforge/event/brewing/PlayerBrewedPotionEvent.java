@@ -13,22 +13,9 @@ import org.jspecify.annotations.NullMarked;
 
 /**
  * This event is called when a player picks up a potion from a brewing stand.
+ * @param getStack The ItemStack of the potion.
  */
 @NullMarked
-public final class PlayerBrewedPotionEvent extends PlayerEvent {
+public record PlayerBrewedPotionEvent(Player getEntity, ItemStack getStack) implements PlayerEvent {
     public static final EventBus<PlayerBrewedPotionEvent> BUS = EventBus.create(PlayerBrewedPotionEvent.class);
-
-    private final ItemStack stack;
-
-    public PlayerBrewedPotionEvent(Player player, ItemStack stack) {
-        super(player);
-        this.stack = stack;
-    }
-
-    /**
-     * The ItemStack of the potion.
-     */
-    public ItemStack getStack() {
-        return stack;
-    }
 }

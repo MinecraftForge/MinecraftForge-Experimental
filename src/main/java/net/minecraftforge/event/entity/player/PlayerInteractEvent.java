@@ -35,14 +35,17 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 /**
  * PlayerInteractEvent is fired when a player interacts in some way.
  * All subclasses are fired on {@link MinecraftForge#EVENT_BUS}.
  * See the individual documentation on each subevent for more details.
  **/
-public sealed class PlayerInteractEvent extends PlayerEvent {
+public sealed abstract class PlayerInteractEvent implements PlayerEvent {
     public static final EventBus<PlayerInteractEvent> BUS = EventBus.create(PlayerInteractEvent.class);
 
+    private final Player player;
     private final InteractionHand hand;
     private final BlockPos pos;
     @Nullable
@@ -50,10 +53,15 @@ public sealed class PlayerInteractEvent extends PlayerEvent {
     private InteractionResult cancellationResult = InteractionResult.PASS;
 
     private PlayerInteractEvent(Player player, InteractionHand hand, BlockPos pos, @Nullable Direction face) {
-        super(Preconditions.checkNotNull(player, "Null player in PlayerInteractEvent!"));
+        this.player = Objects.requireNonNull(player, "Null player in PlayerInteractEvent!");
         this.hand = Preconditions.checkNotNull(hand, "Null hand in PlayerInteractEvent!");
         this.pos = Preconditions.checkNotNull(pos, "Null position in PlayerInteractEvent!");
         this.face = face;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     /**

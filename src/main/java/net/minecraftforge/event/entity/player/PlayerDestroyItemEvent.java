@@ -18,11 +18,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * PlayerDestroyItemEvent is fired when a player destroys an item.<br>
@@ -41,34 +40,15 @@ import org.jetbrains.annotations.Nullable;
  * {@link #original} contains the original ItemStack before the item was destroyed. <br>
  * (@link #hand) contains the hand that the current item was held in.<br>
  * <br>
- * This event is not {@link Cancelable}.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
  * This event is fired from {@link ForgeEventFactory#onPlayerDestroyItem(Player, ItemStack, InteractionHand)}.<br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ *
+ * @param getSlot May be null if this player destroys the item by any use besides holding it.
  **/
-public final class PlayerDestroyItemEvent extends PlayerEvent {
+@NullMarked
+public record PlayerDestroyItemEvent(
+        Player getEntity,
+        ItemStack getOriginal,
+        @Nullable EquipmentSlot getSlot
+) implements PlayerEvent {
     public static final EventBus<PlayerDestroyItemEvent> BUS = EventBus.create(PlayerDestroyItemEvent.class);
-
-    @NotNull
-    private final ItemStack original;
-    @Nullable
-    private final EquipmentSlot slot; // May be null if this player destroys the item by any use besides holding it.
-
-    public PlayerDestroyItemEvent(Player player, @NotNull ItemStack original, @Nullable EquipmentSlot slot) {
-        super(player);
-        this.original = original;
-        this.slot = slot;
-    }
-
-    @NotNull
-    public ItemStack getOriginal() {
-        return this.original;
-    }
-
-    @Nullable
-    public EquipmentSlot getSlot() {
-        return this.slot;
-    }
 }

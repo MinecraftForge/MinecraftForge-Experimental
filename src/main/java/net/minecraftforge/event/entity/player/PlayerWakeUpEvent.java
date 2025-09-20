@@ -15,17 +15,12 @@ import org.jspecify.annotations.NullMarked;
  * There is nothing that can be manipulated with this event.
  */
 @NullMarked
-public final class PlayerWakeUpEvent extends PlayerEvent {
+public record PlayerWakeUpEvent(
+        Player getEntity,
+        boolean wakeImmediately,
+        boolean updateLevel
+) implements PlayerEvent {
     public static final EventBus<PlayerWakeUpEvent> BUS = EventBus.create(PlayerWakeUpEvent.class);
-
-    private final boolean wakeImmediately;
-    private final boolean updateLevel;
-
-    public PlayerWakeUpEvent(Player player, boolean wakeImmediately, boolean updateLevel) {
-        super(player);
-        this.wakeImmediately = wakeImmediately;
-        this.updateLevel = updateLevel;
-    }
 
     /**
      * Used for the 'wake up animation'.

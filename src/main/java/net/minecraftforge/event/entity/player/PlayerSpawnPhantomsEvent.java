@@ -7,7 +7,6 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.level.levelgen.PhantomSpawner;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -20,19 +19,23 @@ import org.jetbrains.annotations.NotNull;
  * This event is fired before any per-player checks (but <i>after<i/> {@link Player#isSpectator()}), but after all global checks.<br>
  * The behavior of {@link PhantomSpawner} is determined by the result of this event.<br>
  * See {@link #setResult} for documentation.<br>
- * <p>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
  * @see PlayerSpawnPhantomsEvent#setResult for the effects of each result.
  */
-public final class PlayerSpawnPhantomsEvent extends PlayerEvent implements HasResult {
+public final class PlayerSpawnPhantomsEvent implements PlayerEvent, HasResult {
     public static final EventBus<PlayerSpawnPhantomsEvent> BUS = EventBus.create(PlayerSpawnPhantomsEvent.class);
 
+    private final Player player;
     private int phantomsToSpawn;
     private Result result = Result.DEFAULT;
 
     public PlayerSpawnPhantomsEvent(Player player, int phantomsToSpawn) {
-        super(player);
+        this.player = player;
         this.phantomsToSpawn = phantomsToSpawn;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     /**

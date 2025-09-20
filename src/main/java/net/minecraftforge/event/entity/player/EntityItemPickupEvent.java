@@ -22,15 +22,21 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  *
  *  setResult(ALLOW) is the same as the old setHandled()
  */
-public final class EntityItemPickupEvent extends PlayerEvent implements Cancellable, HasResult {
+public final class EntityItemPickupEvent implements Cancellable, PlayerEvent, HasResult {
     public static final CancellableEventBus<EntityItemPickupEvent> BUS = CancellableEventBus.create(EntityItemPickupEvent.class);
 
+    private final Player player;
     private final ItemEntity item;
     private Result result = Result.DEFAULT;
 
     public EntityItemPickupEvent(Player player, ItemEntity item) {
-        super(player);
+        this.player = player;
         this.item = item;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     public ItemEntity getItem() {

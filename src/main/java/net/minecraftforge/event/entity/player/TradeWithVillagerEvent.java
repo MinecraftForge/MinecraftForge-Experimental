@@ -8,42 +8,25 @@ package net.minecraftforge.event.entity.player;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
+import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
  * Fired when a player trades with an {@link AbstractVillager}.
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain Event.HasResult have a result}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.</p>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#SERVER logical server}.</p>
+ * @param getMerchantOffer the {@link MerchantOffer} selected by the player to trade with
+ * @param getAbstractVillager the villager the player traded with
  */
-public final class TradeWithVillagerEvent extends PlayerEvent {
+public record TradeWithVillagerEvent(
+        Player getEntity,
+        MerchantOffer getMerchantOffer,
+        AbstractVillager getAbstractVillager
+) implements PlayerEvent {
     public static final EventBus<TradeWithVillagerEvent> BUS = EventBus.create(TradeWithVillagerEvent.class);
 
-    private final MerchantOffer offer;
-    private final AbstractVillager abstractVillager;
-
     @ApiStatus.Internal
-    public TradeWithVillagerEvent(Player player, MerchantOffer offer, AbstractVillager abstractVillager) {
-        super(player);
-        this.offer = offer;
-        this.abstractVillager = abstractVillager;
-    }
-
-    /**
-     * {@return the {@link MerchantOffer} selected by the player to trade with}
-     */
-    public MerchantOffer getMerchantOffer() {
-        return offer;
-    }
-
-    /**
-     * {@return the villager the player traded with}
-     */
-    public AbstractVillager getAbstractVillager() {
-        return abstractVillager;
-    }
+    public TradeWithVillagerEvent {}
 }

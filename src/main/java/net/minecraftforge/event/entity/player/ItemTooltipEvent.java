@@ -16,9 +16,10 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public final class ItemTooltipEvent extends PlayerEvent {
+public final class ItemTooltipEvent implements PlayerEvent {
     public static final EventBus<ItemTooltipEvent> BUS = EventBus.create(ItemTooltipEvent.class);
 
+    private final Player player;
     private final TooltipFlag flags;
     @NotNull
     private final ItemStack itemStack;
@@ -30,7 +31,7 @@ public final class ItemTooltipEvent extends PlayerEvent {
      */
     public ItemTooltipEvent(@NotNull ItemStack itemStack, @Nullable Player player, List<Component> list, TooltipFlag flags)
     {
-        super(player);
+        this.player = player;
         this.itemStack = itemStack;
         this.toolTip = list;
         this.flags = flags;
@@ -68,6 +69,6 @@ public final class ItemTooltipEvent extends PlayerEvent {
     @Nullable
     public Player getEntity()
     {
-        return super.getEntity();
+        return player;
     }
 }

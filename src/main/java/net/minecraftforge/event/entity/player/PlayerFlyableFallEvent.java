@@ -14,16 +14,22 @@ import org.jspecify.annotations.NullMarked;
  * @author Mithion
  */
 @NullMarked
-public final class PlayerFlyableFallEvent extends PlayerEvent {
+public final class PlayerFlyableFallEvent implements PlayerEvent {
     public static final EventBus<PlayerFlyableFallEvent> BUS = EventBus.create(PlayerFlyableFallEvent.class);
 
+    private final Player player;
     private float distance;
     private float multiplier;
 
     public PlayerFlyableFallEvent(Player player, float distance, float multiplier) {
-        super(player);
+        this.player = player;
         this.distance = distance;
         this.multiplier = multiplier;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     public float getDistance() { return distance;}

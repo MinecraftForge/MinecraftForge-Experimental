@@ -23,15 +23,21 @@ import java.util.Optional;
  * setResult(ALLOW) informs game that player can sleep at this time.<br>
  * setResult(DEFAULT) causes game to check !{@link Level#isDay()} instead.
  */
-public final class SleepingTimeCheckEvent extends PlayerEvent implements HasResult {
+public final class SleepingTimeCheckEvent implements PlayerEvent, HasResult {
     public static final EventBus<SleepingTimeCheckEvent> BUS = EventBus.create(SleepingTimeCheckEvent.class);
 
+    private final Player player;
     private final Optional<BlockPos> sleepingLocation;
     private Result result = Result.DEFAULT;
 
     public SleepingTimeCheckEvent(Player player, Optional<BlockPos> sleepingLocation) {
-        super(player);
+        this.player = player;
         this.sleepingLocation = sleepingLocation;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     /**

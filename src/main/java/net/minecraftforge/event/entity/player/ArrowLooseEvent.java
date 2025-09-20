@@ -31,20 +31,26 @@ import org.jetbrains.annotations.NotNull;
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/
-public final class ArrowLooseEvent extends PlayerEvent implements Cancellable {
+public final class ArrowLooseEvent implements Cancellable, PlayerEvent {
     public static final CancellableEventBus<ArrowLooseEvent> BUS = CancellableEventBus.create(ArrowLooseEvent.class);
 
+    private final Player player;
     private final ItemStack bow;
     private final Level level;
     private final boolean hasAmmo;
     private int charge;
 
     public ArrowLooseEvent(Player player, @NotNull ItemStack bow, Level level, int charge, boolean hasAmmo) {
-        super(player);
+        this.player = player;
         this.bow = bow;
         this.level = level;
         this.charge = charge;
         this.hasAmmo = hasAmmo;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     @NotNull

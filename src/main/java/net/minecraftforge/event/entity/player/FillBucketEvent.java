@@ -25,9 +25,10 @@ import org.jetbrains.annotations.Nullable;
  * ItemStack to your inventory and reducing the stack size to process.
  * setResult(ALLOW) is the same as the old setHandled();
  */
-public final class FillBucketEvent extends PlayerEvent implements Cancellable, HasResult {
+public final class FillBucketEvent implements Cancellable, PlayerEvent, HasResult {
     public static final CancellableEventBus<FillBucketEvent> BUS = CancellableEventBus.create(FillBucketEvent.class);
 
+    private final Player player;
     private final ItemStack current;
     private final Level level;
     @Nullable
@@ -37,10 +38,15 @@ public final class FillBucketEvent extends PlayerEvent implements Cancellable, H
     private Result eventResult = Result.DEFAULT;
 
     public FillBucketEvent(Player player, @NotNull ItemStack current, Level level, @Nullable HitResult target) {
-        super(player);
+        this.player = player;
         this.current = current;
         this.level = level;
         this.target = target;
+    }
+
+    @Override
+    public Player getEntity() {
+        return player;
     }
 
     @NotNull

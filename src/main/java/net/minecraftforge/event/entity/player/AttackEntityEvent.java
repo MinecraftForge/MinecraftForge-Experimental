@@ -5,7 +5,6 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -18,24 +17,8 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * {@link #target} contains the Entity that was damaged by the player. <br>
  * <br>
- * This event is {@link Cancelable}.<br>
- * If this event is canceled, the player does not attack the Entity.<br>
- * <br>
- * This event does not have a result. {@link HasResult}<br>
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the player does not attack the Entity.
  **/
-public final class AttackEntityEvent extends PlayerEvent implements Cancellable {
+public record AttackEntityEvent(Player getEntity, Entity getTarget) implements Cancellable, PlayerEvent {
     public static final CancellableEventBus<AttackEntityEvent> BUS = CancellableEventBus.create(AttackEntityEvent.class);
-
-    private final Entity target;
-
-    public AttackEntityEvent(Player player, Entity target) {
-        super(player);
-        this.target = target;
-    }
-
-    public Entity getTarget() {
-        return target;
-    }
 }
