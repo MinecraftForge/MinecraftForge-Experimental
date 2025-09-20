@@ -14,84 +14,54 @@ import java.util.function.BooleanSupplier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
 
-public sealed abstract class TickEvent extends MutableEvent {
-    public final LogicalSide side;
-
-    protected TickEvent(LogicalSide side) {
-        this.side = side;
-    }
-
-    public static sealed abstract class ServerTickEvent extends TickEvent {
-        private final BooleanSupplier haveTime;
-        private final MinecraftServer server;
-
-        protected ServerTickEvent(BooleanSupplier haveTime, MinecraftServer server) {
-            super(LogicalSide.SERVER);
-            this.haveTime = haveTime;
-            this.server = server;
-        }
+public sealed interface TickEvent {
+    sealed interface ServerTickEvent extends TickEvent {
+        BooleanSupplier haveTimeSupplier();
 
         /**
          * @return {@code true} whether the server has enough time to perform any
          * additional tasks (usually IO related) during the current tick,
          * otherwise {@code false}
          */
-        public boolean haveTime() {
-            return this.haveTime.getAsBoolean();
+        default boolean haveTime() {
+            return haveTimeSupplier().getAsBoolean();
         }
 
         /**
          * {@return the server instance}
          */
-        public MinecraftServer getServer() {
-            return server;
-        }
+        MinecraftServer server();
 
-        public static final class Pre extends ServerTickEvent {
+        record Pre(BooleanSupplier haveTimeSupplier, MinecraftServer server) implements RecordEvent, ServerTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
-
-            public Pre(BooleanSupplier haveTime, MinecraftServer server) {
-                super(haveTime, server);
-            }
         }
 
-        public static final class Post extends ServerTickEvent {
+        record Post(BooleanSupplier haveTimeSupplier, MinecraftServer server) implements RecordEvent, ServerTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
-            public Post(BooleanSupplier haveTime, MinecraftServer server) {
-                super(haveTime, server);
-            }
         }
     }
 
-    public static sealed abstract class ClientTickEvent extends TickEvent {
-        protected ClientTickEvent() {
-            super(LogicalSide.CLIENT);
-        }
-
-        public static final class Pre extends ClientTickEvent {
+    sealed interface ClientTickEvent extends TickEvent {
+        record Pre() implements RecordEvent, ClientTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
             public static final Pre INSTANCE = new Pre();
         }
 
-        public static final class Post extends ClientTickEvent {
+        record Post() implements RecordEvent, ClientTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
             public static final Post INSTANCE = new Post();
         }
     }
 
-    public static sealed abstract class LevelTickEvent extends TickEvent {
-        public final Level level;
-        private final BooleanSupplier haveTime;
+    sealed interface LevelTickEvent extends TickEvent {
+        LogicalSide side();
 
-        protected LevelTickEvent(LogicalSide side, Level level, BooleanSupplier haveTime) {
-            super(side);
-            this.level = level;
-            this.haveTime = haveTime;
-        }
+        Level level();
+
+        BooleanSupplier haveTimeSupplier();
 
         /**
          * @return {@code true} whether the server has enough time to perform any
@@ -99,79 +69,46 @@ public sealed abstract class TickEvent extends MutableEvent {
          * otherwise {@code false}
          * @see ServerTickEvent#haveTime()
          */
-        public boolean haveTime() {
-            return this.haveTime.getAsBoolean();
+        default boolean haveTime() {
+            return haveTimeSupplier().getAsBoolean();
         }
 
-        public static final class Pre extends LevelTickEvent {
+        record Pre(LogicalSide side, Level level, BooleanSupplier haveTimeSupplier) implements RecordEvent, LevelTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
-
-            public Pre(LogicalSide side, Level level, BooleanSupplier haveTime) {
-                super(side, level, haveTime);
-            }
         }
 
-        public static final class Post extends LevelTickEvent {
+        record Post(LogicalSide side, Level level, BooleanSupplier haveTimeSupplier) implements RecordEvent, LevelTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
-            public Post(LogicalSide side, Level level, BooleanSupplier haveTime) {
-                super(side, level, haveTime);
-            }
         }
     }
 
-    public static sealed abstract class PlayerTickEvent extends TickEvent {
-        public final Player player;
+    sealed interface PlayerTickEvent extends TickEvent {
+        LogicalSide side();
 
-        protected PlayerTickEvent(Player player) {
-            super(player instanceof ServerPlayer ? LogicalSide.SERVER : LogicalSide.CLIENT);
-            this.player = player;
-        }
-
-        public static final class Pre extends PlayerTickEvent {
+        record Pre(Player player, LogicalSide side) implements RecordEvent, PlayerTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
 
             public Pre(Player player) {
-                super(player);
+                this(player, player instanceof ServerPlayer ? LogicalSide.SERVER : LogicalSide.CLIENT);
             }
         }
 
-        public static final class Post extends PlayerTickEvent {
+        record Post(Player player, LogicalSide side) implements RecordEvent, PlayerTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
             public Post(Player player) {
-                super(player);
+                this(player, player instanceof ServerPlayer ? LogicalSide.SERVER : LogicalSide.CLIENT);
             }
         }
     }
 
-    public static sealed abstract class RenderTickEvent extends TickEvent {
-        private final DeltaTracker timer;
-
-        private RenderTickEvent(DeltaTracker timer) {
-            super(LogicalSide.CLIENT);
-            this.timer = timer;
-        }
-
-        public DeltaTracker getTimer() {
-            return this.timer;
-        }
-
-        public static final class Pre extends RenderTickEvent {
+    sealed interface RenderTickEvent extends TickEvent {
+        record Pre(DeltaTracker timer) implements RecordEvent, RenderTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
-
-            public Pre(DeltaTracker timer) {
-                super(timer);
-            }
         }
 
-        public static final class Post extends RenderTickEvent {
+        record Post(DeltaTracker timer) implements RecordEvent, RenderTickEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
-            public Post(DeltaTracker timer) {
-                super(timer);
-            }
         }
-
     }
 }
