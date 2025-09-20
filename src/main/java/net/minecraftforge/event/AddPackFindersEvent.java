@@ -16,32 +16,20 @@ import java.util.function.Consumer;
 
 /**
  * Fired on {@link PackRepository} creation to allow mods to add new pack finders.
+ *
+ * @param getPackType the {@link PackType} of the pack repository being constructed.
  */
-public final class AddPackFindersEvent implements IModBusEvent {
+public record AddPackFindersEvent(PackType getPackType, Consumer<RepositorySource> sourceAdder) implements IModBusEvent {
     public static EventBus<AddPackFindersEvent> getBus(BusGroup modBusGroup) {
         return IModBusEvent.getBus(modBusGroup, AddPackFindersEvent.class);
     }
 
-    private final PackType packType;
-    private final Consumer<RepositorySource> sources;
-
-    public AddPackFindersEvent(PackType packType, Consumer<RepositorySource> sources) {
-        this.packType = packType;
-        this.sources = sources;
-    }
-
     /**
      * Adds a new source to the list of pack finders.
+     *
      * @param source the pack finder
      */
     public void addRepositorySource(RepositorySource source) {
-        sources.accept(source);
-    }
-
-    /**
-     * @return the {@link PackType} of the pack repository being constructed.
-     */
-    public PackType getPackType() {
-        return packType;
+        sourceAdder.accept(source);
     }
 }

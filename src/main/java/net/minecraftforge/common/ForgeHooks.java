@@ -329,7 +329,7 @@ public final class ForgeHooks {
 
     @Nullable
     public static Component onServerChatSubmittedEvent(ServerPlayer player, Component message) {
-        var plain = message.getContents() instanceof LiteralContents literalContents ? literalContents.text() : "";
+        var plain = message.getContents() instanceof LiteralContents(String text) ? text : "";
         var event = new ServerChatEvent(player, plain, message);
         return ServerChatEvent.BUS.post(event) ? null : event.getMessage();
     }

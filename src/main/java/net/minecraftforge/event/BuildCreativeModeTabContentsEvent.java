@@ -24,10 +24,7 @@ import java.util.function.Supplier;
  * Fired when the contents of a specific creative mode tab are being populated.
  * This event may be fired multiple times if the operator status of the local player or enabled feature flags changes.
  * <p>
- * This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
- * <p>
- * This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.
+ * This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.
  */
 public final class BuildCreativeModeTabContentsEvent implements IModBusEvent, CreativeModeTab.Output {
     public static EventBus<BuildCreativeModeTabContentsEvent> getBus(BusGroup modBusGroup) {

@@ -16,7 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
+import org.jspecify.annotations.NullMarked;
 
+@NullMarked
 public sealed interface TickEvent {
     sealed interface ServerTickEvent extends TickEvent {
         BooleanSupplier haveTimeSupplier();

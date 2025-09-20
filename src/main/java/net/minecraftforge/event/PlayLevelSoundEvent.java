@@ -33,12 +33,7 @@ import java.util.Objects;
  * {@link #getNewVolume()} contains the volume the sound will be played at.
  * {@link #getNewPitch()} contains the pitch the sound will be played at.
  * <p>
- * This event is {@link Cancelable cancelable}.
- * If this event is canceled, the sound is not played.
- * <p>
- * This event does not have a result.
- * <p>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the sound is not played.
  */
 public sealed class PlayLevelSoundEvent extends MutableEvent implements Cancellable, InheritableEvent {
     public static final CancellableEventBus<PlayLevelSoundEvent> BUS = CancellableEventBus.create(PlayLevelSoundEvent.class);

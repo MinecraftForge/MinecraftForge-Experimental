@@ -8,29 +8,27 @@ package net.minecraftforge.event;
 import com.mojang.brigadier.ParseResults;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * CommandEvent is fired after a command is parsed, but before it is executed.
  * This event is fired during the invocation of {@link Commands#performCommand(ParseResults, String)}.
  * <p>
- * This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
- * If the event is cancelled, the command will not be executed.
+ * This event is {@linkplain Cancellable cancellable}. If the event is cancelled, the command will not be executed.
  * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#SERVER logical server}.
+ * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
  **/
+@NullMarked
 public final class CommandEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<CommandEvent> BUS = CancellableEventBus.create(CommandEvent.class);
 
     private ParseResults<CommandSourceStack> parse;
-    @Nullable
-    private Throwable exception;
+    private @Nullable Throwable exception;
 
     public CommandEvent(ParseResults<CommandSourceStack> parse) {
         this.parse = parse;

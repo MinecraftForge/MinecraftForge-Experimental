@@ -7,7 +7,6 @@ package net.minecraftforge.event;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.datafix.fixes.StructuresBecomeConfiguredFix;
-import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Locale;
 import java.util.Map;
@@ -15,7 +14,9 @@ import java.util.Map;
 import com.google.common.base.Preconditions;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired for registering structure conversions for pre-1.18.2 worlds. This is used by {@link StructuresBecomeConfiguredFix}
@@ -28,14 +29,12 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event will only fire if {@link StructuresBecomeConfiguredFix} is used, as a result of converting a
  * pre-1.18.2 world to the current version.</p>
  *
- * <p>This event is not {@linkplain Cancelable cancelable}, and does not {@linkplain HasResult have a result}.</p>
- *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}. </p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#SERVER logical server}. </p>
  *
  * @see StructuresBecomeConfiguredFix
  * @see #register(String, StructuresBecomeConfiguredFix.Conversion)
  */
+@NullMarked
 public final class RegisterStructureConversionsEvent extends MutableEvent {
     public static final EventBus<RegisterStructureConversionsEvent> BUS = EventBus.create(RegisterStructureConversionsEvent.class);
 
