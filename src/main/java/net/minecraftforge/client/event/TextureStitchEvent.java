@@ -6,12 +6,12 @@
 package net.minecraftforge.client.event;
 
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired after a texture atlas is stitched together.
@@ -19,38 +19,26 @@ import org.jetbrains.annotations.ApiStatus;
  * @see TextureStitchEvent.Post
  * @see TextureAtlas
  */
-public sealed class TextureStitchEvent extends MutableEvent implements IModBusEvent, InheritableEvent {
-    private final TextureAtlas atlas;
-
-    @ApiStatus.Internal
-    public TextureStitchEvent(TextureAtlas atlas) {
-        this.atlas = atlas;
-    }
-
+@NullMarked
+public sealed interface TextureStitchEvent {
     /**
      * {@return the texture atlas}
      */
-    public TextureAtlas getAtlas() {
-        return atlas;
-    }
+    TextureAtlas getAtlas();
 
     // Use atlas info JSON files instead
     // /**
     //  * <p>Fired <b>before</b> a texture atlas is stitched together.
     //  * This can be used to add custom sprites to be stitched into the atlas.</p>
     //  *
-    //  * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-    //  *
     //  * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus()} mod-specific event bus},
     //  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
     //  */
-    // public static class Pre extends TextureStitchEvent
-    // {
+    // public static class Pre extends TextureStitchEvent {
     //     private final Set<ResourceLocation> sprites;
     //
     //     @ApiStatus.Internal
-    //     public Pre(TextureAtlas map, Set<ResourceLocation> sprites)
-    //     {
+    //     public Pre(TextureAtlas map, Set<ResourceLocation> sprites) {
     //         super(map);
     //         this.sprites = sprites;
     //     }
@@ -63,8 +51,7 @@ public sealed class TextureStitchEvent extends MutableEvent implements IModBusEv
     //      *
     //      * @param sprite the location of the sprite
     //      */
-    //     public boolean addSprite(ResourceLocation sprite)
-    //     {
+    //     public boolean addSprite(ResourceLocation sprite) {
     //         return this.sprites.add(sprite);
     //     }
     // }
@@ -72,15 +59,14 @@ public sealed class TextureStitchEvent extends MutableEvent implements IModBusEv
     /**
      * Fired <b>after</b> a texture atlas is stitched together and all textures therein has been loaded.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
-     * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus()} mod-specific event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Post extends TextureStitchEvent {
-        @ApiStatus.Internal
-        public Post(TextureAtlas map) {
-            super(map);
+    record Post(TextureAtlas getAtlas) implements TextureStitchEvent, IModBusEvent {
+        public static EventBus<Post> getBus(BusGroup modBusGroup) {
+            return IModBusEvent.getBus(modBusGroup, Post.class);
         }
+
+        @ApiStatus.Internal
+        public Post {}
     }
 }
