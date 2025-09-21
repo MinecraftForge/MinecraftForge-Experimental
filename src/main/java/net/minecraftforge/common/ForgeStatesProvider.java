@@ -14,13 +14,11 @@ import net.minecraftforge.fml.ModLoadingState;
 import net.minecraftforge.fml.core.ModStateProvider;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.registries.GameData;
-import net.minecraftforge.registries.ObjectHolderRegistry;
 import net.minecraftforge.registries.RegistryManager;
 
 public class ForgeStatesProvider implements IModStateProvider {
     public static final ModLoadingState CREATE_REGISTRIES = gather("CREATE_REGISTRIES", ModStateProvider.CONSTRUCT, RegistryManager::postNewRegistryEvent);
-    public static final ModLoadingState OBJECT_HOLDERS = gather("OBJECT_HOLDERS", CREATE_REGISTRIES, ObjectHolderRegistry::findObjectHolders);
-    public static final ModLoadingState INJECT_CAPABILITIES = gather("INJECT_CAPABILITIES", OBJECT_HOLDERS).withInline(CapabilityManager::injectCapabilities);
+    public static final ModLoadingState INJECT_CAPABILITIES = gather("INJECT_CAPABILITIES", CREATE_REGISTRIES).withInline(CapabilityManager::injectCapabilities);
     public static final ModLoadingState UNFREEZE_DATA = gather("UNFREEZE_DATA", INJECT_CAPABILITIES, GameData::unfreezeData);
     public static final ModLoadingState LOAD_REGISTRIES = gather("LOAD_REGISTRIES", UNFREEZE_DATA, GameData::postRegisterEvents);
     public static final ModLoadingState FREEZE_DATA = complete("FREEZE_DATA", ModStateProvider.COMPLETE, GameData::freezeData);
@@ -44,6 +42,6 @@ public class ForgeStatesProvider implements IModStateProvider {
 
     @Override
     public List<IModLoadingState> getAllStates() {
-        return List.of(CREATE_REGISTRIES, OBJECT_HOLDERS, INJECT_CAPABILITIES, UNFREEZE_DATA, LOAD_REGISTRIES, FREEZE_DATA, NETWORK_LOCK);
+        return List.of(CREATE_REGISTRIES, INJECT_CAPABILITIES, UNFREEZE_DATA, LOAD_REGISTRIES, FREEZE_DATA, NETWORK_LOCK);
     }
 }
