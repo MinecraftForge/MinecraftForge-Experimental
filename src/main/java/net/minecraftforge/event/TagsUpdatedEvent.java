@@ -7,36 +7,21 @@ package net.minecraftforge.event;
 
 import net.minecraft.core.RegistryAccess;
 import net.minecraftforge.eventbus.api.bus.EventBus;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 /**
  * Fired when tags are updated on either server or client. This event can be used to refresh data that depends on tags.
+ *
+ * @param getRegistryAccess the dynamic registries that have had their tags rebound
+ * @param getUpdateCause the cause for this tag update
+ * @param isIntegratedServer whether this event is being fired on an integrated server
  */
-public final class TagsUpdatedEvent extends MutableEvent {
+public record TagsUpdatedEvent(RegistryAccess getRegistryAccess, UpdateCause getUpdateCause, boolean isIntegratedServer)
+        implements RecordEvent {
     public static final EventBus<TagsUpdatedEvent> BUS = EventBus.create(TagsUpdatedEvent.class);
 
-    private final RegistryAccess registryAccess;
-    private final UpdateCause updateCause;
-    private final boolean integratedServer;
-
     public TagsUpdatedEvent(RegistryAccess registryAccess, boolean fromClientPacket, boolean isIntegratedServerConnection) {
-        this.registryAccess = registryAccess;
-        this.updateCause = fromClientPacket ? UpdateCause.CLIENT_PACKET_RECEIVED : UpdateCause.SERVER_DATA_LOAD;
-        this.integratedServer = isIntegratedServerConnection;
-    }
-
-    /**
-     * @return The dynamic registries that have had their tags rebound.
-     */
-    public RegistryAccess getRegistryAccess() {
-        return registryAccess;
-    }
-
-    /**
-     * @return the cause for this tag update
-     */
-    public UpdateCause getUpdateCause() {
-        return updateCause;
+        this(registryAccess, fromClientPacket ? UpdateCause.CLIENT_PACKET_RECEIVED : UpdateCause.SERVER_DATA_LOAD, isIntegratedServerConnection);
     }
 
     /**
@@ -44,7 +29,7 @@ public final class TagsUpdatedEvent extends MutableEvent {
      * result of this event. Effectively this means that in single player only the server-side updates this data.
      */
     public boolean shouldUpdateStaticData() {
-        return updateCause == UpdateCause.SERVER_DATA_LOAD || !integratedServer;
+        return getUpdateCause == UpdateCause.SERVER_DATA_LOAD || !isIntegratedServer;
     }
 
     /**

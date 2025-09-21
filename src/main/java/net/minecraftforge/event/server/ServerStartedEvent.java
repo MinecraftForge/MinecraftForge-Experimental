@@ -13,10 +13,6 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  *
  * @author cpw
  */
-public final class ServerStartedEvent extends ServerLifecycleEvent {
+public record ServerStartedEvent(MinecraftServer getServer) implements ServerLifecycleEvent {
     public static final EventBus<ServerStartedEvent> BUS = EventBus.create(ServerStartedEvent.class);
-
-    public ServerStartedEvent(final MinecraftServer server) {
-        super(server);
-    }
 }

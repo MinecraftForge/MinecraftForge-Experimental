@@ -15,10 +15,6 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
  *
  * @author cpw
  */
-public final class ServerStoppedEvent extends ServerLifecycleEvent {
+public record ServerStoppedEvent(MinecraftServer getServer) implements ServerLifecycleEvent {
     public static final EventBus<ServerStoppedEvent> BUS = EventBus.create(ServerStoppedEvent.class);
-
-    public ServerStoppedEvent(MinecraftServer server) {
-        super(server);
-    }
 }
