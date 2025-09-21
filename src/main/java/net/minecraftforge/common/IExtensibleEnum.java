@@ -23,8 +23,7 @@ import java.util.function.Supplier;
  * require the method:
  *
  * <pre>
- * public static MyEnum create(String name, Object foo)
- * {
+ * public static MyEnum create(String name, Object foo) {
  *     throw new IllegalStateException("Enum not extended");
  * }
  * </pre>
