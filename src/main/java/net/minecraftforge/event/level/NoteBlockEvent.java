@@ -5,6 +5,7 @@
 
 package net.minecraftforge.event.level;
 
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.core.BlockPos;
@@ -19,14 +20,35 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 /**
  * Base class for Noteblock Events
  */
-public sealed abstract class NoteBlockEvent extends BlockEvent implements InheritableEvent {
+public sealed abstract class NoteBlockEvent implements InheritableEvent, BlockEvent {
     public static final EventBus<NoteBlockEvent> BUS = EventBus.create(NoteBlockEvent.class);
+
+    private final Level world;
+    private final BlockPos pos;
+    private final BlockState state;
 
     private int noteId;
 
     protected NoteBlockEvent(Level world, BlockPos pos, BlockState state, int note) {
-        super(world, pos, state);
+        this.world = world;
+        this.pos = pos;
+        this.state = state;
         this.noteId = note;
+    }
+
+    @Override
+    public LevelAccessor getLevel() {
+        return world;
+    }
+
+    @Override
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    @Override
+    public BlockState getState() {
+        return state;
     }
 
     /**
