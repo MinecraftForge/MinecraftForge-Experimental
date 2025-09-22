@@ -23,8 +23,8 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
@@ -37,10 +37,10 @@ import java.util.List;
  * @see RenderTooltipEvent.Pre
  * @see RenderTooltipEvent.Background
  */
+@NullMarked
 public abstract sealed class RenderTooltipEvent extends MutableEvent implements InheritableEvent {
     public static final EventBus<RenderTooltipEvent> BUS = EventBus.create(RenderTooltipEvent.class);
 
-    @NotNull
     protected final ItemStack itemStack;
     protected final GuiGraphics graphics;
     protected int x;
@@ -49,8 +49,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
     protected final List<ClientTooltipComponent> components;
 
     @ApiStatus.Internal
-    protected RenderTooltipEvent(@NotNull ItemStack itemStack, GuiGraphics graphics, int x, int y, @NotNull Font font, @NotNull List<ClientTooltipComponent> components)
-    {
+    protected RenderTooltipEvent(ItemStack itemStack, GuiGraphics graphics, int x, int y, Font font, List<ClientTooltipComponent> components) {
         this.itemStack = itemStack;
         this.graphics = graphics;
         this.components = Collections.unmodifiableList(components);
@@ -63,18 +62,23 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * {@return the item stack which the tooltip is being rendered for, or an {@linkplain ItemStack#isEmpty() empty
      * item stack} if there is no associated item stack}
      */
-    @NotNull
-    public ItemStack getItemStack()
-    {
+    
+    public ItemStack getItemStack() {
         return itemStack;
+    }
+
+    /**
+     * {@return the gui graphics helper for the gui}
+     */
+    public GuiGraphics getGuiGraphics() {
+        return graphics;
     }
 
     /**
      * {@return the graphics helper for the gui}
      */
-    public GuiGraphics getGraphics()
-    {
-        return this.graphics;
+    public GuiGraphics getGraphics() {
+        return graphics;
     }
 
     /**
@@ -82,34 +86,28 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      *
      * <p>Use {@link ItemTooltipEvent} or {@link GatherComponents} to modify tooltip contents or components.</p>
      */
-    @NotNull
-    public List<ClientTooltipComponent> getComponents()
-    {
+    public List<ClientTooltipComponent> getComponents() {
         return components;
     }
 
     /**
      * {@return the X position of the tooltip box} By default, this is the mouse X position.
      */
-    public int getX()
-    {
+    public int getX() {
         return x;
     }
 
     /**
      * {@return the Y position of the tooltip box} By default, this is the mouse Y position.
      */
-    public int getY()
-    {
+    public int getY() {
         return y;
     }
 
     /**
      * {@return The font used to render the text}
      */
-    @NotNull
-    public Font getFont()
-    {
+    public Font getFont() {
         return font;
     }
 
@@ -117,7 +115,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * Fired when a tooltip gathers the {@link TooltipComponent}s to be rendered, before any text wrapping or processing.
      * The list of components and the maximum width of the tooltip can be modified through this event.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the list of components will be empty, causing the tooltip to not be rendered and
      * the corresponding {@link RenderTooltipEvent.Pre} and {@link RenderTooltipEvent.Background} to not be fired.</p>
      *
@@ -134,8 +132,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         private int maxWidth;
 
         @ApiStatus.Internal
-        public GatherComponents(ItemStack itemStack, int screenWidth, int screenHeight, List<Either<FormattedText, TooltipComponent>> tooltipElements, int maxWidth)
-        {
+        public GatherComponents(ItemStack itemStack, int screenWidth, int screenHeight, List<Either<FormattedText, TooltipComponent>> tooltipElements, int maxWidth) {
             this.itemStack = itemStack;
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
@@ -147,8 +144,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * {@return the item stack which the tooltip is being rendered for, or an {@linkplain ItemStack#isEmpty() empty
          * item stack} if there is no associated item stack}
          */
-        public ItemStack getItemStack()
-        {
+        public ItemStack getItemStack() {
             return itemStack;
         }
 
@@ -157,8 +153,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * The lines of text within the tooltip are wrapped to be within the screen width, and the tooltip box itself
          * is moved to be within the screen width.
          */
-        public int getScreenWidth()
-        {
+        public int getScreenWidth() {
             return screenWidth;
         }
 
@@ -166,8 +161,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * {@return the height of the screen}
          * The tooltip box is moved to be within the screen height.
          */
-        public int getScreenHeight()
-        {
+        public int getScreenHeight() {
             return screenHeight;
         }
 
@@ -175,8 +169,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * {@return the modifiable list of elements to be rendered on the tooltip} These elements can be either
          * formatted text or custom tooltip components.
          */
-        public List<Either<FormattedText, TooltipComponent>> getTooltipElements()
-        {
+        public List<Either<FormattedText, TooltipComponent>> getTooltipElements() {
             return tooltipElements;
         }
 
@@ -186,8 +179,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * <p>A value of {@code -1} means an unlimited maximum width. However, an unlimited maximum width will still
          * be wrapped to be within the screen bounds.</p>
          */
-        public int getMaxWidth()
-        {
+        public int getMaxWidth() {
             return maxWidth;
         }
 
@@ -196,8 +188,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          *
          * @param maxWidth the new maximum width
          */
-        public void setMaxWidth(int maxWidth)
-        {
+        public void setMaxWidth(int maxWidth) {
             this.maxWidth = maxWidth;
         }
     }
@@ -206,7 +197,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * Fired <b>before</b> the tooltip is rendered.
      * This can be used to modify the positioning and font of the tooltip.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the tooltip will not be rendered and the corresponding
      * {@link RenderTooltipEvent.Background} will not be fired.</p>
      *
@@ -221,8 +212,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         private final ClientTooltipPositioner positioner;
 
         @ApiStatus.Internal
-        public Pre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull Font font, @NotNull List<ClientTooltipComponent> components, @NotNull ClientTooltipPositioner positioner)
-        {
+        public Pre(ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner) {
             super(stack, graphics, x, y, font, components);
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
@@ -234,8 +224,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * The lines of text within the tooltip are wrapped to be within the screen width, and the tooltip box itself
          * is moved to be within the screen width.
          */
-        public int getScreenWidth()
-        {
+        public int getScreenWidth() {
             return screenWidth;
         }
 
@@ -243,13 +232,11 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          * {@return the height of the screen}
          * The tooltip box is moved to be within the screen height.
          */
-        public int getScreenHeight()
-        {
+        public int getScreenHeight() {
             return screenHeight;
         }
 
-        public ClientTooltipPositioner getTooltipPositioner()
-        {
+        public ClientTooltipPositioner getTooltipPositioner() {
             return positioner;
         }
 
@@ -258,8 +245,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          *
          * @param fr the new font
          */
-        public void setFont(@NotNull Font fr)
-        {
+        public void setFont(Font fr) {
             this.font = fr;
         }
 
@@ -268,8 +254,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          *
          * @param x the new X origin
          */
-        public void setX(int x)
-        {
+        public void setX(int x) {
             this.x = x;
         }
 
@@ -278,8 +263,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
          *
          * @param y the new Y origin
          */
-        public void setY(int y)
-        {
+        public void setY(int y) {
             this.y = y;
         }
     }
@@ -288,19 +272,17 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * Fired when the tooltip background prefix is determined.
      * This can be used to modify the textures to be used for the tooltip background.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class Background extends RenderTooltipEvent {
         public static final EventBus<Background> BUS = EventBus.create(Background.class);
 
-        private final ResourceLocation originalBackground;
-        private ResourceLocation background;
+        private final @Nullable ResourceLocation originalBackground;
+        private @Nullable ResourceLocation background;
 
         @ApiStatus.Internal
-        public Background(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, @NotNull Font fr, @NotNull List<ClientTooltipComponent> components, @Nullable ResourceLocation background) {
+        public Background(ItemStack stack, GuiGraphics graphics, int x, int y, Font fr, List<ClientTooltipComponent> components, @Nullable ResourceLocation background) {
             super(stack, graphics, x, y, fr, components);
             this.originalBackground = background;
             this.background = background;
@@ -309,21 +291,21 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         /**
          * Sets the new prefix for the background texture
          */
-        public void setBackground(ResourceLocation background) {
+        public void setBackground(@Nullable ResourceLocation background) {
             this.background = background;
         }
 
         /**
          * @return the potentially modified background's prefix, can be null for default
          */
-        public ResourceLocation getBackground() {
+        public @Nullable ResourceLocation getBackground() {
             return this.background;
         }
 
         /**
          * @return the original tooltip background's prefix, can be null for default
          */
-        public ResourceLocation getOriginalBackground() {
+        public @Nullable ResourceLocation getOriginalBackground() {
             return originalBackground;
         }
     }
