@@ -10,8 +10,9 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
-import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
@@ -25,44 +26,28 @@ import java.util.List;
  * @see DebugText
  * @see Chat
  */
-public abstract sealed class CustomizeGuiOverlayEvent extends MutableEvent implements Cancellable, InheritableEvent {
-    public static final CancellableEventBus<CustomizeGuiOverlayEvent> BUS = CancellableEventBus.create(CustomizeGuiOverlayEvent.class);
+public sealed interface CustomizeGuiOverlayEvent {
+    Window getWindow();
 
-    private final Window window;
-    private final GuiGraphics guiGraphics;
-    private final float partialTick;
+    GuiGraphics getGuiGraphics();
 
-    @ApiStatus.Internal
-    protected CustomizeGuiOverlayEvent(Window window, GuiGraphics guiGraphics, float partialTick) {
-        this.window = window;
-        this.guiGraphics = guiGraphics;
-        this.partialTick = partialTick;
-    }
-
-    public Window getWindow() {
-        return window;
-    }
-
-    public GuiGraphics getGuiGraphics() {
-        return guiGraphics;
-    }
-
-    public float getPartialTick() {
-        return partialTick;
-    }
+    float getPartialTick();
 
     /**
      * Fired <b>before</b> a boss health bar is rendered to the screen.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * Cancelling this event will prevent the given bar from rendering.</p>
      *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class BossEventProgress extends CustomizeGuiOverlayEvent {
+    final class BossEventProgress implements Cancellable, CustomizeGuiOverlayEvent, RecordEvent {
         public static final CancellableEventBus<BossEventProgress> BUS = CancellableEventBus.create(BossEventProgress.class);
 
+        private final Window window;
+        private final GuiGraphics guiGraphics;
+        private final float partialTick;
         private final LerpingBossEvent bossEvent;
         private final int x;
         private final int y;
@@ -70,11 +55,28 @@ public abstract sealed class CustomizeGuiOverlayEvent extends MutableEvent imple
 
         @ApiStatus.Internal
         public BossEventProgress(Window window, GuiGraphics guiGraphics, float partialTick, LerpingBossEvent bossEvent, int x, int y, int increment) {
-            super(window, guiGraphics, partialTick);
+            this.window = window;
+            this.guiGraphics = guiGraphics;
+            this.partialTick = partialTick;
             this.bossEvent = bossEvent;
             this.x = x;
             this.y = y;
             this.increment = increment;
+        }
+
+        @Override
+        public Window getWindow() {
+            return window;
+        }
+
+        @Override
+        public GuiGraphics getGuiGraphics() {
+            return guiGraphics;
+        }
+
+        @Override
+        public float getPartialTick() {
+            return partialTick;
         }
 
         /**
@@ -119,38 +121,23 @@ public abstract sealed class CustomizeGuiOverlayEvent extends MutableEvent imple
      * Fired <b>before</b> textual information is rendered to the debug screen.
      * This can be used to add or remove text information.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     *
+     * @param getText the modifiable list of text to render on the side
+     * @param getSide the side of the text getting rendered
      */
-    public static final class DebugText extends CustomizeGuiOverlayEvent {
-        public static final CancellableEventBus<DebugText> BUS = CancellableEventBus.create(DebugText.class);
-
-        private final List<String> text;
-
-        private final Side side;
+    record DebugText(
+            Window getWindow,
+            GuiGraphics getGuiGraphics,
+            float getPartialTick,
+            List<String> getText,
+            Side getSide
+    ) implements RecordEvent, CustomizeGuiOverlayEvent {
+        public static final EventBus<DebugText> BUS = EventBus.create(DebugText.class);
 
         @ApiStatus.Internal
-        public DebugText(Window window, GuiGraphics guiGraphics, float partialTick, List<String> text, Side side) {
-            super(window, guiGraphics, partialTick);
-            this.text = text;
-            this.side = side;
-        }
-
-        /**
-         * @return the modifiable list of text to render on the side
-         */
-        public List<String> getText() {
-            return this.text;
-        }
-
-        /**
-         * @return the side of the text getting rendered.
-         */
-        public Side getSide() {
-            return this.side;
-        }
+        public DebugText {}
 
         public enum Side {
             Left,
@@ -161,22 +148,40 @@ public abstract sealed class CustomizeGuiOverlayEvent extends MutableEvent imple
     /**
      * Fired <b>before</b> the chat messages overlay is rendered to the screen.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.<p/>
-     *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class Chat extends CustomizeGuiOverlayEvent {
-        public static final CancellableEventBus<Chat> BUS = CancellableEventBus.create(Chat.class);
+    final class Chat extends MutableEvent implements CustomizeGuiOverlayEvent {
+        public static final EventBus<Chat> BUS = EventBus.create(Chat.class);
 
+        private final Window window;
+        private final GuiGraphics guiGraphics;
+        private final float partialTick;
         private int posX;
         private int posY;
 
         @ApiStatus.Internal
         public Chat(Window window, GuiGraphics guiGraphics, float partialTick, int posX, int posY) {
-            super(window, guiGraphics, partialTick);
+            this.window = window;
+            this.guiGraphics = guiGraphics;
+            this.partialTick = partialTick;
             this.setPosX(posX);
             this.setPosY(posY);
+        }
+
+        @Override
+        public Window getWindow() {
+            return window;
+        }
+
+        @Override
+        public GuiGraphics getGuiGraphics() {
+            return guiGraphics;
+        }
+
+        @Override
+        public float getPartialTick() {
+            return partialTick;
         }
 
         /**
