@@ -11,10 +11,10 @@ import net.minecraft.network.Connection;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
-import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired for different client connectivity events.
@@ -27,75 +27,57 @@ import org.jetbrains.annotations.Nullable;
  * @see LoggingOut
  * @see Clone
  **/
-public abstract sealed class ClientPlayerNetworkEvent extends MutableEvent implements InheritableEvent {
-    public static final EventBus<ClientPlayerNetworkEvent> BUS = EventBus.create(ClientPlayerNetworkEvent.class);
-
-    private final MultiPlayerGameMode multiPlayerGameMode;
-    private final LocalPlayer player;
-    private final Connection connection;
-
-    @ApiStatus.Internal
-    protected ClientPlayerNetworkEvent(final MultiPlayerGameMode multiPlayerGameMode, final LocalPlayer player, final Connection connection) {
-        this.multiPlayerGameMode = multiPlayerGameMode;
-        this.player = player;
-        this.connection = connection;
-    }
+public sealed interface ClientPlayerNetworkEvent extends InheritableEvent {
+    EventBus<ClientPlayerNetworkEvent> BUS = EventBus.create(ClientPlayerNetworkEvent.class);
 
     /**
      * {@return the multiplayer game mode controller for the player}
      */
-    public MultiPlayerGameMode getMultiPlayerGameMode() {
-        return multiPlayerGameMode;
-    }
+    MultiPlayerGameMode getMultiPlayerGameMode();
 
     /**
      * {@return the player instance}
      */
-    public LocalPlayer getPlayer() {
-        return player;
-    }
+    LocalPlayer getPlayer();
 
     /**
      * {@return the network connection for the player}
      */
-    public Connection getConnection() {
-        return connection;
-    }
+    Connection getConnection();
 
     /**
      * Fired when the client player logs in to the server. The player should be initialized.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    public static final class LoggingIn extends ClientPlayerNetworkEvent {
+    @NullMarked
+    record LoggingIn(MultiPlayerGameMode getMultiPlayerGameMode, LocalPlayer getPlayer, Connection getConnection)
+            implements ClientPlayerNetworkEvent {
         public static final EventBus<LoggingIn> BUS = EventBus.create(LoggingIn.class);
 
         @ApiStatus.Internal
-        public LoggingIn(final MultiPlayerGameMode controller, final LocalPlayer player, final Connection networkManager) {
-            super(controller, player, networkManager);
-        }
+        public LoggingIn {}
     }
 
     /**
      * Fired when the client player logs out. This event may also fire when a new integrated server is being created.
-     *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
      *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     @SuppressWarnings("NullableProblems")
     // Shush IntelliJ, we override non-nullables as nullables in this specific event; see later comment
-    public static final class LoggingOut extends ClientPlayerNetworkEvent {
+    record LoggingOut(
+            @Nullable MultiPlayerGameMode getMultiPlayerGameMode,
+            @Nullable LocalPlayer getPlayer,
+            @Nullable Connection getConnection
+    ) implements ClientPlayerNetworkEvent {
         public static final EventBus<LoggingOut> BUS = EventBus.create(LoggingOut.class);
 
         @ApiStatus.Internal
-        public LoggingOut(@Nullable final MultiPlayerGameMode controller, @Nullable final LocalPlayer player, @Nullable final Connection networkManager) {
+        public LoggingOut {
             //noinspection ConstantConditions we know these are nullable, but we don't want to annotate the super as nullable since this is the only event with nullables
-            super(controller, player, networkManager);
         }
 
         /**
@@ -106,7 +88,7 @@ public abstract sealed class ClientPlayerNetworkEvent extends MutableEvent imple
         @Nullable
         @Override
         public MultiPlayerGameMode getMultiPlayerGameMode() {
-            return super.getMultiPlayerGameMode();
+            return getMultiPlayerGameMode;
         }
 
         /**
@@ -117,7 +99,7 @@ public abstract sealed class ClientPlayerNetworkEvent extends MutableEvent imple
         @Nullable
         @Override
         public LocalPlayer getPlayer() {
-            return super.getPlayer();
+            return getPlayer;
         }
 
         /**
@@ -128,42 +110,30 @@ public abstract sealed class ClientPlayerNetworkEvent extends MutableEvent imple
         @Nullable
         @Override
         public Connection getConnection() {
-            return super.getConnection();
+            return getConnection;
         }
     }
 
     /**
      * Fired when the client player respawns, creating a new player instance to replace the old player instance.
      *
-     * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-     *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     *
+     * @param getOldPlayer the previous player instance
+     * @param getNewPlayer the newly created player instance
      */
-    public static final class Clone extends ClientPlayerNetworkEvent {
+    @NullMarked
+    record Clone(
+            MultiPlayerGameMode getMultiPlayerGameMode,
+            LocalPlayer getOldPlayer,
+            LocalPlayer getNewPlayer,
+            Connection getConnection
+    ) implements ClientPlayerNetworkEvent {
         public static final EventBus<Clone> BUS = EventBus.create(Clone.class);
 
-        private final LocalPlayer oldPlayer;
-
         @ApiStatus.Internal
-        public Clone(final MultiPlayerGameMode pc, final LocalPlayer oldPlayer, final LocalPlayer newPlayer, final Connection networkManager) {
-            super(pc, newPlayer, networkManager);
-            this.oldPlayer = oldPlayer;
-        }
-
-        /**
-         * {@return the previous player instance}
-         */
-        public LocalPlayer getOldPlayer() {
-            return oldPlayer;
-        }
-
-        /**
-         * {@return the newly created player instance}
-         */
-        public LocalPlayer getNewPlayer() {
-            return super.getPlayer();
-        }
+        public Clone {}
 
         /**
          * {@return the newly created player instance}
@@ -172,7 +142,7 @@ public abstract sealed class ClientPlayerNetworkEvent extends MutableEvent imple
          */
         @Override
         public LocalPlayer getPlayer() {
-            return super.getPlayer();
+            return getNewPlayer;
         }
     }
 }
