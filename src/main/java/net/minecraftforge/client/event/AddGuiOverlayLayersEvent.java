@@ -18,17 +18,22 @@ import org.jspecify.annotations.NullMarked;
  * Fired when the {@linkplain ForgeLayeredDraw#VANILLA_ROOT}'s order is resolved during{@link ForgeLayeredDraw#resolveLayers().
  * This can be used to add additional or move gui layers and entire layer stacks as needed.
  *
- * <p> This event is fired on the {@linkplain IModBusEvent mod event bus},
- * only on the {@linkplain net.minecraftforge.fml.LogicalSide logical client}.</p>
+ * <p>This event is fired only on the {@linkplain net.minecraftforge.fml.LogicalSide logical client}.</p>
  *
  * @param getLayedDraw The provided {@linkplain ForgeLayeredDraw#instance}. By default will be {@linkplain ForgeLayeredDraw#VANILLA_ROOT}.
  */
 @NullMarked
-public record AddGuiOverlayLayersEvent(ForgeLayeredDraw getLayeredDraw) implements IModBusEvent, SelfDestructing, RecordEvent {
+public record AddGuiOverlayLayersEvent(ForgeLayeredDraw getLayeredDraw) implements SelfDestructing, RecordEvent {
+    public static final EventBus<AddGuiOverlayLayersEvent> BUS = EventBus.create(AddGuiOverlayLayersEvent.class);
+
     @ApiStatus.Internal
     public AddGuiOverlayLayersEvent {}
 
+    /**
+     * @deprecated {@link AddGuiOverlayLayersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly.
+     */
+    @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<AddGuiOverlayLayersEvent> getBus(BusGroup modBusGroup) {
-        return IModBusEvent.getBus(modBusGroup, AddGuiOverlayLayersEvent.class);
+        return BUS;
     }
 }

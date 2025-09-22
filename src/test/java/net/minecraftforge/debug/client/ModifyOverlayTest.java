@@ -50,7 +50,7 @@ public class ModifyOverlayTest extends BaseTestMod {
 
     public ModifyOverlayTest(FMLJavaModLoadingContext context) {
         super(context, false, false);
-        AddGuiOverlayLayersEvent.getBus(context.getModBusGroup()).addListener(this::overlayTestListener);
+        AddGuiOverlayLayersEvent.BUS.addListener(this::overlayTestListener);
     }
 
     @GameTest
