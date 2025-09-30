@@ -3,7 +3,7 @@
 @@ -115,7 +_,9 @@
      @Override
      protected InteractionResult useWithoutItem(BlockState p_331116_, Level p_332131_, BlockPos p_333586_, Player p_329332_, BlockHitResult p_331978_) {
-         if (!p_332131_.isClientSide) {
+         if (!p_332131_.isClientSide()) {
 -            p_331116_ = p_331116_.cycle(NOTE);
 +            int _new = net.minecraftforge.common.ForgeHooks.onNoteChange(p_332131_, p_333586_, p_331116_, p_331116_.getValue(NOTE), p_331116_.cycle(NOTE).getValue(NOTE));
 +            if (_new == -1) return InteractionResult.FAIL;

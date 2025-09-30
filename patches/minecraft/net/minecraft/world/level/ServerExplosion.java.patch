@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/ServerExplosion.java
 +++ b/net/minecraft/world/level/ServerExplosion.java
-@@ -167,7 +_,7 @@
+@@ -169,7 +_,7 @@
          return new ObjectArrayList<>(set);
      }
  
@@ -9,7 +9,7 @@
          float f = this.radius * 2.0F;
          int i = Mth.floor(this.center.x - f - 1.0);
          int j = Mth.floor(this.center.x + f + 1.0);
-@@ -176,7 +_,9 @@
+@@ -178,7 +_,9 @@
          int i1 = Mth.floor(this.center.z - f - 1.0);
          int j1 = Mth.floor(this.center.z + f + 1.0);
  
@@ -19,9 +19,9 @@
 +        for (Entity entity : entities) {
              if (!entity.ignoreExplosion(this)) {
                  double d0 = Math.sqrt(entity.distanceToSqr(this.center)) / f;
-                 if (d0 <= 1.0) {
-@@ -245,7 +_,7 @@
-     public void explode() {
+                 if (!(d0 > 1.0)) {
+@@ -233,7 +_,7 @@
+     public int explode() {
          this.level.gameEvent(this.source, GameEvent.EXPLODE, this.center);
          List<BlockPos> list = this.calculateExplodedPositions();
 -        this.hurtEntities();

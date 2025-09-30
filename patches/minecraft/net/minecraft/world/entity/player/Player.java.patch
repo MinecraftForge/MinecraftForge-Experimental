@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -126,7 +_,7 @@
+@@ -119,7 +_,7 @@
+ import net.minecraft.world.scores.PlayerTeam;
  import net.minecraft.world.scores.Team;
- import org.slf4j.Logger;
  
--public abstract class Player extends LivingEntity {
-+public abstract class Player extends LivingEntity implements net.minecraftforge.common.extensions.IForgePlayer {
-     private static final Logger LOGGER = LogUtils.getLogger();
-     public static final HumanoidArm DEFAULT_MAIN_HAND = HumanoidArm.RIGHT;
-     public static final int DEFAULT_MODEL_CUSTOMIZATION = 0;
-@@ -216,6 +_,9 @@
+-public abstract class Player extends Avatar implements ContainerUser {
++public abstract class Player extends Avatar implements ContainerUser, net.minecraftforge.common.extensions.IForgePlayer {
+     public static final int MAX_HEALTH = 20;
+     public static final int SLEEP_DURATION = 100;
+     public static final int WAKE_UP_DURATION = 10;
+@@ -175,6 +_,9 @@
      public Entity currentExplosionCause;
      private boolean ignoreFallDamageFromCurrentImpulse = false;
      private int currentImpulseContextResetGraceTime = 0;
@@ -19,9 +19,9 @@
  
      public Player(Level p_250508_, GameProfile p_252153_) {
          super(EntityType.PLAYER, p_250508_);
-@@ -224,6 +_,17 @@
+@@ -183,6 +_,17 @@
          this.inventory = new Inventory(this, this.equipment);
-         this.inventoryMenu = new InventoryMenu(this.inventory, !p_250508_.isClientSide, this);
+         this.inventoryMenu = new InventoryMenu(this.inventory, !p_250508_.isClientSide(), this);
          this.containerMenu = this.inventoryMenu;
 +
 +        // Forge: wrapped inventories moved to constructor as the inventory init was moved in here too
@@ -37,7 +37,7 @@
      }
  
      @Override
-@@ -258,7 +_,8 @@
+@@ -217,7 +_,8 @@
              .add(Attributes.MINING_EFFICIENCY)
              .add(Attributes.SWEEPING_DAMAGE_RATIO)
              .add(Attributes.WAYPOINT_TRANSMIT_RANGE, 6.0E7)
@@ -47,7 +47,7 @@
      }
  
      @Override
-@@ -274,6 +_,7 @@
+@@ -231,6 +_,7 @@
  
      @Override
      public void tick() {
@@ -55,16 +55,16 @@
          this.noPhysics = this.isSpectator();
          if (this.isSpectator() || this.isPassenger()) {
              this.setOnGround(false);
-@@ -289,7 +_,7 @@
+@@ -246,7 +_,7 @@
                  this.sleepCounter = 100;
              }
  
--            if (!this.level().isClientSide && this.level().isBrightOutside()) {
-+            if (!this.level().isClientSide && !net.minecraftforge.event.ForgeEventFactory.onSleepingTimeCheck(this, getSleepingPos())) {
+-            if (!this.level().isClientSide() && this.level().isBrightOutside()) {
++            if (!this.level().isClientSide() && !net.minecraftforge.event.ForgeEventFactory.onSleepingTimeCheck(this, getSleepingPos())) {
                  this.stopSleepInBed(false, true);
              }
          } else if (this.sleepCounter > 0) {
-@@ -350,6 +_,7 @@
+@@ -284,6 +_,7 @@
          if (this.currentImpulseContextResetGraceTime > 0) {
              this.currentImpulseContextResetGraceTime--;
          }
@@ -72,7 +72,7 @@
      }
  
      @Override
-@@ -452,6 +_,10 @@
+@@ -343,6 +_,10 @@
      }
  
      protected void updatePlayerPose() {
@@ -83,7 +83,7 @@
          if (this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.SWIMMING)) {
              Pose pose = this.getDesiredPose();
              Pose pose1;
-@@ -670,6 +_,7 @@
+@@ -531,6 +_,7 @@
  
      @Override
      public void die(DamageSource p_36152_) {
@@ -91,7 +91,7 @@
          super.die(p_36152_);
          this.reapplyPosition();
          if (!this.isSpectator() && this.level() instanceof ServerLevel serverlevel) {
-@@ -727,10 +_,15 @@
+@@ -588,10 +_,15 @@
  
      @Nullable
      public ItemEntity drop(ItemStack p_36177_, boolean p_36178_) {
@@ -108,7 +108,7 @@
          float f = this.inventory.getSelectedItem().getDestroySpeed(p_36282_);
          if (f > 1.0F) {
              f += (float)this.getAttributeValue(Attributes.MINING_EFFICIENCY);
-@@ -759,11 +_,14 @@
+@@ -620,11 +_,14 @@
              f /= 5.0F;
          }
  
@@ -124,7 +124,7 @@
      }
  
      @Override
-@@ -840,6 +_,7 @@
+@@ -691,6 +_,7 @@
  
      @Override
      public boolean hurtServer(ServerLevel p_369360_, DamageSource p_364544_, float p_368576_) {
@@ -132,7 +132,7 @@
          if (this.isInvulnerableTo(p_369360_, p_364544_)) {
              return false;
          } else if (this.abilities.invulnerable && !p_364544_.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-@@ -908,10 +_,13 @@
+@@ -759,10 +_,13 @@
      @Override
      protected void actuallyHurt(ServerLevel p_365751_, DamageSource p_36312_, float p_36313_) {
          if (!this.isInvulnerableTo(p_365751_, p_36312_)) {
@@ -146,7 +146,7 @@
              float f = p_36313_ - f1;
              if (f > 0.0F && f < 3.4028235E37F) {
                  this.awardStat(Stats.DAMAGE_ABSORBED, Math.round(f * 10.0F));
-@@ -979,6 +_,10 @@
+@@ -830,6 +_,10 @@
  
              return InteractionResult.PASS;
          } else {
@@ -157,26 +157,26 @@
              ItemStack itemstack = this.getItemInHand(p_36159_);
              ItemStack itemstack1 = itemstack.copy();
              InteractionResult interactionresult = p_36158_.interact(this, p_36159_);
-@@ -987,6 +_,10 @@
+@@ -838,6 +_,10 @@
                      itemstack.setCount(itemstack1.getCount());
                  }
  
 +                if (!this.abilities.instabuild && itemstack.isEmpty()) {
-+                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this, itemstack1, getSlotForHand(p_36159_));
++                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this, itemstack1, p_36159_.asEquipmentSlot());
 +                }
 +
                  return interactionresult;
              } else {
                  if (!itemstack.isEmpty() && p_36158_ instanceof LivingEntity) {
-@@ -998,6 +_,7 @@
+@@ -849,6 +_,7 @@
                      if (interactionresult1.consumesAction()) {
                          this.level().gameEvent(GameEvent.ENTITY_INTERACT, p_36158_.position(), GameEvent.Context.of(this));
                          if (itemstack.isEmpty() && !this.hasInfiniteMaterials()) {
-+                            net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this, itemstack1, getSlotForHand(p_36159_));
++                            net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this, itemstack1, p_36159_.asEquipmentSlot());
                              this.setItemInHand(p_36159_, ItemStack.EMPTY);
                          }
  
-@@ -1097,6 +_,7 @@
+@@ -948,6 +_,7 @@
      }
  
      public void attack(Entity p_36347_) {
@@ -184,7 +184,7 @@
          if (p_36347_.isAttackable()) {
              if (!p_36347_.skipAttackInteraction(this)) {
                  float f = this.isAutoSpinAttack() ? this.autoSpinAttackDmg : (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-@@ -1132,8 +_,10 @@
+@@ -983,8 +_,10 @@
                              && !this.isPassenger()
                              && p_36347_ instanceof LivingEntity
                              && !this.isSprinting();
@@ -196,7 +196,7 @@
                          }
  
                          float f3 = f + f1;
-@@ -1141,7 +_,7 @@
+@@ -992,7 +_,7 @@
                          if (flag3 && !flag1 && !flag && this.onGround()) {
                              double d0 = this.getKnownMovement().horizontalDistanceSqr();
                              double d1 = this.getSpeed() * 2.5;
@@ -205,7 +205,7 @@
                                  flag2 = true;
                              }
                          }
-@@ -1177,7 +_,7 @@
+@@ -1028,7 +_,7 @@
                              if (flag2) {
                                  float f6 = 1.0F + (float)this.getAttributeValue(Attributes.SWEEPING_DAMAGE_RATIO) * f;
  
@@ -214,7 +214,7 @@
                                      if (livingentity2 != this
                                          && livingentity2 != p_36347_
                                          && !this.isAlliedTo(livingentity2)
-@@ -1228,8 +_,8 @@
+@@ -1079,8 +_,8 @@
  
                              this.setLastHurtMob(p_36347_);
                              Entity entity = p_36347_;
@@ -225,7 +225,7 @@
                              }
  
                              boolean flag5 = false;
-@@ -1273,6 +_,7 @@
+@@ -1124,6 +_,7 @@
                          }
                      }
                  }
@@ -233,7 +233,7 @@
              }
          }
      }
-@@ -1375,6 +_,7 @@
+@@ -1230,6 +_,7 @@
      }
  
      public void stopSleepInBed(boolean p_36226_, boolean p_36227_) {
@@ -241,7 +241,7 @@
          super.stopSleeping();
          if (this.level() instanceof ServerLevel && p_36227_) {
              ((ServerLevel)this.level()).updateSleepingPlayerList();
-@@ -1483,6 +_,7 @@
+@@ -1338,6 +_,7 @@
      @Override
      public boolean causeFallDamage(double p_391627_, float p_150093_, DamageSource p_150095_) {
          if (this.abilities.mayfly) {
@@ -249,7 +249,7 @@
              return false;
          } else {
              if (p_391627_ >= 2.0) {
-@@ -1537,13 +_,13 @@
+@@ -1392,13 +_,13 @@
      protected void playStepSound(BlockPos p_282121_, BlockState p_282194_) {
          if (this.isInWater()) {
              this.waterSwimSound();
@@ -265,7 +265,7 @@
                  } else {
                      super.playStepSound(blockpos, blockstate);
                  }
-@@ -1574,6 +_,12 @@
+@@ -1429,6 +_,12 @@
      }
  
      public void giveExperiencePoints(int p_36291_) {
@@ -278,7 +278,7 @@
          this.increaseScore(p_36291_);
          this.experienceProgress = this.experienceProgress + (float)p_36291_ / this.getXpNeededForNextLevel();
          this.totalExperience = Mth.clamp(this.totalExperience + p_36291_, 0, Integer.MAX_VALUE);
-@@ -1601,7 +_,7 @@
+@@ -1456,7 +_,7 @@
      }
  
      public void onEnchantmentPerformed(ItemStack p_36172_, int p_36173_) {
@@ -287,7 +287,7 @@
          if (this.experienceLevel < 0) {
              this.experienceLevel = 0;
              this.experienceProgress = 0.0F;
-@@ -1612,6 +_,12 @@
+@@ -1467,6 +_,12 @@
      }
  
      public void giveExperienceLevels(int p_36276_) {
@@ -300,7 +300,7 @@
          this.experienceLevel = IntMath.saturatedAdd(this.experienceLevel, p_36276_);
          if (this.experienceLevel < 0) {
              this.experienceLevel = 0;
-@@ -1791,7 +_,13 @@
+@@ -1602,7 +_,13 @@
  
      @Override
      public Component getDisplayName() {
@@ -315,7 +315,7 @@
          return this.decorateDisplayNameComponent(mutablecomponent);
      }
  
-@@ -1953,18 +_,19 @@
+@@ -1765,18 +_,19 @@
              Predicate<ItemStack> predicate = ((ProjectileWeaponItem)p_36349_.getItem()).getSupportedHeldProjectiles();
              ItemStack itemstack = ProjectileWeaponItem.getHeldProjectile(this, predicate);
              if (!itemstack.isEmpty()) {
@@ -338,7 +338,7 @@
              }
          }
      }
-@@ -2109,6 +_,54 @@
+@@ -1935,6 +_,54 @@
          this.currentImpulseImpactPos = null;
          this.ignoreFallDamageFromCurrentImpulse = false;
      }

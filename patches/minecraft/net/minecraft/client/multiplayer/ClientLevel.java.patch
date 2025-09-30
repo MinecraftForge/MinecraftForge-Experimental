@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientLevel.java
 +++ b/net/minecraft/client/multiplayer/ClientLevel.java
-@@ -130,6 +_,7 @@
+@@ -145,6 +_,7 @@
          p_389331_.put(BiomeColors.FOLIAGE_COLOR_RESOLVER, new BlockTintCache(p_194177_ -> this.calculateBlockTint(p_194177_, BiomeColors.FOLIAGE_COLOR_RESOLVER)));
          p_389331_.put(BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER, new BlockTintCache(p_389335_ -> this.calculateBlockTint(p_389335_, BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER)));
          p_389331_.put(BiomeColors.WATER_COLOR_RESOLVER, new BlockTintCache(p_194168_ -> this.calculateBlockTint(p_194168_, BiomeColors.WATER_COLOR_RESOLVER)));
@@ -8,7 +8,7 @@
      });
      private final ClientChunkCache chunkSource;
      private final Deque<Runnable> lightUpdateQueue = Queues.newArrayDeque();
-@@ -139,6 +_,8 @@
+@@ -156,6 +_,8 @@
      private final int seaLevel;
      private boolean tickDayTime;
      private static final Set<Item> MARKER_PARTICLE_ITEMS = Set.of(Items.BARRIER, Items.LIGHT);
@@ -16,8 +16,8 @@
 +    private final net.minecraftforge.client.model.data.ModelDataManager modelDataManager = new net.minecraftforge.client.model.data.ModelDataManager(this);
  
      public void handleBlockChangedAck(int p_233652_) {
-         this.blockStatePredictionHandler.endPredictionsUpTo(p_233652_, this);
-@@ -217,6 +_,8 @@
+         if (SharedConstants.DEBUG_BLOCK_BREAK) {
+@@ -239,6 +_,8 @@
          this.serverSimulationDistance = p_364305_;
          this.updateSkyBrightness();
          this.prepareWeather();
@@ -26,7 +26,7 @@
      }
  
      public void queueLightUpdate(Runnable p_194172_) {
-@@ -299,6 +_,7 @@
+@@ -343,6 +_,7 @@
          p_104640_.setOldPosAndRot();
          p_104640_.tickCount++;
          Profiler.get().push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(p_104640_.getType()).toString());
@@ -34,7 +34,7 @@
          p_104640_.tick();
          Profiler.get().pop();
  
-@@ -350,8 +_,10 @@
+@@ -394,8 +_,10 @@
      }
  
      public void addEntity(Entity p_104741_) {
@@ -45,7 +45,7 @@
      }
  
      public void removeEntity(int p_171643_, Entity.RemovalReason p_171644_) {
-@@ -532,6 +_,12 @@
+@@ -576,6 +_,12 @@
          float p_263349_,
          long p_263408_
      ) {
@@ -58,7 +58,7 @@
          if (p_394722_ == this.minecraft.player) {
              this.playSound(p_263372_, p_263404_, p_263365_, p_263335_.value(), p_263417_, p_263416_, p_263349_, false, p_263408_);
          }
-@@ -541,6 +_,12 @@
+@@ -585,6 +_,12 @@
      public void playSeededSound(
          @Nullable Entity p_263536_, Entity p_396496_, Holder<SoundEvent> p_263518_, SoundSource p_263487_, float p_263538_, float p_263524_, long p_263509_
      ) {
@@ -71,8 +71,48 @@
          if (p_263536_ == this.minecraft.player) {
              this.minecraft.getSoundManager().play(new EntityBoundSoundInstance(p_263518_.value(), p_263487_, p_263538_, p_263524_, p_396496_, p_263509_));
          }
-@@ -991,6 +_,16 @@
-         this.connection.registerForCleaning(p_396040_);
+@@ -1032,7 +_,7 @@
+ 
+     @Override
+     public void addDestroyBlockEffect(BlockPos p_171667_, BlockState p_171668_) {
+-        if (!p_171668_.isAir() && p_171668_.shouldSpawnTerrainParticles()) {
++        if (!p_171668_.isAir() && !net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(p_171668_).addDestroyEffects(p_171668_, this, p_171667_, this.minecraft.particleEngine)) {
+             VoxelShape voxelshape = p_171668_.getShape(this, p_171667_);
+             double d0 = 0.25;
+             voxelshape.forAllBoxes(
+@@ -1067,6 +_,7 @@
+                                             p_171668_,
+                                             p_171667_
+                                         )
++                                        .updateSprite(p_171668_, p_171667_)
+                                     );
+                             }
+                         }
+@@ -1076,6 +_,13 @@
+         }
+     }
+ 
++    public void addBreakingBlockEffect(BlockPos pos, net.minecraft.world.phys.BlockHitResult target) {
++        var state = this.getBlockState(pos);
++        if (!net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(state).addHitEffects(state, this, target, this.minecraft.particleEngine))
++            addBreakingBlockEffect(pos, target.getDirection());
++    }
++
++    /** @deprecated Forge - Use crack(BlockPos, BlockHitResult) as it has more context and gives more control to modders */
+     public void addBreakingBlockEffect(BlockPos p_425440_, Direction p_431745_) {
+         BlockState blockstate = this.getBlockState(p_425440_);
+         if (blockstate.getRenderShape() != RenderShape.INVISIBLE && blockstate.shouldSpawnTerrainParticles()) {
+@@ -1111,7 +_,7 @@
+                 d0 = i + aabb.maxX + 0.1F;
+             }
+ 
+-            this.minecraft.particleEngine.add(new TerrainParticle(this, d0, d1, d2, 0.0, 0.0, 0.0, blockstate, p_425440_).setPower(0.2F).scale(0.6F));
++            this.minecraft.particleEngine.add(new TerrainParticle(this, d0, d1, d2, 0.0, 0.0, 0.0, blockstate, p_425440_).updateSprite(blockstate, p_425440_).setPower(0.2F).scale(0.6F));
+         }
+     }
+ 
+@@ -1175,6 +_,16 @@
+         this.explosionTracker.track(p_429129_, p_428744_, p_431051_, p_431683_);
      }
  
 +    @Override
@@ -88,7 +128,7 @@
      @OnlyIn(Dist.CLIENT)
      public static class ClientLevelData implements WritableLevelData {
          private final boolean hardcore;
-@@ -1079,6 +_,7 @@
+@@ -1256,6 +_,7 @@
          }
  
          public void setDifficulty(Difficulty p_104852_) {
@@ -96,7 +136,7 @@
              this.difficulty = p_104852_;
          }
  
-@@ -1121,6 +_,12 @@
+@@ -1298,6 +_,12 @@
                      break;
                  default:
              }
@@ -109,7 +149,7 @@
          }
  
          public void onTrackingEnd(Entity p_171716_) {
-@@ -1133,6 +_,15 @@
+@@ -1310,6 +_,15 @@
                      ClientLevel.this.dragonParts.removeAll(Arrays.asList(enderdragon.getSubEntities()));
                      break;
                  default:

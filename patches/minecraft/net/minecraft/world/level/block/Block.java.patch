@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/Block.java
 +++ b/net/minecraft/world/level/block/Block.java
-@@ -66,11 +_,12 @@
+@@ -70,11 +_,12 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import org.slf4j.Logger;
  
@@ -15,7 +15,7 @@
      private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
          .maximumSize(512L)
          .weakKeys()
-@@ -232,6 +_,7 @@
+@@ -236,6 +_,7 @@
                  LOGGER.error("Block classes should end with Block and {} doesn't.", s);
              }
          }
@@ -23,8 +23,8 @@
      }
  
      public static boolean isExceptionForConnection(BlockState p_152464_) {
-@@ -244,12 +_,19 @@
-             || p_152464_.is(BlockTags.SHULKER_BOXES);
+@@ -286,12 +_,19 @@
+         }
      }
  
 +    @Deprecated // FORGE: use shouldRenderFace with level and block pos instead
@@ -43,7 +43,7 @@
          } else if (voxelshape == Shapes.empty()) {
              return true;
          } else {
-@@ -337,9 +_,13 @@
+@@ -379,9 +_,13 @@
      public static void dropResources(
          BlockState p_49882_, Level p_49883_, BlockPos p_49884_, @Nullable BlockEntity p_49885_, @Nullable Entity p_49886_, ItemStack p_49887_
      ) {
@@ -58,7 +58,7 @@
          }
      }
  
-@@ -367,7 +_,7 @@
+@@ -409,7 +_,7 @@
      }
  
      private static void popResource(Level p_152441_, Supplier<ItemEntity> p_152442_, ItemStack p_152443_) {
@@ -67,7 +67,7 @@
              ItemEntity itementity = p_152442_.get();
              itementity.setDefaultPickUpDelay();
              p_152441_.addFreshEntity(itementity);
-@@ -375,11 +_,12 @@
+@@ -417,11 +_,12 @@
      }
  
      public void popExperience(ServerLevel p_49806_, BlockPos p_49807_, int p_49808_) {
@@ -81,7 +81,7 @@
      public float getExplosionResistance() {
          return this.explosionResistance;
      }
-@@ -398,7 +_,8 @@
+@@ -440,7 +_,8 @@
      public void playerDestroy(Level p_49827_, Player p_49828_, BlockPos p_49829_, BlockState p_49830_, @Nullable BlockEntity p_49831_, ItemStack p_49832_) {
          p_49828_.awardStat(Stats.BLOCK_MINED.get(this));
          p_49828_.causeFoodExhaustion(0.005F);
@@ -91,7 +91,7 @@
      }
  
      public void setPlacedBy(Level p_49847_, BlockPos p_49848_, BlockState p_49849_, @Nullable LivingEntity p_49850_, ItemStack p_49851_) {
-@@ -420,6 +_,7 @@
+@@ -462,6 +_,7 @@
          p_49822_.setDeltaMovement(p_49822_.getDeltaMovement().multiply(1.0, 0.0, 1.0));
      }
  
@@ -99,7 +99,7 @@
      public float getFriction() {
          return this.friction;
      }
-@@ -490,7 +_,7 @@
+@@ -532,7 +_,7 @@
              this.item = Item.byBlock(this);
          }
  
@@ -108,7 +108,7 @@
      }
  
      public boolean hasDynamicShape() {
-@@ -556,5 +_,78 @@
+@@ -598,5 +_,78 @@
          public int hashCode() {
              return System.identityHashCode(this.first) * 31 + System.identityHashCode(this.second);
          }

@@ -36,7 +36,7 @@
      }
  
      @Override
-@@ -361,16 +_,24 @@
+@@ -360,16 +_,24 @@
      }
  
      protected void comeOffTrack(ServerLevel p_365684_) {
@@ -63,7 +63,7 @@
          }
      }
  
-@@ -427,7 +_,7 @@
+@@ -426,7 +_,7 @@
      public Vec3 getRedstoneDirection(BlockPos p_369874_) {
          BlockState blockstate = this.level().getBlockState(p_369874_);
          if (blockstate.is(Blocks.POWERED_RAIL) && blockstate.getValue(PoweredRailBlock.POWERED)) {
@@ -72,7 +72,7 @@
              if (railshape == RailShape.EAST_WEST) {
                  if (this.isRedstoneConductor(p_369874_.west())) {
                      return new Vec3(1.0, 0.0, 0.0);
-@@ -599,5 +_,42 @@
+@@ -598,5 +_,42 @@
  
      public boolean isFurnace() {
          return false;

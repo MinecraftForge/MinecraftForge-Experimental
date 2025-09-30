@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/Item.java
 +++ b/net/minecraft/world/item/Item.java
-@@ -83,7 +_,7 @@
+@@ -86,7 +_,7 @@
  import net.minecraft.world.phys.Vec3;
  import org.slf4j.Logger;
  
@@ -9,7 +9,7 @@
      public static final Codec<Holder<Item>> CODEC = BuiltInRegistries.ITEM
          .holderByNameCodec()
          .validate(
-@@ -93,7 +_,7 @@
+@@ -96,7 +_,7 @@
          );
      public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.ITEM);
      private static final Logger LOGGER = LogUtils.getLogger();
@@ -18,7 +18,7 @@
      public static final ResourceLocation BASE_ATTACK_DAMAGE_ID = ResourceLocation.withDefaultNamespace("base_attack_damage");
      public static final ResourceLocation BASE_ATTACK_SPEED_ID = ResourceLocation.withDefaultNamespace("base_attack_speed");
      public static final int DEFAULT_MAX_STACK_SIZE = 64;
-@@ -131,6 +_,7 @@
+@@ -134,6 +_,7 @@
                  LOGGER.error("Item classes should end with Item and {} doesn't.", s);
              }
          }
@@ -26,7 +26,7 @@
      }
  
      @Deprecated
-@@ -138,17 +_,25 @@
+@@ -141,17 +_,25 @@
          return this.builtInRegistryHolder;
      }
  
@@ -94,9 +94,9 @@
      public static class Properties {
          private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = p_367498_ -> Util.makeDescriptionId("block", p_367498_.location());
          private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = p_367603_ -> Util.makeDescriptionId("item", p_367603_.location());
-@@ -588,6 +_,11 @@
-         @Nullable
-         MapItemSavedData mapData(MapId p_335695_);
+@@ -599,6 +_,11 @@
+ 
+         boolean isPeaceful();
  
 +        @Nullable
 +        default Level level() {
@@ -106,10 +106,10 @@
          static Item.TooltipContext of(@Nullable final Level p_332083_) {
              return p_332083_ == null ? EMPTY : new Item.TooltipContext() {
                  @Override
-@@ -603,6 +_,11 @@
+@@ -619,6 +_,11 @@
                  @Override
-                 public MapItemSavedData mapData(MapId p_330171_) {
-                     return p_332083_.getMapData(p_330171_);
+                 public boolean isPeaceful() {
+                     return p_332083_.getDifficulty() == Difficulty.PEACEFUL;
 +                }
 +
 +                @Override

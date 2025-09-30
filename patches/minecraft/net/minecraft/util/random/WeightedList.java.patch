@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/random/WeightedList.java
 +++ b/net/minecraft/util/random/WeightedList.java
-@@ -13,7 +_,7 @@
+@@ -16,7 +_,7 @@
  import net.minecraft.util.ExtraCodecs;
  import net.minecraft.util.RandomSource;
  
@@ -9,7 +9,7 @@
      private static final int FLAT_THRESHOLD = 64;
      private final int totalWeight;
      private final List<Weighted<E>> items;
-@@ -126,7 +_,7 @@
+@@ -133,7 +_,7 @@
          return 31 * i + this.items.hashCode();
      }
  

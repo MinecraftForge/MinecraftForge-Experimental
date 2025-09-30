@@ -1,17 +1,17 @@
 --- a/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-@@ -41,6 +_,7 @@
- public class ServerConfigurationPacketListenerImpl extends ServerCommonPacketListenerImpl implements ServerConfigurationPacketListener, TickablePacketListener {
+@@ -47,6 +_,7 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final Component DISCONNECT_REASON_INVALID_DATA = Component.translatable("multiplayer.disconnect.invalid_player_data");
+     private static final Component DISCONNECT_REASON_CONFIGURATION_ERROR = Component.translatable("multiplayer.disconnect.configuration_error");
 +    private static final ConfigurationTask.Type VANILLA_START = new ConfigurationTask.Type("vanilla_start");
      private final GameProfile gameProfile;
      private final Queue<ConfigurationTask> configurationTasks = new ConcurrentLinkedQueue<>();
      @Nullable
-@@ -48,11 +_,13 @@
-     private ClientInformation clientInformation;
-     @Nullable
+@@ -56,11 +_,13 @@
      private SynchronizeRegistriesTask synchronizeRegistriesTask;
+     @Nullable
+     private PrepareSpawnTask prepareSpawnTask;
 +    private final net.minecraftforge.network.config.ConfigurationTaskContext taskContext;
  
      public ServerConfigurationPacketListenerImpl(MinecraftServer p_301415_, Connection p_298106_, CommonListenerCookie p_301309_) {
@@ -22,7 +22,7 @@
      }
  
      @Override
-@@ -71,18 +_,23 @@
+@@ -84,18 +_,23 @@
          return this.connection.isConnected();
      }
  
@@ -46,14 +46,14 @@
          this.configurationTasks.add(this.synchronizeRegistriesTask);
 +        this.configurationTasks.add(new net.minecraftforge.network.config.SimpleConfigurationTask(VANILLA_START, this::vanillaStart));
          this.addOptionalTasks();
-         this.configurationTasks.add(new JoinWorldTask());
-         this.startNextTask();
-@@ -161,7 +_,7 @@
-             ConfigurationTask configurationtask = this.configurationTasks.poll();
-             if (configurationtask != null) {
-                 this.currentTask = configurationtask;
--                configurationtask.start(this::send);
-+                configurationtask.start(this.taskContext);
-             }
-         }
+         this.returnToWorld();
      }
+@@ -211,7 +_,7 @@
+                 this.currentTask = configurationtask;
+ 
+                 try {
+-                    configurationtask.start(this::send);
++                    configurationtask.start(this.taskContext);
+                 } catch (Exception exception) {
+                     LOGGER.error("Failed to start configuration task {}", configurationtask.type(), exception);
+                     this.disconnect(DISCONNECT_REASON_CONFIGURATION_ERROR);

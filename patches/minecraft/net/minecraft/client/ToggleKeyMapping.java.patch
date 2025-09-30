@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/ToggleKeyMapping.java
 +++ b/net/minecraft/client/ToggleKeyMapping.java
-@@ -17,7 +_,7 @@
+@@ -31,7 +_,7 @@
      @Override
      public void setDown(boolean p_92534_) {
          if (this.needsToggle.getAsBoolean()) {
@@ -9,7 +9,7 @@
                  super.setDown(!this.isDown());
              }
          } else {
-@@ -27,5 +_,9 @@
+@@ -56,5 +_,9 @@
  
      protected void reset() {
          super.setDown(false);

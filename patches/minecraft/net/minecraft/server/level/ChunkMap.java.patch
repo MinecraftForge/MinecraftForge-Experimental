@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -391,6 +_,7 @@
+@@ -393,6 +_,7 @@
                  this.modified = true;
              }
  
@@ -8,7 +8,7 @@
              return p_140179_;
          }
      }
-@@ -517,6 +_,7 @@
+@@ -519,6 +_,7 @@
                  if (this.pendingUnloads.remove(p_140182_, p_140183_) && chunkaccess != null) {
                      if (chunkaccess instanceof LevelChunk levelchunk) {
                          levelchunk.setLoaded(false);
@@ -16,15 +16,15 @@
                      }
  
                      this.save(chunkaccess);
-@@ -767,6 +_,7 @@
+@@ -763,6 +_,7 @@
                  this.activeChunkWrites.incrementAndGet();
                  SerializableChunkData serializablechunkdata = SerializableChunkData.copyOf(this.level, p_140259_);
                  CompletableFuture<CompoundTag> completablefuture = CompletableFuture.supplyAsync(serializablechunkdata::write, Util.backgroundExecutor());
 +                net.minecraftforge.event.ForgeEventFactory.onChunkDataSave(p_140259_, p_140259_.getWorldForge() != null ? p_140259_.getWorldForge() : this.level, serializablechunkdata);
-                 this.write(chunkpos, completablefuture::join).handle((p_358676_, p_358677_) -> {
-                     if (p_358677_ != null) {
-                         this.level.getServer().reportChunkSaveFailure(p_358677_, this.storageInfo(), chunkpos);
-@@ -1122,7 +_,7 @@
+                 this.write(chunkpos, completablefuture::join).handle((p_421447_, p_421448_) -> {
+                     if (p_421448_ != null) {
+                         this.level.getServer().reportChunkSaveFailure(p_421448_, this.storageInfo(), chunkpos);
+@@ -1114,7 +_,7 @@
      }
  
      protected void addEntity(Entity p_140200_) {

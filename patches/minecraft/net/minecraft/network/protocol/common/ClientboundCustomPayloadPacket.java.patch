@@ -1,15 +1,12 @@
 --- a/net/minecraft/network/protocol/common/ClientboundCustomPayloadPacket.java
 +++ b/net/minecraft/network/protocol/common/ClientboundCustomPayloadPacket.java
-@@ -36,7 +_,7 @@
+@@ -17,12 +_,12 @@
  public record ClientboundCustomPayloadPacket(CustomPacketPayload payload) implements Packet<ClientCommonPacketListener> {
      private static final int MAX_PAYLOAD_SIZE = 1048576;
      public static final StreamCodec<RegistryFriendlyByteBuf, ClientboundCustomPayloadPacket> GAMEPLAY_STREAM_CODEC = CustomPacketPayload.<RegistryFriendlyByteBuf>codec(
 -            p_330149_ -> DiscardedPayload.codec(p_330149_, 1048576),
 +            p_330149_ -> net.minecraftforge.common.ForgeHooks.getCustomPayloadCodec(p_330149_, 1048576),
-             Util.make(
-                 Lists.newArrayList(
-                     new CustomPacketPayload.TypeAndCodec<>(BrandPayload.TYPE, BrandPayload.STREAM_CODEC),
-@@ -65,7 +_,7 @@
+             Util.make(Lists.newArrayList(new CustomPacketPayload.TypeAndCodec<>(BrandPayload.TYPE, BrandPayload.STREAM_CODEC)), p_333496_ -> {})
          )
          .map(ClientboundCustomPayloadPacket::new, ClientboundCustomPayloadPacket::payload);
      public static final StreamCodec<FriendlyByteBuf, ClientboundCustomPayloadPacket> CONFIG_STREAM_CODEC = CustomPacketPayload.<FriendlyByteBuf>codec(

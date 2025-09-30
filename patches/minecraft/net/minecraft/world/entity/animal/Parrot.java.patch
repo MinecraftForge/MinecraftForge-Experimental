@@ -3,7 +3,7 @@
 @@ -264,7 +_,7 @@
              }
  
-             if (!this.level().isClientSide) {
+             if (!this.level().isClientSide()) {
 -                if (this.random.nextInt(10) == 0) {
 +                if (this.random.nextInt(10) == 0 && !net.minecraftforge.event.ForgeEventFactory.onAnimalTame(this, p_29414_)) {
                      this.tame(p_29414_);

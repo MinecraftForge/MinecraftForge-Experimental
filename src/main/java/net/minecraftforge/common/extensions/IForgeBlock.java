@@ -182,7 +182,7 @@ public interface IForgeBlock {
      */
     default boolean onDestroyedByPlayer(BlockState state, Level level, BlockPos pos, Player player, boolean willHarvest, FluidState fluid) {
         self().playerWillDestroy(level, pos, state, player);
-        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide ? 11 : 3);
+        return level.setBlock(pos, fluid.createLegacyBlock(), level.isClientSide() ? 11 : 3);
     }
 
     /**
@@ -713,7 +713,7 @@ public interface IForgeBlock {
             // Logic copied from HoeItem#TILLABLES; needs to be kept in sync during updating
             Block block = state.getBlock();
             if (block == Blocks.ROOTED_DIRT) {
-                if (!simulate && !context.getLevel().isClientSide) {
+                if (!simulate && !context.getLevel().isClientSide()) {
                     Block.popResourceFromFace(context.getLevel(), context.getClickedPos(), context.getClickedFace(), new ItemStack(Items.HANGING_ROOTS));
                 }
                 return Blocks.DIRT.defaultBlockState();

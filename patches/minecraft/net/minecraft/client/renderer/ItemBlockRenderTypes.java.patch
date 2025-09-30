@@ -5,12 +5,12 @@
  @OnlyIn(Dist.CLIENT)
  public class ItemBlockRenderTypes {
 +    @Deprecated
-     private static final Map<Block, ChunkSectionLayer> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_389364_ -> {
+     private static final Map<Block, ChunkSectionLayer> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_420870_ -> {
          ChunkSectionLayer chunksectionlayer = ChunkSectionLayer.TRIPWIRE;
-         p_389364_.put(Blocks.TRIPWIRE, chunksectionlayer);
-@@ -353,12 +_,15 @@
-         p_389364_.put(Blocks.BUBBLE_COLUMN, chunksectionlayer3);
-         p_389364_.put(Blocks.TINTED_GLASS, chunksectionlayer3);
+         p_420870_.put(Blocks.TRIPWIRE, chunksectionlayer);
+@@ -357,12 +_,15 @@
+         p_420870_.put(Blocks.BUBBLE_COLUMN, chunksectionlayer3);
+         p_420870_.put(Blocks.TINTED_GLASS, chunksectionlayer3);
      });
 +    @Deprecated
      private static final Map<Fluid, ChunkSectionLayer> LAYER_BY_FLUID = Util.make(Maps.newHashMap(), p_404902_ -> {
@@ -24,7 +24,7 @@
      public static ChunkSectionLayer getChunkRenderType(BlockState p_109283_) {
          Block block = p_109283_.getBlock();
          if (block instanceof LeavesBlock) {
-@@ -369,6 +_,8 @@
+@@ -373,6 +_,8 @@
          }
      }
  
@@ -33,7 +33,7 @@
      public static RenderType getMovingBlockRenderType(BlockState p_109294_) {
          Block block = p_109294_.getBlock();
          if (block instanceof LeavesBlock) {
-@@ -389,11 +_,14 @@
+@@ -393,11 +_,14 @@
          }
      }
  
@@ -48,7 +48,7 @@
      public static RenderType getRenderType(ItemStack p_363859_) {
          if (p_363859_.getItem() instanceof BlockItem blockitem) {
              Block block = blockitem.getBlock();
-@@ -403,12 +_,71 @@
+@@ -407,12 +_,71 @@
          }
      }
  

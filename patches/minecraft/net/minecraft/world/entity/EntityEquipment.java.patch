@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityEquipment.java
 +++ b/net/minecraft/world/entity/EntityEquipment.java
-@@ -50,7 +_,7 @@
+@@ -49,7 +_,7 @@
          for (Entry<EquipmentSlot, ItemStack> entry : this.items.entrySet()) {
              ItemStack itemstack = entry.getValue();
              if (!itemstack.isEmpty()) {
@@ -9,7 +9,7 @@
              }
          }
      }
-@@ -70,5 +_,9 @@
+@@ -69,5 +_,9 @@
  
      public void clear() {
          this.items.replaceAll((p_393205_, p_394162_) -> ItemStack.EMPTY);

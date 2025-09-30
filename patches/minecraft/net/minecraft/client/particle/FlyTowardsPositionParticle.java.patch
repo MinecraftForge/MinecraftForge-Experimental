@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/particle/FlyTowardsPositionParticle.java
 +++ b/net/minecraft/client/particle/FlyTowardsPositionParticle.java
-@@ -104,6 +_,7 @@
+@@ -114,6 +_,7 @@
              this.x = this.xStart + this.xd * f;
              this.y = this.yStart + this.yd * f - f1 * 1.2F;
              this.z = this.zStart + this.zd * f;

@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/pipeline/RenderTarget.java
 +++ b/com/mojang/blaze3d/pipeline/RenderTarget.java
-@@ -92,7 +_,7 @@
+@@ -86,7 +_,7 @@
              this.width = p_83951_;
              this.height = p_83952_;
              if (this.useDepth) {
@@ -9,7 +9,7 @@
                  this.depthTextureView = gpudevice.createTextureView(this.depthTexture);
                  this.depthTexture.setTextureFilter(FilterMode.NEAREST, false);
                  this.depthTexture.setAddressMode(AddressMode.CLAMP_TO_EDGE);
-@@ -166,5 +_,26 @@
+@@ -155,5 +_,26 @@
      @Nullable
      public GpuTextureView getDepthTextureView() {
          return this.depthTextureView;

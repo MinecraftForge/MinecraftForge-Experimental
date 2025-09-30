@@ -9,7 +9,7 @@
      }
  
      static TextureAtlasSprite resolveParticleSprite(TextureSlots p_391346_, ModelBaker p_396500_, ModelDebugName p_393309_) {
-@@ -127,5 +_,9 @@
+@@ -130,5 +_,9 @@
  
      default ItemTransforms getTopTransforms() {
          return findTopTransforms(this);

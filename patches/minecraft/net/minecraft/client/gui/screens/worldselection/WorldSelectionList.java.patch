@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/worldselection/WorldSelectionList.java
 +++ b/net/minecraft/client/gui/screens/worldselection/WorldSelectionList.java
-@@ -75,6 +_,7 @@
+@@ -79,6 +_,7 @@
      static final ResourceLocation JOIN_HIGHLIGHTED_SPRITE = ResourceLocation.withDefaultNamespace("world_list/join_highlighted");
      static final ResourceLocation JOIN_SPRITE = ResourceLocation.withDefaultNamespace("world_list/join");
      static final Logger LOGGER = LogUtils.getLogger();
@@ -8,31 +8,31 @@
      static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
      static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
      static final Component SNAPSHOT_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.snapshot1").withStyle(ChatFormatting.GOLD);
-@@ -400,6 +_,7 @@
-             p_281612_.drawString(this.minecraft.font, s1, p_282820_ + 32 + 3, p_283181_ + 9 + 3, -8355712);
-             p_281612_.drawString(this.minecraft.font, component, p_282820_ + 32 + 3, p_283181_ + 9 + 9 + 3, -8355712);
-             p_281612_.blit(RenderPipelines.GUI_TEXTURED, this.icon.textureLocation(), p_282820_, p_283181_, 0.0F, 0.0F, 32, 32, 32, 32);
-+            renderExperimentalWarning(p_281612_, p_283204_, p_283025_, p_283181_, p_282820_);
-             if (this.minecraft.options.touchscreen().get() || p_283396_) {
-                 p_281612_.fill(p_282820_, p_283181_, p_282820_ + 32, p_283181_ + 32, -1601138544);
-                 int j = p_283204_ - p_282820_;
-@@ -450,6 +_,19 @@
-                     p_281612_.blitSprite(RenderPipelines.GUI_TEXTURED, resourcelocation, p_282820_, p_283181_, 32, 32);
-                 }
+@@ -494,6 +_,19 @@
              }
-+        }
-+
+         }
+ 
 +        // FORGE: Patch in experimental warning icon for worlds in the world selection screen
 +        private void renderExperimentalWarning(GuiGraphics guiGraphics, int mouseX, int mouseY, int top, int left) {
 +           if (this.summary.isLifecycleExperimental()) {
-+              int leftStart = left + WorldSelectionList.this.getRowWidth();
++              int leftStart = left + this.list.getRowWidth();
 +              guiGraphics.blit(RenderPipelines.GUI_TEXTURED, WorldSelectionList.FORGE_EXPERIMENTAL_WARNING_ICON, leftStart - 36, top, 0.0F, 0.0F, 32, 32, 32, 32);
-+              if (WorldSelectionList.this.getEntryAtPosition(mouseX, mouseY) == this && mouseX > leftStart - 36 && mouseX < leftStart) {
++              if (this.list.getEntryAtPosition(mouseX, mouseY) == this && mouseX > leftStart - 36 && mouseX < leftStart) {
 +                 var font = Minecraft.getInstance().font;
 +                 List<net.minecraft.util.FormattedCharSequence> tooltip = font.split(Component.translatable("forge.experimentalsettings.tooltip"), 200);
 +                 guiGraphics.setTooltipForNextFrame(font, tooltip, mouseX, mouseY);
 +              }
 +           }
-         }
- 
++        }
++
          @Override
+         public Component getNarration() {
+             Component component = Component.translatable(
+@@ -520,6 +_,7 @@
+             this.infoText.setPosition(i, this.getContentY() + 9 + 9 + 3);
+             this.infoText.render(p_424437_, p_425443_, p_425024_, p_424775_);
+             p_424437_.blit(RenderPipelines.GUI_TEXTURED, this.icon.textureLocation(), this.getContentX(), this.getContentY(), 0.0F, 0.0F, 32, 32, 32, 32);
++            renderExperimentalWarning(p_424437_, p_425443_, p_425024_, this.getContentY(), this.getContentX());
+             if (this.list.entryType == WorldSelectionList.EntryType.SINGLEPLAYER && (this.minecraft.options.touchscreen().get() || p_430261_)) {
+                 p_424437_.fill(this.getContentX(), this.getContentY(), this.getContentX() + 32, this.getContentY() + 32, -1601138544);
+                 int j = p_425443_ - this.getContentX();

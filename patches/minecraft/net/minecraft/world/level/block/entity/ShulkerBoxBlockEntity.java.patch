@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ShulkerBoxBlockEntity.java
-@@ -234,7 +_,7 @@
+@@ -235,7 +_,7 @@
  
      @Override
      public boolean canPlaceItemThroughFace(int p_59663_, ItemStack p_59664_, @Nullable Direction p_59665_) {
@@ -9,7 +9,7 @@
      }
  
      @Override
-@@ -258,6 +_,11 @@
+@@ -259,6 +_,11 @@
  
      public boolean isClosed() {
          return this.animationStatus == ShulkerBoxBlockEntity.AnimationStatus.CLOSED;

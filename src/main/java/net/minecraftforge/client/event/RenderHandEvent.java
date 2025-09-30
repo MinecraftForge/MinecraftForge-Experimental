@@ -7,7 +7,7 @@ package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -37,7 +37,7 @@ import org.jetbrains.annotations.ApiStatus;
 public record RenderHandEvent(
         InteractionHand getHand,
         PoseStack getPoseStack,
-        MultiBufferSource getMultiBufferSource,
+        SubmitNodeCollector getNodeCollector,
         int getPackedLight,
         float getPartialTick,
         float getInterpolatedPitch,

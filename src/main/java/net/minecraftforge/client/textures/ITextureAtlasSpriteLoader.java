@@ -10,9 +10,12 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.metadata.animation.FrameSize;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.server.packs.resources.ResourceMetadata;
 import net.minecraftforge.client.event.RegisterTextureAtlasSpriteLoadersEvent;
+
+import java.util.List;
+
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -30,7 +33,7 @@ import org.jetbrains.annotations.NotNull;
  * @see RegisterTextureAtlasSpriteLoadersEvent
  */
 public interface ITextureAtlasSpriteLoader {
-    SpriteContents loadContents(ResourceLocation name, Resource resource, FrameSize frameSize, NativeImage image, ResourceMetadata animationMeta, ForgeTextureMetadata forgeMeta);
+    SpriteContents loadContents(ResourceLocation name, Resource resource, FrameSize frameSize, NativeImage image, List<MetadataSectionType.WithValue<?>> metadata);
 
     /**
      * Creates a {@link TextureAtlasSprite} from the given {@link SpriteContents}.

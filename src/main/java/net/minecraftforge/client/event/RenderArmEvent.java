@@ -7,7 +7,7 @@ package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
@@ -23,14 +23,10 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is {@linkplain Cancellable cancellable}. If this event is cancelled, then the arm will not be rendered.</p>
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
- *
- * @param getPoseStack The pose stack used for rendering
- * @param getMultiBufferSource The source of rendering buffers
- * @param getArm The arm being rendered
  */
 public record RenderArmEvent(
         PoseStack getPoseStack,
-        MultiBufferSource getMultiBufferSource,
+        SubmitNodeCollector getNodeCollector,
         int getPackedLight,
         HumanoidArm getArm
 ) implements Cancellable, RecordEvent {

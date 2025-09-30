@@ -25,7 +25,11 @@ public interface IForgeKeyMapping {
      * {@return true if the key conflict context and modifier are active and the keyCode matches this binding, false otherwise}
      */
     default boolean isActiveAndMatches(InputConstants.Key keyCode) {
-        return keyCode != InputConstants.UNKNOWN && keyCode.equals(getKey()) && getKeyConflictContext().isActive() && getKeyModifier().isActive(getKeyConflictContext());
+        return keyCode != InputConstants.UNKNOWN && keyCode.equals(getKey()) && isActive();
+    }
+
+    default boolean isActive() {
+        return getKeyConflictContext().isActive() && getKeyModifier().isActive(getKeyConflictContext());
     }
 
     default void setToDefault() {

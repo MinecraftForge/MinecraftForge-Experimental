@@ -1,0 +1,61 @@
+--- a/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
++++ b/net/minecraft/client/renderer/entity/player/AvatarRenderer.java
+@@ -92,7 +_,7 @@
+     private static HumanoidModel.ArmPose getArmPose(Avatar p_422497_, ItemStack p_429700_, InteractionHand p_430481_) {
+         if (p_429700_.isEmpty()) {
+             return HumanoidModel.ArmPose.EMPTY;
+-        } else if (!p_422497_.swinging && p_429700_.is(Items.CROSSBOW) && CrossbowItem.isCharged(p_429700_)) {
++        } else if (!p_422497_.swinging && p_429700_.getItem() instanceof CrossbowItem && CrossbowItem.isCharged(p_429700_)) {
+             return HumanoidModel.ArmPose.CROSSBOW_HOLD;
+         } else {
+             if (p_422497_.getUsedItemHand() == p_430481_ && p_422497_.getUseItemRemainingTicks() > 0) {
+@@ -126,6 +_,10 @@
+                 }
+             }
+ 
++            var pose = net.minecraftforge.client.extensions.common.IClientItemExtensions.of(p_429700_).getArmPose(p_422497_, p_430481_, p_429700_);
++            if (pose != null)
++                return pose;
++
+             return HumanoidModel.ArmPose.ITEM;
+         }
+     }
+@@ -149,9 +_,10 @@
+             p_423892_.translate(0.0F, 9.0F * 1.15F * 0.025F, 0.0F);
+         }
+ 
+-        if (p_425306_.nameTag != null) {
++        var event = net.minecraftforge.client.event.ForgeEventFactoryClient.fireRenderNameTagEvent(p_425306_, p_425306_.nameTag, this, p_423892_, p_428344_, p_426061_);
++        if (!event.getResult().isDenied() && (event.getResult().isAllowed() || p_425306_.nameTag != null)) {
+             p_428344_.submitNameTag(
+-                p_423892_, p_425306_.nameTagAttachment, i, p_425306_.nameTag, !p_425306_.isDiscrete, p_425306_.lightCoords, p_425306_.distanceToCameraSq, p_426061_
++                p_423892_, p_425306_.nameTagAttachment, i, event.getContent(), !p_425306_.isDiscrete, p_425306_.lightCoords, p_425306_.distanceToCameraSq, p_426061_
+             );
+         }
+ 
+@@ -239,10 +_,12 @@
+     }
+ 
+     public void renderRightHand(PoseStack p_428282_, SubmitNodeCollector p_424928_, int p_427204_, ResourceLocation p_423115_, boolean p_431039_) {
++        if (!net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderArm(p_428282_, p_424928_, p_427204_, HumanoidArm.RIGHT))
+         this.renderHand(p_428282_, p_424928_, p_427204_, p_423115_, this.model.rightArm, p_431039_);
+     }
+ 
+     public void renderLeftHand(PoseStack p_424615_, SubmitNodeCollector p_425532_, int p_427068_, ResourceLocation p_425626_, boolean p_423290_) {
++        if (!net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderArm(p_424615_, p_425532_, p_427068_, HumanoidArm.LEFT))
+         this.renderHand(p_424615_, p_425532_, p_427068_, p_425626_, this.model.leftArm, p_423290_);
+     }
+ 
+@@ -295,5 +_,12 @@
+ 
+     public static boolean isPlayerUpsideDown(Player p_424650_) {
+         return isUpsideDownName(p_424650_.getGameProfile().name());
++    }
++
++    @Override
++    public void submit(AvatarRenderState state, PoseStack pose, SubmitNodeCollector source, CameraRenderState camera) {
++        if (net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderAvatarPre(state, this, pose, source, camera)) return;
++        super.submit(state, pose, source, camera);
++        net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderAvatarPost(state, this, pose, source, camera);
+     }
+ }

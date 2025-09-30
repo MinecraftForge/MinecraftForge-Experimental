@@ -11,7 +11,7 @@
      @Override
      protected void addTags(HolderLookup.Provider p_255639_) {
          (new BlockItemTagsProvider() {
-@@ -459,6 +_,12 @@
+@@ -473,6 +_,12 @@
          @Override
          public TagAppender<Block, Block> addOptionalTag(TagKey<Block> p_407315_) {
              this.itemAppender.addOptionalTag(blockTagToItemTag(p_407315_));

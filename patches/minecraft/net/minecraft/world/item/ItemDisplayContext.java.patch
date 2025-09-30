@@ -9,9 +9,9 @@
      NONE(0, "none"),
      THIRD_PERSON_LEFT_HAND(1, "thirdperson_lefthand"),
      THIRD_PERSON_RIGHT_HAND(2, "thirdperson_righthand"),
-@@ -16,14 +_,16 @@
-     GROUND(7, "ground"),
-     FIXED(8, "fixed");
+@@ -17,14 +_,16 @@
+     FIXED(8, "fixed"),
+     ON_SHELF(9, "on_shelf");
  
 -    public static final Codec<ItemDisplayContext> CODEC = StringRepresentable.fromEnum(ItemDisplayContext::values);
 -    public static final IntFunction<ItemDisplayContext> BY_ID = ByIdMap.continuous(ItemDisplayContext::getId, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
@@ -28,7 +28,7 @@
      }
  
      @Override
-@@ -42,4 +_,29 @@
+@@ -43,4 +_,29 @@
      public boolean leftHand() {
          return this == FIRST_PERSON_LEFT_HAND || this == THIRD_PERSON_LEFT_HAND;
      }

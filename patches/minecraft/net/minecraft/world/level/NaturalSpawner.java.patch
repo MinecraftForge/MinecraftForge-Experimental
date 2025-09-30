@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
-@@ -69,7 +_,7 @@
+@@ -71,7 +_,7 @@
  
          for (Entity entity : p_186526_) {
              if (!(entity instanceof Mob mob && (mob.isPersistenceRequired() || mob.requiresCustomPersistence()))) {
@@ -9,7 +9,7 @@
                  if (mobcategory != MobCategory.MISC) {
                      BlockPos blockpos = entity.blockPosition();
                      p_186527_.query(ChunkPos.asLong(blockpos), p_275163_ -> {
-@@ -200,7 +_,7 @@
+@@ -202,7 +_,7 @@
                                      l1++;
                                      p_47040_.addFreshEntityWithPassengers(mob);
                                      p_47044_.run(mob, p_47041_);
@@ -18,7 +18,7 @@
                                          return;
                                      }
  
-@@ -270,7 +_,7 @@
+@@ -276,7 +_,7 @@
      private static boolean isValidPositionForMob(ServerLevel p_46992_, Mob p_46993_, double p_46994_) {
          return p_46994_ > p_46993_.getType().getCategory().getDespawnDistance() * p_46993_.getType().getCategory().getDespawnDistance() && p_46993_.removeWhenFarAway(p_46994_)
              ? false
@@ -27,7 +27,7 @@
      }
  
      private static Optional<MobSpawnSettings.SpawnerData> getRandomSpawnMobAt(
-@@ -301,9 +_,13 @@
+@@ -307,9 +_,13 @@
          BlockPos p_220448_,
          @Nullable Holder<Biome> p_220449_
      ) {
@@ -44,7 +44,7 @@
      }
  
      public static boolean isInNetherFortressBounds(BlockPos p_220456_, ServerLevel p_220457_, MobCategory p_220458_, StructureManager p_220459_) {
-@@ -389,7 +_,7 @@
+@@ -395,7 +_,7 @@
                                  }
  
                                  entity.snapTo(d0, blockpos.getY(), d1, p_220454_.nextFloat() * 360.0F, 0.0F);
@@ -53,7 +53,7 @@
                                      spawngroupdata = mob.finalizeSpawn(
                                          p_220451_, p_220451_.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.CHUNK_GENERATION, spawngroupdata
                                      );
-@@ -495,7 +_,7 @@
+@@ -501,7 +_,7 @@
              }
  
              this.spawnPotential.addCharge(blockpos, d0);

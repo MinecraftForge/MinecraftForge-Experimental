@@ -6,10 +6,13 @@
 package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
-import net.minecraft.client.renderer.entity.state.PlayerRenderState;
+
+import net.minecraft.client.entity.ClientAvatarEntity;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.world.entity.Avatar;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
@@ -18,20 +21,25 @@ import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
- * Fired when a player is being rendered.
+ * Fired when a Avatar is being rendered, typically a player or a mannequin.
  * See the two subclasses for listening for before and after rendering.
  *
- * @see RenderPlayerEvent.Pre
- * @see RenderPlayerEvent.Post
- * @see PlayerRenderer
+ * @see RenderAvatarEvent.Pre
+ * @see RenderAvatarEvent.Post
+ * @see AvatarRenderer
  */
-public sealed interface RenderPlayerEvent {
-    PlayerRenderState getState();
+public sealed interface RenderAvatarEvent {
+    AvatarRenderState getState();
 
     /**
      * {@return the player entity renderer}
      */
-    PlayerRenderer getRenderer();
+    AvatarRenderer<?> getRenderer();
+
+    @SuppressWarnings("unchecked")
+    default <AvatarlikeEntity extends Avatar & ClientAvatarEntity> AvatarRenderer<AvatarlikeEntity> getRendererTyped() {
+        return (AvatarRenderer<AvatarlikeEntity>) getRenderer();
+    }
 
     /**
      * {@return the pose stack used for rendering}
@@ -39,16 +47,15 @@ public sealed interface RenderPlayerEvent {
     PoseStack getPoseStack();
 
     /**
-     * {@return the source of rendering buffers}
+     * {@return the collector you should render to}
      */
-    MultiBufferSource getMultiBufferSource();
+    SubmitNodeCollector getNodeCollector();
 
     /**
-     * {@return the amount of packed (sky and block) light for rendering}
+     * {@return State related to the current camera}
      *
-     * @see LightTexture
      */
-    int getPackedLight();
+    CameraRenderState getCameraState();
 
     /**
      * Fired <b>before</b> the player is rendered.
@@ -56,17 +63,17 @@ public sealed interface RenderPlayerEvent {
      *
      * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the player will not be rendered and the corresponding
-     * {@link RenderPlayerEvent.Post} will not be fired.</p>
+     * {@link RenderAvatarEvent.Post} will not be fired.</p>
      *
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     record Pre(
-            PlayerRenderState getState,
-            PlayerRenderer getRenderer,
+            AvatarRenderState getState,
+            AvatarRenderer<?> getRenderer,
             PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource,
-            int getPackedLight
-    ) implements Cancellable, RecordEvent, RenderPlayerEvent {
+            SubmitNodeCollector getNodeCollector,
+            CameraRenderState getCameraState
+    ) implements Cancellable, RecordEvent, RenderAvatarEvent {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
         @ApiStatus.Internal
@@ -74,17 +81,17 @@ public sealed interface RenderPlayerEvent {
     }
 
     /**
-     * Fired <b>after</b> the player is rendered, if the corresponding {@link RenderPlayerEvent.Pre} is not cancelled.
+     * Fired <b>after</b> the player is rendered, if the corresponding {@link RenderAvatarEvent.Pre} is not cancelled.
      *
      * <p>This event is only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     record Post(
-            PlayerRenderState getState,
-            PlayerRenderer getRenderer,
+            AvatarRenderState getState,
+            AvatarRenderer<?> getRenderer,
             PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource,
-            int getPackedLight
-    ) implements RecordEvent, RenderPlayerEvent {
+            SubmitNodeCollector getNodeCollector,
+            CameraRenderState getCameraState
+    ) implements RecordEvent, RenderAvatarEvent {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
         @ApiStatus.Internal

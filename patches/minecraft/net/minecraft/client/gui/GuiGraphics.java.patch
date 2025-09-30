@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/GuiGraphics.java
 +++ b/net/minecraft/client/gui/GuiGraphics.java
-@@ -72,7 +_,7 @@
+@@ -83,7 +_,7 @@
  import org.joml.Vector3f;
  
  @OnlyIn(Dist.CLIENT)
@@ -9,7 +9,7 @@
      private static final int EXTRA_SPACE_AFTER_FIRST_TOOLTIP_LINE = 2;
      private final Minecraft minecraft;
      private final Matrix3x2fStack pose;
-@@ -875,6 +_,7 @@
+@@ -950,6 +_,7 @@
                  CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering item");
                  CrashReportCategory crashreportcategory = crashreport.addCategory("Item being rendered");
                  crashreportcategory.setDetail("Item Type", () -> String.valueOf(p_283653_.getItem()));
@@ -17,7 +17,7 @@
                  crashreportcategory.setDetail("Item Components", () -> String.valueOf(p_283653_.getComponents()));
                  crashreportcategory.setDetail("Item Foil", () -> String.valueOf(p_283653_.hasFoil()));
                  throw new ReportedException(crashreport);
-@@ -893,6 +_,7 @@
+@@ -968,6 +_,7 @@
              this.renderItemCooldown(p_283349_, p_282641_, p_282146_);
              this.renderItemCount(p_282005_, p_283349_, p_282641_, p_282146_, p_282803_);
              this.pose.popMatrix();
@@ -25,7 +25,7 @@
          }
      }
  
-@@ -904,21 +_,30 @@
+@@ -979,21 +_,30 @@
          this.setTooltipForNextFrame(this.minecraft.font, p_407686_, DefaultTooltipPositioner.INSTANCE, p_410475_, p_407139_, false);
      }
  
@@ -58,7 +58,7 @@
          this.setTooltipForNextFrameInternal(p_407847_, list, p_409369_, p_407472_, DefaultTooltipPositioner.INSTANCE, p_410303_, false);
      }
  
-@@ -931,7 +_,22 @@
+@@ -1006,7 +_,22 @@
      }
  
      public void setComponentTooltipForNextFrame(Font p_406239_, List<Component> p_410275_, int p_410594_, int p_409343_) {
@@ -82,7 +82,7 @@
      }
  
      public void setComponentTooltipForNextFrame(Font p_408650_, List<Component> p_407512_, int p_406019_, int p_408123_, @Nullable ResourceLocation p_409993_) {
-@@ -994,11 +_,13 @@
+@@ -1069,11 +_,13 @@
          ClientTooltipPositioner p_409451_,
          @Nullable ResourceLocation p_409298_
      ) {
@@ -97,7 +97,7 @@
              if (k > i) {
                  i = k;
              }
-@@ -1008,16 +_,17 @@
+@@ -1083,16 +_,17 @@
  
          int l1 = i;
          int i2 = j;
@@ -118,7 +118,7 @@
              j1 += clienttooltipcomponent1.getHeight(p_283128_) + (k1 == 0 ? 2 : 0);
          }
  
-@@ -1025,7 +_,7 @@
+@@ -1100,7 +_,7 @@
  
          for (int j2 = 0; j2 < p_282716_.size(); j2++) {
              ClientTooltipComponent clienttooltipcomponent2 = p_282716_.get(j2);
@@ -127,7 +127,7 @@
              j1 += clienttooltipcomponent2.getHeight(p_283128_) + (j2 == 0 ? 2 : 0);
          }
  
-@@ -1222,6 +_,14 @@
+@@ -1315,6 +_,14 @@
  
      public void submitProfilerChartRenderState(List<ResultField> p_408565_, int p_410147_, int p_406156_, int p_407365_, int p_408180_) {
          this.guiRenderState.submitPicturesInPictureState(new GuiProfilerChartRenderState(p_408565_, p_410147_, p_406156_, p_407365_, p_408180_, this.scissorStack.peek()));
@@ -141,4 +141,4 @@
 +        return this.scissorStack;
      }
  
-     @OnlyIn(Dist.CLIENT)
+     public TextureAtlasSprite getSprite(Material p_430745_) {

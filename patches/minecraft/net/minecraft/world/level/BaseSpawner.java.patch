@@ -21,7 +21,7 @@
                                  spawndata.getEquipment().ifPresent(mob::equip);
 @@ -280,5 +_,15 @@
  
-     public double getoSpin() {
+     public double getOSpin() {
          return this.oSpin;
 +    }
 +

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/MushroomCow.java
 +++ b/net/minecraft/world/entity/animal/MushroomCow.java
-@@ -115,7 +_,7 @@
+@@ -116,7 +_,7 @@
  
              this.playSound(soundevent, 1.0F, 1.0F);
              return InteractionResult.SUCCESS;
@@ -9,7 +9,7 @@
              if (this.level() instanceof ServerLevel serverlevel) {
                  this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
                  this.gameEvent(GameEvent.SHEAR, p_28941_);
-@@ -170,15 +_,26 @@
+@@ -172,15 +_,26 @@
  
      @Override
      public void shear(ServerLevel p_369641_, SoundSource p_28924_, ItemStack p_364876_) {
@@ -25,21 +25,21 @@
 +        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.COW, time -> {}))
 +            return ret;
          p_369641_.playSound(null, this, SoundEvents.MOOSHROOM_SHEAR, p_28924_, 1.0F, 1.0F);
-         this.convertTo(EntityType.COW, ConversionParams.single(this, false, false), p_405458_ -> {
+         this.convertTo(EntityType.COW, ConversionParams.single(this, false, false), p_421807_ -> {
              p_369641_.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(0.5), this.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
-             this.dropFromShearingLootTable(p_369641_, BuiltInLootTables.SHEAR_MOOSHROOM, p_364876_, (p_405454_, p_405455_) -> {
--                for (int i = 0; i < p_405455_.getCount(); i++) {
--                    p_405454_.addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(1.0), this.getZ(), p_405455_.copyWithCount(1)));
+             this.dropFromShearingLootTable(p_369641_, BuiltInLootTables.SHEAR_MOOSHROOM, p_364876_, (p_421803_, p_421804_) -> {
+-                for (int i = 0; i < p_421804_.getCount(); i++) {
+-                    p_421803_.addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(1.0), this.getZ(), p_421804_.copyWithCount(1)));
 -                }
-+                ret.add(p_405455_);
++                ret.add(p_421804_);
              });
-+            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_405458_);
++            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_421807_);
          });
 +        return ret;
      }
  
      @Override
-@@ -256,6 +_,15 @@
+@@ -258,6 +_,15 @@
          }
  
          return mushroomcow$variant2;

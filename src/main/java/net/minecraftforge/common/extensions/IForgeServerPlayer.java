@@ -51,7 +51,7 @@ public interface IForgeServerPlayer {
     @SuppressWarnings("resource")
     default void openMenu(MenuProvider containerSupplier, Consumer<FriendlyByteBuf> extraDataWriter) {
         var player = self();
-        if (player.level().isClientSide) return;
+        if (player.level().isClientSide()) return;
         player.doCloseContainer();
         player.nextContainerCounter();
         int openContainerId = player.containerCounter;

@@ -12,7 +12,7 @@
 @@ -79,7 +_,7 @@
      @Override
      protected void neighborChanged(BlockState p_49377_, Level p_49378_, BlockPos p_49379_, Block p_49380_, @Nullable Orientation p_362860_, boolean p_49382_) {
-         if (!p_49378_.isClientSide && p_49378_.getBlockState(p_49379_).is(this)) {
+         if (!p_49378_.isClientSide() && p_49378_.getBlockState(p_49379_).is(this)) {
 -            RailShape railshape = p_49377_.getValue(this.getShapeProperty());
 +            RailShape railshape = getRailDirection(p_49377_, p_49378_, p_49379_, null);
              if (shouldBeRemoved(p_49379_, p_49378_, railshape)) {

@@ -114,7 +114,7 @@ public interface IForgeBlockEntity extends ICapabilityProvider {
      default void requestModelDataUpdate() {
          BlockEntity te = self();
          Level level = te.getLevel();
-         if (level != null && level.isClientSide) {
+         if (level != null && level.isClientSide()) {
              var modelDataManager = level.getModelDataManager();
              if (modelDataManager != null) {
                  modelDataManager.requestRefresh(te);

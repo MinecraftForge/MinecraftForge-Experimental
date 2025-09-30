@@ -1,6 +1,6 @@
 --- a/net/minecraft/advancements/Advancement.java
 +++ b/net/minecraft/advancements/Advancement.java
-@@ -226,7 +_,11 @@
+@@ -233,7 +_,11 @@
          }
  
          public AdvancementHolder save(Consumer<AdvancementHolder> p_138390_, String p_138391_) {

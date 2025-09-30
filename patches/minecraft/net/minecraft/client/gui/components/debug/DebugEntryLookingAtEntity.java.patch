@@ -1,0 +1,10 @@
+--- a/net/minecraft/client/gui/components/debug/DebugEntryLookingAtEntity.java
++++ b/net/minecraft/client/gui/components/debug/DebugEntryLookingAtEntity.java
+@@ -25,6 +_,7 @@
+         if (entity != null) {
+             list.add(ChatFormatting.UNDERLINE + "Targeted Entity");
+             list.add(String.valueOf(BuiltInRegistries.ENTITY_TYPE.getKey(entity.getType())));
++            entity.getType().builtInRegistryHolder().tags().forEach(t -> list.add("#" + t.location()));
+         }
+ 
+         p_426755_.addToGroup(GROUP, list);

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-@@ -164,4 +_,27 @@
+@@ -168,4 +_,27 @@
          p_407613_.discard("lock");
          p_407613_.discard("Items");
      }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/advancements/AdvancementsScreen.java
 +++ b/net/minecraft/client/gui/screens/advancements/AdvancementsScreen.java
-@@ -51,6 +_,7 @@
+@@ -53,6 +_,7 @@
      @Nullable
      private AdvancementTab selectedTab;
      private boolean isScrolling;
@@ -8,7 +8,7 @@
  
      public AdvancementsScreen(ClientAdvancements p_97340_) {
          this(p_97340_, null);
-@@ -64,6 +_,19 @@
+@@ -66,6 +_,19 @@
  
      @Override
      protected void init() {
@@ -28,16 +28,16 @@
          this.layout.addTitleHeader(TITLE, this.font);
          this.tabs.clear();
          this.selectedTab = null;
-@@ -108,7 +_,7 @@
+@@ -110,7 +_,7 @@
              int j = (this.height - 140) / 2;
  
              for (AdvancementTab advancementtab : this.tabs.values()) {
--                if (advancementtab.isMouseOver(i, j, p_97343_, p_97344_)) {
-+                if (advancementtab.getPage() == tabPage && advancementtab.isMouseOver(i, j, p_97343_, p_97344_)) {
+-                if (advancementtab.isMouseOver(i, j, p_431395_.x(), p_431395_.y())) {
++                if (advancementtab.getPage() == tabPage && advancementtab.isMouseOver(i, j, p_431395_.x(), p_431395_.y())) {
                      this.advancements.setSelectedTab(advancementtab.getRootNode().holder(), true);
                      break;
                  }
-@@ -183,10 +_,12 @@
+@@ -185,10 +_,12 @@
          p_283395_.blit(RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, p_281890_, p_282532_, 0.0F, 0.0F, 252, 140, 256, 256);
          if (this.tabs.size() > 1) {
              for (AdvancementTab advancementtab : this.tabs.values()) {
@@ -50,7 +50,7 @@
                  advancementtab1.drawIcon(p_283395_, p_281890_, p_282532_);
              }
          }
-@@ -205,6 +_,7 @@
+@@ -207,6 +_,7 @@
  
          if (this.tabs.size() > 1) {
              for (AdvancementTab advancementtab : this.tabs.values()) {

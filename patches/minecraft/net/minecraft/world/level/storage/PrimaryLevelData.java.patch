@@ -8,7 +8,7 @@
  
      private PrimaryLevelData(
          @Nullable CompoundTag p_277888_,
-@@ -199,7 +_,7 @@
+@@ -195,7 +_,7 @@
              p_251864_,
              p_250651_,
              p_78538_
@@ -17,7 +17,7 @@
      }
  
      @Override
-@@ -267,6 +_,8 @@
+@@ -260,6 +_,8 @@
          p_78547_.putInt("WanderingTraderSpawnDelay", this.wanderingTraderSpawnDelay);
          p_78547_.putInt("WanderingTraderSpawnChance", this.wanderingTraderSpawnChance);
          p_78547_.storeNullable("WanderingTraderId", UUIDUtil.CODEC, this.wanderingTraderId);
@@ -26,7 +26,7 @@
      }
  
      private static ListTag stringCollectionToTag(Set<String> p_277880_) {
-@@ -565,6 +_,16 @@
+@@ -552,6 +_,16 @@
      public LevelSettings getLevelSettings() {
          return this.settings.copy();
      }

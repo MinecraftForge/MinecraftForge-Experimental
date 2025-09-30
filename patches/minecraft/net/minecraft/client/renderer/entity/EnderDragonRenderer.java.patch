@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/entity/EnderDragonRenderer.java
 +++ b/net/minecraft/client/renderer/entity/EnderDragonRenderer.java
-@@ -225,11 +_,15 @@
+@@ -238,11 +_,15 @@
  
      protected void extractAdditionalHitboxes(EnderDragon p_394570_, Builder<HitboxRenderState> p_396096_, float p_397646_) {
          super.extractAdditionalHitboxes(p_394570_, p_396096_, p_397646_);

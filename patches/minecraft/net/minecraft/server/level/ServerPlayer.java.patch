@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayer.java
 +++ b/net/minecraft/server/level/ServerPlayer.java
-@@ -196,7 +_,8 @@
+@@ -204,7 +_,8 @@
  import net.minecraft.world.scores.criteria.ObjectiveCriteria;
  import org.slf4j.Logger;
  
@@ -10,7 +10,7 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_XZ = 32;
      private static final int NEUTRAL_MOB_DEATH_NOTIFICATION_RADII_Y = 10;
-@@ -813,6 +_,7 @@
+@@ -874,6 +_,7 @@
  
      @Override
      public void die(DamageSource p_9035_) {
@@ -18,7 +18,7 @@
          this.gameEvent(GameEvent.ENTITY_DIE);
          boolean flag = this.level().getGameRules().getBoolean(GameRules.RULE_SHOWDEATHMESSAGES);
          if (flag) {
-@@ -1010,6 +_,7 @@
+@@ -1082,6 +_,7 @@
  
      @Nullable
      public ServerPlayer teleport(TeleportTransition p_361322_) {
@@ -26,7 +26,7 @@
          if (this.isRemoved()) {
              return null;
          } else {
-@@ -1037,7 +_,7 @@
+@@ -1109,7 +_,7 @@
                  PlayerList playerlist = this.server.getPlayerList();
                  playerlist.sendPlayerPermissionLevel(this);
                  serverlevel1.removePlayerImmediately(this, Entity.RemovalReason.CHANGED_DIMENSION);
@@ -35,7 +35,7 @@
                  ProfilerFiller profilerfiller = Profiler.get();
                  profilerfiller.push("moving");
                  if (resourcekey == Level.OVERWORLD && serverlevel.dimension() == Level.NETHER) {
-@@ -1062,6 +_,7 @@
+@@ -1134,6 +_,7 @@
                  this.lastSentHealth = -1.0F;
                  this.lastSentFood = -1;
                  this.teleportSpectators(p_361322_, serverlevel1);
@@ -43,7 +43,7 @@
                  return this;
              }
          }
-@@ -1102,6 +_,9 @@
+@@ -1175,6 +_,9 @@
  
      @Override
      public Either<Player.BedSleepingProblem, Unit> startSleepInBed(BlockPos p_9115_) {
@@ -53,16 +53,16 @@
          Direction direction = this.level().getBlockState(p_9115_).getValue(HorizontalDirectionalBlock.FACING);
          if (this.isSleeping() || !this.isAlive()) {
              return Either.left(Player.BedSleepingProblem.OTHER_PROBLEM);
-@@ -1113,7 +_,7 @@
-             return Either.left(Player.BedSleepingProblem.OBSTRUCTED);
-         } else {
-             this.setRespawnPosition(new ServerPlayer.RespawnConfig(this.level().dimension(), p_9115_, this.getYRot(), false), true);
+@@ -1189,7 +_,7 @@
+                 new ServerPlayer.RespawnConfig(LevelData.RespawnData.of(this.level().dimension(), p_9115_, this.getYRot(), this.getXRot()), false),
+                 true
+             );
 -            if (this.level().isBrightOutside()) {
 +            if (!net.minecraftforge.event.ForgeEventFactory.onSleepingTimeCheck(this, optAt)) {
                  return Either.left(Player.BedSleepingProblem.NOT_POSSIBLE_NOW);
              } else {
                  if (!this.isCreative()) {
-@@ -1159,6 +_,7 @@
+@@ -1235,6 +_,7 @@
      }
  
      private boolean bedInRange(BlockPos p_9117_, Direction p_9118_) {
@@ -70,7 +70,7 @@
          return this.isReachableBedBlock(p_9117_) || this.isReachableBedBlock(p_9117_.relative(p_9118_.getOpposite()));
      }
  
-@@ -1262,6 +_,7 @@
+@@ -1338,6 +_,7 @@
                  this.connection.send(new ClientboundOpenScreenPacket(abstractcontainermenu.containerId, abstractcontainermenu.getType(), p_9033_.getDisplayName()));
                  this.initMenu(abstractcontainermenu);
                  this.containerMenu = abstractcontainermenu;
@@ -78,7 +78,7 @@
                  return OptionalInt.of(this.containerCounter);
              }
          }
-@@ -1311,6 +_,7 @@
+@@ -1387,6 +_,7 @@
      public void doCloseContainer() {
          this.containerMenu.removed(this);
          this.inventoryMenu.transferState(this.containerMenu);
@@ -86,7 +86,7 @@
          this.containerMenu = this.inventoryMenu;
      }
  
-@@ -1536,6 +_,15 @@
+@@ -1613,6 +_,15 @@
          this.setShoulderEntityLeft(p_9016_.getShoulderEntityLeft());
          this.setShoulderEntityRight(p_9016_.getShoulderEntityRight());
          this.setLastDeathLocation(p_9016_.getLastDeathLocation());
@@ -102,7 +102,7 @@
      }
  
      @Override
-@@ -1635,6 +_,7 @@
+@@ -1712,6 +_,7 @@
  
      public boolean setGameMode(GameType p_143404_) {
          boolean flag = this.isSpectator();
@@ -110,7 +110,7 @@
          if (!this.gameMode.changeGameModeForPlayer(p_143404_)) {
              return false;
          } else {
-@@ -1787,6 +_,9 @@
+@@ -1864,6 +_,9 @@
      public void setCamera(@Nullable Entity p_9214_) {
          Entity entity = this.getCamera();
          this.camera = (Entity)(p_9214_ == null ? this : p_9214_);
@@ -120,7 +120,7 @@
          if (entity != this.camera) {
              if (this.camera.level() instanceof ServerLevel serverlevel) {
                  this.teleportTo(
-@@ -1825,7 +_,11 @@
+@@ -1902,7 +_,11 @@
  
      @Nullable
      public Component getTabListDisplayName() {
@@ -133,7 +133,7 @@
      }
  
      public int getTabListOrder() {
-@@ -1860,6 +_,7 @@
+@@ -1937,6 +_,7 @@
      }
  
      public void setRespawnPosition(@Nullable ServerPlayer.RespawnConfig p_396560_, boolean p_9162_) {
@@ -141,7 +141,7 @@
          if (p_9162_ && p_396560_ != null && !p_396560_.isSamePosition(this.respawnConfig)) {
              this.sendSystemMessage(SPAWN_SET_MESSAGE);
          }
-@@ -1969,9 +_,12 @@
+@@ -2042,9 +_,12 @@
  
      public boolean drop(boolean p_182295_) {
          Inventory inventory = this.getInventory();
@@ -155,7 +155,7 @@
      }
  
      @Override
-@@ -2075,6 +_,75 @@
+@@ -2148,6 +_,75 @@
      @Nullable
      public BlockPos getRaidOmenPosition() {
          return this.raidOmenPosition;
@@ -226,7 +226,7 @@
 +        Component oldName = this.tabListDisplayName;
 +        this.tabListDisplayName = net.minecraftforge.event.ForgeEventFactory.getPlayerTabListDisplayName(this);
 +        if (!java.util.Objects.equals(oldName, this.tabListDisplayName)) {
-+            this.getServer().getPlayerList().broadcastAll(new net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket(net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME, this));
++            this.level().getServer().getPlayerList().broadcastAll(new net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket(net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket.Action.UPDATE_DISPLAY_NAME, this));
 +        }
      }
  

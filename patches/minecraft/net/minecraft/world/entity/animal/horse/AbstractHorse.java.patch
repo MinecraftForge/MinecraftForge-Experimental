@@ -32,7 +32,7 @@
              }
  
              if (this.isVehicle() && this.canGallop) {
-@@ -771,6 +_,7 @@
+@@ -777,6 +_,7 @@
              float f1 = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
              this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * f * p_248808_, 0.0, 0.4F * f1 * p_248808_));
          }
@@ -40,7 +40,7 @@
      }
  
      protected void playJumpSound() {
-@@ -1013,6 +_,26 @@
+@@ -1019,6 +_,26 @@
  
      public boolean hasInventoryChanged(Container p_149512_) {
          return this.inventory != p_149512_;

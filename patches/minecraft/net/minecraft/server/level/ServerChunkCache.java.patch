@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerChunkCache.java
 +++ b/net/minecraft/server/level/ServerChunkCache.java
-@@ -205,6 +_,10 @@
+@@ -187,6 +_,10 @@
              if (chunkholder == null) {
                  return null;
              } else {
@@ -11,7 +11,7 @@
                  ChunkAccess chunkaccess1 = chunkholder.getChunkIfPresent(ChunkStatus.FULL);
                  if (chunkaccess1 != null) {
                      this.storeInCache(i, chunkaccess1, ChunkStatus.FULL);
-@@ -624,5 +_,17 @@
+@@ -623,5 +_,17 @@
                  return super.pollTask();
              }
          }

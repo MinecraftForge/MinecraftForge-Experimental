@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/RenderType.java
 +++ b/net/minecraft/client/renderer/RenderType.java
-@@ -521,6 +_,11 @@
+@@ -485,6 +_,11 @@
      private final int bufferSize;
      private final boolean affectsCrumbling;
      private final boolean sortOnUpload;
@@ -12,7 +12,7 @@
  
      public static RenderType solid() {
          return SOLID;
-@@ -701,7 +_,7 @@
+@@ -665,7 +_,7 @@
      }
  
      public static RenderType text(ResourceLocation p_110498_) {
@@ -21,7 +21,7 @@
      }
  
      public static RenderType textBackground() {
-@@ -709,19 +_,19 @@
+@@ -673,19 +_,19 @@
      }
  
      public static RenderType textIntensity(ResourceLocation p_173238_) {
@@ -45,7 +45,7 @@
      }
  
      public static RenderType textBackgroundSeeThrough() {
-@@ -729,7 +_,7 @@
+@@ -693,7 +_,7 @@
      }
  
      public static RenderType textIntensitySeeThrough(ResourceLocation p_173241_) {

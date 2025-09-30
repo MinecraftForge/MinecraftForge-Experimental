@@ -7,7 +7,7 @@ package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.ItemFrameRenderer;
 import net.minecraft.client.renderer.entity.state.ItemFrameRenderState;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -24,18 +24,13 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
- * @param getItemFrameState The item frame entity
- * @param getRenderer The renderer for the item frame entity
- * @param getPoseStack The pose stack used for rendering
- * @param getMultiBufferSource The source of rendering buffers
- *
  * @see ItemFrameRenderer
  */
 public record RenderItemInFrameEvent(
         ItemFrameRenderState getItemFrameState,
         ItemFrameRenderer<?> getRenderer,
         PoseStack getPoseStack,
-        MultiBufferSource getMultiBufferSource,
+        SubmitNodeCollector getNodeCollector,
         int getPackedLight
 ) implements Cancellable, RecordEvent {
     public static final CancellableEventBus<RenderItemInFrameEvent> BUS = CancellableEventBus.create(RenderItemInFrameEvent.class);

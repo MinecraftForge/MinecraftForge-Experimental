@@ -8,9 +8,10 @@ package net.minecraftforge.client.event;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.LightTexture;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -31,7 +32,7 @@ import org.jetbrains.annotations.ApiStatus;
  * @param <M> the model for the living entity
  * @see RenderLivingEvent.Pre
  * @see RenderLivingEvent.Post
- * @see RenderPlayerEvent
+ * @see RenderAvatarEvent
  * @see LivingEntityRenderer
  */
 public sealed interface RenderLivingEvent<T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> {
@@ -51,16 +52,14 @@ public sealed interface RenderLivingEvent<T extends LivingEntity, S extends Livi
     PoseStack getPoseStack();
 
     /**
-     * {@return the source of rendering buffers}
+     * {@return The render buffer that is collecting the model data. So that things can be batched}
      */
-    MultiBufferSource getMultiBufferSource();
+    SubmitNodeCollector getNodeCollector();
 
     /**
-     * {@return the amount of packed (sky and block) light for rendering}
-     *
-     * @see LightTexture
+     * {@return Various state infomration about the camera}
      */
-    int getPackedLight();
+    CameraRenderState getCameraState();
 
     /**
      * Fired <b>before</b> an entity is rendered.
@@ -80,8 +79,8 @@ public sealed interface RenderLivingEvent<T extends LivingEntity, S extends Livi
             S getState,
             LivingEntityRenderer<T, S, M> getRenderer,
             PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource,
-            int getPackedLight
+            SubmitNodeCollector getNodeCollector,
+            CameraRenderState getCameraState
     ) implements Cancellable, RenderLivingEvent<T, S, M>, RecordEvent {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
@@ -102,8 +101,8 @@ public sealed interface RenderLivingEvent<T extends LivingEntity, S extends Livi
             S getState,
             LivingEntityRenderer<T, S, M> getRenderer,
             PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource,
-            int getPackedLight
+            SubmitNodeCollector getNodeCollector,
+            CameraRenderState getCameraState
     ) implements RecordEvent, RenderLivingEvent<T, S, M> {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
 

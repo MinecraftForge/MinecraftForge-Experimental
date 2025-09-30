@@ -17,7 +17,7 @@
              this.clearFire();
          }
  
-@@ -566,7 +_,7 @@
+@@ -568,7 +_,7 @@
      protected boolean canHitEntity(Entity p_36743_) {
          return p_36743_ instanceof Player && this.getOwner() instanceof Player player && !player.canHarmPlayer((Player)p_36743_)
              ? false

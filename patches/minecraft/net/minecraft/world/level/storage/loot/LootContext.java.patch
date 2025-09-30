@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/storage/loot/LootContext.java
 +++ b/net/minecraft/world/level/storage/loot/LootContext.java
-@@ -23,11 +_,17 @@
+@@ -24,11 +_,17 @@
      private final RandomSource random;
      private final HolderGetter.Provider lootDataResolver;
      private final Set<LootContext.VisitedEntry<?>> visitedElements = Sets.newLinkedHashSet();
@@ -18,7 +18,7 @@
      }
  
      public boolean hasParameter(ContextKey<?> p_368930_) {
-@@ -75,6 +_,10 @@
+@@ -76,6 +_,10 @@
          return this.params.getLevel();
      }
  
@@ -29,7 +29,7 @@
      public static LootContext.VisitedEntry<LootTable> createVisitedEntry(LootTable p_279327_) {
          return new LootContext.VisitedEntry<>(LootDataType.TABLE, p_279327_);
      }
-@@ -87,15 +_,34 @@
+@@ -88,6 +_,18 @@
          return new LootContext.VisitedEntry<>(LootDataType.MODIFIER, p_279163_);
      }
  
@@ -45,7 +45,10 @@
 +        return this.queriedLootTableId == null ? net.minecraftforge.common.loot.LootTableIdCondition.UNKNOWN_LOOT_TABLE : this.queriedLootTableId;
 +    }
 +
-     public static class Builder {
+     public static enum BlockEntityTarget implements StringRepresentable {
+         BLOCK_ENTITY("block_entity", LootContextParams.BLOCK_ENTITY);
+ 
+@@ -113,11 +_,18 @@
          private final LootParams params;
          @Nullable
          private RandomSource random;
@@ -64,7 +67,7 @@
          public LootContext.Builder withOptionalRandomSeed(long p_78966_) {
              if (p_78966_ != 0L) {
                  this.random = RandomSource.create(p_78966_);
-@@ -109,6 +_,11 @@
+@@ -131,6 +_,11 @@
              return this;
          }
  
@@ -76,7 +79,7 @@
          public ServerLevel getLevel() {
              return this.params.getLevel();
          }
-@@ -117,7 +_,7 @@
+@@ -139,7 +_,7 @@
              ServerLevel serverlevel = this.getLevel();
              MinecraftServer minecraftserver = serverlevel.getServer();
              RandomSource randomsource = Optional.ofNullable(this.random).or(() -> p_299315_.map(serverlevel::getRandomSequence)).orElseGet(serverlevel::getRandom);

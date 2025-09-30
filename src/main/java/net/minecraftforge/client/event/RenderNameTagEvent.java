@@ -6,11 +6,11 @@
 package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.CameraRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -28,8 +28,7 @@ import org.jetbrains.annotations.ApiStatus;
  *     <li>{@link Result#DENY} - the nameplate will not be rendered.</li>
  * </ul>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see EntityRenderer
  */
@@ -41,19 +40,19 @@ public final class RenderNameTagEvent extends MutableEvent implements HasResult 
     private final Component originalContent;
     private final EntityRenderer<?, ?> entityRenderer;
     private final PoseStack poseStack;
-    private final MultiBufferSource multiBufferSource;
-    private final int packedLight;
+    private final SubmitNodeCollector nodeCollector;
+    private final CameraRenderState cameraState;
     private Result result = Result.DEFAULT;
 
     @ApiStatus.Internal
-    public RenderNameTagEvent(EntityRenderState state, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight) {
+    public RenderNameTagEvent(EntityRenderState state, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {
         this.state = state;
         this.originalContent = content;
         this.setContent(this.originalContent);
         this.entityRenderer = entityRenderer;
         this.poseStack = poseStack;
-        this.multiBufferSource = multiBufferSource;
-        this.packedLight = packedLight;
+        this.nodeCollector = nodeCollector;
+        this.cameraState = cameraState;
     }
 
     @SuppressWarnings("unchecked")
@@ -99,19 +98,17 @@ public final class RenderNameTagEvent extends MutableEvent implements HasResult 
     }
 
     /**
-     * {@return the source of rendering buffers}
+     * {@return the node collector that you should render to}
      */
-    public MultiBufferSource getMultiBufferSource() {
-        return this.multiBufferSource;
+    public SubmitNodeCollector getNodeCollector() {
+        return this.nodeCollector;
     }
 
     /**
-     * {@return the amount of packed (sky and block) light for rendering}
-     *
-     * @see net.minecraft.client.renderer.LightTexture
+     * {@return CameraState for the current render frame}
      */
-    public int getPackedLight() {
-        return this.packedLight;
+    public CameraRenderState getCameraState() {
+        return this.cameraState;
     }
 
     @Override

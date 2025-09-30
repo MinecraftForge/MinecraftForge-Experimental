@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/AxeItem.java
 +++ b/net/minecraft/world/item/AxeItem.java
-@@ -62,7 +_,7 @@
+@@ -64,7 +_,7 @@
          if (playerHasBlockingItemUseIntent(p_40529_)) {
              return InteractionResult.PASS;
          } else {
@@ -9,7 +9,7 @@
              if (optional.isEmpty()) {
                  return InteractionResult.PASS;
              } else {
-@@ -88,18 +_,25 @@
+@@ -90,17 +_,24 @@
      }
  
      private Optional<BlockState> evaluateNewBlockState(Level p_312809_, BlockPos p_313114_, @Nullable Player p_312029_, BlockState p_311198_) {
@@ -28,8 +28,7 @@
 +            var scrape = ctx == null ? null : p_311198_.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
 +            Optional<BlockState> optional1 = scrape != null ? Optional.of(scrape) : WeatheringCopper.getPrevious(p_311198_);
              if (optional1.isPresent()) {
-                 p_312809_.playSound(p_312029_, p_313114_, SoundEvents.AXE_SCRAPE, SoundSource.BLOCKS, 1.0F, 1.0F);
-                 p_312809_.levelEvent(p_312029_, 3005, p_313114_, 0);
+                 spawnSoundAndParticle(p_312809_, p_313114_, p_312029_, p_311198_, SoundEvents.AXE_SCRAPE, 3005);
                  return optional1;
              } else {
 -                Optional<BlockState> optional2 = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(p_311198_.getBlock()))
@@ -37,8 +36,8 @@
 +                Optional<BlockState> optional2 = waxOff != null ? Optional.of(waxOff) : Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(p_311198_.getBlock()))
                      .map(p_150694_ -> p_150694_.withPropertiesOf(p_311198_));
                  if (optional2.isPresent()) {
-                     p_312809_.playSound(p_312029_, p_313114_, SoundEvents.AXE_WAX_OFF, SoundSource.BLOCKS, 1.0F, 1.0F);
-@@ -115,5 +_,21 @@
+                     spawnSoundAndParticle(p_312809_, p_313114_, p_312029_, p_311198_, SoundEvents.AXE_WAX_OFF, 3004);
+@@ -125,5 +_,21 @@
      private Optional<BlockState> getStripped(BlockState p_150691_) {
          return Optional.ofNullable(STRIPPABLES.get(p_150691_.getBlock()))
              .map(p_359378_ -> p_359378_.defaultBlockState().setValue(RotatedPillarBlock.AXIS, p_150691_.getValue(RotatedPillarBlock.AXIS)));
@@ -56,7 +55,7 @@
 +    }
 +
 +    @Override
-+    public boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
++    public boolean canDisableShield(ItemStack stack, ItemStack shield, net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.entity.LivingEntity attacker) {
 +        return true;
      }
  }

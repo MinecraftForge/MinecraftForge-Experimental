@@ -77,7 +77,7 @@ public class ModelDataManager {
     }
 
     public Map<BlockPos, ModelData> getAt(ChunkPos pos) {
-        Preconditions.checkArgument(level.isClientSide, "Cannot request model data for server level");
+        Preconditions.checkArgument(level.isClientSide(), "Cannot request model data for server level");
         refreshAt(pos);
         return modelDataCache.getOrDefault(pos, Collections.emptyMap());
     }

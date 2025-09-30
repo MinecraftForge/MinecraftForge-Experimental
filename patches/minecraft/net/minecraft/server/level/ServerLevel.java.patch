@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -203,10 +_,12 @@
+@@ -209,11 +_,13 @@
      @Nullable
      private EndDragonFight dragonFight;
      final Int2ObjectMap<EnderDragonPart> dragonParts = new Int2ObjectOpenHashMap<>();
@@ -9,11 +9,12 @@
      private final StructureCheck structureCheck;
      private final boolean tickTime;
      private final RandomSequences randomSequences;
+     final LevelDebugSynchronizers debugSynchronizers = new LevelDebugSynchronizers(this);
 +    private net.minecraftforge.common.util.LevelCapabilityData capabilityData;
  
      public ServerLevel(
          MinecraftServer p_214999_,
-@@ -290,6 +_,18 @@
+@@ -294,6 +_,18 @@
          this.gameEventDispatcher = new GameEventDispatcher(this);
          this.randomSequences = Objects.requireNonNullElseGet(p_288977_, () -> this.getDataStorage().computeIfAbsent(RandomSequences.TYPE));
          this.waypointManager = new ServerWaypointManager();
@@ -32,7 +33,7 @@
      }
  
      @Deprecated
-@@ -331,8 +_,8 @@
+@@ -335,8 +_,8 @@
          int i = this.getGameRules().getInt(GameRules.RULE_PLAYERS_SLEEPING_PERCENTAGE);
          if (this.sleepStatus.areEnoughSleeping(i) && this.sleepStatus.areEnoughDeepSleeping(i, this.players)) {
              if (this.getGameRules().getBoolean(GameRules.RULE_DAYLIGHT)) {
@@ -43,7 +44,7 @@
              }
  
              this.wakeUpAllPlayers();
-@@ -399,6 +_,7 @@
+@@ -407,6 +_,7 @@
                                  p_358707_.stopRiding();
                              }
  
@@ -51,7 +52,7 @@
                              profilerfiller.push("tick");
                              this.guardEntityTick(this::tickNonPassenger, p_358707_);
                              profilerfiller.pop();
-@@ -534,6 +_,7 @@
+@@ -552,6 +_,7 @@
          BlockPos blockpos = this.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, p_300602_);
          BlockPos blockpos1 = blockpos.below();
          Biome biome = this.getBiome(blockpos).value();
@@ -59,7 +60,7 @@
          if (biome.shouldFreeze(this, blockpos1)) {
              this.setBlockAndUpdate(blockpos1, Blocks.ICE.defaultBlockState());
          }
-@@ -713,8 +_,8 @@
+@@ -731,8 +_,8 @@
                  this.server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
              }
  
@@ -70,7 +71,7 @@
          }
      }
  
-@@ -751,6 +_,7 @@
+@@ -769,6 +_,7 @@
          p_8648_.tickCount++;
          profilerfiller.push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(p_8648_.getType()).toString());
          profilerfiller.incrementCounter("tickNonPassenger");
@@ -78,7 +79,7 @@
          p_8648_.tick();
          profilerfiller.pop();
  
-@@ -768,6 +_,7 @@
+@@ -786,6 +_,7 @@
              ProfilerFiller profilerfiller = Profiler.get();
              profilerfiller.push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(p_8664_.getType()).toString());
              profilerfiller.incrementCounter("tickPassenger");
@@ -86,7 +87,7 @@
              p_8664_.rideTick();
              profilerfiller.pop();
  
-@@ -814,6 +_,7 @@
+@@ -832,6 +_,7 @@
              } else {
                  this.entityManager.autoSave();
              }
@@ -94,7 +95,7 @@
          }
      }
  
-@@ -908,6 +_,7 @@
+@@ -926,6 +_,7 @@
      }
  
      private void addPlayer(ServerPlayer p_8854_) {
@@ -102,7 +103,7 @@
          Entity entity = this.getEntity(p_8854_.getUUID());
          if (entity != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", p_8854_.getUUID());
-@@ -915,7 +_,8 @@
+@@ -933,7 +_,8 @@
              this.removePlayerImmediately((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
          }
  
@@ -112,7 +113,7 @@
      }
  
      private boolean addEntity(Entity p_8873_) {
-@@ -923,7 +_,12 @@
+@@ -941,7 +_,12 @@
              LOGGER.warn("Tried to add entity {} but it was marked as removed already", EntityType.getKey(p_8873_.getType()));
              return false;
          } else {
@@ -126,7 +127,7 @@
          }
      }
  
-@@ -971,6 +_,12 @@
+@@ -990,6 +_,12 @@
          float p_263520_,
          long p_263490_
      ) {
@@ -139,7 +140,7 @@
          this.server
              .getPlayerList()
              .broadcast(
-@@ -988,6 +_,12 @@
+@@ -1007,6 +_,12 @@
      public void playSeededSound(
          @Nullable Entity p_392657_, Entity p_394285_, Holder<SoundEvent> p_263412_, SoundSource p_263338_, float p_263352_, float p_263390_, long p_263403_
      ) {
@@ -152,7 +153,7 @@
          this.server
              .getPlayerList()
              .broadcast(
-@@ -1046,6 +_,7 @@
+@@ -1065,6 +_,7 @@
  
      @Override
      public void gameEvent(Holder<GameEvent> p_334475_, Vec3 p_215042_, GameEvent.Context p_215043_) {
@@ -160,7 +161,7 @@
          this.gameEventDispatcher.post(p_334475_, p_215042_, p_215043_);
      }
  
-@@ -1084,16 +_,24 @@
+@@ -1103,16 +_,24 @@
  
      @Override
      public void updateNeighborsAt(BlockPos p_215045_, Block p_215046_) {
@@ -185,7 +186,7 @@
          this.neighborUpdater.updateNeighborsAtExceptFromFacing(p_215052_, p_215053_, p_215054_, p_370072_);
      }
  
-@@ -1139,12 +_,14 @@
+@@ -1159,12 +_,14 @@
          Explosion.BlockInteraction explosion$blockinteraction = switch (p_255827_) {
              case NONE -> Explosion.BlockInteraction.KEEP;
              case BLOCK -> this.getDestroyType(GameRules.RULE_BLOCK_EXPLOSION_DROP_DECAY);
@@ -198,11 +199,11 @@
          ServerExplosion serverexplosion = new ServerExplosion(this, p_256039_, p_255778_, p_256002_, vec3, p_256045_, p_255686_, explosion$blockinteraction);
 +        if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this, serverexplosion))
 +            return;
-         serverexplosion.explode();
+         int i = serverexplosion.explode();
          ParticleOptions particleoptions = serverexplosion.isSmall() ? p_310962_ : p_310322_;
  
-@@ -1737,6 +_,11 @@
-         return this.chunkSource.getGenerator().getSeaLevel();
+@@ -1792,6 +_,11 @@
+         return this.debugSynchronizers;
      }
  
 +    @Override
@@ -213,7 +214,7 @@
      final class EntityCallbacks implements LevelCallback<Entity> {
          public void onCreated(Entity p_143355_) {
              if (p_143355_ instanceof WaypointTransmitter waypointtransmitter && waypointtransmitter.isTransmittingWaypoint()) {
-@@ -1792,6 +_,12 @@
+@@ -1847,6 +_,12 @@
                  }
              }
  
@@ -226,7 +227,7 @@
              p_143371_.updateDynamicGameEventListener(DynamicGameEventListener::add);
          }
  
-@@ -1820,7 +_,16 @@
+@@ -1875,8 +_,17 @@
                  }
              }
  
@@ -237,6 +238,7 @@
 +            }
 +
              p_143375_.updateDynamicGameEventListener(DynamicGameEventListener::remove);
+             ServerLevel.this.debugSynchronizers.dropEntity(p_143375_);
 +
 +            p_143375_.onRemovedFromWorld();
 +            net.minecraftforge.event.ForgeEventFactory.onEntityLeaveLevel(p_143375_, ServerLevel.this);

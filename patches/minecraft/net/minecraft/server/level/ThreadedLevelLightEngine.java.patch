@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ThreadedLevelLightEngine.java
 +++ b/net/minecraft/server/level/ThreadedLevelLightEngine.java
-@@ -171,6 +_,7 @@
+@@ -176,6 +_,7 @@
          }, () -> "lightChunk " + chunkpos + " " + p_9355_));
          return CompletableFuture.supplyAsync(() -> {
              p_9354_.setLightCorrect(true);

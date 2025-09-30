@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/model/HumanoidModel.java
 +++ b/net/minecraft/client/model/HumanoidModel.java
-@@ -255,6 +_,8 @@
+@@ -290,6 +_,8 @@
              case BRUSH:
                  this.rightArm.xRot = this.rightArm.xRot * 0.5F - (float) (Math.PI / 5);
                  this.rightArm.yRot = 0.0F;
@@ -9,7 +9,7 @@
          }
      }
  
-@@ -299,6 +_,8 @@
+@@ -334,6 +_,8 @@
              case BRUSH:
                  this.leftArm.xRot = this.leftArm.xRot * 0.5F - (float) (Math.PI / 5);
                  this.leftArm.yRot = 0.0F;
@@ -18,7 +18,7 @@
          }
      }
  
-@@ -377,7 +_,7 @@
+@@ -402,7 +_,7 @@
      }
  
      @OnlyIn(Dist.CLIENT)
@@ -27,7 +27,7 @@
          EMPTY(false),
          ITEM(false),
          BLOCK(false),
-@@ -393,10 +_,28 @@
+@@ -418,10 +_,28 @@
  
          private ArmPose(final boolean p_102896_) {
              this.twoHanded = p_102896_;

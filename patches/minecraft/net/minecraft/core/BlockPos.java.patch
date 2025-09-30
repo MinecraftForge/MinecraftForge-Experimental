@@ -1,6 +1,6 @@
 --- a/net/minecraft/core/BlockPos.java
 +++ b/net/minecraft/core/BlockPos.java
-@@ -31,7 +_,7 @@
+@@ -32,7 +_,7 @@
  import org.slf4j.Logger;
  
  @Immutable

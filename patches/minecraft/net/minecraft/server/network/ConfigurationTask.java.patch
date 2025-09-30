@@ -10,4 +10,4 @@
 +
      void start(Consumer<Packet<?>> p_299398_);
  
-     ConfigurationTask.Type type();
+     default boolean tick() {

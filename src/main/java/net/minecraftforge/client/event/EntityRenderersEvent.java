@@ -6,24 +6,27 @@
 package net.minecraftforge.client.event;
 
 import com.google.common.collect.ImmutableMap;
+
+import net.minecraft.client.entity.ClientMannequin;
 import net.minecraft.client.model.SkullModel;
 import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.level.block.SkullBlock;
 import net.minecraft.world.level.block.SkullBlock.Type;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -138,41 +141,54 @@ public abstract sealed class EntityRenderersEvent implements IModBusEvent {
         }
 
         private final Map<EntityType<?>, EntityRenderer<?, ?>> renderers;
-        private final Map<PlayerSkin.Model, EntityRenderer<? extends Player, ?>> skinMap;
+        private final Map<PlayerModelType, AvatarRenderer<AbstractClientPlayer>> playerRenderers;
+        private final Map<PlayerModelType, AvatarRenderer<ClientMannequin>> mannequinRenderers;
         private final EntityRendererProvider.Context context;
 
         @ApiStatus.Internal
-        public AddLayers(Map<EntityType<?>, EntityRenderer<?, ?>> renderers, Map<PlayerSkin.Model, EntityRenderer<? extends Player, ?>> playerRenderers, EntityRendererProvider.Context context) {
+        public AddLayers(Map<EntityType<?>, EntityRenderer<?, ?>> renderers, Map<PlayerModelType, AvatarRenderer<AbstractClientPlayer>> playerRenderers, Map<PlayerModelType, AvatarRenderer<ClientMannequin>> mannequinRenderers, EntityRendererProvider.Context context) {
             this.renderers = renderers;
-            this.skinMap = playerRenderers;
+            this.playerRenderers = playerRenderers;
+            this.mannequinRenderers = mannequinRenderers;
             this.context = context;
         }
 
         /**
-         * {@return the set of player skin names which have a renderer}
+         * {@return the set of player model types which have a renderer}
          * <p>
-         * Minecraft provides two default skin names: {@code default} for the
+         * Minecraft provides two default types: {@code wide} for the
          * {@linkplain ModelLayers#PLAYER regular player model} and {@code slim} for the
          * {@linkplain ModelLayers#PLAYER_SLIM slim player model}.
          */
-        public Set<PlayerSkin.Model> getSkins() {
-            return skinMap.keySet();
+        public Set<PlayerModelType> getModelTypes() {
+            return playerRenderers.keySet();
         }
 
         /**
-         * Returns a player skin renderer for the given skin name.
+         * Returns a renderer for the given model type used for normal players.
          *
-         * @param skinName the name of the skin to get the renderer for
-         * @param <R>      the type of the skin renderer, usually {@link PlayerRenderer}
-         * @return the skin renderer, or {@code null} if no renderer is registered for that skin name
-         * @see #getSkins()
+         * @param modelType the type to get the renderer for
+         * @param <R>      the type of the model renderer, usually {@link AvatarRenderer}
+         * @see #getModelTypes()
          */
         @Nullable
         @SuppressWarnings("unchecked")
-        public <R extends EntityRenderer<? extends Player, ?>> R getPlayerSkin(PlayerSkin.Model skinName) {
-            return (R)skinMap.get(skinName);
+        public <R extends EntityRenderer<? extends Player, ?>> R getPlayerRenderer(PlayerModelType modelType) {
+            return (R)playerRenderers.get(modelType);
         }
 
+        /**
+         * Returns a Mannequin renderer for the given model type.
+         *
+         * @param modelType the type to get the renderer for
+         * @param <R>      the type of the model renderer, usually {@link AvatarRenderer}
+         * @see #getModelTypes()
+         */
+        @Nullable
+        @SuppressWarnings("unchecked")
+        public <R extends EntityRenderer<? extends ClientMannequin, ?>> R getMannequinRenderer(PlayerModelType modelType) {
+            return (R)mannequinRenderers.get(modelType);
+        }
         /**
          * Returns an entity renderer for the given entity type.
          *

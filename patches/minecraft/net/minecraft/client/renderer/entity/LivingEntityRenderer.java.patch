@@ -1,22 +1,22 @@
 --- a/net/minecraft/client/renderer/entity/LivingEntityRenderer.java
 +++ b/net/minecraft/client/renderer/entity/LivingEntityRenderer.java
-@@ -75,6 +_,7 @@
+@@ -73,6 +_,7 @@
      }
  
-     public void render(S p_364280_, PoseStack p_115311_, MultiBufferSource p_115312_, int p_115313_) {
-+        if (net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPre(p_364280_, this, p_115311_, p_115312_, p_115313_)) return;
-         p_115311_.pushPose();
-         if (p_364280_.hasPose(Pose.SLEEPING)) {
-             Direction direction = p_364280_.bedOrientation;
-@@ -110,6 +_,7 @@
+     public void submit(S p_427824_, PoseStack p_423787_, SubmitNodeCollector p_424901_, CameraRenderState p_422963_) {
++        if (net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPre(p_427824_, this, p_423787_, p_424901_, p_422963_)) return;
+         p_423787_.pushPose();
+         if (p_427824_.hasPose(Pose.SLEEPING)) {
+             Direction direction = p_427824_.bedOrientation;
+@@ -108,6 +_,7 @@
  
-         p_115311_.popPose();
-         super.render(p_364280_, p_115311_, p_115312_, p_115313_);
-+        net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPost(p_364280_, this, p_115311_, p_115312_, p_115313_);
+         p_423787_.popPose();
+         super.submit(p_427824_, p_423787_, p_424901_, p_422963_);
++        net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPost(p_427824_, this, p_423787_, p_424901_, p_422963_);
      }
  
      protected boolean shouldRenderLayers(S p_360804_) {
-@@ -291,6 +_,7 @@
+@@ -286,6 +_,7 @@
          p_363057_.isFullyFrozen = p_368665_.isFullyFrozen();
          p_363057_.isBaby = p_368665_.isBaby();
          p_363057_.isInWater = p_368665_.isInWater();
@@ -24,7 +24,7 @@
          p_363057_.isAutoSpinAttack = p_368665_.isAutoSpinAttack();
          p_363057_.hasRedOverlay = p_368665_.hurtTime > 0 || p_368665_.deathTime > 0;
          ItemStack itemstack = p_368665_.getItemBySlot(EquipmentSlot.HEAD);
-@@ -315,6 +_,7 @@
+@@ -309,6 +_,7 @@
      }
  
      protected void extractAdditionalHitboxes(T p_392957_, Builder<HitboxRenderState> p_396936_, float p_397822_) {

@@ -8,10 +8,10 @@
          }
      }
  
-@@ -77,6 +_,7 @@
-         p_299748_.send(new ClientboundLevelChunkWithLightPacket(p_297712_, p_298120_.getLightEngine(), null, null));
-         ChunkPos chunkpos = p_297712_.getPos();
-         DebugPackets.sendPoiPacketsForChunk(p_298120_, chunkpos);
+@@ -81,6 +_,7 @@
+         }
+ 
+         p_298120_.debugSynchronizers().startTrackingChunk(p_299748_.player, p_297712_.getPos());
 +        net.minecraftforge.event.ForgeEventFactory.fireChunkWatch(p_299748_.player, p_297712_, p_298120_);
      }
  

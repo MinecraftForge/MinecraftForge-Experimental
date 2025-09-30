@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/block/BlockRenderDispatcher.java
 +++ b/net/minecraft/client/renderer/block/BlockRenderDispatcher.java
-@@ -49,12 +_,17 @@
+@@ -51,12 +_,17 @@
          return this.blockModelShaper;
      }
  
@@ -19,7 +19,7 @@
              this.modelRenderer.tesselateBlock(p_110921_, this.singleThreadPartList, p_110919_, p_110920_, p_110922_, p_110923_, true, OverlayTexture.NO_OVERLAY);
          }
      }
-@@ -97,7 +_,12 @@
+@@ -99,7 +_,12 @@
          return this.blockModelShaper.getBlockModel(p_110911_);
      }
  
@@ -32,7 +32,7 @@
          RenderShape rendershape = p_110913_.getRenderShape();
          if (rendershape != RenderShape.INVISIBLE) {
              BlockStateModel blockstatemodel = this.getBlockModel(p_110913_);
-@@ -105,8 +_,9 @@
+@@ -107,8 +_,9 @@
              float f = (i >> 16 & 0xFF) / 255.0F;
              float f1 = (i >> 8 & 0xFF) / 255.0F;
              float f2 = (i & 0xFF) / 255.0F;
@@ -41,5 +41,5 @@
 -                p_110914_.last(), p_110915_.getBuffer(ItemBlockRenderTypes.getRenderType(p_110913_)), blockstatemodel, f, f1, f2, p_110916_, p_110917_
 +                p_110914_.last(), p_110915_.getBuffer(renderType != null ? renderType : net.minecraftforge.client.RenderTypeHelper.getEntityRenderType(rt)), blockstatemodel, f, f1, f2, p_110916_, p_110917_, modelData, rt
              );
-             this.specialBlockModelRenderer.get().renderByBlock(p_110913_.getBlock(), ItemDisplayContext.NONE, p_110914_, p_110915_, p_110916_, p_110917_);
          }
+     }

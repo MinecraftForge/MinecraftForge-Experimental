@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/monster/Zombie.java
 +++ b/net/minecraft/world/entity/monster/Zombie.java
-@@ -265,21 +_,28 @@
+@@ -264,21 +_,28 @@
      }
  
      protected void convertToZombieType(EntityType<? extends Zombie> p_34311_) {
@@ -8,10 +8,10 @@
          this.convertTo(
              p_34311_,
              ConversionParams.single(this, true, true),
--            p_405517_ -> p_405517_.handleAttributes(p_405517_.level().getCurrentDifficultyAt(p_405517_.blockPosition()).getSpecialMultiplier())
-+            p_375145_ -> {
-+                p_375145_.handleAttributes(p_375145_.level().getCurrentDifficultyAt(p_375145_.blockPosition()).getSpecialMultiplier());
-+                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_375145_);
+-            p_421869_ -> p_421869_.handleAttributes(p_421869_.level().getCurrentDifficultyAt(p_421869_.blockPosition()).getSpecialMultiplier())
++            p_421869_ -> {
++                p_421869_.handleAttributes(p_421869_.level().getCurrentDifficultyAt(p_421869_.blockPosition()).getSpecialMultiplier());
++                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_421869_);
 +            }
          );
      }
@@ -30,7 +30,7 @@
              if (!this.isSilent()) {
                  p_369430_.levelEvent(null, 1026, this.blockPosition(), 0);
              }
-@@ -301,19 +_,26 @@
+@@ -300,19 +_,26 @@
                  livingentity = (LivingEntity)p_363403_.getEntity();
              }
  
@@ -38,8 +38,8 @@
 +            var vanilla = (livingentity != null
                  && p_363771_.getDifficulty() == Difficulty.HARD
                  && this.random.nextFloat() < this.getAttributeValue(Attributes.SPAWN_REINFORCEMENTS_CHANCE)
--                && p_363771_.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING)) {
-+                && p_363771_.getGameRules().getBoolean(GameRules.RULE_DOMOBSPAWNING));
+-                && p_363771_.isSpawningMonsters()) {
++                && p_363771_.isSpawningMonsters());
                  int i = Mth.floor(this.getX());
                  int j = Mth.floor(this.getY());
                  int k = Mth.floor(this.getZ());

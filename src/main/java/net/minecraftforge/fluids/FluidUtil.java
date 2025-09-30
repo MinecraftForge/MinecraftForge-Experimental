@@ -640,7 +640,7 @@ public class FluidUtil
      */
     public static void destroyBlockOnFluidPlacement(Level level, BlockPos pos)
     {
-        if (!level.isClientSide)
+        if (!level.isClientSide())
         {
             BlockState destBlockState = level.getBlockState(pos);
             boolean isDestNonSolid = !destBlockState.isSolid();

@@ -33,6 +33,9 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.client.gui.screens.multiplayer.JoinMultiplayerScreen;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.Model;
 import net.minecraft.client.model.geom.ModelLayerLocation;
@@ -46,6 +49,7 @@ import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
@@ -71,6 +75,7 @@ import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.network.protocol.status.ServerStatus;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceMetadata;
@@ -103,6 +108,7 @@ import net.minecraftforge.client.event.SystemMessageReceivedEvent;
 import net.minecraftforge.client.event.CustomizeGuiOverlayEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ForgeEventFactoryClient;
+import net.minecraftforge.client.event.GatherAtlasMetadataSectionsEvent;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.MovementInputUpdateEvent;
@@ -160,6 +166,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -250,8 +257,8 @@ public class ForgeHooksClient {
         }
     }
 
-    public static boolean renderSpecificFirstPersonHand(InteractionHand hand, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, float partialTick, float interpPitch, float swingProgress, float equipProgress, ItemStack stack) {
-        return RenderHandEvent.BUS.post(new RenderHandEvent(hand, poseStack, bufferSource, packedLight, partialTick, interpPitch, swingProgress, equipProgress, stack));
+    public static boolean renderSpecificFirstPersonHand(InteractionHand hand, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight, float partialTick, float interpPitch, float swingProgress, float equipProgress, ItemStack stack) {
+        return RenderHandEvent.BUS.post(new RenderHandEvent(hand, poseStack, nodeCollector, packedLight, partialTick, interpPitch, swingProgress, equipProgress, stack));
     }
 
     public static void onTextureStitchedPost(TextureAtlas map) {
@@ -315,7 +322,7 @@ public class ForgeHooksClient {
 
     private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!ScreenEvent.Render.Pre.BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
-            screen.renderWithTooltip(guiGraphics, mouseX, mouseY, partialTick);
+            screen.renderWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
         ScreenEvent.Render.Post.BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
@@ -413,26 +420,26 @@ public class ForgeHooksClient {
         MovementInputUpdateEvent.BUS.post(new MovementInputUpdateEvent(player, movementInput));
     }
 
-    public static boolean onScreenKeyPressed(Screen screen, int keyCode, int scanCode, int modifiers) {
-        return ForgeEventFactoryClient.onScreenKeyPressedPre(screen, keyCode, scanCode, modifiers)
-            || screen.keyPressed(keyCode, scanCode, modifiers)
-            || ForgeEventFactoryClient.onScreenKeyPressedPost(screen, keyCode, scanCode, modifiers);
+    public static boolean onScreenKeyPressed(Screen screen, KeyEvent info) {
+        return ForgeEventFactoryClient.onScreenKeyPressedPre(screen, info.key(), info.scancode(), info.modifiers())
+            || screen.keyPressed(info)
+            || ForgeEventFactoryClient.onScreenKeyPressedPost(screen, info.key(), info.scancode(), info.modifiers());
     }
 
-    public static boolean onScreenKeyReleased(Screen screen, int keyCode, int scanCode, int modifiers) {
-        return ForgeEventFactoryClient.onScreenKeyReleasedPre(screen, keyCode, scanCode, modifiers)
-            || screen.keyReleased(keyCode, scanCode, modifiers)
-            || ForgeEventFactoryClient.onScreenKeyReleasedPost(screen, keyCode, scanCode, modifiers);
+    public static boolean onScreenKeyReleased(Screen screen, KeyEvent info) {
+        return ForgeEventFactoryClient.onScreenKeyReleasedPre(screen, info.key(), info.scancode(), info.modifiers())
+            || screen.keyReleased(info)
+            || ForgeEventFactoryClient.onScreenKeyReleasedPost(screen, info.key(), info.scancode(), info.modifiers());
     }
 
-    public static boolean onScreenCharTyped(Screen screen, char codePoint, int modifiers) {
-        return ForgeEventFactoryClient.onScreenCharTypedPre(screen, codePoint, modifiers)
-            || screen.charTyped(codePoint, modifiers)
-            || ForgeEventFactoryClient.onScreenCharTypedPost(screen, codePoint, modifiers);
+    public static boolean onScreenCharTyped(Screen screen, CharacterEvent info) {
+        return ForgeEventFactoryClient.onScreenCharTypedPre(screen, (char)info.codepoint(), info.modifiers())
+            || screen.charTyped(info)
+            || ForgeEventFactoryClient.onScreenCharTypedPost(screen, (char)info.codepoint(), info.modifiers());
     }
 
-    public static void onKeyInput(int key, int scanCode, int action, int modifiers) {
-        InputEvent.Key.BUS.post(new InputEvent.Key(key, scanCode, action, modifiers));
+    public static void onKeyInput(KeyEvent info, int action) {
+        InputEvent.Key.BUS.post(new InputEvent.Key(info.key(), info.scancode(), action, info.modifiers()));
     }
 
     public static boolean isNameplateInRenderDistance(Entity entity, double squareDistance) {
@@ -449,24 +456,32 @@ public class ForgeHooksClient {
         return IClientMobEffectExtensions.of(effectInstance).isVisibleInInventory(effectInstance);
     }
 
+    public static Set<MetadataSectionType<?>> getAtlastMetadataSections(ResourceLocation atlasId, Set<MetadataSectionType<?>> vanilla) {
+        var ret = new HashSet<>(vanilla);
+        ret.add(ForgeTextureMetadata.TYPE);
+
+        var event = new GatherAtlasMetadataSectionsEvent(ret);
+        GatherAtlasMetadataSectionsEvent.BUS.post(event);
+        return Set.of(ret.toArray(new MetadataSectionType<?>[0]));
+    }
+
     @Nullable
-    public static SpriteContents loadSpriteContents(ResourceLocation name, Resource resource, FrameSize frameSize, NativeImage image, ResourceMetadata animationMeta) {
-        try {
-            ForgeTextureMetadata forgeMeta = ForgeTextureMetadata.forResource(resource);
-            return forgeMeta.loader() == null ? null : forgeMeta.loader().loadContents(name, resource, frameSize, image, animationMeta, forgeMeta);
-        } catch (IOException e) {
-            LOGGER.error("Unable to get Forge metadata for {}, falling back to vanilla loading", name);
-            e.printStackTrace();
-            return null;
+    public static SpriteContents loadSpriteContents(ResourceLocation name, Resource resource, FrameSize frameSize, NativeImage image, List<MetadataSectionType.WithValue<?>> metadata) {
+        for (var meta : metadata) {
+            var forgeMeta = meta.unwrapToType(ForgeTextureMetadata.TYPE).orElse(null);
+            if (forgeMeta != null && forgeMeta.loader() != null)
+                return forgeMeta.loader().loadContents(name, resource, frameSize, image, metadata);
         }
+        return null;
     }
 
     @Nullable
     public static TextureAtlasSprite loadTextureAtlasSprite(ResourceLocation atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int spriteX, int spriteY, int mipmapLevel) {
-        if (contents.forgeMeta == null || contents.forgeMeta.loader() == null)
+        var forgeMeta = contents.getAdditionalMetadata(ForgeTextureMetadata.TYPE).orElse(null);
+        if (forgeMeta == null || forgeMeta.loader() == null)
             return null;
 
-        return contents.forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, mipmapLevel);
+        return forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, mipmapLevel);
     }
 
     private static final Map<ModelLayerLocation, Supplier<LayerDefinition>> layerDefinitions = new HashMap<>();
@@ -800,10 +815,10 @@ public class ForgeHooksClient {
         return true;
     }
 
-    public static boolean onScreenMouseDrag(Screen screen, double mouseX, double mouseY, int mouseButton, double dragX, double dragY) {
-        return ForgeEventFactoryClient.onScreenMouseDragPre(screen, mouseX, mouseY, mouseButton, dragX, dragY)
-            || screen.mouseDragged(mouseX, mouseY, mouseButton, dragX, dragY)
-            || ForgeEventFactoryClient.onScreenMouseDragPost(screen, mouseX, mouseY, mouseButton, dragX, dragY);
+    public static boolean onScreenMouseDrag(Screen screen, MouseButtonEvent info, double dragX, double dragY) {
+        return ForgeEventFactoryClient.onScreenMouseDragPre(screen, info.x(), info.y(), info.button(), dragX, dragY)
+            || screen.mouseDragged(info, dragX, dragY)
+            || ForgeEventFactoryClient.onScreenMouseDragPost(screen, info.x(), info.y(), info.button(), dragX, dragY);
     }
 
     public static @Nullable UnbakedGeometry deserializeBlockModelGeometry(JsonObject json, JsonDeserializationContext context) {

@@ -38,7 +38,7 @@
 +                        bucketpickup.getPickupSound(blockstate1).ifPresent(p_150709_ -> p_40704_.playSound(p_150709_, 1.0F, 1.0F));
                          p_40703_.gameEvent(p_40704_, GameEvent.FLUID_PICKUP, blockpos);
                          ItemStack itemstack2 = ItemUtils.createFilledResult(itemstack, p_40704_, itemstack3);
-                         if (!p_40703_.isClientSide) {
+                         if (!p_40703_.isClientSide()) {
 @@ -71,8 +_,8 @@
                  return InteractionResult.FAIL;
              } else {
@@ -64,12 +64,12 @@
          if (!(this.content instanceof FlowingFluid flowingfluid)) {
              return false;
          } else {
-@@ -108,8 +_,12 @@
-                 || $$8
+@@ -109,8 +_,12 @@
                  || $$7 instanceof LiquidBlockContainer liquidblockcontainer
                      && liquidblockcontainer.canPlaceLiquid(p_392717_, p_150717_, p_150718_, blockstate, this.content);
+             boolean flag3 = blockstate.isAir() || flag2 && (!flag1 || p_150719_ == null);
 +            java.util.Optional<net.minecraftforge.fluids.FluidStack> containedFluidStack = java.util.Optional.ofNullable(container).flatMap(net.minecraftforge.fluids.FluidUtil::getFluidContained);
-             if (!flag1) {
+             if (!flag3) {
 -                return p_150719_ != null && this.emptyContents(p_392717_, p_150717_, p_150719_.getBlockPos().relative(p_150719_.getDirection()), null);
 +                return p_150719_ != null && this.emptyContents(p_392717_, p_150717_, p_150719_.getBlockPos().relative(p_150719_.getDirection()), null, container);
 +            } else if (containedFluidStack.isPresent() && this.content.getFluidType().isVaporizedOnPlacement(p_150717_, p_150718_, containedFluidStack.get())) {
@@ -78,7 +78,7 @@
              } else if (p_150717_.dimensionType().ultraWarm() && this.content.is(FluidTags.WATER)) {
                  int l = p_150718_.getX();
                  int i = p_150718_.getY();
-@@ -128,7 +_,7 @@
+@@ -129,7 +_,7 @@
                  }
  
                  return true;
@@ -87,7 +87,7 @@
                  liquidblockcontainer1.placeLiquid(p_150717_, p_150718_, blockstate, flowingfluid.getSource(false));
                  this.playEmptySound(p_392717_, p_150717_, p_150718_);
                  return true;
-@@ -149,7 +_,32 @@
+@@ -150,8 +_,33 @@
  
      protected void playEmptySound(@Nullable LivingEntity p_393933_, LevelAccessor p_40697_, BlockPos p_40698_) {
          SoundEvent soundevent = this.content.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
@@ -119,4 +119,5 @@
 +    protected boolean canBlockContainFluid(Level worldIn, BlockPos posIn, BlockState blockstate) {
 +        return blockstate.getBlock() instanceof LiquidBlockContainer liquid && liquid.canPlaceLiquid(null, worldIn, posIn, blockstate, this.content);
      }
- }
+ 
+     public Fluid getContent() {
