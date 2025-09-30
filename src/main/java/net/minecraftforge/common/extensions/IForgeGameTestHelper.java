@@ -50,6 +50,8 @@ import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 public interface IForgeGameTestHelper {
     private GameTestHelper self() {
@@ -175,6 +177,22 @@ public interface IForgeGameTestHelper {
      * Registers an event listener that will be unregistered when the test is finished running.
      */
     default <E extends InheritableEvent> void addEventListener(EventBus<E> bus, Consumer<E> consumer) {
+        var key = bus.addListener(consumer);
+        self().addCleanup(success -> bus.removeListener(key));
+    }
+
+    /**
+     * Registers an event listener that will be unregistered when the test is finished running.
+     */
+    default <E extends MutableEvent> void addMutableListener(EventBus<E> bus, Consumer<E> consumer) {
+        var key = bus.addListener(consumer);
+        self().addCleanup(success -> bus.removeListener(key));
+    }
+
+    /**
+     * Registers an event listener that will be unregistered when the test is finished running.
+     */
+    default <E extends RecordEvent> void addRecordListener(EventBus<E> bus, Consumer<E> consumer) {
         var key = bus.addListener(consumer);
         self().addCleanup(success -> bus.removeListener(key));
     }
