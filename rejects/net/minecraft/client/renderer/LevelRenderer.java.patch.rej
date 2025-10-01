@@ -1,0 +1,40 @@
+++++ REJECTED HUNK: 10
+@@ -716,9 +718,9 @@
+                             || p_365712_.isDetached()
+                             || p_365712_.getEntity() instanceof LivingEntity && ((LivingEntity)p_365712_.getEntity()).isSleeping()
+                     )
+-                    && (!(entity instanceof LocalPlayer) || p_365712_.getEntity() == entity)) {
++                    && (!(entity instanceof LocalPlayer) || p_365712_.getEntity() == entity || (entity == minecraft.player && !minecraft.player.isSpectator()))) { //FORGE: render local player entity when it is not the renderViewEntity
+                     p_368622_.add(entity);
+-                    if (flag1 && this.minecraft.shouldEntityAppearGlowing(entity)) {
++                    if (flag1 && (this.minecraft.shouldEntityAppearGlowing(entity) || entity.hasCustomOutlineRendering(this.minecraft.player))) {
+                         flag = true;
+                     }
+                 }
+++++ END HUNK
+
+++++ REJECTED HUNK: 13
+@@ -789,6 +793,9 @@
+                         }
+                     }
+ 
++                    if (!customOutline && this.shouldShowEntityOutlines() && blockentity.hasCustomOutlineRendering(this.minecraft.player))
++                        customOutline = true;
++
+                     this.blockEntityRenderDispatcher.render(blockentity, p_367074_, p_366168_, multibuffersource);
+                     p_366168_.popPose();
+                 }
+++++ END HUNK
+
+++++ REJECTED HUNK: 16
+@@ -845,6 +857,9 @@
+                         return;
+                     }
+ 
++                    if (net.minecraftforge.client.ForgeHooksClient.onDrawHighlight(this, p_367935_, blockhitresult, partialTicks, p_365062_, p_367206_))
++                        return;
++
+                     Vec3 vec3 = p_367935_.getPosition();
+                     Boolean obool = this.minecraft.options.highContrastBlockOutline().get();
+                     if (obool) {
+++++ END HUNK

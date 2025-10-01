@@ -1,6 +1,5 @@
---- a/net/minecraft/client/renderer/blockentity/PistonHeadRenderer.java
-+++ b/net/minecraft/client/renderer/blockentity/PistonHeadRenderer.java
-@@ -70,10 +_,15 @@
+++++ REJECTED HUNK: 1
+@@ -70,10 +70,15 @@
      private void renderBlock(
          BlockPos p_112459_, BlockState p_112460_, PoseStack p_112461_, MultiBufferSource p_112462_, Level p_112463_, boolean p_112464_, int p_112465_
      ) {
@@ -19,3 +18,4 @@
      }
  
      @Override
+++++ END HUNK
