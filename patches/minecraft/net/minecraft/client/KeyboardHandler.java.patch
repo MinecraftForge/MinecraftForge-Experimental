@@ -23,11 +23,12 @@
          }
      }
  
-@@ -576,6 +_,7 @@
+@@ -576,7 +_,7 @@
              Screen screen = this.minecraft.screen;
              if (screen != null && this.minecraft.getOverlay() == null) {
                  try {
+-                    screen.charTyped(p_427531_);
 +                    net.minecraftforge.client.ForgeHooksClient.onScreenCharTyped(screen, p_427531_);
-                     screen.charTyped(p_427531_);
                  } catch (Throwable throwable) {
                      CrashReport crashreport = CrashReport.forThrowable(throwable, "charTyped event handler");
+                     screen.fillCrashDetails(crashreport);

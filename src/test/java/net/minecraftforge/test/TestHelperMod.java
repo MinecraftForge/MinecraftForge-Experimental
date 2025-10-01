@@ -49,9 +49,9 @@ public class TestHelperMod extends BaseTestMod {
         var packOutput = gen.getPackOutput();
 
         gen.addProvider(true, new PackMetadataGenerator(packOutput)
-            .add(PackMetadataSection.CLIENT_TYPE, new PackMetadataSection(
+            .add(PackMetadataSection.SERVER_TYPE, new PackMetadataSection(
                 Component.literal("Forge tests resource pack"),
-                DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES).minorRange()
+                DetectedVersion.BUILT_IN.packVersion(PackType.SERVER_DATA).minorRange()
             ))
         );
     }

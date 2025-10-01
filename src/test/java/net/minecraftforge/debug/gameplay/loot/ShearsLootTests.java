@@ -15,6 +15,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DoublePlantBlock;
@@ -85,7 +86,7 @@ public class ShearsLootTests extends BaseTestMod {
         };
 
         helper.makeFloor(); // Seagrass makes water
-        var player = helper.makeMockServerPlayer(false); // Plants prevent loot for creative players
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL); // Plants prevent loot for creative players
         var center = new BlockPos(1, 1, 1);
 
         player.setItemSlot(EquipmentSlot.MAINHAND, new ItemStack(MODDED_SHEARS.get()));

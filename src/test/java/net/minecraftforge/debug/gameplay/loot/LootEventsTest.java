@@ -21,6 +21,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.storage.loot.LootPool;
@@ -68,7 +69,7 @@ public class LootEventsTest extends BaseTestMod {
         helper.setBlock(center, TEST_BLOCK.get());
         helper.assertBlock(center, block -> block == TEST_BLOCK.get(), block -> Component.literal("Failed to set block, was " + block.getDescriptionId()));
 
-        var player = helper.makeMockServerPlayer();
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         player.gameMode.destroyBlock(helper.absolutePos(center));
 
         helper.assertItemEntityPresent(Items.GOLDEN_APPLE, center, 1.0);

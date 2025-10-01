@@ -46,7 +46,7 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
 
     @Override
     protected void renderSelection(GuiGraphics gui, ModListWidget.ModEntry entry, int color) {
-        int widthOffset = this.scrollbarVisible() ? 10 : 4;
+        int widthOffset = this.scrollbarVisible() ? 11 : 4;
         int top = entry.getContentY();
         int left  = entry.getContentX();
         int right = left + entry.getWidth() - widthOffset;

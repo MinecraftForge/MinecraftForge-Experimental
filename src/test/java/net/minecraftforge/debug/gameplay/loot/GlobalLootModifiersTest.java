@@ -22,6 +22,7 @@ import net.minecraft.core.component.predicates.DataComponentPredicates;
 import net.minecraft.core.component.predicates.EnchantmentsPredicate;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.util.ExtraCodecs;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -138,7 +139,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     // Tests the Enchantment condition, as well as the ability to completely override the returned values.
     @GameTest
     public static void smellting(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayer();
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var center = new BlockPos(1, 1, 1);
         var enchants = helper.getLevel().holderLookup(Registries.ENCHANTMENT);
         var smelt = getSmelterAxe(enchants, true);
@@ -166,7 +167,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     @GameTest
     public static void condition_table_name(GameTestHelper helper) {
         var center = new BlockPos(1, 1, 1);
-        var player = helper.makeMockServerPlayer();
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
 
         // Should be doubled
         helper.setBlock(center, TEST_BLOCK.get());
@@ -185,7 +186,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     @GameTest
     public static void silk_reentrant(GameTestHelper helper) {
         var center = new BlockPos(1, 1, 1);
-        var player = helper.makeMockServerPlayer();
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var bamboo = new ItemStack(Items.BAMBOO);
         var normal = new ItemStack(Items.IRON_AXE);
 

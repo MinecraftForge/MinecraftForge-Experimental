@@ -69,24 +69,24 @@ public class ModuleProvider implements DataProvider {
 
         desc.mainClass().ifPresent(module::visitMainClass);
 
-        for (var pkg : sorted(desc.packages(), Function.identity()))
+        for (var pkg : sorted(desc.packages()))
             module.visitPackage(binary(pkg));
 
         for (var req : sorted(desc.requires(), Requires::name))
             module.visitRequire(req.name(), flags(req.accessFlags()), version(req.compiledVersion(), req.rawCompiledVersion()));
 
         for (var exp : sorted(desc.exports(), Exports::source))
-            module.visitExport(binary(exp.source()), flags(exp.accessFlags()), array(exp.targets()));
+            module.visitExport(binary(exp.source()), flags(exp.accessFlags()), array(sorted(exp.targets())));
 
         for (var open : sorted(desc.opens(), Opens::source))
-            module.visitOpen(binary(open.source()), flags(open.accessFlags()), array(open.targets()));
+            module.visitOpen(binary(open.source()), flags(open.accessFlags()), array(sorted(open.targets())));
 
-        for (var uses : sorted(desc.uses(), Function.identity()))
+        for (var uses : sorted(desc.uses()))
             module.visitUse(binary(uses));
 
         for (var provide : sorted(desc.provides(), Provides::service)) {
             var providers = new ArrayList<String>();
-            for (var provider : provide.providers())
+            for (var provider : sorted(provide.providers()))
                 providers.add(binary(provider));
 
             module.visitProvide(provide.service(), array(providers));
@@ -117,6 +117,10 @@ public class ModuleProvider implements DataProvider {
         if (version == null)
             return str.orElse(null);
         return version;
+    }
+
+    private static List<String> sorted(Collection<String> data) {
+        return sorted(data, Function.identity());
     }
 
     private static <T> List<T> sorted(Collection<T> data, Function<T, String> toString) {

@@ -415,7 +415,7 @@ tasks.register('extractInheritance', ExtractInheritance) {
 }
 tasks.register("findFinalizeSpawnTargets", BytecodePredicateFinder) {
     jar = createClientOfficial.output
-    output = rootProject.file('src/main/resources/coremods/finalize_spawn_targets.json')
+    output = rootProject.file('forge-transformers/src/main/resources/coremods/finalize_spawn_targets.json')
     predicate = {
         parent, node, insn ->
             return 'net/minecraft/world/level/BaseSpawner' != parent.name // Ignore this class as we special case it.

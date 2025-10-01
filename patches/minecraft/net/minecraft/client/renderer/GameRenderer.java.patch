@@ -4,7 +4,7 @@
              case null:
              default:
                  this.clearPostEffect();
-+                var rl = net.minecraftforge.client.EntitySpectatorShaderManager.get(p_109107_.getType());
++                var rl = p_109107_ == null ? null : net.minecraftforge.client.EntitySpectatorShaderManager.get(p_109107_.getType());
 +                if (rl != null)
 +                    this.setPostEffect(rl);
          }

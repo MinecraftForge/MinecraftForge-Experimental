@@ -107,7 +107,7 @@
     {
         "class": "net/minecraft/world/level/levelgen/PhantomSpawner",
         "methods": [
-            "tick(Lnet/minecraft/server/level/ServerLevel;ZZ)V"
+            "tick(Lnet/minecraft/server/level/ServerLevel;Z)V"
         ]
     },
     {

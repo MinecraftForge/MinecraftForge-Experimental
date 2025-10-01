@@ -41,6 +41,7 @@ import net.minecraft.network.protocol.game.GameProtocols;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
@@ -146,22 +147,24 @@ public interface IForgeGameTestHelper {
         return this.self().getLevel().registryAccess().lookupOrThrow(registryKey);
     }
 
+    /**
+     * Create a mock server player in creative mode
+     */
     default ServerPlayer makeMockServerPlayer() {
-        return makeMockServerPlayer(true);
+        return makeMockServerPlayer(GameType.CREATIVE);
     }
 
+    /**
+     * Create a mock server player in creative mode
+     */
     default ServerPlayer makeMockServerPlayer(boolean creative) {
+        return makeMockServerPlayer(creative ? GameType.CREATIVE : GameType.SURVIVAL);
+    }
+
+    default ServerPlayer makeMockServerPlayer(GameType type) {
         var level = self().getLevel();
         var cookie = CommonListenerCookie.createInitial(new GameProfile(UUID.randomUUID(), "test-mock-player"), false);
-        var player = new ServerPlayer(level.getServer(), level, cookie.gameProfile(), cookie.clientInformation()) {
-            public boolean isSpectator() {
-                return false;
-            }
-
-            public boolean isCreative() {
-                return creative;
-            }
-        };
+        var player = new ServerPlayer(level.getServer(), level, cookie.gameProfile(), cookie.clientInformation());
         var connection = new Connection(PacketFlow.SERVERBOUND);
         @SuppressWarnings("unused") // The constructor has side effects
         var channel = new EmbeddedChannel(connection);
@@ -170,6 +173,7 @@ public interface IForgeGameTestHelper {
         var listener = new ServerGamePacketListenerImpl(server, connection, player, cookie);
         var info = GameProtocols.SERVERBOUND_TEMPLATE.bind(RegistryFriendlyByteBuf.decorator(server.registryAccess()), listener);
         connection.setupInboundProtocol(info, listener);
+        player.setGameMode(type);
         return player;
     }
 

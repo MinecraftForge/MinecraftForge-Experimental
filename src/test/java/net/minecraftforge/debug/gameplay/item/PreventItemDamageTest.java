@@ -117,7 +117,7 @@ public class PreventItemDamageTest extends BaseTestMod {
         helper.makeFloor();
 
         // setup player
-        var player = helper.makeMockServerPlayer();
+        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
 
         // setup shield
         var shield = FAKE_SHIELD.get().getDefaultInstance();
