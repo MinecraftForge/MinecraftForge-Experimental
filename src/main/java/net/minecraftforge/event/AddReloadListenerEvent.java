@@ -8,7 +8,6 @@ package net.minecraftforge.event;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -76,9 +75,9 @@ public final class AddReloadListenerEvent extends MutableEvent {
     private record WrappedStateAwareListener(PreparableReloadListener wrapped) implements PreparableReloadListener {
 
         @Override
-        public CompletableFuture<Void> reload(final PreparationBarrier stage, final ResourceManager resourceManager, final Executor backgroundExecutor, final Executor gameExecutor) {
+        public CompletableFuture<Void> reload(SharedState state, Executor backgroundExecutor, PreparationBarrier stage, Executor gameExecutor) {
             if (ModLoader.isLoadingStateValid())
-                return wrapped.reload(stage, resourceManager, backgroundExecutor, gameExecutor);
+                return wrapped.reload(state, backgroundExecutor, stage, gameExecutor);
             else
                 return CompletableFuture.completedFuture(null);
         }

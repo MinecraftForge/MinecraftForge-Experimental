@@ -37,10 +37,15 @@ public final class PlayerSetSpawnEvent extends MutableEvent implements Cancellab
         this.player = player;
         this.config = config;
 
-        boolean hasConfig = config != null;
-        this.forced = hasConfig && config.forced();
-        this.spawnLevel = hasConfig ? config.dimension() : Level.OVERWORLD;
-        this.newSpawn = hasConfig ? config.pos() : null;
+        if (config == null) {
+            this.forced = false;
+            this.spawnLevel = Level.OVERWORLD;
+            this.newSpawn = null;
+        } else {
+            this.forced = config.forced();
+            this.spawnLevel = config.respawnData().dimension();
+            this.newSpawn = config.respawnData().pos();
+        }
     }
 
     @Override

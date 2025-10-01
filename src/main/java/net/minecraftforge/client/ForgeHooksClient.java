@@ -45,6 +45,7 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.client.multiplayer.ServerData;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -274,6 +275,7 @@ public class ForgeHooksClient {
     }
 
     /** Copies humanoid model properties from the original model to another, used for armor models */
+    /* Mojang removied copying in 1.21.9
     @SuppressWarnings("unchecked")
     public static <T extends HumanoidRenderState> void copyModelProperties(HumanoidModel<T> original, HumanoidModel<?> replacement) {
         // this function does not make use of the <T> generic, so the unchecked cast should be safe
@@ -286,6 +288,7 @@ public class ForgeHooksClient {
         replacement.rightLeg.visible = original.rightLeg.visible;
         replacement.leftLeg.visible = original.leftLeg.visible;
     }
+    */
 
     //This properly moves the domain, if provided, to the front of the string before concatenating
     public static String fixDomain(String base, String complex) {
@@ -607,8 +610,8 @@ public class ForgeHooksClient {
             GameData.revertToFrozen();
     }
 
-    public static void onRegisterParticleProviders(ParticleEngine particleEngine) {
-        ModLoader.get().postEvent(new RegisterParticleProvidersEvent(particleEngine));
+    public static void onRegisterParticleProviders(ParticleResources particles) {
+        ModLoader.get().postEvent(new RegisterParticleProvidersEvent(particles));
     }
 
     public static void onRegisterKeyMappings(Options options) {

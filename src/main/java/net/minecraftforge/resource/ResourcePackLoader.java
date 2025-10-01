@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.server.packs.repository.Pack.Position;
-import net.minecraft.SharedConstants;
+import net.minecraft.DetectedVersion;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
@@ -79,7 +79,7 @@ public class ResourcePackLoader {
 
     private static void findPacks(Consumer<Pack> packAcceptor, boolean client) {
         var type = client ? PackType.CLIENT_RESOURCES : PackType.SERVER_DATA;
-        var version = SharedConstants.getCurrentVersion().packVersion(type);
+        var version = DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES);
         var hiddenPacks = new ArrayList<PackResources>();
 
         for (var mod : ModList.get().getModFiles()) {
@@ -94,7 +94,7 @@ public class ResourcePackLoader {
             var modinfo = file.getModInfos().get(0);
             var name = "mod:" + modinfo.getModId();
             var info = new PackLocationInfo(name, Component.literal(file.getFileName()), PackSource.DEFAULT, Optional.empty());
-            var meta = Pack.readPackMetadata(info, supplier, version);
+            var meta = Pack.readPackMetadata(info, supplier, version, type);
             Pack pack = null;
             if (meta != null)
                 pack = new Pack(info, supplier, meta, new PackSelectionConfig(false, Position.BOTTOM, false));
@@ -118,8 +118,7 @@ public class ResourcePackLoader {
             var delegating = new DelegatingPackResources(info,
                 new PackMetadataSection(
                     Component.translatable("fml.resources.modresources", hiddenPacks.size()),
-                    version,
-                    Optional.empty()
+                    version.minorRange()
                 ),
                 hiddenPacks
             );

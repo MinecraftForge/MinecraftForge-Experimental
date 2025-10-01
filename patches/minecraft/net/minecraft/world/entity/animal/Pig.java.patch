@@ -12,7 +12,7 @@
                  }
  
                  p_421808_.setPersistenceRequired();
-+                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_405460_);
++                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_421808_);
              });
              if (zombifiedpiglin == null) {
                  super.thunderHit(p_29473_, p_29474_);

@@ -4,12 +4,12 @@
      }
  
      @Override
-+    public boolean keyPressed(int key, int scanCode, int modifiers) {
-+       if (key == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
++    public boolean keyPressed(net.minecraft.client.input.KeyEvent event) {
++       if (event.key() == org.lwjgl.glfw.GLFW.GLFW_KEY_ESCAPE) {
 +          minecraft.setScreen(this.nextScreen);
 +          return true;
 +       }
-+       return super.keyPressed(key, scanCode, modifiers);
++       return super.keyPressed(event);
 +    }
 +
 +    @Override

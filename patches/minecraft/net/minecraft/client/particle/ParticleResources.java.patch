@@ -13,13 +13,13 @@
      }
  
 +    /** @deprecated Register via {@link net.minecraftforge.client.event.RegisterParticleProvidersEvent} */
-     private <T extends ParticleOptions> void register(ParticleType<T> p_427222_, ParticleProvider<T> p_423729_) {
+     public <T extends ParticleOptions> void register(ParticleType<T> p_427222_, ParticleProvider<T> p_423729_) {
          this.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(p_427222_), p_423729_);
 +        this.providersByName.put(BuiltInRegistries.PARTICLE_TYPE.getKey(p_427222_), p_423729_);
      }
  
 +    /** @deprecated Register via {@link net.minecraftforge.client.event.RegisterParticleProvidersEvent} */
-     private <T extends ParticleOptions> void register(ParticleType<T> p_427223_, ParticleResources.SpriteParticleRegistration<T> p_423156_) {
+     public <T extends ParticleOptions> void register(ParticleType<T> p_427223_, ParticleResources.SpriteParticleRegistration<T> p_423156_) {
          ParticleResources.MutableSpriteSet particleresources$mutablespriteset = new ParticleResources.MutableSpriteSet();
          this.spriteSets.put(BuiltInRegistries.PARTICLE_TYPE.getKey(p_427223_), particleresources$mutablespriteset);
 -        this.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(p_427223_), p_423156_.create(particleresources$mutablespriteset));

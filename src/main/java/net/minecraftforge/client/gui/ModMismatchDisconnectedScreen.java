@@ -26,6 +26,7 @@ import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
@@ -101,7 +102,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
         this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         int textYOffset = hasMismatches ? 18 : 0;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset - 9 * 2, 0xAAAAAA);
-        this.message.renderCentered(guiGraphics, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset);
+        this.message.render(guiGraphics, MultiLineLabel.Align.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, true, -1);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
@@ -293,13 +294,13 @@ public class ModMismatchDisconnectedScreen extends Screen {
         }
 
         @Override
-        public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-            Style style = getComponentStyleAt(mouseX, mouseY);
+        public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
+            Style style = getComponentStyleAt(info.x(), info.y());
             if (style != null) {
                 handleComponentClicked(style);
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(info, recent);
         }
 
         @Override

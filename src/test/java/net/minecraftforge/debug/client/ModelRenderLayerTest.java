@@ -63,7 +63,7 @@ public class ModelRenderLayerTest extends BaseTestMod {
             BlockBehaviour.Properties.of()
                 .setId(BLOCKS.key(BLOCK_NAME))
                 .mapColor(MapColor.PLANT)
-                .noCollission()
+                .noCollision()
                 .randomTicks()
                 .instabreak()
                 .sound(SoundType.GRASS)

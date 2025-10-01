@@ -14,8 +14,6 @@ import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
-import java.util.Optional;
-
 @Mod(Datagen.MOD_ID)
 public class Datagen {
     static final String MOD_ID = "mdk_datagen";
@@ -28,10 +26,9 @@ public class Datagen {
         var gen = event.getGenerator();
         var packOutput = gen.getPackOutput();
         gen.addProvider(true, new PackMetadataGenerator(packOutput)
-            .add(PackMetadataSection.TYPE, new PackMetadataSection(
+            .add(PackMetadataSection.CLIENT_TYPE, new PackMetadataSection(
                 Component.literal("${mod_id} resources"),
-                DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES),
-                Optional.empty()
+                DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES).minorRange()
             ))
         );
     }

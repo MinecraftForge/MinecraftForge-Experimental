@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.function.Supplier;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.InputQuirks;
+
 import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.network.chat.Component;
@@ -20,21 +21,17 @@ public enum KeyModifier {
     CONTROL {
         @Override
         public boolean matches(InputConstants.Key key) {
-            int keyCode = key.getValue();
-            if (Minecraft.ON_OSX)
-                return keyCode == GLFW.GLFW_KEY_LEFT_SUPER || keyCode == GLFW.GLFW_KEY_RIGHT_SUPER;
-            else
-                return keyCode == GLFW.GLFW_KEY_LEFT_CONTROL || keyCode == GLFW.GLFW_KEY_RIGHT_CONTROL;
+            return key.getValue() == InputQuirks.EDIT_SHORTCUT_KEY_LEFT || key.getValue() == InputQuirks.EDIT_SHORTCUT_KEY_RIGHT;
         }
 
         @Override
         public boolean isActive(@Nullable IKeyConflictContext conflictContext) {
-            return Screen.hasControlDown();
+            return Minecraft.getInstance().hasControlDown();
         }
 
         @Override
         public Component getCombinedName(InputConstants.Key key, Supplier<Component> defaultLogic) {
-            String localizationFormatKey = Minecraft.ON_OSX ? "forge.controlsgui.control.mac" : "forge.controlsgui.control";
+            String localizationFormatKey = InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY ? "forge.controlsgui.control.mac" : "forge.controlsgui.control";
             return Component.translatable(localizationFormatKey, defaultLogic.get());
         }
     },
@@ -46,7 +43,7 @@ public enum KeyModifier {
 
         @Override
         public boolean isActive(@Nullable IKeyConflictContext conflictContext) {
-            return Screen.hasShiftDown();
+            return Minecraft.getInstance().hasShiftDown();
         }
 
         @Override
@@ -62,7 +59,7 @@ public enum KeyModifier {
 
         @Override
         public boolean isActive(@Nullable IKeyConflictContext conflictContext) {
-            return Screen.hasAltDown();
+            return Minecraft.getInstance().hasAltDown();
         }
 
         @Override

@@ -20,7 +20,6 @@ import com.mojang.blaze3d.textures.TextureFormat;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderStateShard.TextureStateShard;
 import net.minecraft.client.renderer.RenderType;
 
@@ -42,8 +41,7 @@ public enum ForgeRenderTypes {
     ITEM_LAYERED_TRANSLUCENT(()-> getItemLayeredTranslucent(blockAtlas())),
     ITEM_UNSORTED_TRANSLUCENT(()-> getUnsortedTranslucent(blockAtlas())),
     ITEM_UNLIT_TRANSLUCENT(()-> getUnlitTranslucent(blockAtlas())),
-    ITEM_UNSORTED_UNLIT_TRANSLUCENT(()-> getUnlitTranslucent(blockAtlas(), false)),
-    TRANSLUCENT_ON_PARTICLES_TARGET(() -> getTranslucentParticlesTarget(blockAtlas()));
+    ITEM_UNSORTED_UNLIT_TRANSLUCENT(()-> getUnlitTranslucent(blockAtlas(), false));
 
     /**
      * Controls the texture filtering state for certain {@link RenderType Render Types}.
@@ -174,16 +172,6 @@ public enum ForgeRenderTypes {
     public static RenderType getTextIntensitySeeThrough(ResourceLocation locationIn) {
         return Internal.TEXT_INTENSITY_SEE_THROUGH.apply(locationIn);
     }
-
-    /**
-     * @see #enableTextTextureLinearFiltering
-     *
-     * @return A variation of {@link RenderType#translucent()} that uses {@link RenderStateShard.OutputStateShard#PARTICLES_TARGET}
-     */
-    public static RenderType getTranslucentParticlesTarget(ResourceLocation locationIn) {
-        return Internal.TRANSLUCENT_PARTICLES_TARGET.apply(locationIn);
-    }
-
 
     /**
      * Render type for rendering the early loading screen, not for modder consumption.
@@ -425,22 +413,6 @@ public enum ForgeRenderTypes {
                                   .setTextureState(new CustomizableTextureState(locationIn, false))
                                   .setLightmapState(LIGHTMAP)
                                   .createCompositeState(false)
-            );
-        }
-
-        public static Function<ResourceLocation, RenderType> TRANSLUCENT_PARTICLES_TARGET = Util.memoize(Internal::getTranslucentParticlesTarget);
-        private static RenderType getTranslucentParticlesTarget(ResourceLocation locationIn) {
-            return create(
-                    "forge_translucent_particles_target",
-                    TRANSIENT_BUFFER_SIZE,
-                    true,
-                    true,
-                    RenderPipelines.TRANSLUCENT_PARTICLE,
-                    CompositeState.builder()
-                                  .setTextureState(new TextureStateShard(locationIn, false))
-                                  .setOutputState(PARTICLES_TARGET)
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(true)
             );
         }
 

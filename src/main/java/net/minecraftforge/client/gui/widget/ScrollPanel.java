@@ -11,6 +11,7 @@ import net.minecraft.client.gui.components.Renderable;
 import net.minecraft.client.gui.components.events.AbstractContainerEventHandler;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.narration.NarratableEntry;
+import net.minecraft.client.input.MouseButtonEvent;
 import java.util.Collections;
 import java.util.List;
 
@@ -196,23 +197,23 @@ public abstract class ScrollPanel extends AbstractContainerEventHandler implemen
     }
 
     @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-        if (super.mouseClicked(mouseX, mouseY, button))
+    public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
+        if (super.mouseClicked(info, recent))
             return true;
 
-        this.scrolling = button == 0 && mouseX >= barLeft && mouseX < barLeft + barWidth;
+        this.scrolling = info.button() == 0 && info.x() >= barLeft && info.x() < barLeft + barWidth;
         if (this.scrolling)
             return true;
 
-        int mouseListY = ((int)mouseY) - this.top - this.getContentHeight() + (int)this.scrollDistance - border;
-        if (mouseX >= left && mouseX <= right && mouseListY < 0)
-            return this.clickPanel(mouseX - left, mouseY - this.top + (int)this.scrollDistance - border, button);
+        int mouseListY = ((int)info.y()) - this.top - this.getContentHeight() + (int)this.scrollDistance - border;
+        if (info.x() >= left && info.x() <= right && mouseListY < 0)
+            return this.clickPanel(info.x() - left, info.y() - this.top + (int)this.scrollDistance - border, info.button());
         return false;
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button) {
-        if (super.mouseReleased(mouseX, mouseY, button))
+    public boolean mouseReleased(MouseButtonEvent info) {
+        if (super.mouseReleased(info))
             return true;
 
         boolean ret = this.scrolling;
@@ -232,7 +233,7 @@ public abstract class ScrollPanel extends AbstractContainerEventHandler implemen
     }
 
     @Override
-    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
+    public boolean mouseDragged(MouseButtonEvent info, double deltaX, double deltaY) {
         if (this.scrolling) {
             int maxScroll = height - getBarHeight();
             double moved = deltaY / maxScroll;

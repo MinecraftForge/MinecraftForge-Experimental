@@ -25,7 +25,7 @@
 +    public void enableStencil() {
 +        if (stencilEnabled) return;
 +        stencilEnabled = true;
-+        this.resize(viewWidth, viewHeight);
++        this.resize(width, height);
 +    }
 +
 +    /**

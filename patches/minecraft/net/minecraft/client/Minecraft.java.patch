@@ -41,7 +41,7 @@
          this.particleResources = new ParticleResources();
          this.resourceManager.registerReloadListener(this.particleResources);
          this.particleEngine = new ParticleEngine(this.level, this.particleResources);
-+        net.minecraftforge.client.ForgeHooksClient.onRegisterParticleProviders(this.particleEngine);
++        net.minecraftforge.client.ForgeHooksClient.onRegisterParticleProviders(this.particleResources);
          this.particleResources.onReload(this.particleEngine::clearParticles);
          this.waypointStyles = new WaypointStyleManager();
          this.resourceManager.registerReloadListener(this.waypointStyles);

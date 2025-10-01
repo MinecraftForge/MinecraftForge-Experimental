@@ -157,12 +157,14 @@ public record PacketDistributor<T>(BiFunction<PacketDistributor<T>, T, Consumer<
         return p -> getServer().getPlayerList().broadcast(tp.excluded, tp.x, tp.y, tp.z, tp.r2, tp.dim, p);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"}) // This should only ever be used during PLAY and the vanilla code forces it to be ClientGamePacketListener, so do an unsafe cast
     private Consumer<Packet<?>> trackingEntity(Entity entity) {
-        return p -> ((ServerChunkCache)entity.level().getChunkSource()).broadcast(entity, p);
+        return p -> ((ServerChunkCache)entity.level().getChunkSource()).sendToTrackingPlayers(entity, (Packet)p);
     }
 
+    @SuppressWarnings({"rawtypes", "unchecked"}) // This should only ever be used during PLAY and the vanilla code forces it to be ClientGamePacketListener, so do an unsafe cast
     private Consumer<Packet<?>> trackingEntityAndSelf(Entity entity) {
-        return p -> ((ServerChunkCache)entity.level().getChunkSource()).broadcastAndSend(entity, p);
+        return p -> ((ServerChunkCache)entity.level().getChunkSource()).sendToTrackingPlayersAndSelf(entity, (Packet)p);
     }
 
     @SuppressWarnings("resource")

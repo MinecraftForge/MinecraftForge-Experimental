@@ -8,6 +8,7 @@ package net.minecraftforge.client.gui.widget;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ObjectSelectionList;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.network.chat.Component;
@@ -44,12 +45,14 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
     }
 
     @Override
-    protected void renderSelection(GuiGraphics gui, int top, int rowWidth, int height, int borderColor, int backgroundColor) {
+    protected void renderSelection(GuiGraphics gui, ModListWidget.ModEntry entry, int color) {
         int barOffset = this.scrollbarVisible() ? 6 : 0;
-        int left  = this.getX() + (this.width - rowWidth) / 2;
-        int right = this.getX() + (this.width + rowWidth) / 2 - barOffset;
-        gui.fill(left,     top - 2, right,     top + height + 2, borderColor);
-        gui.fill(left + 1, top - 1, right - 1, top + height + 1, backgroundColor);
+        int top = entry.getContentY();
+        int left  = entry.getContentX();
+        int right = left + entry.getWidth();
+        int bottom = top + entry.getHeight();
+        gui.fill(left,     top - 2, right,     bottom + 2, color);
+        gui.fill(left + 1, top - 1, right - 1, bottom + 1, /*backgroundColor*/ 0xFF000000);
     }
 
     public void refreshList() {
@@ -72,7 +75,11 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int entryIdx, int top, int left, int entryWidth, int entryHeight, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+            int top = this.getContentY();
+            int left = this.getContentX();
+            int entryHeight = this.getContentBottom();
+
             Component name = Component.literal(stripControlCodes(modInfo.getDisplayName()));
             Component version = Component.literal(stripControlCodes(MavenVersionStringHelper.artifactVersionToString(modInfo.getVersion())));
             VersionChecker.CheckResult vercheck = VersionChecker.getResult(modInfo);
@@ -90,7 +97,7 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
         }
 
         @Override
-        public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_) {
+        public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
             parent.setSelected(this);
             ModListWidget.this.setSelected(this);
             return false;

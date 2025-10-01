@@ -80,7 +80,7 @@ public final class ForgeInternalHandler {
 
     @SubscribeEvent
     static void playerLogin(PlayerEvent.PlayerLoggedInEvent event) {
-        UsernameCache.setUsername(event.getEntity().getUUID(), event.getEntity().getGameProfile().getName());
+        UsernameCache.setUsername(event.getEntity().getUUID(), event.getEntity().getGameProfile().name());
     }
 
     @SubscribeEvent

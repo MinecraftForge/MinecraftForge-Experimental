@@ -394,17 +394,20 @@ public final class ForgeLayeredDraw implements ForgeLayer {
             .add(BOSS_OVERLAY, gui::renderBossOverlay);
         var postSleepDraw = new ForgeLayeredDraw(POST_SLEEP_STACK)
             .add(DEMO_OVERLAY, gui::renderDemoOverlay)
-            .add(DEBUG_OVERLAY, gui::renderDebugOverlay)
             .add(SCOREBOARD, gui::renderScoreboardSidebar)
             .add(HOTBAR_MESSAGE, gui::renderOverlayMessage)
             .add(TITLE_OVERLAY, gui::renderTitle)
             .add(CHAT_OVERLAY, gui::renderChat)
             .add(TAB_LIST, gui::renderTabList)
-            .add(SUBTITLE_OVERLAY, gui::renderSubtitleOverlay);
+            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.renderSubtitleOverlay(gfx, minecraft.screen != null || minecraft.screen.isInGameUi()));
         instance
             .add(PRE_SLEEP_STACK, preSleepDraw, () -> !minecraft.options.hideGui)
             .add(SLEEP_OVERLAY, gui::renderSleepOverlay)
-            .add(POST_SLEEP_STACK, postSleepDraw, () -> !minecraft.options.hideGui);
+            .add(POST_SLEEP_STACK, postSleepDraw, () -> !minecraft.options.hideGui)
+            .add(SUBTITLE_OVERLAY, (gfx, delta) -> {
+                if (minecraft.options.hideGui && minecraft.screen != null && minecraft.screen.isInGameUi())
+                    gui.renderSubtitleOverlay(gfx,  true);
+            });
         instance.resolveLayers();
     }
 }

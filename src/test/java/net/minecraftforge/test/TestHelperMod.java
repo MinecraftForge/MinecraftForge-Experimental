@@ -5,10 +5,7 @@
 
 package net.minecraftforge.test;
 
-import java.util.Optional;
-
 import net.minecraft.DetectedVersion;
-import net.minecraft.SharedConstants;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
@@ -52,11 +49,9 @@ public class TestHelperMod extends BaseTestMod {
         var packOutput = gen.getPackOutput();
 
         gen.addProvider(true, new PackMetadataGenerator(packOutput)
-            .add(PackMetadataSection.TYPE, new PackMetadataSection(
+            .add(PackMetadataSection.CLIENT_TYPE, new PackMetadataSection(
                 Component.literal("Forge tests resource pack"),
-                SharedConstants.getCurrentVersion().packVersion(PackType.CLIENT_RESOURCES),
-                Optional.empty()
-                //Arrays.stream(PackType.values()).collect(Collectors.toMap(Function.identity(), DetectedVersion.BUILT_IN::getPackVersion))
+                DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES).minorRange()
             ))
         );
     }

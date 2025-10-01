@@ -5,9 +5,8 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.client.particle.ParticleProvider;
-import net.minecraft.client.particle.TextureSheetParticle;
+import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
@@ -34,11 +33,11 @@ public final class RegisterParticleProvidersEvent implements IModBusEvent {
         return IModBusEvent.getBus(modBusGroup, RegisterParticleProvidersEvent.class);
     }
 
-    private final ParticleEngine particleEngine;
+    private final ParticleResources particles;
 
     @ApiStatus.Internal
-    public RegisterParticleProvidersEvent(ParticleEngine particleEngine) {
-        this.particleEngine = particleEngine;
+    public RegisterParticleProvidersEvent(ParticleResources particles) {
+        this.particles = particles;
     }
 
     /**
@@ -54,23 +53,7 @@ public final class RegisterParticleProvidersEvent implements IModBusEvent {
      */
     @SuppressWarnings("deprecation")
     public <T extends ParticleOptions> void registerSpecial(ParticleType<T> type, ParticleProvider<T> provider) {
-        particleEngine.register(type, provider);
-    }
-
-    /**
-     * <p>Registers a ParticleProvider for a json-based ParticleType with a single texture;
-     * the resulting {@link TextureSheetParticle}s will use that texture when created.</p>
-     *
-     * <p>A particle json with an ID matching the ParticleType <strong>must exist</strong> in the <code>particles</code> asset folder,
-     * or a missing texture list error will occur when particle jsons load.</p>
-     *
-     * @param <T> ParticleOptions used by the ParticleType and Sprite function.
-     * @param type ParticleType to register a ParticleProvider for.
-     * @param sprite Sprite function responsible for providing that ParticleType's particles.
-     */
-    @SuppressWarnings("deprecation")
-    public <T extends ParticleOptions> void registerSprite(ParticleType<T> type, ParticleProvider.Sprite<T> sprite) {
-        particleEngine.register(type, sprite);
+        particles.register(type, provider);
     }
 
     /**
@@ -85,7 +68,7 @@ public final class RegisterParticleProvidersEvent implements IModBusEvent {
      * @param registration SpriteParticleRegistration function responsible for providing that ParticleType's particles.
      */
     @SuppressWarnings("deprecation")
-    public <T extends ParticleOptions> void registerSpriteSet(ParticleType<T> type, ParticleEngine.SpriteParticleRegistration<T> registration) {
-        particleEngine.register(type, registration);
+    public <T extends ParticleOptions> void registerSpriteSet(ParticleType<T> type, ParticleResources.SpriteParticleRegistration<T> registration) {
+        particles.register(type, registration);
     }
 }

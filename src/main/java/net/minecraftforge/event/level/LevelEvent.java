@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ReceivingLevelScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
@@ -110,7 +109,7 @@ public sealed interface LevelEvent extends InheritableEvent
      *
      * The event is called in {@link net.minecraft.world.level.NaturalSpawner#mobsAt(ServerLevel, StructureManager,
      * ChunkGenerator, MobCategory, BlockPos, Holder)}.</p>
-     * 
+     *
      * <p>This event is {@linkplain Cancellable cancellable}.
      * Cancelling the event will result in an empty list, meaning no entity will be spawned.</p>
      */

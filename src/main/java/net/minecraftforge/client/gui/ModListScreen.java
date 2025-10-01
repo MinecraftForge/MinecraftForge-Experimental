@@ -28,6 +28,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -203,13 +204,13 @@ public class ModListScreen extends Screen {
         }
 
         @Override
-        public boolean mouseClicked(final double mouseX, final double mouseY, final int button) {
-            final Style component = findTextLine((int) mouseX, (int) mouseY);
+        public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
+            final Style component = findTextLine((int)info.x(), (int)info.y());
             if (component != null) {
                 ModListScreen.this.handleComponentClicked(component);
                 return true;
             }
-            return super.mouseClicked(mouseX, mouseY, button);
+            return super.mouseClicked(info, recent);
         }
 
         @Override

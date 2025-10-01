@@ -102,7 +102,6 @@ import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
@@ -694,10 +693,13 @@ public final class ForgeHooks {
                 var potion = itemStack.get(DataComponents.POTION_CONTENTS).potion().orElse(null);
                 if (potion != null && potion.unwrapKey().isPresent())
                     return potion.unwrapKey().get().location().getNamespace();
-            } else if (item instanceof SpawnEggItem egg) {
-                var resourceLocation = EntityType.getKey(egg.getDefaultType());
-                if (resourceLocation != null)
-                    return resourceLocation.getNamespace();
+            } else if (item instanceof SpawnEggItem) {
+                var data = item.components().get(DataComponents.ENTITY_DATA);
+                if (data != null && data.type() != null) {
+                    var resourceLocation = EntityType.getKey(data.type());
+                    if (resourceLocation != null)
+                        return resourceLocation.getNamespace();
+                }
             }
         }
         return modId;

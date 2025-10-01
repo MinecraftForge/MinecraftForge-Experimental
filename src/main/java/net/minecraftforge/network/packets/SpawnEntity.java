@@ -147,7 +147,7 @@ public class SpawnEntity {
             e.setUUID(msg.uuid);
             if (world.orElse(null) instanceof ClientLevel cworld)
                 cworld.addEntity(e);
-            e.lerpMotion(msg.velX / 8000.0, msg.velY / 8000.0, msg.velZ / 8000.0);
+            //e.lerpMotion(msg.velX / 8000.0, msg.velY / 8000.0, msg.velZ / 8000.0);
             if (e instanceof IEntityAdditionalSpawnData entityAdditionalSpawnData)
                 entityAdditionalSpawnData.readSpawnData(msg.buf);
         } finally {

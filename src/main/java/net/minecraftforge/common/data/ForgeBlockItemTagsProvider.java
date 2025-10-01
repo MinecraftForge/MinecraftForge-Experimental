@@ -41,7 +41,8 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(Blocks.MEDIUM_AMETHYST_BUD)
             .add(Blocks.LARGE_AMETHYST_BUD);
         tag(Tags.Blocks.CHAINS, Tags.Items.CHAINS)
-            .add(Blocks.CHAIN);
+            .add(Blocks.IRON_CHAIN)
+            .addAll(Blocks.COPPER_CHAIN.asList());
         tag(Tags.Blocks.CHESTS, Tags.Items.CHESTS)
             .addTags(
                 Tags.Blocks.CHESTS_ENDER,

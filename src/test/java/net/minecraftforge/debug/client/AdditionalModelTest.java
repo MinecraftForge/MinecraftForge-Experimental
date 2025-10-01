@@ -14,16 +14,14 @@ import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
 import net.minecraft.client.model.CowModel;
 import net.minecraft.client.model.PigModel;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.MovingBlockRenderState;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.PigRenderState;
 import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
@@ -43,7 +41,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -128,7 +125,7 @@ public class AdditionalModelTest extends BaseTestMod {
         LivingEntityRenderer<Pig, PigRenderState, PigModel> pig = event.getEntityRenderer(EntityType.PIG);
         pig.addLayer(new RenderLayer<>(pig) {
             @Override
-            public void render(PoseStack stack, MultiBufferSource source, int light, PigRenderState state, float xRot, float yRot) {
+            public void submit(PoseStack stack, SubmitNodeCollector source, int light, PigRenderState state, float xRot, float yRot) {
                 var part = this.getParentModel().root().createPartLookup().apply("head");
                 if (part != null) {
                     var manager = Minecraft.getInstance().getModelManager();
@@ -152,11 +149,9 @@ public class AdditionalModelTest extends BaseTestMod {
         LivingEntityRenderer<Cow, LivingEntityRenderState, CowModel> cow = event.getEntityRenderer(EntityType.COW);
         cow.addLayer(new RenderLayer<>(cow) {
             @Override
-            public void render(PoseStack stack, MultiBufferSource source, int light, LivingEntityRenderState state, float xRot, float yRot) {
+            public void submit(PoseStack stack, SubmitNodeCollector source, int light, LivingEntityRenderState cowState, float xRot, float yRot) {
                 var part = this.getParentModel().root().createPartLookup().apply("head");
                 if (part != null) {
-                    var manager = Minecraft.getInstance().getModelManager();
-
                     stack.pushPose();
 
                     this.getParentModel().root().translateAndRotate(stack);
@@ -165,10 +160,9 @@ public class AdditionalModelTest extends BaseTestMod {
                     stack.translate(-0.5, -0.5, -0.5);
                     stack.translate(0, -1, -0.5);
 
-                    var model = manager.getBlockModelShaper().getBlockModel(COW_HEAD_STATE.any());
-
-                    var consumer = source.getBuffer(RenderType.solid());
-                    ModelBlockRenderer.renderModel(stack.last(), consumer, model, 1.0F, 1.0F, 1.0F, light, OverlayTexture.NO_OVERLAY, ModelData.EMPTY, null);
+                    var state = new MovingBlockRenderState();
+                    state.blockState = COW_HEAD_STATE.any();
+                    source.submitMovingBlock(stack, state);
                     stack.popPose();
                 }
             }

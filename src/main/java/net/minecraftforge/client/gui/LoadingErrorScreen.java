@@ -127,7 +127,9 @@ public class LoadingErrorScreen extends ErrorScreen {
             }
 
             @Override
-            public void render(GuiGraphics guiGraphics, int entryIdx, int top, int left, final int entryWidth, final int entryHeight, final int mouseX, final int mouseY, final boolean p_194999_5_, final float partialTick) {
+            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+                int top = this.getContentY();
+                int left = this.getContentX();
                 var mc = Minecraft.getInstance();
                 Font font = mc.font;
                 var strings = font.split(message, LoadingEntryList.this.width - 20);

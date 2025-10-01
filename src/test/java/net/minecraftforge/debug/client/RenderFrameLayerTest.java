@@ -4,7 +4,7 @@
  */
 
 package net.minecraftforge.debug.client;
- 
+
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraftforge.client.FramePassManager;
 import net.minecraftforge.client.event.AddFramePassEvent;
@@ -64,7 +64,7 @@ public class RenderFrameLayerTest extends BaseTestMod {
                 var buffSource = Minecraft.getInstance().renderBuffers().bufferSource();
                 var vc = buffSource.getBuffer(RenderType.lines());
 
-                ShapeRenderer.renderLineBox(ps, vc, 0, -60, 0, 10, -50, 10, 1f, 1f, 1f, 1f);
+                ShapeRenderer.renderLineBox(ps.last(), vc, 0, -60, 0, 10, -50, 10, 1f, 1f, 1f, 1f);
                 buffSource.endBatch();
                 ps.popPose();
             }
@@ -85,7 +85,7 @@ public class RenderFrameLayerTest extends BaseTestMod {
                 var buffSource = Minecraft.getInstance().renderBuffers().bufferSource();
                 var vc = buffSource.getBuffer(RenderType.lines());
 
-                ShapeRenderer.renderLineBox(ps, vc, 1, -61, 1, 9, -49, 9, 1f, 1f, 1f, 1f);
+                ShapeRenderer.renderLineBox(ps.last(), vc, 1, -61, 1, 9, -49, 9, 1f, 1f, 1f, 1f);
                 buffSource.endBatch();
                 ps.popPose();
             }

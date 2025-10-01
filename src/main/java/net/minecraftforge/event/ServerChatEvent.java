@@ -37,7 +37,7 @@ public final class ServerChatEvent extends MutableEvent implements Cancellable {
     @ApiStatus.Internal
     public ServerChatEvent(ServerPlayer player, String rawText, Component message) {
         this.player = player;
-        this.username = player.getGameProfile().getName();
+        this.username = player.getGameProfile().name();
         this.rawText = rawText;
         this.message = message;
     }

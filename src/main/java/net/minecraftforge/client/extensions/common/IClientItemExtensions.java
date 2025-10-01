@@ -19,7 +19,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.IArmPoseTransformer;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.NotNull;
@@ -119,7 +118,7 @@ public interface IClientItemExtensions {
     default Model getGenericArmorModel(HumanoidRenderState state, ItemStack itemStack, EquipmentSlot equipmentSlot, HumanoidModel<?> original) {
         HumanoidModel<?> replacement = getHumanoidArmorModel(state, itemStack, equipmentSlot, original);
         if (replacement != original) {
-            ForgeHooksClient.copyModelProperties(original, replacement);
+            //ForgeHooksClient.copyModelProperties(original, replacement);
             return replacement;
         }
         return original;
