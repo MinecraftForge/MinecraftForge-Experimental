@@ -1,15 +1,15 @@
 {
   "type": "minecraft:crafting_shaped",
-  "category": "redstone",
+  "category": "misc",
   "key": {
     "#": "#c:ingots/copper"
   },
   "pattern": [
-    "##",
-    "##"
+    "###",
+    "###"
   ],
   "result": {
-    "count": 1,
-    "id": "minecraft:copper_trapdoor"
+    "count": 16,
+    "id": "minecraft:copper_bars"
   }
 }

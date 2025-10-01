@@ -2,16 +2,16 @@
   "type": "minecraft:crafting_shaped",
   "category": "misc",
   "key": {
-    "I": "#c:ingots/iron",
-    "N": "minecraft:iron_nugget"
+    "#": "#c:ingots/copper",
+    "X": "#c:chests/wooden"
   },
   "pattern": [
-    "N",
-    "I",
-    "N"
+    "###",
+    "#X#",
+    "###"
   ],
   "result": {
     "count": 1,
-    "id": "minecraft:chain"
+    "id": "minecraft:copper_chest"
   }
 }
