@@ -136,10 +136,9 @@ public interface IForgeBlockEntity extends ICapabilityProvider {
     /**
      * Returns whether this {@link BlockEntity} has custom outline rendering behavior.
      *
-     * @param player the local player currently viewing this {@code BlockEntity}
      * @return {@code true} to enable outline processing
      */
-    default boolean hasCustomOutlineRendering(Player player) {
+    default boolean hasCustomOutlineRendering() {
         return false;
     }
 }

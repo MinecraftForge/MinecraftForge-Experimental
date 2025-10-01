@@ -8,55 +8,85 @@ package net.minecraftforge.client.event;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.MultiBufferSource.BufferSource;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Fired before a selection highlight is rendered.
+ * You should extract your custom data here so that you can use it in the render callback without effecting world state.
+ *
  * See the two subclasses to listen for blocks or entities.
  *
  * @see Block
  * @see Entity
  */
-public sealed interface RenderHighlightEvent extends Cancellable, InheritableEvent {
+public sealed abstract class RenderHighlightEvent extends MutableEvent implements Cancellable, InheritableEvent permits RenderHighlightEvent.Block, RenderHighlightEvent.Entity {
     CancellableEventBus<RenderHighlightEvent> BUS = CancellableEventBus.create(RenderHighlightEvent.class);
+
+    private final LevelRenderer levelRenderer;
+    private final Camera camera;
+    private final LevelRenderState levelRenderState;
+    private Callback customRenderer;
+
+    private RenderHighlightEvent(LevelRenderer levelRenderer, Camera camera, LevelRenderState levelRenderState) {
+        this.levelRenderer = levelRenderer;
+        this.camera = camera;
+        this.levelRenderState = levelRenderState;
+    }
 
     /**
      * {@return the level renderer}
      */
-    LevelRenderer getLevelRenderer();
+    public LevelRenderer getLevelRenderer() {
+        return this.levelRenderer;
+    }
+
+    /**
+     * {@return the level renderer state}
+     */
+    public LevelRenderState getLevelRenderState() {
+        return this.levelRenderState;
+    }
 
     /**
      * {@return the camera information}
      */
-    Camera getCamera();
+    public Camera getCamera() {
+        return this.camera;
+    }
 
     /**
      * {@return the hit result which triggered the selection highlight}
      */
-    HitResult getTarget();
+    abstract HitResult getTarget();
 
     /**
-     * {@return the partial tick}
+     * {@return the custom renderer that an event listener has set}
      */
-    float getPartialTick();
+    @Nullable
+    public Callback getCustomRenderer() {
+        return this.customRenderer;
+    }
 
     /**
-     * {@return the pose stack used for rendering}
+     * Set a custom renderer to render the selection highlight.
+     * May be null to clear a previously set custom renderer.
+     *
+     * If the callback is set, it will be invoked instead of the vanilla rendering.
      */
-    PoseStack getPoseStack();
-
-    /**
-     * {@return the source of rendering buffers}
-     */
-    MultiBufferSource getMultiBufferSource();
+    public void setCustomRenderer(@Nullable Callback value) {
+        this.customRenderer = value;
+    }
 
     /**
      * Fired before a block's selection highlight is rendered.
@@ -66,25 +96,22 @@ public sealed interface RenderHighlightEvent extends Cancellable, InheritableEve
      *
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    record Block(
-            LevelRenderer getLevelRenderer,
-            Camera getCamera,
-            BlockHitResult getTarget,
-            float getPartialTick,
-            PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource
-    ) implements RenderHighlightEvent {
+    public static final class Block extends RenderHighlightEvent {
         public static final CancellableEventBus<Block> BUS = CancellableEventBus.create(Block.class);
+        private final BlockHitResult target;
 
         @ApiStatus.Internal
-        public Block {}
+        public Block(LevelRenderer levelRenderer, Camera camera, LevelRenderState levelRenderState, BlockHitResult target) {
+            super(levelRenderer, camera, levelRenderState);
+            this.target = target;
+        }
 
         /**
          * {@return the block hit result}
          */
         @Override
         public BlockHitResult getTarget() {
-            return getTarget;
+            return target;
         }
     }
 
@@ -95,25 +122,26 @@ public sealed interface RenderHighlightEvent extends Cancellable, InheritableEve
      *
      * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
-    record Entity(
-            LevelRenderer getLevelRenderer,
-            Camera getCamera,
-            EntityHitResult getTarget,
-            float getPartialTick,
-            PoseStack getPoseStack,
-            MultiBufferSource getMultiBufferSource
-    ) implements RenderHighlightEvent {
+    public static final class Entity extends RenderHighlightEvent {
         public static final CancellableEventBus<Entity> BUS = CancellableEventBus.create(Entity.class);
+        private final EntityHitResult target;
 
         @ApiStatus.Internal
-        public Entity {}
+        public Entity(LevelRenderer levelRenderer, Camera camera, LevelRenderState levelRenderState, EntityHitResult target) {
+            super(levelRenderer, camera, levelRenderState);
+            this.target = target;
+        }
 
         /**
          * {@return the entity hit result}
          */
         @Override
         public EntityHitResult getTarget() {
-            return getTarget;
+            return target;
         }
+    }
+
+    public interface Callback {
+        void render(BufferSource source, PoseStack stack, boolean translucent, LevelRenderState state);
     }
 }

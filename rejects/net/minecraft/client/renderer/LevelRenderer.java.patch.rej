@@ -12,29 +12,3 @@
                      }
                  }
 ++++ END HUNK
-
-++++ REJECTED HUNK: 13
-@@ -789,6 +793,9 @@
-                         }
-                     }
- 
-+                    if (!customOutline && this.shouldShowEntityOutlines() && blockentity.hasCustomOutlineRendering(this.minecraft.player))
-+                        customOutline = true;
-+
-                     this.blockEntityRenderDispatcher.render(blockentity, p_367074_, p_366168_, multibuffersource);
-                     p_366168_.popPose();
-                 }
-++++ END HUNK
-
-++++ REJECTED HUNK: 16
-@@ -845,6 +857,9 @@
-                         return;
-                     }
- 
-+                    if (net.minecraftforge.client.ForgeHooksClient.onDrawHighlight(this, p_367935_, blockhitresult, partialTicks, p_365062_, p_367206_))
-+                        return;
-+
-                     Vec3 vec3 = p_367935_.getPosition();
-                     Boolean obool = this.minecraft.options.highContrastBlockOutline().get();
-                     if (obool) {
-++++ END HUNK

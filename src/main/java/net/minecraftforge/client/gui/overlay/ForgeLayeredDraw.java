@@ -399,7 +399,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
             .add(TITLE_OVERLAY, gui::renderTitle)
             .add(CHAT_OVERLAY, gui::renderChat)
             .add(TAB_LIST, gui::renderTabList)
-            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.renderSubtitleOverlay(gfx, minecraft.screen != null || minecraft.screen.isInGameUi()));
+            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.renderSubtitleOverlay(gfx, minecraft.screen != null && minecraft.screen.isInGameUi()));
         instance
             .add(PRE_SLEEP_STACK, preSleepDraw, () -> !minecraft.options.hideGui)
             .add(SLEEP_OVERLAY, gui::renderSleepOverlay)

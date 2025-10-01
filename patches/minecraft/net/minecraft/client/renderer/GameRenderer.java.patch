@@ -42,6 +42,17 @@
                  } catch (Throwable throwable1) {
                      CrashReport crashreport1 = CrashReport.forThrowable(throwable1, "Rendering screen");
                      CrashReportCategory crashreportcategory1 = crashreport1.addCategory("Screen render details");
+@@ -672,6 +_,10 @@
+                         BlockInWorld blockinworld = new BlockInWorld(this.minecraft.level, blockpos, false);
+                         Registry<Block> registry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
+                         flag = !itemstack.isEmpty() && (itemstack.canBreakBlockInAdventureMode(blockinworld) || itemstack.canPlaceOnBlockInAdventureMode(blockinworld));
++                        if (!flag && blockstate.hasBlockEntity()) {
++                            var blockEntity = this.minecraft.level.getBlockEntity(blockpos);
++                            flag = blockEntity != null && blockEntity.hasCustomOutlineRendering();
++                        }
+                     }
+                 }
+             }
 @@ -706,6 +_,9 @@
          if (this.minecraft.options.bobView().get()) {
              this.bobView(posestack, this.mainCamera.getPartialTickTime());

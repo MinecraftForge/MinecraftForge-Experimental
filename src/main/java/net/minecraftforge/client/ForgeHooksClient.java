@@ -54,6 +54,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -67,6 +68,7 @@ import net.minecraft.client.resources.model.UnbakedGeometry;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.core.BlockPos;
+import net.minecraft.data.AtlasIds;
 import net.minecraft.locale.Language;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.ChatType;
@@ -245,17 +247,21 @@ public class ForgeHooksClient {
     }
     */
 
-    public static boolean onDrawHighlight(LevelRenderer context, Camera camera, HitResult target, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource) {
-        switch (target.getType()) {
-            case BLOCK:
-                if (!(target instanceof BlockHitResult blockTarget)) return false;
-                return RenderHighlightEvent.Block.BUS.post(new RenderHighlightEvent.Block(context, camera, blockTarget, partialTick, poseStack, bufferSource));
-            case ENTITY:
-                if (!(target instanceof EntityHitResult entityTarget)) return false;
-                return RenderHighlightEvent.Entity.BUS.post(new RenderHighlightEvent.Entity(context, camera, entityTarget, partialTick, poseStack, bufferSource));
-            default:
-                return false; // NO-OP - This doesn't even get called for anything other than blocks and entities
+    private static final RenderHighlightEvent.Callback NOOP_HIGHLIGHTER = (source, stack, translucent, state) -> { };
+
+    public static RenderHighlightEvent.Callback onExtractBlockOutline(LevelRenderer context, Camera camera, LevelRenderState state, HitResult target) {
+        if (target instanceof BlockHitResult blockTarget) {
+            var event = new RenderHighlightEvent.Block(context, camera, state, blockTarget);
+            if (RenderHighlightEvent.Block.BUS.post(event))
+                return NOOP_HIGHLIGHTER;
+            return event.getCustomRenderer();
+        } else if (target instanceof EntityHitResult entityTarget) {
+            var event = new RenderHighlightEvent.Entity(context, camera, state, entityTarget);
+            if (RenderHighlightEvent.Entity.BUS.post(event))
+                return NOOP_HIGHLIGHTER;
+            return event.getCustomRenderer();
         }
+        return null;
     }
 
     public static boolean renderSpecificFirstPersonHand(InteractionHand hand, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight, float partialTick, float interpPitch, float swingProgress, float equipProgress, ItemStack stack) {
@@ -363,13 +369,11 @@ public class ForgeHooksClient {
     public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluidStateIn) {
         IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
         ResourceLocation overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
-        @SuppressWarnings("deprecation")
-        var BLOCKS = TextureAtlas.LOCATION_BLOCKS;
-        var atlas = Minecraft.getInstance().getTextureAtlas(BLOCKS);
+        var atlas = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS);
         return new TextureAtlasSprite[] {
-            atlas.apply(props.getStillTexture(fluidStateIn, level, pos)),
-            atlas.apply(props.getFlowingTexture(fluidStateIn, level, pos)),
-            overlayTexture == null ? null : atlas.apply(overlayTexture),
+            atlas.getSprite(props.getStillTexture(fluidStateIn, level, pos)),
+            atlas.getSprite(props.getFlowingTexture(fluidStateIn, level, pos)),
+            overlayTexture == null ? null : atlas.getSprite(overlayTexture),
         };
     }
 
