@@ -103,7 +103,7 @@ public final class CapabilityManager {
 
         @SuppressWarnings("removal")
         var event = new RegisterCapabilitiesEvent();
-        ModLoader.get().postEvent(event);
+        ModLoader.postEvent(event);
     }
 
     private static void error(String message) {

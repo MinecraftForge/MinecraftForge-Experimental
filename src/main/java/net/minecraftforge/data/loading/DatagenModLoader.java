@@ -116,7 +116,7 @@ public class DatagenModLoader {
         }
 
         existingFileHelper = new ExistingFileHelper(existingPacks, existingMods, validate, assetIndex, assetsDir);
-        ModLoader.get().runEventGenerator(mc -> new GatherDataEvent(
+        ModLoader.runEventGenerator(mc -> new GatherDataEvent(
             mc,
             config.makeGenerator(
                 p -> config.isFlat() ? p : p.resolve(mc.getModId()),

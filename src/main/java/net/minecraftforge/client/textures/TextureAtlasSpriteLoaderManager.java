@@ -40,7 +40,7 @@ public final class TextureAtlasSpriteLoaderManager {
     public static void init() {
         var loaders = HashBiMap.<ResourceLocation, ITextureAtlasSpriteLoader>create();
         var event = new RegisterTextureAtlasSpriteLoadersEvent(loaders);
-        ModLoader.get().postEventWrapContainerInModOrder(event);
+        ModLoader.postEventWrapContainerInModOrder(event);
         LOADERS = ImmutableBiMap.copyOf(loaders);
     }
 

@@ -135,8 +135,8 @@ public class RegistryManager {
         DataPackRegistryEvent.NewRegistry dataPackEvent = new DataPackRegistryEvent.NewRegistry();
         vanillaRegistryKeys = Set.copyOf(BuiltInRegistries.REGISTRY.keySet());
 
-        ModLoader.get().postEventWrapContainerInModOrder(event);
-        ModLoader.get().postEventWrapContainerInModOrder(dataPackEvent);
+        ModLoader.postEventWrapContainerInModOrder(event);
+        ModLoader.postEventWrapContainerInModOrder(dataPackEvent);
 
         event.fill();
         dataPackEvent.process();

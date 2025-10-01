@@ -206,16 +206,7 @@ import net.minecraftforge.fml.LogicalSide;
 
 @ApiStatus.Internal
 public final class ForgeEventFactory {
-    private static final ModLoader ML = ModLoader.get();
-
     private ForgeEventFactory() {}
-
-    /**
-     * Post an event to the {@link ModLoader#get()} event bus
-     */
-    private static <T extends IModBusEvent> void postModBus(T e) {
-        ML.postEvent(e);
-    }
 
     public static boolean onMultiBlockPlace(@Nullable Entity entity, List<BlockSnapshot> blockSnapshots, Direction direction) {
         var snap = blockSnapshots.getFirst();
@@ -953,7 +944,7 @@ public final class ForgeEventFactory {
 
     // TODO: Remove from mod bus - Lex 04222024
     public static void addPackFindersServer(Consumer<RepositorySource> consumer) {
-        postModBus(new AddPackFindersEvent(PackType.SERVER_DATA, consumer));
+        ModLoader.postEvent(new AddPackFindersEvent(PackType.SERVER_DATA, consumer));
     }
 
     public static boolean onEntityJoinLevel(Entity entity, Level level) {

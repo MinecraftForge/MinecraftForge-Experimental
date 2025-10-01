@@ -358,7 +358,7 @@ public class ModLoader {
         return completedStates.contains(state);
     }
 
-    public <T extends IModBusEvent> void runEventGenerator(Function<ModContainer, T> generator) {
+    public static <T extends IModBusEvent> void runEventGenerator(Function<ModContainer, T> generator) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event generator to a broken mod state");
             return;
@@ -367,8 +367,7 @@ public class ModLoader {
             mod.acceptEvent(generator.apply(mod));
     }
 
-    public <T extends IModBusEvent> void postEvent(T e) {
-        var cls = e.getClass();
+    public static <T extends IModBusEvent> void postEvent(T e) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;
@@ -377,7 +376,7 @@ public class ModLoader {
             mod.acceptEvent(e);
     }
 
-    public <T extends IModBusEvent> T postEventWithReturn(T e) {
+    public static <T extends IModBusEvent> T postEventWithReturn(T e) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return e;
@@ -388,14 +387,14 @@ public class ModLoader {
     }
 
     @SuppressWarnings("removal")
-    public <T extends IModBusEvent> void postEventWrapContainerInModOrder(T event) {
+    public static <T extends IModBusEvent> void postEventWrapContainerInModOrder(T event) {
         postEventWithWrapInModOrder(event,
             (mc, e) -> ModLoadingContext.get().setActiveContainer(mc),
             (mc, e) -> ModLoadingContext.get().setActiveContainer(null)
         );
     }
 
-    public <T extends IModBusEvent> void postEventWithWrapInModOrder(T e, BiConsumer<ModContainer, T> pre, BiConsumer<ModContainer, T> post) {
+    public static <T extends IModBusEvent> void postEventWithWrapInModOrder(T e, BiConsumer<ModContainer, T> pre, BiConsumer<ModContainer, T> post) {
         if (!loadingStateValid) {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;

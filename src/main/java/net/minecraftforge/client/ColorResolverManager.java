@@ -27,7 +27,7 @@ public final class ColorResolverManager {
     @ApiStatus.Internal
     public static void init() {
         var builder = new ArrayList<ColorResolver>();
-        ModLoader.get().postEvent(new RegisterColorHandlersEvent.ColorResolvers(builder));
+        ModLoader.postEvent(new RegisterColorHandlersEvent.ColorResolvers(builder));
         colorResolvers = List.copyOf(builder);
     }
 
