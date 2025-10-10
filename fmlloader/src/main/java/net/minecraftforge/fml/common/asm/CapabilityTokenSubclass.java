@@ -34,11 +34,10 @@ import cpw.mods.modlauncher.serviceapi.ILaunchPluginService;
  *  }</code>
  * </pre>
  */
-public class CapabilityTokenSubclass implements ILaunchPluginService {
-
+public final class CapabilityTokenSubclass implements ILaunchPluginService {
     private static final String FUNC_NAME = "getType";
     private static final String FUNC_DESC = "()Ljava/lang/String;";
-    private static final String CAP_INJECT = "net/minecraftforge/common/capabilities/CapabilityToken"; //Don't directly reference this to prevent class loading.
+    private static final String CAP_INJECT = "net/minecraftforge/common/capabilities/CapabilityToken"; // Don't directly reference this to prevent class loading.
 
     @Override
     public String name() {
@@ -56,8 +55,11 @@ public class CapabilityTokenSubclass implements ILaunchPluginService {
         String internalName = classType.getInternalName();
         if (internalName.startsWith("net/minecraft/") || internalName.startsWith("com/mojang/"))
             return NAY;
+
+        if (internalName.startsWith("net/minecraftforge/common/capabilities/"))
+            return YAY;
         
-        return YAY;
+        return internalName.contains("$") ? YAY : NAY; // Anonymous subclasses only
     }
 
     @Override
@@ -70,7 +72,7 @@ public class CapabilityTokenSubclass implements ILaunchPluginService {
             }
             return ComputeFlags.SIMPLE_REWRITE;
         } else if (CAP_INJECT.equals(classNode.superName)) {
-            Holder cls = new Holder();
+            var cls = new Object() { String value = null; };
 
             SignatureReader reader = new SignatureReader(classNode.signature); // Having a node version of this would probably be useful.
             reader.accept(new SignatureVisitor(Opcodes.ASM9) {
@@ -105,9 +107,5 @@ public class CapabilityTokenSubclass implements ILaunchPluginService {
         } else {
             return ComputeFlags.NO_REWRITE;
         }
-    }
-
-    private static final class Holder {
-        String value;
     }
 }
