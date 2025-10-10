@@ -12,17 +12,17 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired after the field of vision (FOV) modifier for the player is calculated to allow developers to adjust it further.
- *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
  *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see ViewportEvent.ComputeFov
  */
+@NullMarked
 public final class ComputeFovModifierEvent extends MutableEvent {
     public static final EventBus<ComputeFovModifierEvent> BUS = EventBus.create(ComputeFovModifierEvent.class);
 

@@ -18,7 +18,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * LivingEvent is fired whenever an event involving a {@link LivingEntity} occurs.
+ * LivingEvent is a marker interface for whenever an event involving a {@link LivingEntity} occurs.
  */
 public interface LivingEvent extends EntityEvent {
     @Override

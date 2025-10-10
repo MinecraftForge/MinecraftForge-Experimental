@@ -69,12 +69,12 @@ public sealed interface MobEffectEvent extends LivingEvent, InheritableEvent {
 
     /**
      * This event is fired to check if a {@link MobEffectInstance} can be applied to an entity.
-     * This event is not {@link Cancelable}.
-     * This event {@link HasResult has a result}.
-     * <p>
-     * {@link Result#ALLOW ALLOW} will apply this mob effect.
-     * {@link Result#DENY DENY} will not apply this mob effect.
-     * {@link Result#DEFAULT DEFAULT} will run vanilla logic to determine if this mob effect is applicable in {@link LivingEntity#canBeAffected}.
+     * <p>This event {@link HasResult has a result}:</p>
+     * <ul>
+     *     <li>{@link Result#ALLOW ALLOW} will apply this mob effect.</li>
+     *     <li>{@link Result#DENY DENY} will not apply this mob effect.</li>
+     *     <li>{@link Result#DEFAULT DEFAULT} will run vanilla logic to determine if this mob effect is applicable in {@link LivingEntity#canBeAffected}.</li>
+     * </ul>
      */
     final class Applicable implements MobEffectEvent, HasResult {
         public static final EventBus<Applicable> BUS = EventBus.create(Applicable.class);

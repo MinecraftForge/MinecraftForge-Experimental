@@ -33,6 +33,7 @@ public sealed interface DataPackRegistryEvent {
     final class NewRegistry extends MutableEvent implements DataPackRegistryEvent {
         public static final EventBus<NewRegistry> BUS = EventBus.create(NewRegistry.class);
 
+        /** @deprecated {@link DataPackRegistryEvent.NewRegistry} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<NewRegistry> getBus(BusGroup modBusGroup) {
             return BUS;

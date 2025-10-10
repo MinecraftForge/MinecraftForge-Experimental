@@ -22,7 +22,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event is fired via the {@link ForgeHooks#onLivingAttack(LivingEntity, DamageSource, float)}.<br>
  * <br>
  * This event is {@linkplain Cancellable cancellable}.<br>
- * If this event is canceled, the Entity does not take attack damage.
+ * If this event is cancelled, the Entity does not take attack damage.
  *
  * @param getSource the source of the attack
  * @param getAmount the amount of damage dealt to the entity

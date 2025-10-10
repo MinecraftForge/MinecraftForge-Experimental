@@ -21,10 +21,11 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
  * This event is fired when game checks, if sleeping player should be still considered "in bed".<br>
  * Failing this check will cause player to wake up.<br>
  *
- * This event has a result. {@link HasResult}<br>
- *
- * setResult(ALLOW) informs game that player is still "in bed"<br>
- * setResult(DEFAULT) causes game to check {@link Block#isBed(BlockState, BlockGetter, BlockPos, Entity)} instead
+ * <p>This event {@linkplain HasResult has a result}:</p>
+ * <ul>
+ *     <li>{@link Result#ALLOW}: informs game that player is still "in bed"</li>
+ *     <li>{@link Result#DEFAULT}: causes game to check {@link Block#isBed(BlockState, BlockGetter, BlockPos, Entity)} instead</li>
+ * </ul>
  */
 public final class SleepingLocationCheckEvent extends MutableEvent implements LivingEvent, HasResult {
     public static final EventBus<SleepingLocationCheckEvent> BUS = EventBus.create(SleepingLocationCheckEvent.class);

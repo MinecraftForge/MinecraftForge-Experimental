@@ -15,6 +15,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -38,6 +39,7 @@ public record BuildCreativeModeTabContentsEvent(
 ) implements RecordEvent, CreativeModeTab.Output {
     public static final EventBus<BuildCreativeModeTabContentsEvent> BUS = EventBus.create(BuildCreativeModeTabContentsEvent.class);
 
+    /** @deprecated {@link BuildCreativeModeTabContentsEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<BuildCreativeModeTabContentsEvent> getBus(BusGroup modBusGroup) {
         return BUS;

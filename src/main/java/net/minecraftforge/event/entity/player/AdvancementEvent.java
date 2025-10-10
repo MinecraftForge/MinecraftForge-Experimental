@@ -5,7 +5,6 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementProgress;
 import net.minecraft.world.entity.player.Player;
@@ -46,8 +45,8 @@ public sealed interface AdvancementEvent extends PlayerEvent {
      * @param getProgressType the type of progress for the criterion in this event
      *
      * @see AdvancementEarnEvent
-     * @see net.minecraft.server.PlayerAdvancements#award(Advancement, String)
-     * @see net.minecraft.server.PlayerAdvancements#revoke(Advancement, String)
+     * @see net.minecraft.server.PlayerAdvancements#award(AdvancementHolder, String)
+     * @see net.minecraft.server.PlayerAdvancements#revoke(AdvancementHolder, String)
      */
     record AdvancementProgressEvent(
             Player getEntity,

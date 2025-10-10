@@ -6,14 +6,13 @@
 package net.minecraftforge.client.event;
 
 import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ObjectiveArgument;
 import net.minecraft.commands.arguments.ResourceLocationArgument;
-import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
-import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -23,13 +22,11 @@ import org.jspecify.annotations.NullMarked;
  *
  * <p>Some command arguments behave differently for the client commands dispatcher:</p>
  * <ul>
- * <li>{@link ResourceLocationArgument#getAdvancement(com.mojang.brigadier.context.CommandContext, String)} only returns
- * advancements that are shown on the advancements screen.
+ * <li>{@link ResourceLocationArgument#getId(CommandContext, String)} only returns advancements that are shown on
+ * the advancements screen.
  * <li>{@link ObjectiveArgument#getObjective(com.mojang.brigadier.context.CommandContext, String)} only returns
  * objectives that are displayed to the player.
  * </ul>
- *
- * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *

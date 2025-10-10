@@ -10,9 +10,12 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientCommandHandler;
 import net.minecraftforge.client.ConfigScreenHandler;
+import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.config.IConfigSpec;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.DualStackUtils;
 import net.minecraftforge.versions.forge.ForgeVersion;
@@ -27,10 +30,15 @@ import java.util.function.Supplier;
 
 public class MinecraftForge {
     /**
-     * The EventBus for all the Forge Events.
+     * A helper for partial source-level back-compat with the old event system used in 1.21.5 and older, that acts as
+     * a wrapper around {@link BusGroup#DEFAULT}.
      *
-     * Events marked with {@link net.minecraftforge.fml.event.IModBusEvent}
-     * belong on the ModBus and not this bus
+     * <p>Please refer to the javadocs for {@link EventBusMigrationHelper} for further information and resources on how
+     * to properly migrate your mod to the new event system.</p>
+     *
+     * <p>Events marked with {@link IModBusEvent} belong on the
+     * {@linkplain FMLJavaModLoadingContext#getModBusGroup() mod BusGroup} and not on the
+     * {@linkplain BusGroup#DEFAULT default BusGroup}.</p>
      */
     public static final EventBusMigrationHelper EVENT_BUS = EventBusMigrationHelper.INSTANCE;
 
@@ -54,7 +62,7 @@ public class MinecraftForge {
      * @param screenFunction A function that takes the mods screen as an argument and returns your config screen to
      *                       show when the player clicks the config button for your mod on the mods screen.
      *                       <p>You should call {@link Minecraft#setScreen(Screen)} with the provided mods screen for the
-     *                       action of your close button, using {@link Screen#minecraft} to get the client instance.</p>
+     *                       action of your close button, using {@link Screen#getMinecraft()} to get the client instance.</p>
      * @see ModLoadingContext#registerExtensionPoint(Class, Supplier)
      * @see ModLoadingContext#registerConfig(ModConfig.Type, IConfigSpec)
      */

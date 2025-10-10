@@ -141,8 +141,8 @@ public sealed class PlayLevelSoundEvent extends MutableEvent implements Cancella
      * PlayLevelSoundEvent.AtEntity is fired when a sound is played on the {@link Level} at an {@link Entity Entity}'s position.
      * This event is fired from {@link Level#playSound}, {@link Level#playSeededSound}, and {@link LocalPlayer#playSound}.
      * <p>
-     * This event is {@link Cancelable cancelable}.
-     * If this event is canceled, the sound is not played.
+     * This event is {@link Cancellable cancellable}.
+     * If this event is cancelled, the sound is not played.
      * <p>
      * This event does not have a result.
      * <p>
@@ -170,8 +170,8 @@ public sealed class PlayLevelSoundEvent extends MutableEvent implements Cancella
      * PlayLevelSoundEvent.AtPosition is fired when a sound is played on the {@link Level} at a specific position.
      * This event is fired from {@link Level#playSound} and {@link Level#playSeededSound}.
      * <p>
-     * This event is {@link Cancelable cancelable}.
-     * If this event is canceled, the sound is not played.
+     * This event is {@link Cancellable cancellable}.
+     * If this event is cancelled, the sound is not played.
      * <p>
      * This event does not have a result.
      * <p>

@@ -21,7 +21,7 @@ import org.jetbrains.annotations.ApiStatus;
 /**
  * Fired before an entity renderer renders the nameplate of an entity.
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and  {@linkplain HasResult has a result}.</p>
+ * <p>This event {@linkplain HasResult has a result}:</p>
  * <ul>
  *     <li>{@link Result#ALLOW} - the nameplate will be forcibly rendered.</li>
  *     <li>{@link Result#DEFAULT} - the vanilla logic will be used.</li>

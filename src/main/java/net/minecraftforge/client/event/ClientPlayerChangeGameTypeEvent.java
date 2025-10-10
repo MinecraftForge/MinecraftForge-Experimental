@@ -7,18 +7,14 @@ package net.minecraftforge.client.event;
 
 import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.world.level.GameType;
-import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
-import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired when the client player is notified of a change of {@link GameType} from the server.
- *
- * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *

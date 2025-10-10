@@ -39,6 +39,7 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
@@ -69,6 +70,7 @@ public sealed interface EntityRenderersEvent {
     record RegisterLayerDefinitions() implements SelfDestructing, RecordEvent, EntityRenderersEvent {
         public static final EventBus<RegisterLayerDefinitions> BUS = EventBus.create(RegisterLayerDefinitions.class);
 
+        /** @deprecated {@link EntityRenderersEvent.RegisterLayerDefinitions} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<RegisterLayerDefinitions> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -102,6 +104,7 @@ public sealed interface EntityRenderersEvent {
     record RegisterRenderers() implements SelfDestructing, RecordEvent, EntityRenderersEvent {
         public static final EventBus<RegisterRenderers> BUS = EventBus.create(RegisterRenderers.class);
 
+        /** @deprecated {@link RegisterRenderers} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<RegisterRenderers> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -140,6 +143,7 @@ public sealed interface EntityRenderersEvent {
     final class AddLayers extends MutableEvent implements EntityRenderersEvent {
         public static final EventBus<AddLayers> BUS = EventBus.create(AddLayers.class);
 
+        /** @deprecated {@link EntityRenderersEvent.AddLayers} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<AddLayers> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -231,6 +235,7 @@ public sealed interface EntityRenderersEvent {
     final class CreateSkullModels extends MutableEvent implements EntityRenderersEvent {
         public static final EventBus<CreateSkullModels> BUS = EventBus.create(CreateSkullModels.class);
 
+        /** @deprecated {@link EntityRenderersEvent.CreateSkullModels} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<CreateSkullModels> getBus(BusGroup modBusGroup) {
             return BUS;

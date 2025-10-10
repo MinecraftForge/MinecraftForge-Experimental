@@ -46,15 +46,16 @@ public sealed abstract class LivingEntityUseItemEvent extends MutableEvent imple
     }
 
     /**
-     * Fired when a player starts 'using' an item, typically when they hold right mouse.
+     * Fired when a player starts 'using' an item, typically when they hold right mouse.<br>
      * Examples:
-     *   Drawing a bow
-     *   Eating Food
-     *   Drinking Potions/Milk
-     *   Guarding with a sword
-     *
+     * <ul>
+     *     <li>Drawing a bow</li>
+     *     <li>Eating food</li>
+     *     <li>Drinking potions/milk</li>
+     *     <li>Guarding with a sword</li>
+     * </ul>
+     * <p>
      * Cancel the event, or set the duration or {@literal <} 0 to prevent it from processing.
-     *
      */
     public static final class Start extends LivingEntityUseItemEvent implements Cancellable {
         public static final CancellableEventBus<Start> BUS = CancellableEventBus.create(Start.class);
@@ -66,9 +67,8 @@ public sealed abstract class LivingEntityUseItemEvent extends MutableEvent imple
 
     /**
      * Fired every tick that a player is 'using' an item, see {@link Start} for info.
-     *
+     * <p>
      * Cancel the event, or set the duration to {@literal <=} 0 to cause the player to stop using the item.
-     *
      */
     public static final class Tick extends LivingEntityUseItemEvent implements Cancellable {
         public static final CancellableEventBus<Tick> BUS = CancellableEventBus.create(Tick.class);

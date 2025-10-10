@@ -6,15 +6,13 @@
 package net.minecraftforge.event;
 
 import net.minecraft.world.Difficulty;
-import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 /**
  * DifficultyChangeEvent is fired when difficulty is changing. <br>
  * <br>
- * This event is fired via the {@link ForgeHooks#onDifficultyChange(Difficulty, Difficulty)}.<br>
+ * This event is fired via the {@link ForgeEventFactory#onDifficultyChange(Difficulty, Difficulty)}.<br>
  */
 public record DifficultyChangeEvent(Difficulty getDifficulty, Difficulty getOldDifficulty) implements RecordEvent {
     public static final EventBus<DifficultyChangeEvent> BUS = EventBus.create(DifficultyChangeEvent.class);

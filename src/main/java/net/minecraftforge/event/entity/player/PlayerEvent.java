@@ -32,10 +32,8 @@ import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NullMarked;
 
 /**
- * PlayerEvent is fired whenever an event involving a {@link Player} occurs. <br>
- * If a method utilizes this {@link net.minecraftforge.eventbus.api.Event} as its parameter, the method will
- * receive every child event of this class.<br>
- **/
+ * PlayerEvent is a marker interface for whenever an event involving a {@link Player} occurs.
+ */
 public interface PlayerEvent extends LivingEvent {
     @Override
     Player getEntity();
@@ -317,6 +315,7 @@ public interface PlayerEvent extends LivingEvent {
         public static final EventBus<ItemSmeltedEvent> BUS = EventBus.create(ItemSmeltedEvent.class);
     }
 
+    @NullMarked
     record PlayerLoggedInEvent(Player getEntity) implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerLoggedInEvent> BUS = EventBus.create(PlayerLoggedInEvent.class);
     }
@@ -325,6 +324,7 @@ public interface PlayerEvent extends LivingEvent {
         public static final EventBus<PlayerLoggedOutEvent> BUS = EventBus.create(PlayerLoggedOutEvent.class);
     }
 
+    @NullMarked
     record PlayerRespawnEvent(Player getEntity, boolean isEndConquered) implements RecordEvent, PlayerEvent {
         public static final EventBus<PlayerRespawnEvent> BUS = EventBus.create(PlayerRespawnEvent.class);
 

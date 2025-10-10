@@ -16,7 +16,7 @@ import net.minecraftforge.fml.LogicalSide;
  * Fired when the client queues a {@link Toast} message to be shown onscreen.
  * Toasts are small popups that appear on the top right of the screen, for certain actions such as unlocking Advancements and Recipes.
  *
- * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * <p>This event is {@linkplain Cancellable cancellable}.
  * Cancelling the event stops the toast from being queued, which means it never renders.</p>
  *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},

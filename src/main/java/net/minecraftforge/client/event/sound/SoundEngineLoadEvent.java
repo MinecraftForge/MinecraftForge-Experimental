@@ -10,6 +10,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -23,6 +24,7 @@ import org.jspecify.annotations.NullMarked;
 public record SoundEngineLoadEvent(SoundEngine getEngine) implements RecordEvent, SoundEvent {
     public static final EventBus<SoundEngineLoadEvent> BUS = EventBus.create(SoundEngineLoadEvent.class);
 
+    /** @deprecated {@link SoundEngineLoadEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<SoundEngineLoadEvent> getBus(BusGroup modBusGroup) {
         return BUS;

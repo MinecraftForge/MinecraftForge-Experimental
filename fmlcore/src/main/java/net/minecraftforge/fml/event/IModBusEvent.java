@@ -8,16 +8,22 @@ package net.minecraftforge.fml.event;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import org.jspecify.annotations.NonNull;
 
 /**
- * Marker interface for events dispatched on the ModLifecycle event bus instead of the primary event bus
+ * Marker interface for mod lifecycle events dispatched on the
+ * {@linkplain net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext#getModBusGroup() mod BusGroup} instead
+ * of the {@linkplain BusGroup#DEFAULT default BusGroup}.
+ *
+ * @apiNote Each mod gets its own unique mod BusGroup instance, obtained from the mod loading context. Most events
+ *          should go on the default BusGroup.
  */
 public interface IModBusEvent extends InheritableEvent {
     /**
      * @param modEventBusGroup Obtained from {@link net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext#getModBusGroup()} or your language provider's equivalent.
      * @param eventClass The event type you want to get the associated bus for.
      */
-    static <T extends IModBusEvent> EventBus<T> getBus(BusGroup modEventBusGroup, Class<T> eventClass) {
+    static <T extends IModBusEvent> @NonNull EventBus<@NonNull T> getBus(@NonNull BusGroup modEventBusGroup, @NonNull Class<T> eventClass) {
         // Do not copy! Temporary solution until the FML rewrite is complete. May throw in future
         // without prior notice.
         //

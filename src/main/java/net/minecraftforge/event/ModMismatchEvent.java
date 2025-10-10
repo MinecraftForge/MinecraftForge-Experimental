@@ -35,8 +35,7 @@ import java.util.stream.Stream;
  * unsafe to access server or level information during handling of this event.
  * </p>
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
- * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
+ * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModBusGroup() mod BusGroup},
  * on both {@linkplain LogicalSide logical sides}.</p>
  */
 public final class ModMismatchEvent implements IModBusEvent {

@@ -25,7 +25,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 /**
  * <p>Event for registering {@link PresetEditor} screen factories for world presets.</p>
  *
- * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModEventBus() mod-specific event bus},
+ * <p>This event is fired on the {@linkplain FMLJavaModLoadingContext#getModBusGroup() mod BusGroup},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  */
 public final class RegisterPresetEditorsEvent implements SelfDestructing, IModBusEvent {

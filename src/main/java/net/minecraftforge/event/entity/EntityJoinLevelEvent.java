@@ -23,7 +23,7 @@ import net.minecraftforge.fml.LogicalSide;
  * You will cause chunk loading deadlocks if you do not delay your world interactions.
  * <p>
  * This event is {@linkplain Cancellable cancellable}.
- * If the event is canceled, the entity will not be added to the level.
+ * If the event is cancelled, the entity will not be added to the level.
  * <p>
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * on both logical sides.

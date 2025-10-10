@@ -14,7 +14,8 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.io.File;
 import java.io.IOException;
@@ -22,7 +23,7 @@ import java.io.IOException;
 /**
  * Fired when a screenshot is taken, but before it is written to disk.
  *
- * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * <p>This event is {@linkplain Cancellable cancellable}.
  * If this event is cancelled, then the screenshot is not written to disk, and the message in the event will be posted
  * to the player's chat.</p>
  *
@@ -31,6 +32,7 @@ import java.io.IOException;
  *
  * @see Screenshot
  */
+@NullMarked
 public final class ScreenshotEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<ScreenshotEvent> BUS = CancellableEventBus.create(ScreenshotEvent.class);
     public static final Component DEFAULT_CANCEL_REASON = Component.literal("Screenshot canceled");
@@ -80,7 +82,7 @@ public final class ScreenshotEvent extends MutableEvent implements Cancellable {
      *
      * @param resultMessage the new result message
      */
-    public void setResultMessage(Component resultMessage) {
+    public void setResultMessage(@Nullable Component resultMessage) {
         this.resultMessage = resultMessage;
     }
 

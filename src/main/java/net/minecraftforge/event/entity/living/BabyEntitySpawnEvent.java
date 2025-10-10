@@ -30,11 +30,9 @@ import org.jetbrains.annotations.Nullable;
  * {@link #causedByPlayer} contains the player responsible for the breading (if applicable).<br>
  * {@link #child} contains the child that will be spawned.<br>
  * <br>
- * This event is {@link Cancelable}.<br>
- * If this event is canceled, the child Entity is not added to the world, and the parents <br>
+ * This event is {@link Cancellable}.<br>
+ * If this event is cancelled, the child Entity is not added to the world, and the parents <br>
  * will no longer attempt to mate.
- * <br>
- * This event does not have a result. {@link HasResult}<br>
  * <br>
  * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
  **/

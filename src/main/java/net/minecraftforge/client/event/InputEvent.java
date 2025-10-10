@@ -17,6 +17,7 @@ import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
 import org.lwjgl.glfw.GLFW;
 
 /**
@@ -127,6 +128,7 @@ public sealed interface InputEvent {
      * @param getMouseX the X position of the mouse cursor
      * @param getMouseY the Y position of the mouse cursor
      */
+    @NullMarked
     record MouseScrollingEvent(
             double getDeltaX,
             double getDeltaY,

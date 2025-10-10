@@ -29,9 +29,7 @@ public record AddGuiOverlayLayersEvent(ForgeLayeredDraw getLayeredDraw) implemen
     @ApiStatus.Internal
     public AddGuiOverlayLayersEvent {}
 
-    /**
-     * @deprecated {@link AddGuiOverlayLayersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly.
-     */
+    /** @deprecated {@link AddGuiOverlayLayersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<AddGuiOverlayLayersEvent> getBus(BusGroup modBusGroup) {
         return BUS;

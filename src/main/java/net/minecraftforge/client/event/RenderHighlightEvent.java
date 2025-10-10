@@ -22,9 +22,9 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Fired before a selection highlight is rendered.
+ * Fired before a selection highlight is rendered.<br>
  * You should extract your custom data here so that you can use it in the render callback without effecting world state.
- *
+ * <br><br>
  * See the two subclasses to listen for blocks or entities.
  *
  * @see Block

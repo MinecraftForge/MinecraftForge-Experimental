@@ -39,22 +39,22 @@ public sealed abstract class ZombieEvent implements EntityEvent, InheritableEven
      * SummonAidEvent is fired when a Zombie Entity is summoned.
      * This event is fired whenever a Zombie Entity is summoned in
      * {@code Zombie#actuallyHurt(DamageSource, float)}.
-     *
+     * <br>
      * This event is fired via the {@link ForgeEventFactory#fireZombieSummonAid(Zombie, Level, int, int, int, LivingEntity, double)}.
-     *
-     * {@link #getCustomSummonedAid()} remains null, but can be populated with a custom EntityZombie which will be spawned.
-     * {@link #getLevel()} contains the world that this summoning is occurring in.
-     * {@link #getX()} contains the x-coordinate at which this summoning event is occurring.
-     * {@link #getY()} contains the y-coordinate at which this summoning event is occurring.
-     * {@link #getZ()} contains the z-coordinate at which this summoning event is occurring.
-     * {@link #getAttacker()} contains the living Entity that attacked and caused this event to fire.
-     * {@link #getSummonChance()} contains the likelihood that a Zombie would successfully be summoned.
-     *
-     * This event is not {@link Cancelable}.
-     *
-     * This event has a result. {@link HasResult}
-     * {@link Result#ALLOW} Zombie is summoned.
-     * {@link Result#DENY} Zombie is not summoned.
+     * <br>
+     * {@link #getCustomSummonedAid()} remains null, but can be populated with a custom EntityZombie which will be spawned.<br>
+     * {@link #getLevel()} contains the world that this summoning is occurring in.<br>
+     * {@link #getX()} contains the x-coordinate at which this summoning event is occurring.<br>
+     * {@link #getY()} contains the y-coordinate at which this summoning event is occurring.<br>
+     * {@link #getZ()} contains the z-coordinate at which this summoning event is occurring.<br>
+     * {@link #getAttacker()} contains the living Entity that attacked and caused this event to fire.<br>
+     * {@link #getSummonChance()} contains the likelihood that a Zombie would successfully be summoned.<br>
+     * <br>
+     * This event {@linkplain HasResult has a result}:
+     * <ul>
+     *     <li>{@link Result#ALLOW} Zombie is summoned.</li>
+     *     <li>{@link Result#DENY} Zombie is not summoned.</li>
+     * </ul>
      *
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      **/

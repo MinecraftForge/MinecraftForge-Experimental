@@ -15,8 +15,6 @@ import org.jetbrains.annotations.ApiStatus;
 /**
  * Fired when the {@link ClientRecipeBook} has updated information about recipes from the server to the client.
  *
- * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
- *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *

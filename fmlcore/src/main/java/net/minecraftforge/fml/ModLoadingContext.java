@@ -19,7 +19,13 @@ public class ModLoadingContext {
     private Object languageExtension;
 
     /**
-     * @deprecated Use the context provided by your language loader in your mod's constructor
+     * @deprecated Use the context provided by your language loader in your mod's constructor. Example for Java mods: {@snippet :
+     * @Mod("examplemod")
+     * public final class ExampleMod {
+     *      public ExampleMod(FMLJavaModLoadingContext context) {
+     *           // Use context from the param instead of FMLJavaModLoadingContext.get() or ModLoadingContext.get()
+     *      }
+     * }}
      */
     @Deprecated(forRemoval = true, since="1.21.1")
     public static ModLoadingContext get() {

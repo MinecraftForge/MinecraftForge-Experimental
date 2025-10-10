@@ -58,7 +58,7 @@ public abstract sealed class GrindstoneEvent extends MutableEvent implements Inh
     }
 
     /**
-     * This event is {@link Cancelable} <br>
+     * This event is {@link Cancellable} <br>
      * {@link OnPlaceItem} is fired when the inputs to a grindstone are changed. <br>
      *
      * The following rules apply:
@@ -72,7 +72,7 @@ public abstract sealed class GrindstoneEvent extends MutableEvent implements Inh
      *     <li>Vanilla XP calculation logic will be used unless all of the following criterias are met:</li>
      *     <ul>
      *         <li>the amount of experience is greater than or equal to {@code 0};</li>
-     *         <li>the event is not {@linkplain #isCanceled() canceled};</li>
+     *         <li>the event is not {@linkplain Cancellable cancelled};</li>
      *         <li>the {@linkplain #getOutput() output} is not empty.</li>
      *     </ul>
      * </ul>
@@ -108,7 +108,7 @@ public abstract sealed class GrindstoneEvent extends MutableEvent implements Inh
     }
 
     /**
-     * This event is {@link Cancelable} <br>
+     * This event is {@link Cancellable} <br>
      * {@link OnTakeItem} is fired when the output in a grindstone are is taken. <br>
      * It is called from {@link GrindstoneMenu#GrindstoneMenu(int, Inventory)}. <br>
      * If the event is canceled, vanilla behavior will not run, and no inputs will be consumed. <br>

@@ -18,7 +18,6 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -51,6 +50,7 @@ public sealed interface ModelEvent {
             implements RecordEvent, ModelEvent {
         public static final EventBus<ModifyBakingResult> BUS = EventBus.create(ModifyBakingResult.class);
 
+        /** @deprecated {@link ModelEvent.ModifyBakingResult} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<ModifyBakingResult> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -75,6 +75,7 @@ public sealed interface ModelEvent {
             implements RecordEvent, ModelEvent {
         public static final EventBus<BakingCompleted> BUS = EventBus.create(BakingCompleted.class);
 
+        /** @deprecated {@link ModelEvent.BakingCompleted} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<BakingCompleted> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -95,6 +96,7 @@ public sealed interface ModelEvent {
     final class RegisterModelStateDefinitions extends MutableEvent implements ModelEvent {
         public static final EventBus<RegisterModelStateDefinitions> BUS = EventBus.create(RegisterModelStateDefinitions.class);
 
+        /** @deprecated {@link ModelEvent.RegisterModelStateDefinitions} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<RegisterModelStateDefinitions> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -130,6 +132,7 @@ public sealed interface ModelEvent {
     final class RegisterGeometryLoaders extends MutableEvent implements ModelEvent {
         public static final EventBus<RegisterGeometryLoaders> BUS = EventBus.create(RegisterGeometryLoaders.class);
 
+        /** @deprecated {@link ModelEvent.RegisterGeometryLoaders} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<RegisterGeometryLoaders> getBus(BusGroup modBusGroup) {
             return BUS;

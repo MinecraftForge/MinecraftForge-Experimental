@@ -16,7 +16,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event is fired whenever a player attacks an Entity in
  * {@link Player#attack(Entity)}.<br>
  * <br>
- * {@link #target} contains the Entity that was damaged by the player. <br>
+ * {@link #getTarget()} contains the Entity that was damaged by the player. <br>
  * <br>
  * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the player does not attack the Entity.
  **/

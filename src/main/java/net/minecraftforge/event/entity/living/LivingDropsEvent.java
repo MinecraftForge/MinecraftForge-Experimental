@@ -20,7 +20,7 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * This event is fired whenever an Entity dies and drops items in
  * {@link LivingEntity#die(DamageSource)}.<br>
  * <br>
- * This event is fired via the {@link ForgeEventFactory#onLivingDrops(LivingEntity, DamageSource, Collection, int, boolean)} .<br>
+ * This event is fired via the {@link ForgeEventFactory#onLivingDrops(LivingEntity, DamageSource, Collection, boolean)}.<br>
  * <br>
  * @param getSource contains the DamageSource that caused the drop to occur.
  * @param getDrops contains the ArrayList of EntityItems that will be dropped.

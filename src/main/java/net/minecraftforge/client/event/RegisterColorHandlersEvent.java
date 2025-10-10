@@ -15,6 +15,7 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -38,6 +39,7 @@ public sealed interface RegisterColorHandlersEvent {
     record Block(BlockColors getBlockColors) implements RecordEvent, RegisterColorHandlersEvent {
         public static final EventBus<Block> BUS = EventBus.create(Block.class);
 
+        /** @deprecated {@link RegisterColorHandlersEvent.Block} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<Block> getBus(BusGroup modBusGroup) {
             return BUS;
@@ -75,6 +77,7 @@ public sealed interface RegisterColorHandlersEvent {
     final class ColorResolvers extends MutableEvent implements SelfDestructing, RegisterColorHandlersEvent {
         public static final EventBus<ColorResolvers> BUS = EventBus.create(ColorResolvers.class);
 
+        /** @deprecated {@link RegisterColorHandlersEvent.ColorResolvers} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
         @Deprecated(forRemoval = true, since = "1.21.9")
         public static EventBus<ColorResolvers> getBus(BusGroup modBusGroup) {
             return BUS;

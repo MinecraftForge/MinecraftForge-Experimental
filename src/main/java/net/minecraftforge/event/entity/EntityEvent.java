@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 
 /**
- * EntityEvent is fired when an event involving any Entity occurs.
+ * EntityEvent is a marker interface for when an event involving any Entity occurs.
  */
 public interface EntityEvent {
     /**

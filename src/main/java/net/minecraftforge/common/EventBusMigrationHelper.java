@@ -16,9 +16,16 @@ import java.util.Collection;
 
 /**
  * A small helper class to aid Forge modders in migrating from EventBus 6 to the new EventBus 7.
- * <br>
- * Refer to the migration guide mentioned in the Forge 1.21.6 announcement or ask in the Forge Discord for help with
- * migrating your mod to the new system.
+ * <p>
+ * Refer to the <a href="https://gist.github.com/PaintNinja/ad82c224aecee25efac1ea3e2cf19b91">migration guide</a>
+ * mentioned in the <a href="https://files.minecraftforge.net">Forge 1.21.6 changelog</a> or
+ * <a href="https://forums.minecraftforge.net/topic/159525-forge-581-minecraft-1218/">1.21.8 announcement</a> on the
+ * forums, or ask in <a href="https://discord.minecraftforge.net">the Forge Discord</a> for help with migrating your mod
+ * to the new system.
+ * </p>
+ * <p>
+ * You can also check the updated example code in <a href="https://files.minecraftforge.net">the MDK</a> for the MC
+ * version you're using.
  */
 public final class EventBusMigrationHelper {
     public static final EventBusMigrationHelper INSTANCE = new EventBusMigrationHelper(BusGroup.DEFAULT);

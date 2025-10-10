@@ -18,9 +18,9 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
  * <br>
  * This event is fired via the {@link net.minecraftforge.event.ForgeEventFactory#onLivingFall(LivingEntity, double, float)}.<br>
  * <br>
- * {@link #distance} contains the distance the Entity is to fall. If this event is canceled, this value is set to 0.0F.
+ * {@link #distance} contains the distance the Entity is to fall. If this event is cancelled, this value is set to 0.0F.
  * <br>
- * This event is {@linkplain Cancellable cancellable}. If this event is canceled, the Entity does not fall.
+ * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity does not fall.
  **/
 public final class LivingFallEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingFallEvent> BUS = CancellableEventBus.create(LivingFallEvent.class);

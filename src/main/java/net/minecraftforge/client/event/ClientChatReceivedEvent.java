@@ -22,7 +22,7 @@ import java.util.UUID;
  * Fired when a chat message is received on the client.
  * This can be used for filtering and detecting messages with specific words or phrases, and suppressing them.
  *
- * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * <p>This event is {@linkplain Cancellable cancellable}.
  * If the event is cancelled, the message is not displayed in the chat message window.</p>
  *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -89,7 +89,7 @@ public sealed class ClientChatReceivedEvent extends MutableEvent implements Canc
     /**
      * Fired when a player chat message is received on the client.
      *
-     * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * If the event is cancelled, the message is not displayed in the chat message window.</p>
      *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -120,8 +120,8 @@ public sealed class ClientChatReceivedEvent extends MutableEvent implements Canc
     /**
      * Fired when a system message is received on the client.
      *
-     * @Deprecated Mojang made ChatType a registry, which isn't always accessible when the System messages are sent.
-     * So moved to it's own event. {@link SystemMessageReceivedEvent}
+     * @deprecated Mojang made ChatType a registry, which isn't always accessible when the System messages are sent.
+     * So moved to its own event. {@link SystemMessageReceivedEvent}
      */
     @Deprecated(forRemoval = true, since = "1.21.1")
     public static final class System extends ClientChatReceivedEvent {

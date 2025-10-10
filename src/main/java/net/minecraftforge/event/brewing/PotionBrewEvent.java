@@ -48,10 +48,8 @@ public sealed abstract class PotionBrewEvent extends MutableEvent implements Inh
      * <br>
      * {@link #stacks} contains the itemstack array from the TileEntityBrewer holding all items in Brewer.<br>
      * <br>
-     * This event is {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
-     * If the event is not canceled, the vanilla brewing will take place instead of modded brewing.
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
+     * This event is {@link Cancellable}.<br>
+     * If the event is not cancelled, the vanilla brewing will take place instead of modded brewing.
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      * <br>
@@ -71,10 +69,6 @@ public sealed abstract class PotionBrewEvent extends MutableEvent implements Inh
      * The event is fired during the {@code BrewingStandBlockEntity#doBrew(Level, BlockPos, NonNullList)} method invocation.<br>
      * <br>
      * {@link #stacks} contains the itemstack array from the TileEntityBrewer holding all items in Brewer.<br>
-     * <br>
-     * This event is not {@link net.minecraftforge.eventbus.api.Cancelable}.<br>
-     * <br>
-     * This event does not have a result. {@link HasResult}<br>
      * <br>
      * This event is fired on the {@link MinecraftForge#EVENT_BUS}.<br>
      **/

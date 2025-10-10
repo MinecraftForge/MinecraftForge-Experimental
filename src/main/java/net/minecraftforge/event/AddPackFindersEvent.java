@@ -11,6 +11,7 @@ import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
+import net.minecraftforge.fml.event.IModBusEvent;
 
 import java.util.function.Consumer;
 
@@ -22,6 +23,7 @@ import java.util.function.Consumer;
 public record AddPackFindersEvent(PackType getPackType, Consumer<RepositorySource> sourceAdder) implements RecordEvent {
     public static final EventBus<AddPackFindersEvent> BUS = EventBus.create(AddPackFindersEvent.class);
 
+    /** @deprecated {@link AddPackFindersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<AddPackFindersEvent> getBus(BusGroup modBusGroup) {
         return BUS;

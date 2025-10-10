@@ -24,6 +24,7 @@ import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Collections;
@@ -110,7 +111,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the screen's overridable initialization method is fired.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the initialization method will not be called, and the widgets and children lists
          * will not be cleared.</p>
          *
@@ -128,8 +129,6 @@ public sealed interface ScreenEvent {
 
         /**
          * Fired <b>after</b> the screen's overridable initialization method is called.
-         *
-         * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
@@ -175,7 +174,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the screen is drawn.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen will not be drawn.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -191,8 +190,6 @@ public sealed interface ScreenEvent {
 
         /**
          * Fired <b>after</b> the screen is drawn.
-         *
-         * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
@@ -343,7 +340,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the mouse click is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's mouse click handler will be bypassed
          * and the corresponding {@link MouseButtonPressed.Post} will not be fired.</p>
          *
@@ -362,7 +359,7 @@ public sealed interface ScreenEvent {
          * Fired <b>after</b> the mouse click is handled, if the corresponding {@link MouseButtonPressed.Pre} was not
          * cancelled.
          *
-         * <p>This event is not {@linkplain Cancellable cancellable}, {@linkplain HasResult has a result}.</p>
+         * <p>This event {@linkplain HasResult has a result}:</p>
          * <ul>
          *   <li>{@link Result#ALLOW} - forcibly sets the mouse click as handled</li>
          *   <li>{@link Result#DEFAULT} - defaults to the return value of
@@ -415,7 +412,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the mouse release is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's mouse release handler will be bypassed
          * and the corresponding {@link MouseButtonReleased.Post} will not be fired.</p>
          *
@@ -434,11 +431,11 @@ public sealed interface ScreenEvent {
          * Fired <b>after</b> the mouse release is handled, if the corresponding {@link MouseButtonReleased.Pre} was
          * not cancelled.
          *
-         * <p>This event is not {@linkplain Cancellable cancellable}, {@linkplain HasResult has a result}.</p>
+         * <p>This event {@linkplain HasResult has a result}:</p>
          * <ul>
          *   <li>{@link Result#ALLOW} - forcibly sets the mouse release as handled</li>
          *   <li>{@link Result#DEFAULT} - defaults to the return value of
-         *   {@link Screen#mouseReleased(double, double, int)} from the screen (see {@link #wasHandled()}.</li>
+         *   {@link Screen#mouseReleased(MouseButtonEvent)} from the screen (see {@link #wasHandled()}.</li>
          *   <li>{@link Result#DENY} - forcibly sets the mouse release as not handled.</li>
          * </ul>
          *
@@ -476,6 +473,7 @@ public sealed interface ScreenEvent {
      * @see MouseDragged.Pre
      * @see MouseDragged.Post
      */
+    @NullMarked
     sealed interface MouseDragged extends MouseInput {
         /**
          * {@return the mouse button's input code}
@@ -498,7 +496,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the mouse drag is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's mouse drag handler will be bypassed
          * and the corresponding {@link MouseDragged.Post} will not be fired.</p>
          *
@@ -551,6 +549,7 @@ public sealed interface ScreenEvent {
      * @see MouseScrolled.Pre
      * @see MouseScrolled.Post
      */
+    @NullMarked
     sealed interface MouseScrolled extends MouseInput {
         /**
          * {@return the amount of change / delta of the mouse scroll in the vertical direction}
@@ -565,7 +564,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the mouse scroll is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's mouse scroll handler will be bypassed
          * and the corresponding {@link MouseScrolled.Post} will not be fired.</p>
          *
@@ -666,7 +665,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the key press is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable} and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's key press handler will be bypassed
          * and the corresponding {@link KeyPressed.Post} will not be fired.</p>
          *
@@ -684,7 +683,7 @@ public sealed interface ScreenEvent {
          * Fired <b>after</b> the key press is handled, if not handled by the screen
          * and the corresponding {@link KeyPressed.Pre} is not cancelled.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the key press will be set as handled.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -709,7 +708,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the key release is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's key release handler will be bypassed
          * and the corresponding {@link KeyReleased.Post} will not be fired.</p>
          *
@@ -727,7 +726,7 @@ public sealed interface ScreenEvent {
          * Fired <b>after</b> the key release is handled, if not handled by the screen
          * and the corresponding {@link KeyReleased.Pre} is not cancelled.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the key release will be set as handled.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -781,7 +780,7 @@ public sealed interface ScreenEvent {
         /**
          * Fired <b>before</b> the character input is handled by the screen.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the screen's character input handler will be bypassed
          * and the corresponding {@link CharacterTyped.Post} will not be fired.</p>
          *
@@ -799,7 +798,7 @@ public sealed interface ScreenEvent {
          * Fired <b>after</b> the character input is handled, if not handled by the screen
          * and the corresponding {@link CharacterTyped.Pre} is not cancelled.
          *
-         * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+         * <p>This event is {@linkplain Cancellable cancellable}.
          * If the event is cancelled, the character input will be set as handled.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
@@ -817,7 +816,7 @@ public sealed interface ScreenEvent {
      * Fired before any {@link Screen} is opened, to allow changing it or preventing it from being opened.
      * All screen layers on the screen are closed before this event is fired.
      *
-     * <p>This event is {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.
+     * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the {@code Screen} shall be prevented from opening and any previous screen
      * will remain open. However, cancelling this event will not prevent the closing of screen layers which happened before
      * this event fired.</p>
@@ -873,8 +872,6 @@ public sealed interface ScreenEvent {
     /**
      * Fired before a {@link Screen} is closed.
      * All screen layers on the screen are closed before this event is fired.
-     *
-     * <p>This event is not {@linkplain Cancellable cancellable}, and does not {@linkplain HasResult have a result}.</p>
      *
      * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
      * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>

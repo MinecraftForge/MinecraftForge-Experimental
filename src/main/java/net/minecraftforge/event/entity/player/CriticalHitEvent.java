@@ -16,10 +16,12 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
  * This event is fired whenever a player attacks an Entity in
  * EntityPlayer#attackTargetEntityWithCurrentItem(Entity).<br>
  * <br>
- * This event has a result. {@link HasResult}<br>
- * DEFAULT: means the vanilla logic will determine if this a critical hit.<br>
- * DENY: it will not be a critical hit but the player still will attack<br>
- * ALLOW: this attack is forced to be critical
+ * This event {@linkplain HasResult has a result}:
+ * <ul>
+ *     <li>{@link Result#DEFAULT}: means the vanilla logic will determine if this a critical hit.</li>
+ *     <li>{@link Result#DENY}: it will not be a critical hit but the player still will attack</li>
+ *     <li>{@link Result#ALLOW}: this attack is forced to be critical</li>
+ * </ul>
  **/
 public final class CriticalHitEvent extends MutableEvent implements PlayerEvent, HasResult {
     public static final EventBus<CriticalHitEvent> BUS = EventBus.create(CriticalHitEvent.class);

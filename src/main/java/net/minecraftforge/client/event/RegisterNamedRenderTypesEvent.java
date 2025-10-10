@@ -16,6 +16,7 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
@@ -28,6 +29,7 @@ import java.util.Map;
 public final class RegisterNamedRenderTypesEvent extends MutableEvent implements SelfDestructing {
     public static final EventBus<RegisterNamedRenderTypesEvent> BUS = EventBus.create(RegisterNamedRenderTypesEvent.class);
 
+    /** @deprecated {@link RegisterNamedRenderTypesEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<RegisterNamedRenderTypesEvent> getBus(BusGroup modBusGroup) {
         return BUS;

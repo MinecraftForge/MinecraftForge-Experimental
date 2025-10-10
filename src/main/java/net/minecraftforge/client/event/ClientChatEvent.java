@@ -12,16 +12,19 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Fired when the client is about to send a chat message to the server.
  *
- * <p>This event is {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.
+ * <p>This event is {@linkplain Cancellable cancellable}.
  * If the event is cancelled, the chat message will not be sent to the server.</p>
  *
  * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
  * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  **/
+@NullMarked
 public final class ClientChatEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<ClientChatEvent> BUS = CancellableEventBus.create(ClientChatEvent.class);
 
@@ -47,7 +50,7 @@ public final class ClientChatEvent extends MutableEvent implements Cancellable {
      *
      * @param message the new message to be sent
      */
-    public void setMessage(String message) {
+    public void setMessage(@Nullable String message) {
         this.message = Strings.nullToEmpty(message);
     }
 

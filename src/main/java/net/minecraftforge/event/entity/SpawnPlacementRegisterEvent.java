@@ -20,6 +20,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.listener.Priority;
+import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -41,6 +42,7 @@ import org.jetbrains.annotations.ApiStatus;
 public final class SpawnPlacementRegisterEvent extends MutableEvent {
     public static final EventBus<SpawnPlacementRegisterEvent> BUS = EventBus.create(SpawnPlacementRegisterEvent.class);
 
+    /** @deprecated {@link SpawnPlacementRegisterEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<SpawnPlacementRegisterEvent> getBus(BusGroup modBusGroup) {
         return BUS;

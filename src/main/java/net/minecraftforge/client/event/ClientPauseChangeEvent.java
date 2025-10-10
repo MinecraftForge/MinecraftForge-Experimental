@@ -12,6 +12,7 @@ import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * Fired when pause is about to change
@@ -21,6 +22,7 @@ import net.minecraftforge.fml.LogicalSide;
  * @see ClientPauseChangeEvent.Pre
  * @see ClientPauseChangeEvent.Post
  */
+@NullMarked
 public sealed interface ClientPauseChangeEvent extends InheritableEvent {
     EventBus<ClientPauseChangeEvent> BUS = EventBus.create(ClientPauseChangeEvent.class);
 

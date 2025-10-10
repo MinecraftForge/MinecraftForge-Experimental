@@ -12,6 +12,7 @@ import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.event.IModBusEvent;
+import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * This event fires for each forge and vanilla registry when all registries are ready to have modded objects registered.
  * <p>
- * Fired on the {@link IModBusEvent mod bus}.
+ * Fired on the {@linkplain FMLJavaModLoadingContext#getModBusGroup() mod BusGroup}.
  *
  * @see #register(ResourceKey, ResourceLocation, Supplier)
  * @see #register(ResourceKey, Consumer)

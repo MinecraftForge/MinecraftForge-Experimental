@@ -62,8 +62,6 @@ public sealed interface ContainerScreenEvent {
          * <p>This can be used for rendering elements that must be above other screen elements, but
          * below tooltips and the dragged stack, such as slot or item stack specific overlays.</p>
          *
-         * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
-         *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
@@ -82,8 +80,6 @@ public sealed interface ContainerScreenEvent {
         /**
          * Fired after the container screen's background layer and elements are drawn.
          * This can be used for rendering new background elements.
-         *
-         * <p>This event is not {@linkplain Cancelable cancellable}, and does not {@linkplain HasResult have a result}.</p>
          *
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>

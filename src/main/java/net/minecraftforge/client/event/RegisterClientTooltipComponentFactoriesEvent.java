@@ -12,6 +12,7 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
+import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -28,6 +29,7 @@ import java.util.function.Function;
 public final class RegisterClientTooltipComponentFactoriesEvent extends MutableEvent implements SelfDestructing {
     public static final EventBus<RegisterClientTooltipComponentFactoriesEvent> BUS = EventBus.create(RegisterClientTooltipComponentFactoriesEvent.class);
 
+    /** @deprecated {@link RegisterClientTooltipComponentFactoriesEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
     @Deprecated(forRemoval = true, since = "1.21.9")
     public static EventBus<RegisterClientTooltipComponentFactoriesEvent> getBus(BusGroup modBusGroup) {
         return BUS;

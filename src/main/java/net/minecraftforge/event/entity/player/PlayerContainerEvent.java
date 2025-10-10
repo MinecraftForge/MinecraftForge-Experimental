@@ -9,12 +9,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
+import org.jspecify.annotations.NullMarked;
 
 public sealed interface PlayerContainerEvent extends PlayerEvent, InheritableEvent {
     EventBus<PlayerContainerEvent> BUS = EventBus.create(PlayerContainerEvent.class);
 
     AbstractContainerMenu getContainer();
 
+    @NullMarked
     record Open(Player getEntity, AbstractContainerMenu getContainer) implements PlayerContainerEvent {
         public static final EventBus<Open> BUS = EventBus.create(Open.class);
     }
