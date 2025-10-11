@@ -146,9 +146,8 @@ public class FMLLoader {
     }
 
     public static List<ITransformationService.Resource> beginModScan(final Map<String,?> arguments) {
-        LOGGER.debug(SCAN,"Scanning for Mod Locators");
-        var modDiscoverer = new ModDiscoverer(arguments);
-        modValidator = modDiscoverer.discoverMods();
+        LOGGER.debug(SCAN, "Scanning for Mod Locators");
+        modValidator = ModDiscoverer.discoverMods(arguments);
         var pluginResources = modValidator.getPluginResources();
         return List.of(pluginResources);
     }

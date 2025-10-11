@@ -36,9 +36,7 @@ public class LoadingModList {
                 .map(ModFile::getModFileInfo)
                 .map(ModFileInfo.class::cast)
                 .toList();
-        this.sortedList = sortedList.stream()
-                .map(ModInfo.class::cast)
-                .toList();
+        this.sortedList = sortedList.stream().toList();
         this.fileById = this.modFiles.stream()
                 .map(ModFileInfo::getMods)
                 .flatMap(Collection::stream)

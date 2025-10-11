@@ -34,7 +34,6 @@ public class ModValidator {
     private LoadingModList loadingModList;
     private final List<IModFile> brokenFiles = new ArrayList<>();
     private final List<EarlyLoadingException.ExceptionData> discoveryErrorData;
-    private final List<ModFileLoadingException> modFileLoadingExceptions;
 
     public ModValidator(Map<IModFile.Type, List<ModFile>> modFiles, List<IModFileInfo> brokenFiles, List<EarlyLoadingException.ExceptionData> discoveryErrorData, List<ModFileLoadingException> modFileLoadingExceptions) {
         this.candidateMods = lst(modFiles.get(IModFile.Type.MOD));
@@ -44,7 +43,6 @@ public class ModValidator {
         this.candidatePlugins.addAll(lst(modFiles.get(IModFile.Type.LIBRARY)));
         this.discoveryErrorData = discoveryErrorData;
         this.brokenFiles.addAll(brokenFiles.stream().map(IModFileInfo::getFile).toList());
-        this.modFileLoadingExceptions = modFileLoadingExceptions;
     }
 
     public ModValidator(Map<IModFile.Type, List<ModFile>> modFiles, List<IModFileInfo> brokenFiles, List<EarlyLoadingException.ExceptionData> discoveryErrorData) {
@@ -52,7 +50,9 @@ public class ModValidator {
     }
 
     private static List<ModFile> lst(List<ModFile> files) {
-        return files == null ? new ArrayList<>() : new ArrayList<>(files);
+        if (files == null) return new ArrayList<>();
+        if (files instanceof ArrayList) return files;
+        return new ArrayList<>(files);
     }
 
     public void stage1Validation() {
@@ -60,7 +60,7 @@ public class ModValidator {
         if (LOGGER.isDebugEnabled(LogMarkers.SCAN)) {
             LOGGER.debug(LogMarkers.SCAN, "Found {} mod files with {} mods", candidateMods.size(), candidateMods.stream().mapToInt(mf -> mf.getModInfos().size()).sum());
         }
-        ImmediateWindowHandler.updateProgress("Found "+candidateMods.size()+" mod candidates");
+        ImmediateWindowHandler.updateProgress("Found " + candidateMods.size() + " mod candidates");
     }
 
     @NotNull

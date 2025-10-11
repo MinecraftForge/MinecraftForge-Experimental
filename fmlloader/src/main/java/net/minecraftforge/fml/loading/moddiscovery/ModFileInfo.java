@@ -264,7 +264,7 @@ public class ModFileInfo implements IModFileInfo, IConfigurable {
 
     @Override
     public String versionString()  {
-        return getMods().get(0).getVersion().toString();
+        return getMods().getFirst().getVersion().toString();
     }
 
     @Override

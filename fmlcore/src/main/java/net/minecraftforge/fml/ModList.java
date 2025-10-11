@@ -41,14 +41,14 @@ public class ModList {
     private List<ModContainer> sortedContainers;
 
     private ModList(final List<ModFile> modFiles, final List<ModInfo> sortedList) {
-        this.modFiles = modFiles.stream().map(ModFile::getModFileInfo).toList();
+        var modFileInfos = this.modFiles = modFiles.stream().map(ModFile::getModFileInfo).toList();
         this.sortedList = sortedList.stream().map(IModInfo.class::cast).toList();
         var byId = new HashMap<String, IModFileInfo>();
-        for (var file : this.modFiles) {
+        for (var file : modFileInfos) {
             for (var mod : file.getMods())
                 byId.put(mod.getModId(), mod.getOwningFile());
         }
-        this.fileById = Collections.unmodifiableMap(byId);
+        this.fileById = Map.copyOf(byId);
         CrashReportCallables.registerCrashCallable("Mod List", this::crashReport);
     }
 
@@ -67,7 +67,7 @@ public class ModList {
     }
 
     private String crashReport() {
-        return "\n"+applyForEachModFile(this::fileToLine).collect(Collectors.joining("\n\t\t", "\t\t", ""));
+        return "\n" + applyForEachModFile(this::fileToLine).collect(Collectors.joining("\n\t\t", "\t\t", ""));
     }
 
     public static ModList of(List<ModFile> modFiles, List<ModInfo> sortedList) {
@@ -126,10 +126,9 @@ public class ModList {
                     map(IModFileInfo::getFile).
                     distinct().
                     map(IModFile::getScanResult).
-                    collect(Collectors.toList());
+                    toList();
         }
         return modFileScanData;
-
     }
 
     public void forEachModFile(Consumer<IModFile> fileConsumer) {

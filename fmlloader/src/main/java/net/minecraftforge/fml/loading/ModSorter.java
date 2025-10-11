@@ -46,7 +46,7 @@ public class ModSorter {
         List<ModFile> modFiles;
 
         try {
-            modFiles = new UniqueModListBuilder(mods).buildUniqueList().modFiles();
+            modFiles = UniqueModListBuilder.buildUniqueList(mods).modFiles();
         } catch (EarlyLoadingException e) {
             // We cannot build any list with duped mods. We have to abort immediately and report it
             // Note this will never actually throw an error because the duplicate checks are done in ModDiscovererer before we get to this phase

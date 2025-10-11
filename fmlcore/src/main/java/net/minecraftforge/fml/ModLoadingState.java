@@ -7,6 +7,7 @@ package net.minecraftforge.fml;
 
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
@@ -59,7 +60,7 @@ public record ModLoadingState(
      */
     @Deprecated(since = "1.21.3", forRemoval = true)
     public static ModLoadingState empty(final String name, final String previous, final ModLoadingPhase phase) {
-        return of(name, phase).after(previous).empty();
+        return new ModLoadingState(name, previous, ml -> "", ml -> 0, phase, Optional.empty(), Optional.empty());
     }
 
     /**
@@ -118,6 +119,22 @@ public record ModLoadingState(
 
     public static Builder of(final String name, final ModLoadingPhase phase) {
         return new Builder(name, phase);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof ModLoadingState that
+                && this.phase == that.phase
+                && this.name.equals(that.name)
+                && Objects.equals(this.previous, that.previous);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = phase.hashCode();
+        result = 31 * result + name.hashCode();
+        result = 31 * result + Objects.hashCode(previous);
+        return result;
     }
 
     public static class Builder {

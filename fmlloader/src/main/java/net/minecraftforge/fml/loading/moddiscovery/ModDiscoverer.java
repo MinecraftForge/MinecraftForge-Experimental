@@ -5,7 +5,6 @@
 
 package net.minecraftforge.fml.loading.moddiscovery;
 
-import com.google.common.collect.ImmutableList;
 import com.mojang.logging.LogUtils;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
@@ -35,41 +34,36 @@ import java.util.ServiceLoader;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
-public class ModDiscoverer {
-    private static final Logger LOGGER = LogUtils.getLogger();
-    private final ServiceLoader<IModLocator> modLocators;
-    private final ServiceLoader<IDependencyLocator> dependencyLocators;
-    private final List<IModLocator>          modLocatorList;
-    private final List<IDependencyLocator>   dependencyLocatorList;
+public final class ModDiscoverer {
+    private ModDiscoverer() {}
 
-    public ModDiscoverer(Map<String, ?> arguments) {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
+    @SuppressWarnings("removal")
+    public static ModValidator discoverMods(Map<String, ?> arguments) {
         Launcher.INSTANCE.environment().computePropertyIfAbsent(Environment.Keys.MODDIRECTORYFACTORY.get(), v->ModsFolderLocator::new);
         Launcher.INSTANCE.environment().computePropertyIfAbsent(Environment.Keys.PROGRESSMESSAGE.get(), v-> StartupNotificationManager.locatorConsumer().orElseGet(()-> s->{}));
         final var moduleLayerManager = Launcher.INSTANCE.environment().findModuleLayerManager().orElseThrow();
-        modLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IModLocator.class);
-        dependencyLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IDependencyLocator.class);
-        modLocatorList = ServiceLoaderUtils.streamServiceLoader(()-> modLocators, sce->LOGGER.error("Failed to load mod locator list", sce)).collect(Collectors.toList());
+        ServiceLoader<IModLocator> modLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IModLocator.class);
+        ServiceLoader<IDependencyLocator> dependencyLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IDependencyLocator.class);
+        List<IModLocator> modLocatorList = ServiceLoaderUtils.streamWithErrorHandling(modLocators, sce -> LOGGER.error("Failed to load mod locator list", sce)).toList();
         for (IModLocator iModLocator : modLocatorList) {
             iModLocator.initArguments(arguments);
         }
-        dependencyLocatorList = ServiceLoaderUtils.streamServiceLoader(()-> dependencyLocators, sce->LOGGER.error("Failed to load dependency locator list", sce)).collect(Collectors.toList());
+        List<IDependencyLocator> dependencyLocatorList = ServiceLoaderUtils.streamWithErrorHandling(dependencyLocators, sce -> LOGGER.error("Failed to load dependency locator list", sce)).toList();
         for (IDependencyLocator l : dependencyLocatorList) {
             l.initArguments(arguments);
         }
-        if (LOGGER.isDebugEnabled(LogMarkers.CORE))
-        {
+        if (LOGGER.isDebugEnabled(LogMarkers.CORE)) {
             LOGGER.debug(LogMarkers.CORE, "Found Mod Locators : {}", modLocatorList.stream()
-                                                                       .map(modLocator -> "(%s:%s)".formatted(modLocator.name(),
-                                                                         modLocator.getClass().getPackage().getImplementationVersion())).collect(Collectors.joining(",")));
+                    .map(modLocator -> "(%s:%s)".formatted(modLocator.name(),
+                            modLocator.getClass().getPackage().getImplementationVersion())).collect(Collectors.joining(",")));
 
             LOGGER.debug(LogMarkers.CORE, "Found Dependency Locators : {}", dependencyLocatorList.stream()
-                                                                       .map(dependencyLocator -> "(%s:%s)".formatted(dependencyLocator.name(),
-                                                                         dependencyLocator.getClass().getPackage().getImplementationVersion())).collect(Collectors.joining(",")));
+                    .map(dependencyLocator -> "(%s:%s)".formatted(dependencyLocator.name(),
+                            dependencyLocator.getClass().getPackage().getImplementationVersion())).collect(Collectors.joining(",")));
         }
-    }
 
-    @SuppressWarnings("removal")
-    public ModValidator discoverMods() {
         LOGGER.debug(LogMarkers.SCAN,"Scanning for mods and other resources to load. We know {} ways to find mods", modLocatorList.size());
         List<ModFile> loadedFiles = new ArrayList<>();
         List<EarlyLoadingException.ExceptionData> discoveryErrorData = new ArrayList<>();
@@ -131,8 +125,7 @@ public class ModDiscoverer {
         //First processing run of the mod list. Any duplicates will cause resolution failure and dependency loading will be skipped.
         Map<IModFile.Type, List<ModFile>> modFilesMap = new EnumMap<>(IModFile.Type.class);
         try {
-            final UniqueModListBuilder modsUniqueListBuilder = new UniqueModListBuilder(loadedFiles);
-            final UniqueModListBuilder.UniqueModListData uniqueModsData = modsUniqueListBuilder.buildUniqueList();
+            final UniqueModListBuilder.UniqueModListData uniqueModsData = UniqueModListBuilder.buildUniqueList(loadedFiles);
 
             //Grab the temporary results.
             //This allows loading to continue to a base state, in case dependency loading fails.
@@ -152,7 +145,7 @@ public class ModDiscoverer {
             for (IDependencyLocator locator : dependencyLocatorList) {
                 try {
                     LOGGER.debug(LogMarkers.SCAN,"Trying locator {}", locator);
-                    final List<IModFile> locatedMods = ImmutableList.copyOf(loadedFiles);
+                    final List<IModFile> locatedMods = List.copyOf(loadedFiles);
 
                     var locatedFiles = locator.scanMods(locatedMods);
                     if (locatedFiles.stream().anyMatch(file -> !(file instanceof ModFile))) {
@@ -169,8 +162,7 @@ public class ModDiscoverer {
 
             //Second processing run of the mod list. Any duplicates will cause resolution failure and only the mods list will be loaded.
             try {
-                final UniqueModListBuilder modsAndDependenciesUniqueListBuilder = new UniqueModListBuilder(loadedFiles);
-                final UniqueModListBuilder.UniqueModListData uniqueModsAndDependenciesData = modsAndDependenciesUniqueListBuilder.buildUniqueList();
+                final UniqueModListBuilder.UniqueModListData uniqueModsAndDependenciesData = UniqueModListBuilder.buildUniqueList(loadedFiles);
 
                 //We now only need the mod files map, not the list.
                 modFilesMap = uniqueModsAndDependenciesData.modFiles().stream()

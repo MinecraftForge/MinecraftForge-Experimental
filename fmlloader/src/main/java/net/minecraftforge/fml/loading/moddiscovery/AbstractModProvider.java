@@ -145,6 +145,12 @@ public abstract class AbstractModProvider implements IModProvider {
             public <T> Optional<T> getConfigElement(String... key) {
                 return Optional.empty();
             }
+
+            @Override
+            public List<? extends IConfigurable> getConfigList(String key) {
+                return Collections.emptyList();
+            }
+
             @Override
             public List<? extends IConfigurable> getConfigList(String... key) {
                 return Collections.emptyList();

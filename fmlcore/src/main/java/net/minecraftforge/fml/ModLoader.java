@@ -84,20 +84,20 @@ public class ModLoader {
     private ModList modList;
 
     private ModLoader() {
-        this.loadingModList = FMLLoader.getLoadingModList();
-        this.loadingExceptions = this.loadingModList.getErrors().stream()
+        var loadingModList = this.loadingModList = FMLLoader.getLoadingModList();
+        var loadingExceptions = this.loadingExceptions = loadingModList.getErrors().stream()
                 .flatMap(ModLoadingException::fromEarlyException)
                 .collect(Collectors.toList());
-        this.loadingWarnings = this.loadingModList.getBrokenFiles().stream()
+        this.loadingWarnings = loadingModList.getBrokenFiles().stream()
                 .map(file -> new ModLoadingWarning(null, ModLoadingStage.VALIDATE, InvalidModIdentifier.identifyJarProblem(file.getFilePath()).orElse("fml.modloading.brokenfile"), file.getFileName()))
                 .collect(Collectors.toList());
-        if (this.loadingExceptions.isEmpty()) {
+        if (loadingExceptions.isEmpty()) {
             this.erroredModInfos = Collections.emptySet();
         } else {
             this.erroredModInfos = Collections.newSetFromMap(new IdentityHashMap<>());
-            this.erroredModInfos.addAll(this.loadingExceptions.stream().map(ModLoadingException::getModInfo).toList());
+            this.erroredModInfos.addAll(loadingExceptions.stream().map(ModLoadingException::getModInfo).toList());
         }
-        this.loadingModList.getModFiles().stream()
+        loadingModList.getModFiles().stream()
                 .filter(ModFileInfo::missingLicense)
                 .filter(modFileInfo -> modFileInfo.getMods().stream().noneMatch(this.erroredModInfos::contains)) //Ignore files where any other mod already encountered an error
                 .map(modFileInfo -> new ModLoadingException(null, ModLoadingStage.VALIDATE, "fml.modloading.missinglicense", null, modFileInfo.getFile()))
@@ -112,16 +112,16 @@ public class ModLoader {
 
     private static String computeLanguageList() {
         return "\n" + FMLLoader.getLanguageLoadingProvider()
-                .applyForEach(lp -> lp.name() + "@" + lp.getClass().getPackage().getImplementationVersion())
+                .applyForEach(lp -> lp.name() + '@' + lp.getClass().getPackage().getImplementationVersion())
                 .collect(Collectors.joining("\n\t\t", "\t\t", ""));
     }
 
     private static String computeModLauncherServiceList() {
         final List<Map<String, String>> mods = FMLLoader.modLauncherModList();
-        return "\n"+mods.stream().map(mod->mod.getOrDefault("file","nofile")+
-                " "+mod.getOrDefault("name", "missing")+
-                " "+mod.getOrDefault("type","NOTYPE")+
-                " "+mod.getOrDefault("description", "")).
+        return "\n" + mods.stream().map(mod -> mod.getOrDefault("file","nofile") +
+                ' ' + mod.getOrDefault("name", "missing") +
+                ' ' + mod.getOrDefault("type","NOTYPE") +
+                ' ' + mod.getOrDefault("description", "")).
                 collect(Collectors.joining("\n\t\t","\t\t",""));
     }
 
@@ -254,7 +254,7 @@ public class ModLoader {
     }
 
     private void handleInlineTransition(final Consumer<ModList> transition, final IModLoadingState state, final ModWorkManager.DrivenExecutor syncExecutor, final Runnable ticker) {
-        var pb = StartupMessageManager.addProgressBar("State transition " +state.name()+" running", 0);
+        var pb = StartupMessageManager.addProgressBar("State transition " + state.name() + " running", 0);
         syncExecutor.drive(ticker);
         transition.accept(this.modList);
         syncExecutor.drive(ticker);
@@ -353,8 +353,14 @@ public class ModLoader {
         return loadingStateValid;
     }
 
+    /** @deprecated Use {@link #hasCompletedState(IModLoadingState)} instead */
+    @Deprecated(forRemoval = true)
     public boolean hasCompletedState(final String stateName) {
         IModLoadingState state = stateManager.findState(stateName);
+        return completedStates.contains(state);
+    }
+
+    public boolean hasCompletedState(IModLoadingState state) {
         return completedStates.contains(state);
     }
 

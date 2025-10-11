@@ -45,7 +45,7 @@ public class ResourcePackLoader {
     }
 
     public static List<String> getPackNames() {
-        return ModList.get().applyForEachModFile(mf->"mod:"+mf.getModInfos().get(0).getModId()).filter(n->!n.equals("mod:minecraft")).collect(Collectors.toList());
+        return ModList.get().applyForEachModFile(mf->"mod:"+mf.getModInfos().getFirst().getModId()).filter(n->!n.equals("mod:minecraft")).toList();
     }
 
     public static <V> Comparator<Map.Entry<String,V>> getSorter() {
@@ -55,7 +55,7 @@ public class ResourcePackLoader {
 
         ModList.get().getModFiles().stream()
                 .filter(mf -> mf.requiredLanguageLoaders().stream().noneMatch(ls->ls.languageName().equals("minecraft")))
-                .map(e -> e.getMods().get(0).getModId())
+                .map(e -> e.getMods().getFirst().getModId())
                 .map(e -> "mod:" + e)
                 .forEach(order::add);
 
@@ -91,7 +91,7 @@ public class ResourcePackLoader {
             var root = file.findResource("");
             var supplier = new PathPackResources.PathResourcesSupplier(root);
 
-            var modinfo = file.getModInfos().get(0);
+            var modinfo = file.getModInfos().getFirst();
             var name = "mod:" + modinfo.getModId();
             var info = new PackLocationInfo(name, Component.literal(file.getFileName()), PackSource.DEFAULT, Optional.empty());
             var meta = Pack.readPackMetadata(info, supplier, version, type);
