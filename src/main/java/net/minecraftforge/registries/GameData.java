@@ -53,7 +53,6 @@ import net.minecraft.world.level.levelgen.DebugLevelSource;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.common.CreativeModeTabRegistry;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.fluids.FluidType;
@@ -313,6 +312,7 @@ public class GameData {
         // the id mapping has reverted, fire remap events for those that care about id changes
         if (fireEvents) {
             fireRemapEvent(ImmutableMap.of(), true);
+            ObjectHolderRegistry.applyObjectHolders();
         }
 
         // the id mapping has reverted, ensure we sync up the object holders
@@ -350,6 +350,9 @@ public class GameData {
 
                 if (forgeRegistry != null)
                     forgeRegistry.freeze();
+                LOGGER.debug(REGISTRIES, "Applying holder lookups: {}", registryKey.location());
+                ObjectHolderRegistry.applyObjectHolders(registryKey.location()::equals);
+                LOGGER.debug(REGISTRIES, "Holder lookups applied: {}", registryKey.location());
             } catch (Throwable t) {
                 aggregate.addSuppressed(t);
             }
@@ -687,6 +690,9 @@ public class GameData {
 
         // Tell mods that the ids have changed
         fireRemapEvent(remaps, false);
+
+        // The id map changed, ensure we apply object holders
+        ObjectHolderRegistry.applyObjectHolders();
 
         // Return an empty list, because we're good
         return ArrayListMultimap.create();
