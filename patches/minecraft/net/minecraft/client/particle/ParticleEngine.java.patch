@@ -1,14 +1,5 @@
 --- a/net/minecraft/client/particle/ParticleEngine.java
 +++ b/net/minecraft/client/particle/ParticleEngine.java
-@@ -26,7 +_,7 @@
- public class ParticleEngine {
-     private static final List<ParticleRenderType> RENDER_ORDER = List.of(ParticleRenderType.SINGLE_QUADS, ParticleRenderType.ITEM_PICKUP, ParticleRenderType.ELDER_GUARDIANS);
-     protected ClientLevel level;
--    private final Map<ParticleRenderType, ParticleGroup<?>> particles = Maps.newIdentityHashMap();
-+    private final Map<ParticleRenderType, ParticleGroup<?>> particles = Maps.newTreeMap(net.minecraftforge.client.ForgeHooksClient.makeParticleRenderTypeComparator(RENDER_ORDER));
-     private final Queue<TrackingEmitter> trackingEmitters = Queues.newArrayDeque();
-     private final Queue<Particle> particlesToAdd = Queues.newArrayDeque();
-     private final Object2IntOpenHashMap<ParticleLimit> trackedParticleCounts = new Object2IntOpenHashMap<>();
 @@ -63,7 +_,7 @@
      private <T extends ParticleOptions> Particle makeParticle(
          T p_107396_, double p_107397_, double p_107398_, double p_107399_, double p_107400_, double p_107401_, double p_107402_
@@ -18,12 +9,34 @@
          return particleprovider == null
              ? null
              : particleprovider.createParticle(p_107396_, this.level, p_107397_, p_107398_, p_107399_, p_107400_, p_107401_, p_107402_, this.random);
-@@ -123,7 +_,7 @@
+@@ -113,6 +_,8 @@
+             return new ItemPickupParticleGroup(this);
+         } else if (p_428647_ == ParticleRenderType.ELDER_GUARDIANS) {
+             return new ElderGuardianParticleGroup(this);
++        }  else if (factories.containsKey(p_428647_)) {
++            return factories.get(p_428647_).apply(this);
+         } else {
+             return (ParticleGroup<?>)(p_428647_ == ParticleRenderType.NO_RENDER ? new NoRenderParticleGroup(this) : new QuadParticleGroup(this, p_428647_));
+         }
+@@ -122,8 +_,20 @@
+         this.trackedParticleCounts.addTo(p_423291_, p_172283_);
      }
  
++
++    private static final Map<ParticleRenderType, java.util.function.Function<ParticleEngine, ParticleGroup<?>>> factories = new java.util.HashMap<>();
++    private static final List<ParticleRenderType> particleRenderOrder = new java.util.ArrayList<>(RENDER_ORDER);
++
++    // Forge: allow custom particle groups
++    public static void registerParticleGroup(ParticleRenderType type, java.util.function.Function<ParticleEngine, ParticleGroup<?>> factory) {
++        if (factories.putIfAbsent(type, factory) != null) {
++            throw new IllegalArgumentException(type.name() + " already has a factory registered. Previous factory was " + factories.get(type) + ". This factory was " + factory);
++        }
++        particleRenderOrder.add(type);
++    }
++
      public void extract(ParticlesRenderState p_423938_, Frustum p_424803_, Camera p_430521_, float p_426823_) {
 -        for (ParticleRenderType particlerendertype : RENDER_ORDER) {
-+        for (ParticleRenderType particlerendertype : this.particles.keySet()) { // Forge: allow custom ParticleRenderType's
++        for (ParticleRenderType particlerendertype : particleRenderOrder) { // Forge: allow custom ParticleRenderType's
              ParticleGroup<?> particlegroup = this.particles.get(particlerendertype);
              if (particlegroup != null && !particlegroup.isEmpty()) {
                  p_423938_.add(particlegroup.extractRenderState(p_424803_, p_430521_, p_426823_));
