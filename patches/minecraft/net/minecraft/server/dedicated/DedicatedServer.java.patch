@@ -45,9 +45,9 @@
          }
      }
  
-@@ -510,6 +_,13 @@
-         if (this.gui == null) {
-             this.gui = MinecraftServerGui.showFrameFor(this);
+@@ -439,6 +_,13 @@
+                 LOGGER.error("Interrupted while stopping the management server", (Throwable)interruptedexception);
+             }
          }
 +
 +        if (this.dediLanPinger != null) {
