@@ -87,7 +87,7 @@ public abstract class AbstractModProvider implements IModProvider {
         return new IModLocator.ModFileOrException(mod, null);
     }
 
-    private static JarMetadata loadMetaFromJar(SecureJar jar, ModJarMetadata mjm) {
+    protected static JarMetadata loadMetaFromJar(SecureJar jar, ModJarMetadata mjm) {
         var info = jar.moduleDataProvider().open(MODULE_INFO).orElse(null);
         if (info != null) {
             try {

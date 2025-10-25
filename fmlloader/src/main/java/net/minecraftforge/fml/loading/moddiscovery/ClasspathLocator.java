@@ -74,7 +74,8 @@ public final class ClasspathLocator extends AbstractModProvider implements IModL
         var ret = new ArrayList<ModFileOrException>();
         for (var path : claimed) {
             // Filter out anything found by the ServiceLoader
-            if (!ModDirTransformerDiscoverer.isServiceProvider(path))
+            if (!ModDirTransformerDiscoverer.isServiceProvider(path)
+                && !JarInJarDependencyLocator.isOption(path))
                 ret.add(createMod(path));
         }
         return ret;
@@ -107,7 +108,7 @@ public final class ClasspathLocator extends AbstractModProvider implements IModL
         return Path.of(URI.create(str));
     }
 
-    private static Path getPathFromResource(ClassLoader cl, String resource) {
+    static Path getPathFromResource(ClassLoader cl, String resource) {
         var url = cl.getResource(resource);
         if (url == null)
             return null;

@@ -135,6 +135,7 @@ dependencies {
     installer(libs.bundles.terminalconsoleappender)
     installer(libs.mixin)
     installer(libs.bundles.jarjar)
+    installer(libs.roimfs)
 
     installer(project(':fmlcore'))
     installer(project(':fmlloader'))

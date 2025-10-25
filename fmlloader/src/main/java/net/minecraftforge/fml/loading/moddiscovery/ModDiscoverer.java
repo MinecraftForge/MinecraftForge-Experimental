@@ -111,7 +111,7 @@ public final class ModDiscoverer {
                 }
 
                 LOGGER.debug(LogMarkers.SCAN, "Locator {} found {} valid mod files", locator, locatedFiles.size());
-                handleLocatedFiles(loadedFiles, locatedFiles);
+                handleLocatedFiles(loadedFiles, locatedFiles, locator);
             } catch (InvalidModFileException imfe) {
                 // We don't generally expect this exception, since it should come from the candidates stream above and be handled in the Locator, but just in case.
                 LOGGER.error(LogMarkers.SCAN, "Locator {} found an invalid mod file {}", locator, imfe.getBrokenFile(), imfe);
@@ -148,11 +148,7 @@ public final class ModDiscoverer {
                     final List<IModFile> locatedMods = List.copyOf(loadedFiles);
 
                     var locatedFiles = locator.scanMods(locatedMods);
-                    if (locatedFiles.stream().anyMatch(file -> !(file instanceof ModFile))) {
-                        LOGGER.error(LogMarkers.SCAN, "A dependency locator returned a file which is not a ModFile instance!. They will be skipped!");
-                    }
-
-                    handleLocatedFiles(loadedFiles, locatedFiles);
+                    handleLocatedFiles(loadedFiles, locatedFiles, locator);
                 }
                 catch (EarlyLoadingException exception) {
                     LOGGER.error(LogMarkers.SCAN, "Failed to load dependencies with locator {}", locator, exception);
@@ -185,11 +181,14 @@ public final class ModDiscoverer {
         return validator;
     }
 
-    private static void handleLocatedFiles(final List<ModFile> loadedFiles, final List<IModFile> locatedFiles) {
-        var locatedModFiles = locatedFiles.stream().filter(ModFile.class::isInstance).map(ModFile.class::cast).toList();
-        for (IModFile mf : locatedModFiles) {
-            LOGGER.info(LogMarkers.SCAN, "Found mod file {} of type {} with provider {}", mf.getFileName(), mf.getType(), mf.getProvider());
+    private static void handleLocatedFiles(final List<ModFile> loadedFiles, final List<IModFile> locatedFiles, final Object locator) {
+        for (IModFile mf : locatedFiles) {
+            if (mf instanceof ModFile modFile) {
+                LOGGER.info(LogMarkers.SCAN, "Found mod file {} of type {} with provider {}", mf.getFileName(), mf.getType(), mf.getProvider());
+                loadedFiles.add(modFile);
+            } else {
+                LOGGER.error(LogMarkers.SCAN, "Skipping mod file {} found by {}, as it was not a ModFile instance!", mf.getFileName(), locator);
+            }
         }
-        loadedFiles.addAll(locatedModFiles);
     }
 }

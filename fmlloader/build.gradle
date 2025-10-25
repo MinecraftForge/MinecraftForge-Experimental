@@ -36,6 +36,7 @@ dependencies {
     implementation(libs.accesstransformers)
     implementation(libs.terminalconsoleappender)
     implementation(libs.jimfs)
+    implementation(libs.roimfs)
 
     // Needed because we have a custom log4j plugin, and they removed package scanning and require a data file to be generated
     implementation(libs.log4j.core)
@@ -103,11 +104,22 @@ tasks.register('writeForgeVersionJson') {
     }
 }
 
+tasks.register('jarJarOptionsJson', net.minecraftforge.forge.tasks.JarJarMetadataOptions) {
+    metadataFile = project.file('src/main/resources/jarjar_options.json')
+    // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
+    //add(libs.mixin, 'org/spongepowered/asm/mixin/Mixin.class')
+}
+
 tasks.named('generateResources').configure {
     dependsOn('eclipseJdt')
     dependsOn('eclipseJdtApt')
     dependsOn('eclipseFactorypath')
     dependsOn('writeForgeVersionJson')
+    dependsOn('jarJarOptionsJson')
+}
+
+tasks.named('sourcesJar') {
+    dependsOn('jarJarOptionsJson')
 }
 
 eclipse {

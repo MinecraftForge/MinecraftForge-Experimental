@@ -38,6 +38,10 @@ tasks.register('generateResources') {
     dependsOn('writeManifest')
 }
 
+tasks.named('processResources') {
+    dependsOn(generateResources)
+}
+
 // Make sure out manifests get written before compiling the code, IDEA calls this task if you tell it to use the gradle build.
 tasks.withType(JavaCompile).configureEach {
     dependsOn 'generateResources'
