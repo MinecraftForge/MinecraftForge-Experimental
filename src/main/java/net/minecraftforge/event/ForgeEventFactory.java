@@ -571,7 +571,7 @@ public final class ForgeEventFactory {
 //    }
 
     @Nullable
-    public static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent<?> event, @Nullable ICapabilityProvider parent) {
+    public static CapabilityDispatcher gatherCapabilities(AttachCapabilitiesEvent event, @Nullable ICapabilityProvider parent) {
         return !event.getCapabilities().isEmpty() || parent != null ? new CapabilityDispatcher(event.getCapabilities(), event.getListeners(), parent) : null;
     }
 

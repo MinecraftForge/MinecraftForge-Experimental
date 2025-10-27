@@ -50,7 +50,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         }
 
         @Override
-        protected AttachCapabilitiesEvent<Entity> fireAttachCapabilitiesEvent(Entity provider) {
+        protected AttachCapabilitiesEvent.Entities fireAttachCapabilitiesEvent(Entity provider) {
             return AttachCapabilitiesEvent.Entities.BUS.fire(new AttachCapabilitiesEvent.Entities(provider));
         }
 
@@ -70,7 +70,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         }
 
         @Override
-        protected AttachCapabilitiesEvent<BlockEntity> fireAttachCapabilitiesEvent(BlockEntity provider) {
+        protected AttachCapabilitiesEvent.BlockEntities fireAttachCapabilitiesEvent(BlockEntity provider) {
             return AttachCapabilitiesEvent.BlockEntities.BUS.fire(new AttachCapabilitiesEvent.BlockEntities(provider));
         }
 
@@ -90,7 +90,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         }
 
         @Override
-        protected AttachCapabilitiesEvent<ItemStack> fireAttachCapabilitiesEvent(ItemStack provider) {
+        protected AttachCapabilitiesEvent.ItemStacks fireAttachCapabilitiesEvent(ItemStack provider) {
             return AttachCapabilitiesEvent.ItemStacks.BUS.fire(new AttachCapabilitiesEvent.ItemStacks(provider));
         }
 
@@ -110,7 +110,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         }
 
         @Override
-        protected AttachCapabilitiesEvent<Level> fireAttachCapabilitiesEvent(Level provider) {
+        protected AttachCapabilitiesEvent.Levels fireAttachCapabilitiesEvent(Level provider) {
             return AttachCapabilitiesEvent.Levels.BUS.fire(new AttachCapabilitiesEvent.Levels(provider));
         }
 
@@ -155,7 +155,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
         doGatherCapabilities(parent == null ? null : parent.get());
     }
 
-    protected abstract AttachCapabilitiesEvent<?> fireAttachCapabilitiesEvent(B provider);
+    protected abstract AttachCapabilitiesEvent fireAttachCapabilitiesEvent(B provider);
     protected abstract boolean shouldFireAttachCapabilitiesEvent();
 
     private void doGatherCapabilities(@Nullable ICapabilityProvider parent) {
@@ -282,7 +282,7 @@ public abstract class CapabilityProvider<B extends ICapabilityProviderImpl<B>> i
             }
 
             @Override
-            protected AttachCapabilitiesEvent<LevelChunk> fireAttachCapabilitiesEvent(LevelChunk provider) {
+            protected AttachCapabilitiesEvent.LevelChunks fireAttachCapabilitiesEvent(LevelChunk provider) {
                 return AttachCapabilitiesEvent.LevelChunks.BUS.fire(new AttachCapabilitiesEvent.LevelChunks(provider));
             }
 

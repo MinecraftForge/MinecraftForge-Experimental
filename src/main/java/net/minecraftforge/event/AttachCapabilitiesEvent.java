@@ -37,61 +37,86 @@ import org.jspecify.annotations.NullMarked;
  * @see LevelChunks
  */
 @NullMarked
-public abstract class AttachCapabilitiesEvent<T> extends MutableEvent implements InheritableEvent {
-    private final T obj;
+public abstract class AttachCapabilitiesEvent extends MutableEvent implements InheritableEvent {
+    private final Object obj;
     private final Map<ResourceLocation, ICapabilityProvider> caps = new LinkedHashMap<>();
     private final Map<ResourceLocation, ICapabilityProvider> view = Collections.unmodifiableMap(caps);
     private final List<Runnable> listeners = new ArrayList<>();
     private final List<Runnable> listenersView = Collections.unmodifiableList(listeners);
 
-    public static class Entities extends AttachCapabilitiesEvent<Entity> {
+    public static class Entities extends AttachCapabilitiesEvent {
         public static final EventBus<Entities> BUS = EventBus.create(Entities.class);
 
         public Entities(Entity obj) {
             super(obj);
         }
+
+        @Override
+        public Entity getObject() {
+            return (Entity)super.getObject();
+        }
     }
 
-    public static class BlockEntities extends AttachCapabilitiesEvent<BlockEntity> {
+    public static class BlockEntities extends AttachCapabilitiesEvent {
         public static final EventBus<BlockEntities> BUS = EventBus.create(BlockEntities.class);
 
         public BlockEntities(BlockEntity obj) {
             super(obj);
         }
+
+        @Override
+        public BlockEntity getObject() {
+            return (BlockEntity)super.getObject();
+        }
     }
 
-    public static class ItemStacks extends AttachCapabilitiesEvent<ItemStack> {
+    public static class ItemStacks extends AttachCapabilitiesEvent {
         public static final EventBus<ItemStacks> BUS = EventBus.create(ItemStacks.class);
 
         public ItemStacks(ItemStack obj) {
             super(obj);
         }
+
+        @Override
+        public ItemStack getObject() {
+            return (ItemStack)super.getObject();
+        }
     }
 
-    public static class Levels extends AttachCapabilitiesEvent<Level> {
+    public static class Levels extends AttachCapabilitiesEvent {
         public static final EventBus<Levels> BUS = EventBus.create(Levels.class);
 
         public Levels(Level obj) {
             super(obj);
         }
+
+        @Override
+        public Level getObject() {
+            return (Level)super.getObject();
+        }
     }
 
-    public static class LevelChunks extends AttachCapabilitiesEvent<LevelChunk> {
+    public static class LevelChunks extends AttachCapabilitiesEvent {
         public static final EventBus<LevelChunks> BUS = EventBus.create(LevelChunks.class);
 
         public LevelChunks(LevelChunk obj) {
             super(obj);
         }
+
+        @Override
+        public LevelChunk getObject() {
+            return (LevelChunk)super.getObject();
+        }
     }
 
-    protected AttachCapabilitiesEvent(T obj) {
+    protected AttachCapabilitiesEvent(Object obj) {
         this.obj = obj;
     }
 
     /**
      * Retrieves the object that is being created, Not much state is set.
      */
-    public T getObject() {
+    public Object getObject() {
         return this.obj;
     }
 

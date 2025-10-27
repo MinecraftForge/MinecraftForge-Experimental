@@ -54,7 +54,7 @@ public class ItemCapabilityTest extends BaseTestMod {
         super(context, false, true);
     }
 
-    private static void onEvent(AttachCapabilitiesEvent<ItemStack> event) {
+    private static void onEvent(AttachCapabilitiesEvent.ItemStacks event) {
         if (event.getObject().getItem() == Items.COPPER_INGOT) {
             event.addCapability(
                     ResourceLocation.fromNamespaceAndPath("forge", "test"),
