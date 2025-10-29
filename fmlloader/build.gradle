@@ -108,6 +108,15 @@ tasks.register('jarJarOptionsJson', net.minecraftforge.forge.tasks.JarJarMetadat
     metadataFile = project.file('src/main/resources/jarjar_options.json')
     // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
     //add(libs.mixin, 'org/spongepowered/asm/mixin/Mixin.class')
+    add(libs.mixinextras.forge) {
+        containedJarMetadata {
+            path = ''
+        }
+        resource = 'com/llamalad7/mixinextras/platform/forge/MixinExtrasConfigPlugin.class'
+        layer = 'GAMELIBRARY'
+        id = 'mixinextras'
+        nested = true
+    }
 }
 
 tasks.named('generateResources').configure {

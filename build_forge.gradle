@@ -135,6 +135,7 @@ dependencies {
     installer(libs.maven.artifact)
     installer(libs.bundles.terminalconsoleappender)
     installer(libs.mixin)
+    installer(libs.mixinextras.forge)
     installer(libs.bundles.jarjar)
     installer(libs.roimfs)
 

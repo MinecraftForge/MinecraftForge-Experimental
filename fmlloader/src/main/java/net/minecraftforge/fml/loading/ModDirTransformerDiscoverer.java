@@ -7,8 +7,10 @@ package net.minecraftforge.fml.loading;
 
 import com.mojang.logging.LogUtils;
 import cpw.mods.jarhandling.SecureJar;
+import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
 import cpw.mods.modlauncher.api.NamedPath;
+import cpw.mods.modlauncher.api.TypesafeMap;
 import cpw.mods.modlauncher.serviceapi.ITransformerDiscoveryService;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -40,6 +42,17 @@ public class ModDirTransformerDiscoverer implements ITransformerDiscoveryService
 
     @Override
     public void earlyInitialization(final String launchTarget, final String[] arguments) {
+        boolean isMixinEnabledInDev = false;
+        for (String arg : arguments) {
+            if (arg.startsWith("-mixin.config")) {
+                isMixinEnabledInDev = true;
+                break;
+            }
+        }
+        Launcher.INSTANCE.blackboard().putIfAbsent(
+            TypesafeMap.Key.getOrCreate(Launcher.INSTANCE.blackboard(), "isMixinEnabledInDev", Boolean.class),
+            isMixinEnabledInDev
+        );
         ImmediateWindowHandler.load(launchTarget, arguments);
     }
 
