@@ -302,6 +302,10 @@ tasks.userdevConfig.configure {
         libraries.add(dep)
     }
 
+    // TODO [ForgeDev][UserDev] Split API/Runtime elements in userdev config
+    //      so we don't gotta keep making exceptions for MixinExtras
+    mixinExtras = libs.mixinextras.common
+
     inject = '' // We don't have a userdev sourceset anymore. Empty as a gradle workaround...
     runs {
         client {

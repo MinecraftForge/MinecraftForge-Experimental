@@ -38,7 +38,9 @@ dependencyResolutionManagement {
 
             library('roimfs', 'net.minecraftforge:roimfs:1.0.0') // ReadOnlyInMemoryFileSystem - Used for JarInJar extraction at runtime
             library('mixin', 'org.spongepowered:mixin:0.8.7')
-            library('mixinextras-forge', 'io.github.llamalad7:mixinextras-forge:0.5.0')
+            version('mixinextras', '0.5.0')
+            library('mixinextras-forge', 'io.github.llamalad7', 'mixinextras-forge').versionRef('mixinextras')
+            library('mixinextras-common', 'io.github.llamalad7', 'mixinextras-common').versionRef('mixinextras')
             library('jetbrains-annotations', 'org.jetbrains:annotations:24.1.0') // for ApiStatus annotations
             library('jspecify', 'org.jspecify:jspecify:1.0.0') // for nullability annotations
             library('slf4j-api', 'org.slf4j:slf4j-api:2.0.7')
