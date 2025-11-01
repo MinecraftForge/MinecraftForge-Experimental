@@ -72,6 +72,7 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
     private static volatile boolean optionsLoaded = false;
 
     private static final Attributes.Name MIXIN_CONFIGS_ATTR = new Attributes.Name("MixinConfigs");
+    private static final Attributes.Name MIXIN_CONNECTOR_ATTR = new Attributes.Name("MixinConnector");
     private static final ContainedJarMetadata MIXIN_EXTRAS_DEPENDENCY = makeMixinExtraDependency();
 
     private static ContainedJarMetadata makeMixinExtraDependency() {
@@ -231,7 +232,8 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
         }
 
         for (var mod : mods) {
-            if (mod.getSecureJar().moduleDataProvider().getManifest().getMainAttributes().getValue(MIXIN_CONFIGS_ATTR) != null) {
+            var attributes = mod.getSecureJar().moduleDataProvider().getManifest().getMainAttributes();
+            if (attributes.getValue(MIXIN_CONFIGS_ATTR) != null || attributes.getValue(MIXIN_CONNECTOR_ATTR) != null) {
                 anyMixinsLoaded = true;
                 return true;
             }
