@@ -172,7 +172,7 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
         // Now lets build the actual mod files
         for (var entry : selected) {
             try {
-                var root = entry.path;
+                var root = entry.getFinalPath();
                 var mod = createMod(root, false, entry.type.name());
 
                 if (mod.ex() != null)
@@ -274,6 +274,10 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
             this.path = path;
             this.type = type;
             this.coord = coord;
+        }
+
+        Path getFinalPath() {
+            return path;
         }
 
         void cleanup(boolean selected) {
@@ -385,10 +389,25 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
             this.zipPath = zipPath;
         }
 
+        /*
+         * Due to a bug in Mixin, anything that is not on the DefaultFileSystem MUST be a directory.
+         * Or else it can't resolve resources correctly. So for anything we put on the roimfs we need
+         * to return the nested zip file system.
+         *
+         * This will be an annoying to backport, but we can cross that bridge when we come to it.
+         *
+         * See: https://github.com/SpongePowered/Mixin/blob/4053421aa10aaac6127d969028a29c94fe3054f6/src/main/java/org/spongepowered/asm/launch/platform/MainAttributes.java#L102
+         */
+        @Override
+        public Path getFinalPath() {
+            return zipPath;
+        }
+
         @Override
         void cleanup(boolean selected) {
             if (selected)
                 return;
+
             LOGGER.info(MARKER, "Closeing unselected FileSystem {}", this);
             try {
                 zipPath.getFileSystem().close();
@@ -417,11 +436,14 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
         private final HashMap<Entry, HashMap<String, String>> children = new HashMap<>();
 
         private Selector(Iterable<IModFile> mods) {
-            for (var mod : mods) {
-                var entry = new ModEntry(mod);
-                this.force(entry);
-                entries.put(new Key(entry, ""), entry);
-            }
+            for (var mod : mods)
+                this.force(new ModEntry(mod));
+        }
+
+        @Override
+        public void force(Entry entry) {
+            super.force(entry);
+            entries.put(new Key(entry, ""), entry);
         }
 
         @Override
@@ -490,7 +512,7 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
             Path roimfsPath = null;
             Path zipPath = null;
             try {
-                // Lets copy the uncomressed file to memory, and then create a ReadOnlyInMemorryFileSystem for it, this allows us to reference it by URI.
+                // Lets copy the uncompressed file to memory, and then create a ReadOnlyInMemorryFileSystem for it, this allows us to reference it by URI.
                 // Which is needed because a lot of things require navigation via URI.
                 // And ZipFileSystem only caches the FileSystem instance when accessed via URI.
                 byte[] data = Files.readAllBytes(targetPath);

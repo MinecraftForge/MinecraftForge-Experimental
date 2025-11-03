@@ -54,12 +54,16 @@ public abstract class AbstractModProvider implements IModProvider {
 
     @Nullable
     protected IModLocator.ModFileOrException createMod(Path path, boolean ignoreUnknown, String defaultType) {
+        var debug = path.toString();
+        if (debug.equals("/"))
+            debug = path.toUri().toString();
+
         var mjm = new ModJarMetadata();
         SecureJar sj = null;
         try {
             sj = SecureJar.from(jar -> loadMetaFromJar(jar, mjm), path);
         } catch (Throwable t) {
-            return new IModLocator.ModFileOrException(null, new ModFileLoadingException("Failed to create secure jar for \"" + path + "\" - " + t.getMessage()));
+            return new IModLocator.ModFileOrException(null, new ModFileLoadingException("Failed to create secure jar for \"" + debug + "\" - " + t.getMessage()));
         }
 
         IModFile mod;
@@ -68,7 +72,7 @@ public abstract class AbstractModProvider implements IModProvider {
             type = defaultType;
 
         if (sj.moduleDataProvider().findFile(MODS_TOML).isPresent()) {
-            LOGGER.debug(LogMarkers.SCAN, "Found {} mod of type {}: {}", MODS_TOML, type, path);
+            LOGGER.debug(LogMarkers.SCAN, "Found {} mod of type {}: {}", MODS_TOML, type, debug);
             mod = new ModFile(sj, this, ModFileParser::modsTomlParser);
             // ModJarMetadata is only used when loading mods.toml mods as ModJarMetadata
             mjm.setModFile(mod);
@@ -77,12 +81,12 @@ public abstract class AbstractModProvider implements IModProvider {
                 return new IModLocator.ModFileOrException(null, new ModFileLoadingException("File \"%s\" is not a Forge mod and cannot be loaded. Look for a Forge version of this mod or consider alternative mods.".formatted(mod.getFileName())));
             }
         } else if (type != null) {
-            LOGGER.debug(LogMarkers.SCAN, "Found {} mod of type {}: {}", JarFile.MANIFEST_NAME, type, path);
+            LOGGER.debug(LogMarkers.SCAN, "Found {} mod of type {}: {}", JarFile.MANIFEST_NAME, type, debug);
             mod = new ModFile(sj, this, this::manifestParser, type);
         } else if (ignoreUnknown) {
             return null;
         } else
-            return new IModLocator.ModFileOrException(null, new ModFileLoadingException("Invalid mod file found " + path));
+            return new IModLocator.ModFileOrException(null, new ModFileLoadingException("Invalid mod file found " + debug));
 
         return new IModLocator.ModFileOrException(mod, null);
     }

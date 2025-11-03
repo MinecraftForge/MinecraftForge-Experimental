@@ -21,13 +21,13 @@ import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.slf4j.Logger;
 
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -98,7 +98,7 @@ public class ModFile implements IModFile {
 
     public boolean identifyMods() {
         if (this.modFileInfo == null) return this.getType() != Type.MOD;
-        LOGGER.debug(LogMarkers.LOADING,"Loading mod file {} with languages {}", this.getFilePath(), this.modFileInfo.requiredLanguageLoaders());
+        LOGGER.debug(LogMarkers.LOADING,"Loading mod file {} with languages {}", this.getFileName(), this.modFileInfo.requiredLanguageLoaders());
         this.coreMods = ModFileParser.getCoreMods(this);
         if (!this.coreMods.isEmpty())
             LOGGER.warn("Mod file {} contains javascript coremods! JS CoreMods are deprecated and will be removed in a future release. Consider using Mixin or ModLauncher transformers.", this.getFileName());
@@ -179,12 +179,28 @@ public class ModFile implements IModFile {
 
     @Override
     public String toString() {
-        return "Mod File: " + Objects.toString(this.jar.getPrimaryPath());
+        var path = getFilePath();
+        return "Mod File: " + path == null ? "null" : path.toUri().toString();
     }
 
     @Override
     public String getFileName() {
-        return getFilePath().getFileName().toString();
+        // This is only used for debugging, so lets try and make it a useful debug
+        var path = getFilePath();
+        var filename = path.getFileName();
+
+        // ZipFileSystem toString will return the outer file path
+        var ret = filename == null ? path.getFileSystem().toString() : filename.toString();
+
+        // If it's a directory on the default file system, return the full path
+        if (Files.isDirectory(path) && path.getFileSystem() == FileSystems.getDefault())
+            ret = path.toAbsolutePath().toString();
+
+        // If we are in a FileSystem 'root' like UnionFS, return the full uri
+        if (ret.isEmpty() || ret.equals("/"))
+            ret = path.toUri().toString();
+
+        return ret;
     }
 
     @Override
