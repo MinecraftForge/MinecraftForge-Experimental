@@ -135,6 +135,7 @@ dependencies {
     installer(libs.maven.artifact)
     installer(libs.bundles.terminalconsoleappender)
     installer(libs.mixin)
+    installer(libs.mixinextras.forge)
     installer(libs.bundles.jarjar)
     installer(libs.roimfs)
 
@@ -300,6 +301,11 @@ tasks.userdevConfig.configure {
             dep = "net.minecraftforge:$it.dependencyProject.name:$it.dependencyProject.version"
         libraries.add(dep)
     }
+
+    // TODO [ForgeDev][UserDev] Split API/Runtime elements in userdev config
+    //      so we don't gotta keep making exceptions for MixinExtras
+    addCompileDependency(libs.mixinextras.common)
+    addAnnotationProcessorDependency(libs.mixinextras.common)
 
     inject = '' // We don't have a userdev sourceset anymore. Empty as a gradle workaround...
     runs {

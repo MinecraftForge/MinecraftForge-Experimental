@@ -9,16 +9,23 @@ import com.electronwill.nightconfig.core.UnmodifiableConfig;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import com.mojang.logging.LogUtils;
 
+import cpw.mods.modlauncher.Launcher;
+import cpw.mods.modlauncher.api.TypesafeMap;
 import net.minecraftforge.fml.loading.EarlyLoadingException;
 import net.minecraftforge.fml.loading.EarlyLoadingException.ExceptionData;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IDependencyLocator;
 import net.minecraftforge.forgespi.locating.IModFile;
 import net.minecraftforge.forgespi.locating.IModFile.Type;
+import net.minecraftforge.jarjar.metadata.ContainedJarIdentifier;
 import net.minecraftforge.jarjar.metadata.ContainedJarMetadata;
+import net.minecraftforge.jarjar.metadata.ContainedVersion;
 import net.minecraftforge.jarjar.metadata.MetadataIOHandler;
 import net.minecraftforge.jarjar.selection.JarSelector;
 
+import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
+import org.apache.maven.artifact.versioning.VersionRange;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
@@ -44,6 +51,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.TreeMap;
+import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 import java.util.stream.Collectors;
@@ -63,6 +71,25 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
     private static final Map<Path, Option> OPTIONS = new HashMap<>();
     private static volatile boolean optionsLoaded = false;
 
+    private static final Attributes.Name MIXIN_CONFIGS_ATTR = new Attributes.Name("MixinConfigs");
+    private static final Attributes.Name MIXIN_CONNECTOR_ATTR = new Attributes.Name("MixinConnector");
+    private static final ContainedJarMetadata MIXIN_EXTRAS_DEPENDENCY = makeMixinExtraDependency();
+
+    private static ContainedJarMetadata makeMixinExtraDependency() {
+        VersionRange range = null;
+        try {
+            range = VersionRange.createFromVersionSpec("[0,)");
+        } catch (InvalidVersionSpecificationException e) {
+            throw new RuntimeException("Failed to create version range for mixinextras-forge dependency", e);
+        }
+
+        return new ContainedJarMetadata(
+            new ContainedJarIdentifier("io.github.llamalad7", "mixinextras-forge"),
+            new ContainedVersion(range, null),
+            null, false
+        );
+    }
+
     @Override
     public String name() {
         return "JarInJar";
@@ -80,7 +107,11 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
 
         var selector = new Selector(mods);
 
-        if (selector.entries.size() == mods.size()) {
+        // Add a synthetic Mixin-Extras dependency if we detect anyone using Mixin
+        if (anyMixinsLoaded(mods)) {
+            if (!selector.isRequired(MIXIN_EXTRAS_DEPENDENCY.identifier()))
+                selector.addRequirement(MIXIN_EXTRAS_DEPENDENCY);
+        } else if (selector.entries.size() == mods.size()) {
             LOGGER.info("No dependencies to load found. Skipping!");
             return Collections.emptyList();
         }
@@ -187,6 +218,29 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
         }
 
         return ret;
+    }
+
+    private static Boolean anyMixinsLoaded = null;
+    private static boolean anyMixinsLoaded(List<IModFile> mods) {
+        var ret = anyMixinsLoaded;
+        if (ret != null) return ret;
+
+        if (!FMLEnvironment.production
+                && Launcher.INSTANCE.blackboard().get(TypesafeMap.Key.getOrCreate(Launcher.INSTANCE.blackboard(), "isMixinEnabledInDev", Boolean.class)).orElse(false)) {
+            anyMixinsLoaded = true;
+            return true;
+        }
+
+        for (var mod : mods) {
+            var attributes = mod.getSecureJar().moduleDataProvider().getManifest().getMainAttributes();
+            if (attributes.getValue(MIXIN_CONFIGS_ATTR) != null || attributes.getValue(MIXIN_CONNECTOR_ATTR) != null) {
+                anyMixinsLoaded = true;
+                return true;
+            }
+        }
+
+        anyMixinsLoaded = false;
+        return false;
     }
 
     private record Options(List<OptionMetadata> options) {}
