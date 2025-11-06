@@ -1,3 +1,4 @@
+TODO [Forge][MDK] Rework or trim down this entire document
 
 Source installation information for modders
 -------------------------------------------

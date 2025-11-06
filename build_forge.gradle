@@ -959,10 +959,11 @@ tasks.register('mdkZip', Zip) {
         from mdkGradleWrapper.map(Wrapper.&getPropertiesFile)
     }
     from(rootProject.file('mdk/')){
-        rootProject.file('mdk/gitignore.txt').eachLine{
+        rootProject.file('mdk/gitignore.txt').eachLine {
             if (!it.trim().isEmpty() && !it.trim().startsWith('#'))
                 exclude it
         }
+
         filter(ReplaceTokens, tokens: [
             FORGE_VERSION: FORGE_VERSION,
             FORGE_GROUP: project.group,
