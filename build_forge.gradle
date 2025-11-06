@@ -939,17 +939,24 @@ tasks.register('installerJar', InstallerJar) {
     jarSigner.sign(it)
 }
 
+final mdkGradleWrapper = tasks.register('mdkGradleWrapper', Wrapper) {
+    gradleVersion = '9.2.0'
+}
+
 tasks.register('mdkZip', Zip) {
+    dependsOn mdkGradleWrapper
+
     archiveBaseName = project.name
     archiveClassifier = 'mdk'
     archiveVersion = project.version
     destinationDirectory = file('build/libs')
 
-    from rootProject.file('gradlew')
-    from rootProject.file('gradlew.bat')
+    from mdkGradleWrapper.map(Wrapper.&getScriptFile)
+    from mdkGradleWrapper.map(Wrapper.&getBatchScript)
     from(EXTRA_TXTS)
-    from(rootProject.file('gradle/')){
-        into('gradle/')
+    into('gradle/wrapper/') {
+        from mdkGradleWrapper.map(Wrapper.&getJarFile)
+        from mdkGradleWrapper.map(Wrapper.&getPropertiesFile)
     }
     from(rootProject.file('mdk/')){
         rootProject.file('mdk/gitignore.txt').eachLine{
