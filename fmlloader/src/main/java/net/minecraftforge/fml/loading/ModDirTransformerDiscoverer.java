@@ -11,13 +11,13 @@ import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.LamdbaExceptionUtils;
 import cpw.mods.modlauncher.api.NamedPath;
 import cpw.mods.modlauncher.api.TypesafeMap;
+import cpw.mods.modlauncher.api.IModuleLayerManager.Layer;
 import cpw.mods.modlauncher.serviceapi.ITransformerDiscoveryService;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.slf4j.Logger;
 
 import java.io.IOException;
-import java.lang.module.ModuleDescriptor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -69,28 +69,40 @@ public class ModDirTransformerDiscoverer implements ITransformerDiscoveryService
     }
 
     private static void scan(final Path gameDirectory) {
+        final var bootLayer = Launcher.INSTANCE.findLayerManager().orElseThrow().getLayer(Layer.BOOT).orElseThrow();
+
         final Path modsDir = gameDirectory.resolve(FMLPaths.MODSDIR.relative()).toAbsolutePath().normalize();
         if (!Files.exists(modsDir)) {
             // Skip if the mods dir doesn't exist yet.
             return;
         }
-        try (var walk = Files.walk(modsDir, 1)){
-            walk.forEach(ModDirTransformerDiscoverer::visitFile);
+
+        try (var walk = Files.walk(modsDir, 1)) {
+            walk.forEach(path -> visitFile(path, bootLayer));
         } catch (IOException | IllegalStateException ioe) {
             LOGGER.error("Error during early discovery", ioe);
         }
     }
 
-    private static void visitFile(Path path) {
+    private static void visitFile(Path path, ModuleLayer bootLayer) {
         if (!Files.isRegularFile(path)) return;
         if (!path.toString().endsWith(".jar")) return;
         if (LamdbaExceptionUtils.uncheck(() -> Files.size(path)) == 0) return;
 
         SecureJar jar = SecureJar.from(path);
-        jar.moduleDataProvider().descriptor().provides().stream()
-            .map(ModuleDescriptor.Provides::service)
-            .filter(SERVICES::contains)
-            .forEach(s -> found.add(new NamedPath(s, path)));
+        var module = jar.moduleDataProvider().descriptor();
+
+        // Skip anything that we found in the parent layer, this is specifically for Mixin.
+        // But written in a generic way because anything would cause issues if in multiple layers.
+        if (bootLayer.findModule(module.name()).isPresent())
+            return;
+
+        for (var provides : module.provides()) {
+            if (SERVICES.contains(provides.service())) {
+                found.add(new NamedPath(provides.service(), path));
+                return;
+            }
+        }
     }
 
     public static boolean isServiceProvider(Path path) {
