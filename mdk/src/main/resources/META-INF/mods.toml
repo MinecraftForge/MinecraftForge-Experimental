@@ -3,7 +3,7 @@
 
 modLoader="javafml"
 loaderVersion="[@FORGE_SPEC_VERSION@,)"
-license="${mod_license}"
+#license="All Rights Reserved"
 #issueTrackerURL="https://github.com/MyOrganization/MyMod/"
 #clientSideOnly=true #optional, default=false
 

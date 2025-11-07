@@ -25,20 +25,16 @@ minecraft {
             workingDir = layout.projectDirectory.dir('run')
 
             systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
+            systemProperty 'forge.enabledGameTestNamespaces', 'examplemod'
         }
 
-        register('client') {
-            systemProperty 'forge.enabledGameTestNamespaces', mod_id
-        }
+        register('client')
 
         register('server') {
-            systemProperty 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
         }
 
-        register('gameTestServer') {
-            systemProperty 'forge.enabledGameTestNamespaces', mod_id
-        }
+        register('gameTestServer')
 
         register('data') {
             workingDir = layout.projectDirectory.dir('run-data')
