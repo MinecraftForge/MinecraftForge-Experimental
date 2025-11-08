@@ -161,7 +161,7 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
             }
 
             for (var entry : ids.entrySet()) {
-                LOGGER.info(MARKER, "JarJar Candidated for {}", entry.getKey());
+                LOGGER.info(MARKER, "JarJar Candidates for {}", entry.getKey());
                 Collections.sort(entry.getValue());
                 for (var option : entry.getValue())
                     LOGGER.info(MARKER, "\t{}{}", selected.contains(option) ? '*' : ' ', option);
@@ -277,14 +277,12 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
                 }
 
                 var meta = MetadataIOHandler.getGson().fromJson(new InputStreamReader(stream), Options.class);
-                //var meta = MetadataIOHandler.fromStream(stream).orElse(null);
                 if (meta == null) {
                     LOGGER.error(MARKER, "Corrupted jarjar_options.json");
                     return;
                 }
 
                 for (var jar : meta.options()) {
-                    //var cl = self.getClassLoader();
                     var cl = ClassLoader.getSystemClassLoader();
                     Path path = ClasspathLocator.getPathFromResource(cl, jar.resource());
                     if (path == null) {
