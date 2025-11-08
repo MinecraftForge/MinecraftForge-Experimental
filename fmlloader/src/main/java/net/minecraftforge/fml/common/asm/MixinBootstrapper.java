@@ -6,6 +6,7 @@
 package net.minecraftforge.fml.common.asm;
 
 import java.lang.reflect.Method;
+import java.net.URI;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,9 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -41,7 +40,6 @@ import net.minecraftforge.unsafe.UnsafeHacks;
 public class MixinBootstrapper implements ITransformationService {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("MIXIN");
-    private IEnvironment environment;
 
     @Override
     public @NotNull String name() {
@@ -54,7 +52,6 @@ public class MixinBootstrapper implements ITransformationService {
 
     @Override
     public void onLoad(IEnvironment env, Set<String> otherServices) throws IncompatibleEnvironmentException {
-        this.environment = env;
     }
 
     @SuppressWarnings("rawtypes")
@@ -131,24 +128,32 @@ public class MixinBootstrapper implements ITransformationService {
             }
         }
 
-        /**
-         * Several things have already been called for Transformation services.
-         * Basically we need to mimic TransformationServicesHandler.initializeTransformationServices
-         *
-         * And then call completeScan
-         */
         if (transformers.isEmpty())
             return List.of();
 
+        /**
+         * Several things have already been called for Transformation services.
+         * Basically we need to mimic TransformationServicesHandler.initializeTransformationServices
+         *    onLoad
+         *    isValid
+         *    processArguments
+         *    onInitalize
+         *    runScan - Skipped
+         *
+         * And then call completeScan
+         */
         var oldCl = Thread.currentThread().getContextClassLoader();
         try {
             // OnLoad calls context classloader. So lets set it to one that knows about Mixin.
             Thread.currentThread().setContextClassLoader(module.getClassLoader());
+
+            var environment = Launcher.INSTANCE.environment();
+
             for (var t : transformers) {
                 LOGGER.debug(MARKER, "Loading Mixin Transformation Service {}", t.name);
-                LazyTransforms.onLoad.call(t.wrapper, environment, newServiceLookup.keySet());
-
-                if (!LazyTransforms.isValid.test(t.wrapper)) {
+                try {
+                    t.service.onLoad(environment, newServiceLookup.keySet());
+                } catch (IncompatibleEnvironmentException e) {
                     LOGGER.error(MARKER, "Mixin Transformation service {} failed to load", t.name);
                     throw new IllegalStateException("Invalid Services found " + t.name);
                 }
@@ -161,7 +166,7 @@ public class MixinBootstrapper implements ITransformationService {
 
             for (var t : transformers) {
                 LOGGER.debug(MARKER, "Initalizing Mixin Transformation Service {}", t.name);
-                LazyTransforms.onInitalize.accept(t.wrapper);
+                t.service.initialize(environment);
             }
 
             // This is a noop on mixin currently, and we're too late for the values to be used because this is to find the PLUGIN layer.
@@ -177,7 +182,7 @@ public class MixinBootstrapper implements ITransformationService {
             var ret = new ArrayList<Resource>();
             for (var t : transformers) {
                 LOGGER.debug(MARKER, "Completing Mixin Transformation Service scan {}", t.name);
-                var resources = LazyTransforms.onCompleteScan.call(t.wrapper, layerManager);
+                var resources = t.service.completeScan(layerManager);
                 ret.addAll(resources);
             }
             return ret;
@@ -227,8 +232,14 @@ public class MixinBootstrapper implements ITransformationService {
         if (location.isEmpty())
             return "MISSING FILE";
 
-        var path = Path.of(location.get());
-        return path.toString();
+        var uri = location.get();
+        var str = uri.toString();
+        if (str.startsWith("jar:")) {
+            str = str.substring(4, str.length() - 2);
+            uri = URI.create(str);
+        }
+
+        return Path.of(uri).toString();
     }
 
     private static class LazyPlugins {
@@ -246,12 +257,7 @@ public class MixinBootstrapper implements ITransformationService {
         @SuppressWarnings({ "unchecked", "rawtypes" })
         private static final UnsafeFieldAccess<Object, Map<String, TransformationServiceDecorator>> services = UnsafeHacks.<Object, Map<String, TransformationServiceDecorator>>findField((Class)handler.getClass(), "serviceLookup");
         private static final NewWrapper wrapper = getWrapper();
-        private static final OnLoad onLoad = getOnLoad();
-        private static final Predicate<TransformationServiceDecorator> isValid = getIsValid();
         private static final Supplier<Object> processArguments = getProcessArguments();
-        private static final Consumer<TransformationServiceDecorator> onInitalize = getOnInitalize();
-        //private static final Consumer<TransformationServiceDecorator> runScan = getRunScan();
-        private static final OnCompleteScan onCompleteScan = getOnCompleteScan();
 
         private interface NewWrapper extends Function<ITransformationService, TransformationServiceDecorator> { }
         private static NewWrapper getWrapper() {
@@ -262,62 +268,11 @@ public class MixinBootstrapper implements ITransformationService {
             }).get();
         }
 
-        private interface OnLoad {
-            void call(TransformationServiceDecorator instance, IEnvironment env, Set<String> otherServices);
-        }
-
-        private static OnLoad getOnLoad() {
-            return wrap(() -> {
-                var mtd = TransformationServiceDecorator.class.getDeclaredMethod("onLoad", IEnvironment.class, Set.class);
-                UnsafeHacks.setAccessible(mtd);
-                return (OnLoad)((inst, env, other) -> wrap(() -> mtd.invoke(inst, env, other)).get());
-            }).get();
-        }
-
-        private static Predicate<TransformationServiceDecorator> getIsValid() {
-            return wrap(() -> {
-                var mtd = TransformationServiceDecorator.class.getDeclaredMethod("isValid");
-                UnsafeHacks.setAccessible(mtd);
-                return (Predicate<TransformationServiceDecorator>)(inst -> wrap(() -> (boolean)mtd.invoke(inst)).get());
-            }).get();
-        }
-
         private static Supplier<Object> getProcessArguments() {
             return wrap(() -> {
                 var mtd = handler.getClass().getDeclaredMethod("processArguments", ArgumentHandler.class, Environment.class);
                 UnsafeHacks.setAccessible(mtd);
                 return wrap(() -> mtd.invoke(handler, arguments, Launcher.INSTANCE.environment()));
-            }).get();
-        }
-
-        private static Consumer<TransformationServiceDecorator> getOnInitalize() {
-            return wrap(() -> {
-                var mtd = TransformationServiceDecorator.class.getDeclaredMethod("onInitialize", IEnvironment.class);
-                UnsafeHacks.setAccessible(mtd);
-                return (Consumer<TransformationServiceDecorator>)(inst -> wrap(() -> mtd.invoke(inst, Launcher.INSTANCE.environment())).get());
-            }).get();
-        }
-
-        /*
-        private static Consumer<TransformationServiceDecorator> getRunScan() {
-            return wrap(() -> {
-                var mtd = TransformationServiceDecorator.class.getDeclaredMethod("runScan", IEnvironment.class);
-                UnsafeHacks.setAccessible(mtd);
-                return (Consumer<TransformationServiceDecorator>)(inst -> wrap(() -> mtd.invoke(inst, Launcher.INSTANCE.environment())));
-            }).get();
-        }
-        */
-
-        private interface OnCompleteScan {
-            List<Resource> call(TransformationServiceDecorator instance, IModuleLayerManager manager);
-        }
-
-        @SuppressWarnings("unchecked")
-        private static OnCompleteScan getOnCompleteScan() {
-            return wrap(() -> {
-                var mtd = TransformationServiceDecorator.class.getDeclaredMethod("onCompleteScan", IModuleLayerManager.class);
-                UnsafeHacks.setAccessible(mtd);
-                return (OnCompleteScan)((inst, layers) -> wrap(() -> (List<Resource>)mtd.invoke(inst, layers)).get());
             }).get();
         }
     }
@@ -334,7 +289,7 @@ public class MixinBootstrapper implements ITransformationService {
         private static void add(String name, String type, String file) {
             modlist.add(Map.of(
                 "name", name,
-                "type", "PLUGINSERVICE",
+                "type", type,
                 "file", file
             ));
         }
