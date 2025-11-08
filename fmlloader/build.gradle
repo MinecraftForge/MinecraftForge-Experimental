@@ -37,6 +37,7 @@ dependencies {
     implementation(libs.terminalconsoleappender)
     implementation(libs.jimfs)
     implementation(libs.roimfs)
+    implementation(libs.unsafe) // Needed to delay mixin loading
 
     // Needed because we have a custom log4j plugin, and they removed package scanning and require a data file to be generated
     implementation(libs.log4j.core)
@@ -107,7 +108,15 @@ tasks.register('writeForgeVersionJson') {
 tasks.register('jarJarOptionsJson', net.minecraftforge.forge.tasks.JarJarMetadataOptions) {
     metadataFile = project.file('src/main/resources/jarjar_options.json')
     // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
-    //add(libs.mixin, 'org/spongepowered/asm/mixin/Mixin.class')
+    add(libs.mixin) {
+        containedJarMetadata {
+            path = ''
+        }
+        resource = 'org/spongepowered/asm/mixin/Mixin.class'
+        layer = 'LIBRARY'
+        id = 'mixin'
+        nested = false
+    }
     add(libs.mixinextras.forge) {
         containedJarMetadata {
             path = ''

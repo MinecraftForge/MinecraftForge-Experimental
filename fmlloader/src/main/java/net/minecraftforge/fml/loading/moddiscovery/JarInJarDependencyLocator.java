@@ -14,6 +14,7 @@ import cpw.mods.modlauncher.api.TypesafeMap;
 import net.minecraftforge.fml.loading.EarlyLoadingException;
 import net.minecraftforge.fml.loading.EarlyLoadingException.ExceptionData;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.locating.IDependencyLocator;
 import net.minecraftforge.forgespi.locating.IModFile;
@@ -24,6 +25,7 @@ import net.minecraftforge.jarjar.metadata.ContainedVersion;
 import net.minecraftforge.jarjar.metadata.MetadataIOHandler;
 import net.minecraftforge.jarjar.selection.JarSelector;
 
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.jetbrains.annotations.ApiStatus;
@@ -36,6 +38,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.module.ModuleDescriptor;
+import java.lang.module.ModuleDescriptor.Version;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.FileSystem;
@@ -48,12 +51,14 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.StringJoiner;
 import java.util.TreeMap;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 @ApiStatus.Internal
@@ -70,12 +75,14 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
 
     private static final Map<Path, Option> OPTIONS = new HashMap<>();
     private static volatile boolean optionsLoaded = false;
+    private static final Pattern DASH_VERSION = Pattern.compile("-(\\d+(\\.|$))");
 
     private static final Attributes.Name MIXIN_CONFIGS_ATTR = new Attributes.Name("MixinConfigs");
     private static final Attributes.Name MIXIN_CONNECTOR_ATTR = new Attributes.Name("MixinConnector");
-    private static final ContainedJarMetadata MIXIN_EXTRAS_DEPENDENCY = makeMixinExtraDependency();
+    private static final ContainedJarMetadata MIXIN_DEPENDENCY = makeMixinExtraDependency("org.spongepowered", "mixin");
+    private static final ContainedJarMetadata MIXIN_EXTRAS_DEPENDENCY = makeMixinExtraDependency("io.github.llamalad7", "mixinextras-forge");
 
-    private static ContainedJarMetadata makeMixinExtraDependency() {
+    private static ContainedJarMetadata makeMixinExtraDependency(String group, String artifact) {
         VersionRange range = null;
         try {
             range = VersionRange.createFromVersionSpec("[0,)");
@@ -84,7 +91,7 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
         }
 
         return new ContainedJarMetadata(
-            new ContainedJarIdentifier("io.github.llamalad7", "mixinextras-forge"),
+            new ContainedJarIdentifier(group, artifact),
             new ContainedVersion(range, null),
             null, false
         );
@@ -109,6 +116,11 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
 
         // Add a synthetic Mixin-Extras dependency if we detect anyone using Mixin
         if (anyMixinsLoaded(mods)) {
+            findMixin();
+
+            if (!selector.isRequired(MIXIN_DEPENDENCY.identifier()))
+                selector.addRequirement(MIXIN_DEPENDENCY);
+
             if (!selector.isRequired(MIXIN_EXTRAS_DEPENDENCY.identifier()))
                 selector.addRequirement(MIXIN_EXTRAS_DEPENDENCY);
         } else if (selector.entries.size() == mods.size()) {
@@ -272,7 +284,9 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
                 }
 
                 for (var jar : meta.options()) {
-                    Path path = ClasspathLocator.getPathFromResource(self.getClassLoader(), jar.resource());
+                    //var cl = self.getClassLoader();
+                    var cl = ClassLoader.getSystemClassLoader();
+                    Path path = ClasspathLocator.getPathFromResource(cl, jar.resource());
                     if (path == null) {
                         LOGGER.error(MARKER, "Failed to find JarJar option for {}", jar.resource());
                         continue;
@@ -288,6 +302,64 @@ public class JarInJarDependencyLocator extends AbstractModProvider implements ID
                 LOGGER.error(MARKER, "Failed to read JarJar Options file", e);
             }
         }
+    }
+
+    private static void findMixin() {
+        var modsDir = FMLPaths.MODSDIR.get();
+        if (Files.exists(modsDir)) {
+            try {
+                for (var path : Files.list(modsDir).toList()) {
+
+                    if (Files.isDirectory(path) || path.getFileName() == null)
+                        continue;
+
+                    var name = path.getFileName().toString().toLowerCase(Locale.ENGLISH);
+                    if (!name.endsWith(".jar") || !name.contains("mixin"))
+                        continue;
+
+                    try (FileSystem fs = FileSystems.newFileSystem(path)) {
+                        var moduleInfoPath = fs.getPath("/module-info.class");
+                        if (!Files.exists(moduleInfoPath))
+                            continue;
+
+                        try (var reader = Files.newInputStream(moduleInfoPath)) {
+                            var module = ModuleDescriptor.read(reader);
+
+                            if (!"org.spongepowered.mixin".equals(module.name()))
+                                continue;
+
+                            var version = module.version().orElse(null);
+                            if (version == null) {
+                                var matcher = DASH_VERSION.matcher(name);
+                                if (matcher.find()) {
+                                    // attempt to parse the tail as a version string
+                                    try {
+                                        var tail = name.substring(matcher.start() + 1, name.length() - 4);
+                                        version = Version.parse(tail);
+                                    } catch (IllegalArgumentException ignore) { }
+                                }
+                            }
+
+                            if (version != null) {
+                                var meta = new ContainedJarMetadata(
+                                    MIXIN_DEPENDENCY.identifier(),
+                                    new ContainedVersion(null, new DefaultArtifactVersion(version.toString())),
+                                    null, false
+                                );
+                                OPTIONS.put(path, new Option(path.getFileName().toString(), path, Type.LIBRARY, meta, List.of()));
+                            }
+                        }
+                    } catch (IOException e) {
+                        System.err.println("Failed to read jar file: " + path);
+                        e.printStackTrace(System.err);
+                    }
+                }
+            } catch (IOException e) {
+                System.err.println("Failed to read mods directory: " + modsDir);
+                e.printStackTrace(System.err);
+            }
+        }
+
     }
 
     static boolean isOption(Path path) {

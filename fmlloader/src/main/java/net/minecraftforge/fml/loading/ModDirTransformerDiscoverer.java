@@ -92,9 +92,9 @@ public class ModDirTransformerDiscoverer implements ITransformerDiscoveryService
         SecureJar jar = SecureJar.from(path);
         var module = jar.moduleDataProvider().descriptor();
 
-        // Skip anything that we found in the parent layer, this is specifically for Mixin.
-        // But written in a generic way because anything would cause issues if in multiple layers.
-        if (bootLayer.findModule(module.name()).isPresent())
+        // Skip anything that we found in the parent layer, because anything would cause issues if in multiple layers.
+        // We specifically ignore sponge because it *was* in the bootstrap, but now its loaded by JarInJar discovery.
+        if (bootLayer.findModule(module.name()).isPresent() || "org.spongepowered.mixin".equals(module.name()))
             return;
 
         for (var provides : module.provides()) {

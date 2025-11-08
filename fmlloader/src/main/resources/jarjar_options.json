@@ -1,6 +1,24 @@
 {
   "options": [
     {
+      "resource": "org/spongepowered/asm/mixin/Mixin.class",
+      "layer": "LIBRARY",
+      "id": "mixin",
+      "deps": [],
+      "meta": {
+        "identifier": {
+          "group": "org.spongepowered",
+          "artifact": "mixin"
+        },
+        "version": {
+          "artifactVersion": "0.8.7"
+        },
+        "path": "",
+        "isObfuscated": false
+      },
+      "nested": false
+    },
+    {
       "resource": "com/llamalad7/mixinextras/platform/forge/MixinExtrasConfigPlugin.class",
       "layer": "GAMELIBRARY",
       "id": "mixinextras",

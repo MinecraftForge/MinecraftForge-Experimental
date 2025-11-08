@@ -47,7 +47,9 @@ public final class MixinLocator extends AbstractModProvider implements IModLocat
     @Override
     public List<IModLocator.ModFileOrException> scanMods() {
         var bootLayer = Launcher.INSTANCE.findLayerManager().orElseThrow().getLayer(Layer.BOOT).orElseThrow();
-        var mixin = bootLayer.findModule(MIXIN).orElseThrow();
+        var mixin = bootLayer.findModule(MIXIN).orElse(null);
+        if (mixin == null)
+            return List.of();
         var cl = Thread.currentThread().getContextClassLoader();
         var path = ClasspathLocator.getPathFromResource(cl, MIXINS);
 

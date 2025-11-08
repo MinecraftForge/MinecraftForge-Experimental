@@ -122,7 +122,6 @@ include 'javafmllanguage'
 include 'lowcodelanguage'
 include 'fmlearlydisplay'
 include 'forge-transformers'
-include 'mixin-finder'
 
 include ':mcp'
 project(":mcp").projectDir = file("projects/mcp")
