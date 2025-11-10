@@ -118,11 +118,13 @@ dependencies {
     bootstrap(libs.securemodules) // Has Union file system in it
     bootstrap(libs.unsafe)        // Needed by securemodules
     bootstrap(libs.bundles.asm)   // Needed by securemodules
+    bootstrap(libs.bootstrap.prod) // Needed so we can filter out mixin from the boot classpath
 
     implementation(libs.jopt.simple)
 
     installer(libs.bootstrap)
-    installer(libs.bootstrap.api) // Needed by securemodules
+    installer(libs.bootstrap.api)
+    installer(libs.bootstrap.prod)
     installer(libs.accesstransformers)
     installer(libs.eventbus)
     installer(libs.jspecify) // Dep of EventBus

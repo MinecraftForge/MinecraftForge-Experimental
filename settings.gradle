@@ -50,10 +50,11 @@ dependencyResolutionManagement {
             library('jimfs', 'com.google.jimfs:jimfs:1.3.0')
             bundle('jimfs', ['guava', 'failureaccess'])
 
-            version('bootstrap', '2.1.10')
+            version('bootstrap', '2.2.1')
             library('bootstrap',      'net.minecraftforge', 'bootstrap'     ).versionRef('bootstrap') // Needs modlauncher
             library('bootstrap-api',  'net.minecraftforge', 'bootstrap-api' ).versionRef('bootstrap')
             library('bootstrap-dev',  'net.minecraftforge', 'bootstrap-dev' ).versionRef('bootstrap')
+            library('bootstrap-prod', 'net.minecraftforge', 'bootstrap-prod').versionRef('bootstrap')
             library('bootstrap-shim', 'net.minecraftforge', 'bootstrap-shim').versionRef('bootstrap')
 
             // ASM it's used for so many of our hacks

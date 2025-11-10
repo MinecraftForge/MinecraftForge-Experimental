@@ -107,7 +107,6 @@ tasks.register('writeForgeVersionJson') {
 
 tasks.register('jarJarOptionsJson', net.minecraftforge.forge.tasks.JarJarMetadataOptions) {
     metadataFile = project.file('src/main/resources/jarjar_options.json')
-    // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
     add(libs.mixin) {
         containedJarMetadata {
             path = ''

@@ -44,14 +44,14 @@ abstract class LauncherJson extends DefaultTask {
                 mainClass: '',
                 libraries: []
             ] as LinkedHashMap)
-            
+
             [
                 project.tasks.universalJar
             ].forEach { packed ->
                 dependsOn(packed)
                 input.from packed.archiveFile
             }
-            
+
             def patched = project.tasks.applyClientBinPatches
             dependsOn(patched)
             input.from patched.output
@@ -91,6 +91,9 @@ abstract class LauncherJson extends DefaultTask {
 
         json.libraries.addAll(getArtifacts(project.configurations.installerextra).values())
         json.libraries.addAll(getArtifacts(project.configurations.installer).values())
+
+		json.libraries = json.libraries.unique()
+
         Files.writeString(output.get().asFile.toPath(), new JsonBuilder(json).toPrettyString())
     }
 }

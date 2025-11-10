@@ -76,7 +76,7 @@ public final class ModDiscoverer {
         //Loop all mod locators to get the prime mods to load from.
         for (IModLocator locator : modLocators) {
             try {
-                LOGGER.debug(LogMarkers.SCAN, "Trying locator {}", locator);
+                LOGGER.info("Trying locator {}", locator);
                 var candidates = locator.scanMods();
 
                 if (candidates.isEmpty())
@@ -161,7 +161,7 @@ public final class ModDiscoverer {
 
         for (var locator : locators) {
             try {
-                LOGGER.debug(LogMarkers.SCAN, "Trying locator {}", locator);
+                LOGGER.info("Trying locator {}", locator);
                 var candidates = locator.scanMods(modsView);
                 for (var candidate : candidates) {
                     if (candidate instanceof ModFile mf) {
