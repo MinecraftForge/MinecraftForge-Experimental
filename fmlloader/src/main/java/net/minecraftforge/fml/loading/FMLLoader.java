@@ -8,6 +8,7 @@ package net.minecraftforge.fml.loading;
 import com.mojang.logging.LogUtils;
 import cpw.mods.modlauncher.Launcher;
 import cpw.mods.modlauncher.api.*;
+import cpw.mods.modlauncher.api.ITransformationService.Resource;
 import net.minecraftforge.fml.loading.moddiscovery.BackgroundScanHandler;
 import net.minecraftforge.fml.loading.moddiscovery.ModDiscoverer;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
@@ -26,7 +27,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
-import java.util.Set;
 import java.util.function.BiFunction;
 import static net.minecraftforge.fml.loading.LogMarkers.CORE;
 import static net.minecraftforge.fml.loading.LogMarkers.SCAN;
@@ -50,7 +50,7 @@ public class FMLLoader {
     private static boolean production;
     private static IModuleLayerManager moduleLayerManager;
 
-    static void onInitialLoad(IEnvironment env, Set<String> otherServices) throws IncompatibleEnvironmentException {
+    static void onInitialLoad(IEnvironment env) throws IncompatibleEnvironmentException {
         LOGGER.debug(CORE, "Detected version data : {}", versionInfo);
         LOGGER.debug(CORE, "FML {} loading", LauncherVersion.getVersion());
 
@@ -117,10 +117,9 @@ public class FMLLoader {
           return providers.get(0);
     }
 
-    static void setupLaunchHandler(final IEnvironment environment, final Map<String, Object> arguments) {
-        final String launchTarget = environment.getProperty(IEnvironment.Keys.LAUNCHTARGET.get()).orElse("MISSING");
+    static void setupLaunchHandler(String launchTarget, final Map<String, Object> arguments) {
         arguments.put("launchTarget", launchTarget);
-        final Optional<ILaunchHandlerService> launchHandler = environment.findLaunchHandler(launchTarget);
+        var launchHandler = Launcher.INSTANCE.environment().findLaunchHandler(launchTarget);
         LOGGER.debug(CORE, "Using {} as launch service", launchTarget);
         if (launchHandler.isEmpty()) {
             LOGGER.error(CORE, "Missing LaunchHandler {}, cannot continue", launchTarget);
@@ -134,7 +133,7 @@ public class FMLLoader {
         }
         commonLaunchHandler = (CommonLaunchHandler)launchHandler.get();
         launchHandlerName = launchHandler.get().name();
-        gamePath = environment.getProperty(IEnvironment.Keys.GAMEDIR.get()).orElse(Path.of(".").toAbsolutePath());
+        gamePath = FMLPaths.GAMEDIR.get();
 
         naming = commonLaunchHandler.getNaming();
         dist = commonLaunchHandler.getDist();
@@ -145,19 +144,25 @@ public class FMLLoader {
         runtimeDistCleaner.getExtension().accept(dist);
     }
 
-    public static List<ITransformationService.Resource> beginModScan(final Map<String,?> arguments) {
+    static void beginModScan(final Map<String,?> arguments, List<Path> extraLocators) {
         LOGGER.debug(SCAN, "Scanning for Mod Locators");
-        modValidator = ModDiscoverer.discoverMods(arguments);
-        var pluginResources = modValidator.getPluginResources();
-        return List.of(pluginResources);
+        modValidator = ModDiscoverer.discoverMods(arguments, extraLocators);
     }
 
-    public static List<ITransformationService.Resource> completeScan(IModuleLayerManager layerManager) {
+    static Resource getServiceResources() {
+        return modValidator.getServiceResources();
+    }
+
+    static Resource getPluginResources() {
+        return modValidator.getPluginResources();
+    }
+
+    static Resource completeScan(IModuleLayerManager layerManager) {
         moduleLayerManager = layerManager;
         languageLoadingProvider = new LanguageLoadingProvider();
         backgroundScanHandler = modValidator.stage2Validation();
         loadingModList = backgroundScanHandler.getLoadingModList();
-        return List.of(modValidator.getModResources());
+        return modValidator.getModResources();
     }
 
     public static ICoreModProvider getCoreModProvider() {

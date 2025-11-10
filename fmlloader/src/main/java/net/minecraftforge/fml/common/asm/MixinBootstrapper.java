@@ -5,41 +5,36 @@
 
 package net.minecraftforge.fml.common.asm;
 
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.Callable;
-import java.util.function.Function;
-import java.util.function.Supplier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
 import org.jetbrains.annotations.NotNull;
 
-import cpw.mods.modlauncher.ArgumentHandler;
-import cpw.mods.modlauncher.Environment;
 import cpw.mods.modlauncher.LaunchPluginHandler;
 import cpw.mods.modlauncher.Launcher;
-import cpw.mods.modlauncher.TransformationServiceDecorator;
 import cpw.mods.modlauncher.api.IEnvironment;
 import cpw.mods.modlauncher.api.IModuleLayerManager;
+import cpw.mods.modlauncher.api.IModuleLayerManager.Layer;
 import cpw.mods.modlauncher.api.ITransformationService;
 import cpw.mods.modlauncher.api.ITransformer;
 import cpw.mods.modlauncher.api.IncompatibleEnvironmentException;
-import cpw.mods.modlauncher.api.IModuleLayerManager.Layer;
 import cpw.mods.modlauncher.serviceapi.ILaunchPluginService;
-import net.minecraftforge.unsafe.UnsafeFieldAccess;
 import net.minecraftforge.unsafe.UnsafeHacks;
 
 public class MixinBootstrapper implements ITransformationService {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("MIXIN");
+
+    public MixinBootstrapper() {
+        bootstrap();
+    }
 
     @Override
     public @NotNull String name() {
@@ -62,15 +57,25 @@ public class MixinBootstrapper implements ITransformationService {
 
     @Override
     public List<Resource> completeScan(IModuleLayerManager layerManager) {
-        var layer = layerManager.getLayer(Layer.PLUGIN).orElseThrow(() -> new IllegalStateException("Could not find PLUGIN layer in completeScan"));
+        return List.of();
+    }
+
+    private void bootstrap() {
+        var layerManager = Launcher.INSTANCE.findLayerManager().orElseThrow(() -> new IllegalStateException("Could not find Layer Manager"));
+        var layer = layerManager.getLayer(Layer.SERVICE).orElseThrow(() -> new IllegalStateException("Could not find SERVICE layer in completeScan"));
         var module = layer.findModule("org.spongepowered.mixin").orElse(null);
 
         // If mixin wasn't loaded we don't need to do any work.
         if (module == null)
-            return List.of();
+            return;
 
-        // Mixin-Extras needs access to internal stuff in Mixin. I have no idea why this worked before. But lets just open Mixin to everyone
-        openAllPackages(module);
+        // Mixin's onLoad calls context classloader. Which is currently BOOT, lets set it to Mixin's.
+        Thread.currentThread().setContextClassLoader(module.getClassLoader());
+
+        // Mixin-Extras needs access to internal stuff in Mixin.
+        // SecureJar just makes everything open unless told otherwise
+        // If we make it respect the module info we would need to add opens, but we don't
+        //openAllPackages(module);
 
         var fileName = fileName(module);
 
@@ -98,99 +103,9 @@ public class MixinBootstrapper implements ITransformationService {
                 sneak(e);
             }
         }
-
-        var itransformers = services.getOrDefault(ITransformationService.class.getName(), List.of());
-        if (itransformers.isEmpty())
-            return List.of();
-
-        // To prevent concurrent modification exceptions, we need to set the service field to a new map as we're in its iterator right now.
-        var oldServiceLookup = LazyTransforms.services.get(LazyTransforms.handler);
-        var newServiceLookup = new HashMap<>(oldServiceLookup);
-        LazyTransforms.services.set(LazyTransforms.handler, newServiceLookup);
-
-        record Transformer(ITransformationService service, String name, TransformationServiceDecorator wrapper) {}
-        var transformers = new ArrayList<Transformer>();
-        for (var provider : itransformers) {
-            try {
-                @SuppressWarnings("unchecked")
-                var cls = (Class<ITransformationService>)Class.forName(provider, true, module.getClassLoader());
-                var service = wrap(() -> (ITransformationService)cls.getConstructor().newInstance()).get();
-
-                // Create Service and add to mod list
-                LazyModList.add(service.name(), "TRANSFORMATIONSERVICE", fileName);
-
-                // Create wrapper and add to service handler
-                var wrapper = LazyTransforms.wrapper.apply(service);
-                newServiceLookup.put(service.name(), wrapper);
-                transformers.add(new Transformer(service, provider, wrapper));
-            } catch (Throwable e) {
-                sneak(e);
-            }
-        }
-
-        if (transformers.isEmpty())
-            return List.of();
-
-        /**
-         * Several things have already been called for Transformation services.
-         * Basically we need to mimic TransformationServicesHandler.initializeTransformationServices
-         *    onLoad
-         *    isValid
-         *    processArguments
-         *    onInitalize
-         *    runScan - Skipped
-         *
-         * And then call completeScan
-         */
-        var oldCl = Thread.currentThread().getContextClassLoader();
-        try {
-            // OnLoad calls context classloader. So lets set it to one that knows about Mixin.
-            Thread.currentThread().setContextClassLoader(module.getClassLoader());
-
-            var environment = Launcher.INSTANCE.environment();
-
-            for (var t : transformers) {
-                LOGGER.debug(MARKER, "Loading Mixin Transformation Service {}", t.name);
-                try {
-                    t.service.onLoad(environment, newServiceLookup.keySet());
-                } catch (IncompatibleEnvironmentException e) {
-                    LOGGER.error(MARKER, "Mixin Transformation service {} failed to load", t.name);
-                    throw new IllegalStateException("Invalid Services found " + t.name);
-                }
-            }
-
-            // call process arguments so that it can find dev time values
-            // Note: this calls it on EVERY service because it needs to read the whole argument list
-            // I'd have to do some hacks with jopt if I wanted to get around that.
-            LazyTransforms.processArguments.get();
-
-            for (var t : transformers) {
-                LOGGER.debug(MARKER, "Initalizing Mixin Transformation Service {}", t.name);
-                t.service.initialize(environment);
-            }
-
-            // This is a noop on mixin currently, and we're too late for the values to be used because this is to find the PLUGIN layer.
-            // So technically we don't need to call it
-            /*
-            for (var t : transformers) {
-                LOGGER.debug(MARKER, "Running Mixin Transformation Service scan {}", t.name);
-                LazyTransforms.runScan.accept(t.wrapper);
-            }
-            */
-
-            // Last but not least, we need to call complete scan, and return whatever it wants us to.
-            var ret = new ArrayList<Resource>();
-            for (var t : transformers) {
-                LOGGER.debug(MARKER, "Completing Mixin Transformation Service scan {}", t.name);
-                var resources = t.service.completeScan(layerManager);
-                ret.addAll(resources);
-            }
-            return ret;
-        } finally {
-            Thread.currentThread().setContextClassLoader(oldCl);
-        }
     }
 
+    /*
     private static void openAllPackages(Module module) {
         for (var pkg : module.getDescriptor().packages())
             addOpens(module, pkg);
@@ -208,20 +123,11 @@ public class MixinBootstrapper implements ITransformationService {
             sneak(t);
         }
     }
+    */
 
     @SuppressWarnings("unchecked")
     public static <R, E extends Throwable> R sneak(Throwable e) throws E {
         throw (E) e;
-    }
-
-    private static <T> Supplier<T> wrap(Callable<T> func) {
-        return () -> {
-            try {
-                return func.call();
-            } catch (Throwable e) {
-                return sneak(e);
-            }
-        };
     }
 
     private static String fileName(Module module) {
@@ -248,32 +154,6 @@ public class MixinBootstrapper implements ITransformationService {
         private static Map<String, ILaunchPluginService> get() {
             var launchPlugins = UnsafeHacks.<Launcher, LaunchPluginHandler>findField(Launcher.class, "launchPlugins").get(Launcher.INSTANCE);
             return UnsafeHacks.<LaunchPluginHandler, Map<String, ILaunchPluginService>>findField(LaunchPluginHandler.class, "plugins").get(launchPlugins);
-        }
-    }
-
-    private static class LazyTransforms {
-        private static final Object handler = UnsafeHacks.<Launcher, Object>findField(Launcher.class, "transformationServicesHandler").get(Launcher.INSTANCE);
-        private static final ArgumentHandler arguments = UnsafeHacks.<Launcher, ArgumentHandler>findField(Launcher.class, "argumentHandler").get(Launcher.INSTANCE);
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        private static final UnsafeFieldAccess<Object, Map<String, TransformationServiceDecorator>> services = UnsafeHacks.<Object, Map<String, TransformationServiceDecorator>>findField((Class)handler.getClass(), "serviceLookup");
-        private static final NewWrapper wrapper = getWrapper();
-        private static final Supplier<Object> processArguments = getProcessArguments();
-
-        private interface NewWrapper extends Function<ITransformationService, TransformationServiceDecorator> { }
-        private static NewWrapper getWrapper() {
-            return wrap(() -> {
-                var ctr = TransformationServiceDecorator.class.getDeclaredConstructor(ITransformationService.class);
-                UnsafeHacks.setAccessible(ctr);
-                return (NewWrapper)(service -> wrap(() -> ctr.newInstance(service)).get());
-            }).get();
-        }
-
-        private static Supplier<Object> getProcessArguments() {
-            return wrap(() -> {
-                var mtd = handler.getClass().getDeclaredMethod("processArguments", ArgumentHandler.class, Environment.class);
-                UnsafeHacks.setAccessible(mtd);
-                return wrap(() -> mtd.invoke(handler, arguments, Launcher.INSTANCE.environment()));
-            }).get();
         }
     }
 

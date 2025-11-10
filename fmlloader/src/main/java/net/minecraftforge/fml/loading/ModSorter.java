@@ -40,13 +40,12 @@ public class ModSorter {
 
     private ModSorter() {}
 
-    @SuppressWarnings("removal")
     public static LoadingModList sort(List<ModFile> mods, final List<ExceptionData> errors) {
         State systemMods = detectSystemMods(mods);
         List<ModFile> modFiles;
 
         try {
-            modFiles = UniqueModListBuilder.buildUniqueList(mods).modFiles();
+            modFiles = UniqueModListBuilder.build(mods);
         } catch (EarlyLoadingException e) {
             // We cannot build any list with duped mods. We have to abort immediately and report it
             // Note this will never actually throw an error because the duplicate checks are done in ModDiscovererer before we get to this phase

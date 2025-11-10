@@ -8,12 +8,12 @@ package net.minecraftforge.fml.loading.moddiscovery;
 import com.mojang.logging.LogUtils;
 
 import cpw.mods.jarhandling.SecureJar;
-import cpw.mods.modlauncher.api.IModuleLayerManager;
-import cpw.mods.modlauncher.api.ITransformationService;
+import cpw.mods.modlauncher.api.IModuleLayerManager.Layer;
+import cpw.mods.modlauncher.api.ITransformationService.Resource;
 import net.minecraftforge.fml.loading.EarlyLoadingException;
-import net.minecraftforge.fml.loading.ImmediateWindowHandler;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.LogMarkers;
+import net.minecraftforge.fml.loading.ModDiscoveryService;
 import net.minecraftforge.fml.loading.ModSorter;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
@@ -31,6 +31,7 @@ public class ModValidator {
     private final List<ModFile> candidatePlugins;
     private final List<ModFile> candidateMods;
     private final List<ModFile> gameLibraries;
+    private final List<ModFile> candidateService;
     private LoadingModList loadingModList;
     private final List<IModFile> brokenFiles = new ArrayList<>();
     private final List<EarlyLoadingException.ExceptionData> discoveryErrorData;
@@ -41,6 +42,20 @@ public class ModValidator {
         this.candidateMods.addAll(this.gameLibraries);
         this.candidatePlugins = lst(modFiles.get(IModFile.Type.LANGPROVIDER));
         this.candidatePlugins.addAll(lst(modFiles.get(IModFile.Type.LIBRARY)));
+
+        // Because there is no Type.SERVICE, lets just look for the service and promote
+        this.candidateService = new ArrayList<>();
+        for (var itr = this.candidatePlugins.iterator(); itr.hasNext(); ) {
+            var mod = itr.next();
+            for (var provider : mod.getSecureJar().moduleDataProvider().descriptor().provides()) {
+                if (ModDiscoveryService.isService(provider.service())) {
+                    itr.remove();
+                    this.candidateService.add(mod);
+                    break;
+                }
+            }
+        }
+
         this.discoveryErrorData = discoveryErrorData;
         this.brokenFiles.addAll(brokenFiles.stream().map(IModFileInfo::getFile).toList());
     }
@@ -60,7 +75,6 @@ public class ModValidator {
         if (LOGGER.isDebugEnabled(LogMarkers.SCAN)) {
             LOGGER.debug(LogMarkers.SCAN, "Found {} mod files with {} mods", candidateMods.size(), candidateMods.stream().mapToInt(mf -> mf.getModInfos().size()).sum());
         }
-        ImmediateWindowHandler.updateProgress("Found " + candidateMods.size() + " mod candidates");
     }
 
     @NotNull
@@ -77,11 +91,15 @@ public class ModValidator {
         return brokenFiles;
     }
 
-    public ITransformationService.Resource getPluginResources() {
-        return new ITransformationService.Resource(IModuleLayerManager.Layer.PLUGIN, this.candidatePlugins.stream().map(IModFile::getSecureJar).toList());
+    public Resource getServiceResources() {
+        return new Resource(Layer.PLUGIN, this.candidateService.stream().map(IModFile::getSecureJar).toList());
     }
 
-    public ITransformationService.Resource getModResources() {
+    public Resource getPluginResources() {
+        return new Resource(Layer.PLUGIN, this.candidatePlugins.stream().map(IModFile::getSecureJar).toList());
+    }
+
+    public Resource getModResources() {
         var mods = new ArrayList<SecureJar>();
         // Add only the valid mods that we will be attempting to load.
         // If any detectable error happens during the sorting process {missing deps, duplicates,
@@ -101,7 +119,7 @@ public class ModValidator {
                 mods.add(jar);
         }
 
-        return new ITransformationService.Resource(IModuleLayerManager.Layer.GAME, mods);
+        return new Resource(Layer.GAME, mods);
     }
 
     private List<EarlyLoadingException.ExceptionData> validateLanguages() {

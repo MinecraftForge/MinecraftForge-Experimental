@@ -8,7 +8,7 @@ package net.minecraftforge.fml.loading.moddiscovery;
 import com.mojang.logging.LogUtils;
 import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.LogMarkers;
-import net.minecraftforge.fml.loading.ModDirTransformerDiscoverer;
+import net.minecraftforge.fml.loading.ModDiscoveryService;
 import net.minecraftforge.forgespi.locating.IModLocator;
 
 import org.slf4j.Logger;
@@ -41,13 +41,12 @@ public class ModsFolderLocator extends AbstractModProvider implements IModLocato
     @Override
     public List<IModLocator.ModFileOrException> scanMods() {
         LOGGER.debug(LogMarkers.SCAN, "Scanning mods dir {} for mods", this.modFolder);
-        var excluded = ModDirTransformerDiscoverer.allExcluded();
         try {
             var ret = new ArrayList<IModLocator.ModFileOrException>();
             var files = Files.list(this.modFolder).toList();
             for (var file : files) {
                 var name = file.getFileName().toString().toLowerCase(Locale.ROOT);
-                if (excluded.contains(file) || !name.endsWith(SUFFIX))
+                if (!name.endsWith(SUFFIX) || ModDiscoveryService.isClaimed(file))
                     continue;
                 var mod = this.createMod(file, true);
                 if (mod == null) {

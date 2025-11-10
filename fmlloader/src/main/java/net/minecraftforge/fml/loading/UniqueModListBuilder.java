@@ -23,13 +23,22 @@ import static java.util.stream.Collectors.joining;
 import static net.minecraftforge.fml.loading.LogMarkers.LOADING;
 
 @ApiStatus.Internal
-@Deprecated(since = "1.21.3", forRemoval = true) // TODO: [FML][Loading] Convert to package private in 1.22
 public final class UniqueModListBuilder {
     private UniqueModListBuilder() {}
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
+    public static List<ModFile> build(List<ModFile> modFiles) {
+        if (modFiles.isEmpty())
+            return List.of();
+        return buildUniqueList(modFiles).modFiles();
+    }
+
+    @Deprecated(since = "1.21.3", forRemoval = true) // TODO: [FML][Loading] Can't make package private because of ModDiscoverer, but can remove the record as nothing uses it
     public static UniqueModListData buildUniqueList(List<ModFile> modFiles) {
+        if (modFiles.isEmpty())
+            return new UniqueModListData(List.of(), Map.of());
+
         // Collect mod files by module name. This will be used for deduping purposes
         final Map<String, List<ModFile>> modFilesByFirstId = modFiles.stream()
                 .filter(mf -> mf.getModFileInfo() != null)
