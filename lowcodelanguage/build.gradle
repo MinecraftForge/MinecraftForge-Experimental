@@ -21,7 +21,7 @@ license {
 }
 
 dependencies {
-    compileOnly libs.nulls
+    compileOnly libs.jetbrains.annotations
 
     implementation projects.fmlloader
     implementation projects.fmlcore

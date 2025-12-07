@@ -12,7 +12,7 @@ final vendor = 'Forge Development LLC'
 description = 'Modifications to Minecraft to enable mod developers.'
 
 dependencies {
-    compileOnly libs.nulls
+    compileOnly libs.jetbrains.annotations
 
     api libs.eventbus
 

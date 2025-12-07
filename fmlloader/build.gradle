@@ -1,6 +1,7 @@
 import groovy.transform.CompileDynamic
 import groovy.transform.CompileStatic
 import groovy.transform.PackageScope
+import net.minecraftforge.forgedev.legacy.tasks.JarJarMetadataOptions
 import org.gradle.api.plugins.jvm.JvmTestSuite
 
 import javax.inject.Inject
@@ -35,7 +36,7 @@ configurations {
 }
 
 dependencies {
-    compileOnly libs.nulls
+    compileOnly libs.jetbrains.annotations
 
     api libs.bundles.asm // Needed by all the black magic
     api libs.forgespi
@@ -66,7 +67,7 @@ dependencies {
 
 testing.suites.named('test', JvmTestSuite) {
     dependencies {
-        compileOnly libs.nulls
+        compileOnly libs.jetbrains.annotations
         runtimeOnly libs.bootstrap
     }
 }
@@ -144,12 +145,28 @@ tasks.register('writeForgeVersionJson', WriteForgeVersionJson) {
     outputFile = file('src/main/resources/forge_version.json')
 }
 
+tasks.register('jarJarOptionsJson', JarJarMetadataOptions) {
+    metadataFile = project.file('src/main/resources/jarjar_options.json')
+    // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
+    //add(libs.mixin, 'org/spongepowered/asm/mixin/Mixin.class')
+    add(libs.mixinextras.forge) {
+        containedJarMetadata {
+            path = ''
+        }
+        resource = 'com/llamalad7/mixinextras/platform/forge/MixinExtrasConfigPlugin.class'
+        layer = 'GAMELIBRARY'
+        id = 'mixinextras'
+        nested = true
+    }
+}
+
 tasks.named('generateResources') {
     dependsOn(
         tasks.named('eclipseJdt'),
         tasks.named('eclipseJdtApt'),
         tasks.named('eclipseFactorypath'),
         tasks.named('writeForgeVersionJson', WriteForgeVersionJson),
+        tasks.named('jarJarOptionsJson')
     )
 }
 
