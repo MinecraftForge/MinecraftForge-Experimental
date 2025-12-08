@@ -8,7 +8,7 @@ package net.minecraftforge.client.model.generators.loaders;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -22,7 +22,7 @@ import java.util.*;
  */
 public class CompositeModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "composite");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "composite");
 
     public static <T extends ModelBuilder<T>> CompositeModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper)
     {

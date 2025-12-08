@@ -18,7 +18,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.packets.LoginWrapper;
 
@@ -31,16 +31,16 @@ public abstract class Channel<MSG> {
         this.instance = instance;
     }
 
-    public ResourceLocation getName() {
+    public Identifier getName() {
         return instance.getChannelName();
     }
 
     /**
      * Retrieves the channel name to use for the specified packet
      * This typically is the main channel's name, but in some cases
-     * you want to specify a custom one. If your channel has {@link NetworkInstance#addChild(ResourceLocation) children}
+     * you want to specify a custom one. If your channel has {@link NetworkInstance#addChild(Identifier) children}
      */
-    ResourceLocation getName(MSG packet) {
+    Identifier getName(MSG packet) {
         return getName();
     }
 

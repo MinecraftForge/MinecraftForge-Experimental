@@ -10,7 +10,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.metadata.PackMetadataGenerator;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.world.item.CreativeModeTab;
@@ -26,7 +26,7 @@ import net.minecraftforge.registries.RegisterEvent;
 @Mod(TestHelperMod.MOD_ID)
 public class TestHelperMod extends BaseTestMod {
     public static final String MOD_ID = "test_helper_mod";
-    public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "test_items"));
+    public static final ResourceKey<CreativeModeTab> TAB = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "test_items"));
 
     public TestHelperMod(FMLJavaModLoadingContext context) {
         super(context);

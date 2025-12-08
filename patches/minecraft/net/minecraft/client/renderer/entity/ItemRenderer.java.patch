@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/entity/ItemRenderer.java
 +++ b/net/minecraft/client/renderer/entity/ItemRenderer.java
-@@ -111,7 +_,7 @@
+@@ -112,7 +_,7 @@
                  f3 = 1.0F;
              }
  

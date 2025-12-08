@@ -12,7 +12,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
@@ -89,7 +89,7 @@ public class ClientCommandSourceStack extends CommandSourceStack {
      * {@return the advancement from the id from the client side where the advancement needs to be visible to the player}
      */
     @Override
-    public AdvancementHolder getAdvancement(ResourceLocation id) {
+    public AdvancementHolder getAdvancement(Identifier id) {
         return Minecraft.getInstance().getConnection().getAdvancements().get(id);
     }
 

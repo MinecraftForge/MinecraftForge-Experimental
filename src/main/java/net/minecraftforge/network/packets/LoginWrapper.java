@@ -8,12 +8,12 @@ package net.minecraftforge.network.packets;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.Channel;
 
 public class LoginWrapper {
     public static final StreamCodec<FriendlyByteBuf, LoginWrapper> STREAM_CODEC = StreamCodec.ofMember(LoginWrapper::encode, LoginWrapper::new);
-    private final ResourceLocation name;
+    private final Identifier name;
     private FriendlyByteBuf data;
     private final Channel<Object> channel;
     private final Object packet;
@@ -23,11 +23,11 @@ public class LoginWrapper {
     }
 
     private LoginWrapper(FriendlyByteBuf buf) {
-        this(buf.readResourceLocation(), buf.wrap(buf.readBytes(buf.readVarInt())), null, null);
+        this(buf.readIdentifier(), buf.wrap(buf.readBytes(buf.readVarInt())), null, null);
     }
 
     @SuppressWarnings("unchecked")
-    private LoginWrapper(ResourceLocation name, FriendlyByteBuf data, Channel<?> channel, Object packet) {
+    private LoginWrapper(Identifier name, FriendlyByteBuf data, Channel<?> channel, Object packet) {
         this.name = name;
         this.data = data;
         this.channel = (Channel<Object>)channel;
@@ -35,7 +35,7 @@ public class LoginWrapper {
     }
 
     public void encode(FriendlyByteBuf buf) {
-        buf.writeResourceLocation(name);
+        buf.writeIdentifier(name);
 
         if (data == null) {
             data = buf.wrap(Unpooled.buffer());
@@ -46,7 +46,7 @@ public class LoginWrapper {
         buf.writeBytes(data.slice());
     }
 
-    public ResourceLocation name() {
+    public Identifier name() {
         return this.name;
     }
 

@@ -10,7 +10,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -365,7 +365,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
     private void addColored(TagKey<Item> group, String pattern) {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (DyeColor color : DyeColor.values()) {
-            ResourceLocation key = ResourceLocation.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
+            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
             TagKey<Item> tag = getForgeItemTag(prefix + color.getName());
             Item item = BuiltInRegistries.ITEM.getValue(key);
             if (item == null || item == Items.AIR)
@@ -377,7 +377,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
     private void addColored(Consumer<TagKey<Item>> consumer, TagKey<Item> group, String pattern) {
         String prefix = group.location().getPath() + '/';
         for (DyeColor color  : DyeColor.values()) {
-            ResourceLocation key = ResourceLocation.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
+            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
             TagKey<Item> tag = forgeItemTagKey(prefix + color.getName());
             Item item = ForgeRegistries.ITEMS.getValue(key);
             if (item == null || item  == Items.AIR)
@@ -405,8 +405,8 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         }
     }
 
-    private static ResourceLocation forgeRl(String path) {
-        return ResourceLocation.fromNamespaceAndPath("forge", path);
+    private static Identifier forgeRl(String path) {
+        return Identifier.fromNamespaceAndPath("forge", path);
     }
 
     private static TagKey<Item> forgeItemTagKey(String path) {

@@ -9,7 +9,7 @@ import java.util.List;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
 import net.minecraft.world.item.DyeColor;
@@ -29,10 +29,10 @@ public class CreativeModeTabTest {
     public static final String MOD_ID = "creative_mode_tab_test";
     private static final boolean ENABLED = true;
 
-    private static final ResourceKey<CreativeModeTab> LOGS = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "logs"));
-    private static final ResourceKey<CreativeModeTab> STONE = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "stone"));
-    private static final ResourceKey<CreativeModeTab> COLORS = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "colors"));
-    private static final ResourceKey<CreativeModeTab> SEARCH = ResourceKey.create(Registries.CREATIVE_MODE_TAB, ResourceLocation.fromNamespaceAndPath(MOD_ID, "search"));
+    private static final ResourceKey<CreativeModeTab> LOGS = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "logs"));
+    private static final ResourceKey<CreativeModeTab> STONE = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "stone"));
+    private static final ResourceKey<CreativeModeTab> COLORS = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "colors"));
+    private static final ResourceKey<CreativeModeTab> SEARCH = ResourceKey.create(Registries.CREATIVE_MODE_TAB, Identifier.fromNamespaceAndPath(MOD_ID, "search"));
 
     public CreativeModeTabTest(FMLJavaModLoadingContext context) {
         if (!ENABLED)
@@ -98,7 +98,7 @@ public class CreativeModeTabTest {
             List<Block> blocks = List.of(Blocks.GRANITE, Blocks.DIORITE, Blocks.ANDESITE, Blocks.COBBLESTONE);
             for (int i = 0; i < blocks.size(); i++) {
                 Block block = blocks.get(i);
-                helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "dummy" + i), CreativeModeTab.builder()
+                helper.register(Identifier.fromNamespaceAndPath(MOD_ID, "dummy" + i), CreativeModeTab.builder()
                       .title(Component.literal("Dummy " + i))
                       .icon(() -> new ItemStack(block))
                       .displayItems((params, output) -> output.accept(block))
@@ -106,8 +106,8 @@ public class CreativeModeTabTest {
                 );
             }
 
-            //final ResourceLocation custom_tabs_image = new ResourceLocation(MOD_ID, "textures/gui/container/creative_inventory/custom_tabs.png");
-            helper.register(ResourceLocation.fromNamespaceAndPath(MOD_ID, "with_tabs_image"), CreativeModeTab.builder()
+            //final Identifier custom_tabs_image = new Identifier(MOD_ID, "textures/gui/container/creative_inventory/custom_tabs.png");
+            helper.register(Identifier.fromNamespaceAndPath(MOD_ID, "with_tabs_image"), CreativeModeTab.builder()
                 .title(Component.translatable("itemGroup.with_tabs_image"))
                 .icon(() -> new ItemStack(Blocks.BRICKS))
                 .displayItems((params, output) -> output.accept(Blocks.BRICKS))

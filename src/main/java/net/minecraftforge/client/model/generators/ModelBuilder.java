@@ -30,7 +30,7 @@ import net.minecraft.client.renderer.block.model.ItemTransform;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.resources.model.UnbakedModel.GuiLight;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.ForgeFaceData;
@@ -76,7 +76,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
 
     private final RootTransformsBuilder rootTransforms = new RootTransformsBuilder();
 
-    protected ModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper)
+    protected ModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper)
     {
         super(outputLocation);
         this.existingFileHelper = existingFileHelper;
@@ -124,11 +124,11 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
             this.textures.put(key, texture);
             return self();
         } else {
-            ResourceLocation asLoc;
+            Identifier asLoc;
             if (texture.contains(":")) {
-                asLoc = ResourceLocation.parse(texture);
+                asLoc = Identifier.parse(texture);
             } else {
-                asLoc = ResourceLocation.fromNamespaceAndPath(getLocation().getNamespace(), texture);
+                asLoc = Identifier.fromNamespaceAndPath(getLocation().getNamespace(), texture);
             }
             return texture(key, asLoc);
         }
@@ -146,7 +146,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
      *                               with {@code '#'}) and does not exist in any
      *                               known resource pack
      */
-    public T texture(String key, ResourceLocation texture) {
+    public T texture(String key, Identifier texture) {
         Preconditions.checkNotNull(key, "Key must not be null");
         Preconditions.checkNotNull(texture, "Texture must not be null");
         Preconditions.checkArgument(existingFileHelper.exists(texture, ModelProvider.TEXTURE),
@@ -170,7 +170,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
      */
     public T renderType(String renderType) {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
-        return renderType(ResourceLocation.parse(renderType));
+        return renderType(Identifier.parse(renderType));
     }
 
     /**
@@ -185,23 +185,23 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
      */
     public T renderType(String renderType, String renderTypeFast) {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
-        return renderType(ResourceLocation.parse(renderType), ResourceLocation.parse(renderTypeFast));
+        return renderType(Identifier.parse(renderType), Identifier.parse(renderTypeFast));
     }
 
     /**
      * Set the render type for this model. Any render types to be used must be registered via
      * {@link net.minecraftforge.client.event.RegisterNamedRenderTypesEvent RegisterNamedRenderTypesEvent}.
      * <p>
-     * Consider using {@linkplain #renderType(ResourceLocation, ResourceLocation)} if you need to set a render type for
+     * Consider using {@linkplain #renderType(Identifier, Identifier)} if you need to set a render type for
      * {@linkplain net.minecraft.client.GraphicsStatus#FAST fast graphics}.
      *
      * @param renderType the render type
      * @return this builder
      *
      * @throws NullPointerException if {@code renderType} is {@code null}
-     * @see #renderType(ResourceLocation, ResourceLocation)
+     * @see #renderType(Identifier, Identifier)
      */
-    public T renderType(ResourceLocation renderType) {
+    public T renderType(Identifier renderType) {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
         this.renderType = renderType.toString();
         this.renderTypeFast = null;
@@ -218,7 +218,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
      *
      * @throws NullPointerException if {@code renderType} is {@code null}
      */
-    public T renderType(ResourceLocation renderType, ResourceLocation renderTypeFast) {
+    public T renderType(Identifier renderType, Identifier renderTypeFast) {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
         Preconditions.checkNotNull(renderTypeFast, "Fast graphics render type must not be null");
         this.renderType = renderType.toString();
@@ -405,7 +405,7 @@ public class ModelBuilder<T extends ModelBuilder<T>> extends ModelFile {
         if (tex.charAt(0) == '#') {
             return tex;
         }
-        return ResourceLocation.parse(tex).toString();
+        return Identifier.parse(tex).toString();
     }
 
     private JsonArray serializeVector3f(Vector3fc vec) {

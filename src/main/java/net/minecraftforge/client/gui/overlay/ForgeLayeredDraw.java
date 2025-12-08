@@ -6,19 +6,17 @@
 package net.minecraftforge.client.gui.overlay;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.ForgeEventFactoryClient;
 import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
-import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.BooleanSupplier;
 
@@ -29,47 +27,45 @@ import java.util.function.BooleanSupplier;
  * Layers must be uniquely named per ForgeLayeredDraw, but may be duplicated across different instances.
  * Any change which would result in a duplicate will not be applied.
  * All methods which return a {@linkplain ForgeLayeredDraw} will return its caller's instance.
- * To select a specific instance, use {@linkplain ForgeLayeredDraw#locateStack(ResourceLocation)} before adding
+ * To select a specific instance, use {@linkplain ForgeLayeredDraw#locateStack(Identifier)} before adding
  * or use the methods that include a stack identifier.
  */
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 public final class ForgeLayeredDraw implements ForgeLayer {
-    private final Map<ResourceLocation, ForgeLayer> namedLayers = new HashMap<>();
-    private final Map<ResourceLocation, Map.Entry<ForgeLayeredDraw, BooleanSupplier>> subLayerStacks = new HashMap<>();
-    private final List<ResourceLocation> order = new LinkedList<>();
+    private final Map<Identifier, ForgeLayer> namedLayers = new HashMap<>();
+    private final Map<Identifier, Map.Entry<ForgeLayeredDraw, BooleanSupplier>> subLayerStacks = new HashMap<>();
+    private final List<Identifier> order = new LinkedList<>();
     private final List<ForgeLayer> bakedLayers = new ArrayList<>();
-    private final ResourceLocation name;
+    private final Identifier name;
 
-    public static final ResourceLocation  PRE_SLEEP_STACK = ResourceLocation.withDefaultNamespace("pre_sleep_phase");
-    public static final ResourceLocation   CAMERA_OVERLAY = ResourceLocation.withDefaultNamespace("camera_overlay");
-    public static final ResourceLocation        CROSSHAIR = ResourceLocation.withDefaultNamespace("crosshair");
-    public static final ResourceLocation   CHANGE_STRATUM = ResourceLocation.withDefaultNamespace("stratum_change");
-    public static final ResourceLocation HOTBAR_AND_DECOS = ResourceLocation.withDefaultNamespace("hotbar");
-    public static final ResourceLocation   POTION_EFFECTS = ResourceLocation.withDefaultNamespace("potion_effects");
-    public static final ResourceLocation     BOSS_OVERLAY = ResourceLocation.withDefaultNamespace("boss_overlay");
+    public static final Identifier  PRE_SLEEP_STACK = Identifier.withDefaultNamespace("pre_sleep_phase");
+    public static final Identifier   CAMERA_OVERLAY = Identifier.withDefaultNamespace("camera_overlay");
+    public static final Identifier        CROSSHAIR = Identifier.withDefaultNamespace("crosshair");
+    public static final Identifier   CHANGE_STRATUM = Identifier.withDefaultNamespace("stratum_change");
+    public static final Identifier HOTBAR_AND_DECOS = Identifier.withDefaultNamespace("hotbar");
+    public static final Identifier   POTION_EFFECTS = Identifier.withDefaultNamespace("potion_effects");
+    public static final Identifier     BOSS_OVERLAY = Identifier.withDefaultNamespace("boss_overlay");
 
-    public static final ResourceLocation POST_SLEEP_STACK = ResourceLocation.withDefaultNamespace("post_sleep_phase");
-    public static final ResourceLocation     DEMO_OVERLAY = ResourceLocation.withDefaultNamespace("demo");
-    public static final ResourceLocation    DEBUG_OVERLAY = ResourceLocation.withDefaultNamespace("debug");
-    public static final ResourceLocation       SCOREBOARD = ResourceLocation.withDefaultNamespace("scoreboard");
-    public static final ResourceLocation   HOTBAR_MESSAGE = ResourceLocation.withDefaultNamespace("hotbar_message");
-    public static final ResourceLocation    TITLE_OVERLAY = ResourceLocation.withDefaultNamespace("title");
-    public static final ResourceLocation     CHAT_OVERLAY = ResourceLocation.withDefaultNamespace("chat_overlay");
-    public static final ResourceLocation         TAB_LIST = ResourceLocation.withDefaultNamespace("tab_list");
-    public static final ResourceLocation SUBTITLE_OVERLAY = ResourceLocation.withDefaultNamespace("subtitle");
+    public static final Identifier POST_SLEEP_STACK = Identifier.withDefaultNamespace("post_sleep_phase");
+    public static final Identifier     DEMO_OVERLAY = Identifier.withDefaultNamespace("demo");
+    public static final Identifier    DEBUG_OVERLAY = Identifier.withDefaultNamespace("debug");
+    public static final Identifier       SCOREBOARD = Identifier.withDefaultNamespace("scoreboard");
+    public static final Identifier   HOTBAR_MESSAGE = Identifier.withDefaultNamespace("hotbar_message");
+    public static final Identifier    TITLE_OVERLAY = Identifier.withDefaultNamespace("title");
+    public static final Identifier     CHAT_OVERLAY = Identifier.withDefaultNamespace("chat_overlay");
+    public static final Identifier         TAB_LIST = Identifier.withDefaultNamespace("tab_list");
+    public static final Identifier SUBTITLE_OVERLAY = Identifier.withDefaultNamespace("subtitle");
 
-    public static final ResourceLocation     VANILLA_ROOT = ResourceLocation.withDefaultNamespace("vanilla_root");
-    public static final ResourceLocation    SLEEP_OVERLAY = ResourceLocation.withDefaultNamespace("sleep_overlay");
+    public static final Identifier     VANILLA_ROOT = Identifier.withDefaultNamespace("vanilla_root");
+    public static final Identifier    SLEEP_OVERLAY = Identifier.withDefaultNamespace("sleep_overlay");
 
     private static final ForgeLayeredDraw instance = new ForgeLayeredDraw(VANILLA_ROOT);
 
     /**
-     * Creates an empty draw list. Add entries with {@linkplain ForgeLayeredDraw#add(ResourceLocation, ForgeLayer)}
+     * Creates an empty draw list. Add entries with {@linkplain ForgeLayeredDraw#add(Identifier, ForgeLayer)}
      * @param name marker for which phase this is.
      */
-    public ForgeLayeredDraw(ResourceLocation name) {
+    public ForgeLayeredDraw(Identifier name) {
         this.name = name;
     }
 
@@ -81,7 +77,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param supplier condition for this stack to render
      * @return this
      */
-    public ForgeLayeredDraw add(ResourceLocation name, ForgeLayeredDraw layeredDraw, BooleanSupplier supplier) {
+    public ForgeLayeredDraw add(Identifier name, ForgeLayeredDraw layeredDraw, BooleanSupplier supplier) {
         if (isNameAvailable(name)) {
             subLayerStacks.put(name, Map.entry(layeredDraw, supplier));
             order.add(name);
@@ -98,7 +94,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param layer layer render code, see {@linkplain ForgeLayer} and example usages in {@linkplain Gui}
      * @return this
      */
-    public ForgeLayeredDraw add(ResourceLocation targetStack, ResourceLocation name, ForgeLayer layer) {
+    public ForgeLayeredDraw add(Identifier targetStack, Identifier name, ForgeLayer layer) {
         locateStack(targetStack).ifPresentOrElse((stack) -> stack.add(name, layer), () -> stackNotPresentWarning(targetStack));
         return this;
     }
@@ -106,12 +102,12 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     /**
      * Helper method, assumes the intended draw stack instance is the caller.
      * Use any of the non-deprecated add methods if you want a specific instance,
-     * or call {@linkplain ForgeLayeredDraw#locateStack(ResourceLocation)} to get a reference to an instance.
+     * or call {@linkplain ForgeLayeredDraw#locateStack(Identifier)} to get a reference to an instance.
      * @param name RL of layer to add
      * @param layer layer render code, see {@linkplain ForgeLayer} and example usages in {@linkplain Gui}
      * @return this
      */
-    public ForgeLayeredDraw add(ResourceLocation name, ForgeLayer layer) {
+    public ForgeLayeredDraw add(Identifier name, ForgeLayer layer) {
         if (isNameAvailable(name)) {
             namedLayers.put(name, layer);
             order.add(name);
@@ -124,12 +120,12 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     /**
      * Use to specify where your custom draw stack should go. Can also be used to re-order layers.
      * Both target and destination must be in the same draw stack.
-     * @param expectedStack Which ForgeLayeredDraw the target is expected to be in. If you already have a reference to it, you can use {@linkplain ForgeLayeredDraw#move(ResourceLocation, ResourceLocation, LayerOffset)}
+     * @param expectedStack Which ForgeLayeredDraw the target is expected to be in. If you already have a reference to it, you can use {@linkplain ForgeLayeredDraw#move(Identifier, Identifier, LayerOffset)}
      * @param target layer name to move
      * @param destination layer name to order against
      * @return this
      */
-    public ForgeLayeredDraw putAbove(ResourceLocation expectedStack, ResourceLocation target, ResourceLocation destination) {
+    public ForgeLayeredDraw putAbove(Identifier expectedStack, Identifier target, Identifier destination) {
         locateStack(expectedStack).ifPresentOrElse((stack) -> stack.move(target, destination, LayerOffset.ABOVE), () -> stackNotPresentWarning(expectedStack));
         return this;
     }
@@ -137,12 +133,12 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     /**
      * Use to specify where your custom draw stack should go. Can also be used to re-order layers.
      * Both target and destination must be in the same draw stack.
-     * @param expectedStack Which ForgeLayeredDraw the target is expected to be in. If you already have a reference to it, you can use {@linkplain ForgeLayeredDraw#move(ResourceLocation, ResourceLocation, LayerOffset)}
+     * @param expectedStack Which ForgeLayeredDraw the target is expected to be in. If you already have a reference to it, you can use {@linkplain ForgeLayeredDraw#move(Identifier, Identifier, LayerOffset)}
      * @param target layer name to move
      * @param destination layer name to order against
      * @return this
      */
-    public ForgeLayeredDraw putBelow(ResourceLocation expectedStack, ResourceLocation target, ResourceLocation destination) {
+    public ForgeLayeredDraw putBelow(Identifier expectedStack, Identifier target, Identifier destination) {
         locateStack(expectedStack).ifPresentOrElse((stack) -> stack.move(target, destination, LayerOffset.BELOW), () -> stackNotPresentWarning(expectedStack));
         return this;
     }
@@ -155,7 +151,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param offset Self-explanatory
      * @return this
      */
-    public ForgeLayeredDraw move(ResourceLocation target, ResourceLocation destination, LayerOffset offset) {
+    public ForgeLayeredDraw move(Identifier target, Identifier destination, LayerOffset offset) {
         if (!order.contains(target)) {
             layerNotPresentWarning(target);
             return this;
@@ -179,7 +175,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param layer layer render code, see {@linkplain ForgeLayer} and example usages in {@linkplain Gui}
      * @return this
      */
-    public ForgeLayeredDraw addAbove(ResourceLocation expectedStack, ResourceLocation newLayer, ResourceLocation otherLayer, ForgeLayer layer) {
+    public ForgeLayeredDraw addAbove(Identifier expectedStack, Identifier newLayer, Identifier otherLayer, ForgeLayer layer) {
         locateStack(expectedStack).ifPresentOrElse((stack) -> {
             if (!stack.isNameAvailable(otherLayer)) {
                 stack.add(newLayer, layer).move(newLayer, otherLayer, LayerOffset.ABOVE);
@@ -193,7 +189,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     /**
      * Helper method, assumes intended draw stack is the caller
      */
-    public ForgeLayeredDraw addAbove(ResourceLocation newLayer, ResourceLocation otherLayer, ForgeLayer layer) {
+    public ForgeLayeredDraw addAbove(Identifier newLayer, Identifier otherLayer, ForgeLayer layer) {
         return addAbove(name, newLayer, otherLayer, layer);
     }
 
@@ -206,7 +202,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param layer layer render code, see {@linkplain ForgeLayer} and example usages in {@linkplain Gui}
      * @return this
      */
-    public ForgeLayeredDraw addBelow(ResourceLocation expectedStack, ResourceLocation newLayer, ResourceLocation otherLayer, ForgeLayer layer) {
+    public ForgeLayeredDraw addBelow(Identifier expectedStack, Identifier newLayer, Identifier otherLayer, ForgeLayer layer) {
         locateStack(expectedStack).ifPresentOrElse((stack) -> {
             if (!stack.isNameAvailable(otherLayer)) {
                 stack.add(newLayer, layer).move(newLayer, otherLayer, LayerOffset.BELOW);
@@ -220,7 +216,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     /**
      * Helper method, assumes intended draw stack is the caller
      */
-    public ForgeLayeredDraw addBelow(ResourceLocation newLayer, ResourceLocation otherLayer, ForgeLayer layer) {
+    public ForgeLayeredDraw addBelow(Identifier newLayer, Identifier otherLayer, ForgeLayer layer) {
         return addBelow(name, newLayer, otherLayer, layer);
     }
 
@@ -232,7 +228,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param condition supplier for the condition
      * @return this
      */
-    public ForgeLayeredDraw addWithCondition(ResourceLocation targetStack, ResourceLocation name, ForgeLayer layer, BooleanSupplier condition) {
+    public ForgeLayeredDraw addWithCondition(Identifier targetStack, Identifier name, ForgeLayer layer, BooleanSupplier condition) {
         locateStack(targetStack).ifPresentOrElse((stack) -> stack.addWithCondition(name, layer, condition), () -> stackNotPresentWarning(targetStack));
         return this;
     }
@@ -244,7 +240,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param condition supplier for the condition
      * @return this
      */
-    public ForgeLayeredDraw addWithCondition(ResourceLocation name, ForgeLayer layer, BooleanSupplier condition) {
+    public ForgeLayeredDraw addWithCondition(Identifier name, ForgeLayer layer, BooleanSupplier condition) {
         add(name, layer).addConditionTo(name, condition);
         return this;
     }
@@ -257,20 +253,20 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param condition supplier for the condition
      * @return this
      */
-    public ForgeLayeredDraw addConditionTo(ResourceLocation targetStack, ResourceLocation targetLayer, BooleanSupplier condition) {
+    public ForgeLayeredDraw addConditionTo(Identifier targetStack, Identifier targetLayer, BooleanSupplier condition) {
         locateStack(targetStack).ifPresentOrElse((stack) -> stack.addConditionTo(targetLayer, condition), () -> stackNotPresentWarning(targetStack));
         return this;
     }
 
     /**
      * Assumes the correct stack is the caller of this method.
-     * Use {@linkplain ForgeLayeredDraw#addConditionTo(ResourceLocation, ResourceLocation, BooleanSupplier)}
+     * Use {@linkplain ForgeLayeredDraw#addConditionTo(Identifier, Identifier, BooleanSupplier)}
      * if you do not have a reference to the draw stack you want.
      * @param targetLayer name of layer to add condition to
      * @param condition supplier for the condition
      * @return this
      */
-    public ForgeLayeredDraw addConditionTo(ResourceLocation targetLayer, BooleanSupplier condition) {
+    public ForgeLayeredDraw addConditionTo(Identifier targetLayer, BooleanSupplier condition) {
         var result = namedLayers.computeIfPresent(targetLayer,
                 (name, layer) -> (guiGraphics, deltaTracker) -> {
                     if (condition.getAsBoolean()) {
@@ -303,7 +299,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * Parent layer stack {@linkplain ForgeLayeredDraw#VANILLA_ROOT} holds the results.
      */
     private void resolveNested() {
-        for (ResourceLocation layerName : order) {
+        for (Identifier layerName : order) {
             if (subLayerStacks.containsKey(layerName)) {
                 var entry = subLayerStacks.get(layerName);
                 entry.getKey().resolveNested();
@@ -322,7 +318,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      * @param targetStack Name of ForgeLayeredDraw to find
      * @return Filled Optional if target exists, empty otherwise.
      */
-    public Optional<ForgeLayeredDraw> locateStack(ResourceLocation targetStack) {
+    public Optional<ForgeLayeredDraw> locateStack(Identifier targetStack) {
         if (!name.equals(targetStack)) {
             for (Map.Entry<ForgeLayeredDraw, BooleanSupplier> value : subLayerStacks.values()) {
                 if (value.getKey() instanceof ForgeLayeredDraw searchable) {
@@ -337,32 +333,32 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     }
 
     @Nullable
-    public ForgeLayeredDraw getChild(ResourceLocation childName) {
+    public ForgeLayeredDraw getChild(Identifier childName) {
         return locateStack(childName).orElse(null);
     }
 
     @Nullable
-    public ForgeLayer getLayer(ResourceLocation layerName) {
+    public ForgeLayer getLayer(Identifier layerName) {
         return namedLayers.get(layerName);
     }
 
-    public ResourceLocation getName() {
+    public Identifier getName() {
         return name;
     }
 
-    private void stackNotPresentWarning(ResourceLocation stackName) {
-        LogUtils.getLogger().warn("Target stack {} was not present anywhere. Is your ResourceLocation correct?", stackName);
+    private void stackNotPresentWarning(Identifier stackName) {
+        LogUtils.getLogger().warn("Target stack {} was not present anywhere. Is your Identifier correct?", stackName);
     }
 
-    private void layerNotPresentWarning(ResourceLocation layer) {
+    private void layerNotPresentWarning(Identifier layer) {
         LogUtils.getLogger().warn("Expected layer {} was not found in stack {}, no layer modifications have been made.", layer, name);
     }
 
-    private void nameTakenWarning(ResourceLocation layer) {
+    private void nameTakenWarning(Identifier layer) {
         LogUtils.getLogger().warn("Name {} was already present in {} and cannot be re-used.", layer, name);
     }
 
-    private boolean isNameAvailable(ResourceLocation name) {
+    private boolean isNameAvailable(Identifier name) {
         return !namedLayers.containsKey(name) && !subLayerStacks.containsKey(name);
     }
 

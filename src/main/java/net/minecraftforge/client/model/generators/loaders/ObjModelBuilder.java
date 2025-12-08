@@ -8,7 +8,7 @@ package net.minecraftforge.client.model.generators.loaders;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import net.minecraft.server.packs.PackType;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -20,25 +20,25 @@ import net.minecraftforge.common.data.ExistingFileHelper;
  */
 public class ObjModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "obj");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "obj");
     public static <T extends ModelBuilder<T>> ObjModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper)
     {
         return new ObjModelBuilder<>(parent, existingFileHelper);
     }
 
-    private ResourceLocation modelLocation;
+    private Identifier modelLocation;
     private Boolean automaticCulling;
     private Boolean shadeQuads;
     private Boolean flipV;
     private Boolean emissiveAmbient;
-    private ResourceLocation mtlOverride;
+    private Identifier mtlOverride;
 
     protected ObjModelBuilder(T parent, ExistingFileHelper existingFileHelper)
     {
         super(NAME, parent, existingFileHelper);
     }
 
-    public ObjModelBuilder<T> modelLocation(ResourceLocation modelLocation)
+    public ObjModelBuilder<T> modelLocation(Identifier modelLocation)
     {
         Preconditions.checkNotNull(modelLocation, "modelLocation must not be null");
         Preconditions.checkArgument(existingFileHelper.exists(modelLocation, PackType.CLIENT_RESOURCES),
@@ -71,7 +71,7 @@ public class ObjModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuil
         return this;
     }
 
-    public ObjModelBuilder<T> overrideMaterialLibrary(ResourceLocation mtlOverride)
+    public ObjModelBuilder<T> overrideMaterialLibrary(Identifier mtlOverride)
     {
         Preconditions.checkNotNull(mtlOverride, "mtlOverride must not be null");
         Preconditions.checkArgument(existingFileHelper.exists(mtlOverride, PackType.CLIENT_RESOURCES),

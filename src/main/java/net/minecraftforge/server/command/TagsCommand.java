@@ -19,14 +19,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceKeyArgument;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.chat.*;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 
@@ -57,7 +57,7 @@ import java.util.stream.Stream;
 class TagsCommand {
     private static final long PAGE_SIZE = 8;
     private static final ResourceKey<Registry<Registry<?>>> ROOT_REGISTRY_KEY =
-            ResourceKey.createRegistryKey(ResourceLocation.parse("root"));
+            ResourceKey.createRegistryKey(Identifier.parse("root"));
 
     private static final DynamicCommandExceptionType UNKNOWN_REGISTRY = new DynamicCommandExceptionType(key ->
             Component.translatable("commands.forge.tags.error.unknown_registry", key));
@@ -83,7 +83,7 @@ class TagsCommand {
                                 )
                         )
                         .then(Commands.literal("get")
-                                .then(Commands.argument("tag", ResourceLocationArgument.id())
+                                .then(Commands.argument("tag", IdentifierArgument.id())
                                         .suggests(suggestFromRegistry(r -> r.getTags().map(t -> t.key().location())::iterator))
                                         .executes(ctx -> listTagElements(ctx, 1))
                                         .then(Commands.argument("page", IntegerArgumentType.integer(1))
@@ -92,7 +92,7 @@ class TagsCommand {
                                 )
                         )
                         .then(Commands.literal("query")
-                                .then(Commands.argument("element", ResourceLocationArgument.id())
+                                .then(Commands.argument("element", IdentifierArgument.id())
                                         .suggests(suggestFromRegistry(Registry::keySet))
                                         .executes(ctx -> queryElementTags(ctx, 1))
                                         .then(Commands.argument("page", IntegerArgumentType.integer(1))
@@ -107,12 +107,12 @@ class TagsCommand {
         final ResourceKey<? extends Registry<?>> registryKey = getResourceKey(ctx, "registry", ROOT_REGISTRY_KEY)
                 .orElseThrow(); // Expect to be always retrieve a resource key for the root registry (registry key)
         final Registry<?> registry = ctx.getSource().getServer().registryAccess().lookup(registryKey)
-                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.location()));
+                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.identifier()));
 
         final long tagCount = registry.getTags().count();
 
         ctx.getSource().sendSuccess(() -> createMessage(
-                Component.translatable("commands.forge.tags.registry_key", Component.literal(registryKey.location().toString()).withStyle(ChatFormatting.GOLD)),
+                Component.translatable("commands.forge.tags.registry_key", Component.literal(registryKey.identifier().toString()).withStyle(ChatFormatting.GOLD)),
                 "commands.forge.tags.tag_count",
                 "commands.forge.tags.copy_tag_names",
                 tagCount,
@@ -130,24 +130,24 @@ class TagsCommand {
         final ResourceKey<? extends Registry<?>> registryKey = getResourceKey(ctx, "registry", ROOT_REGISTRY_KEY)
                 .orElseThrow(); // Expect to be always retrieve a resource key for the root registry (registry key)
         final Registry<Object> registry = ctx.getSource().getServer().registryAccess().lookup(registryKey)
-                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.location()));
+                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.identifier()));
 
-        final ResourceLocation tagLocation = ResourceLocationArgument.getId(ctx, "tag");
+        final Identifier tagLocation = IdentifierArgument.getId(ctx, "tag");
         final TagKey<Object> tagKey = TagKey.create(cast(registryKey), tagLocation);
 
         final HolderSet.Named<?> tag = registry.get(tagKey)
-                .orElseThrow(() -> UNKNOWN_TAG.create(tagKey.location(), registryKey.location()));
+                .orElseThrow(() -> UNKNOWN_TAG.create(tagKey.location(), registryKey.identifier()));
 
         ctx.getSource().sendSuccess(() -> createMessage(
                 Component.translatable("commands.forge.tags.tag_key",
-                        Component.literal(tagKey.registry().location().toString()).withStyle(ChatFormatting.GOLD),
+                        Component.literal(tagKey.registry().identifier().toString()).withStyle(ChatFormatting.GOLD),
                         Component.literal(tagKey.location().toString()).withStyle(ChatFormatting.DARK_GREEN)),
                 "commands.forge.tags.element_count",
                 "commands.forge.tags.copy_element_names",
                 tag.size(),
                 page,
                 ChatFormatting.YELLOW,
-                () -> tag.stream().map(s -> s.unwrap().map(k -> k.location().toString(), Object::toString))
+                () -> tag.stream().map(s -> s.unwrap().map(k -> k.identifier().toString(), Object::toString))
         ), false);
 
         return tag.size();
@@ -157,19 +157,19 @@ class TagsCommand {
         final ResourceKey<? extends Registry<?>> registryKey = getResourceKey(ctx, "registry", ROOT_REGISTRY_KEY)
                 .orElseThrow(); // Expect to be always retrieve a resource key for the root registry (registry key)
         final Registry<Object> registry = ctx.getSource().getServer().registryAccess().lookup(registryKey)
-                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.location()));
+                .orElseThrow(() -> UNKNOWN_REGISTRY.create(registryKey.identifier()));
 
-        final ResourceLocation elementLocation = ResourceLocationArgument.getId(ctx, "element");
+        final Identifier elementLocation = IdentifierArgument.getId(ctx, "element");
         final ResourceKey<Object> elementKey = ResourceKey.create(cast(registryKey), elementLocation);
 
         final Holder<?> elementHolder = registry.get(elementKey)
-                .orElseThrow(() -> UNKNOWN_ELEMENT.create(elementLocation, registryKey.location()));
+                .orElseThrow(() -> UNKNOWN_ELEMENT.create(elementLocation, registryKey.identifier()));
 
         final long containingTagsCount = elementHolder.tags().count();
 
         ctx.getSource().sendSuccess(() -> createMessage(
                 Component.translatable("commands.forge.tags.element",
-                        Component.literal(registryKey.location().toString()).withStyle(ChatFormatting.GOLD),
+                        Component.literal(registryKey.identifier().toString()).withStyle(ChatFormatting.GOLD),
                         Component.literal(elementLocation.toString()).withStyle(ChatFormatting.YELLOW)),
                 "commands.forge.tags.containing_tag_count",
                 "commands.forge.tags.copy_tag_names",
@@ -223,13 +223,13 @@ class TagsCommand {
     ) {
         ctx.getSource().registryAccess().registries()
                 .map(RegistryAccess.RegistryEntry::key)
-                .map(ResourceKey::location)
-                .map(ResourceLocation::toString)
+                .map(ResourceKey::identifier)
+                .map(Identifier::toString)
                 .forEach(builder::suggest);
         return builder.buildFuture();
     }
 
-    private static SuggestionProvider<CommandSourceStack> suggestFromRegistry(final Function<Registry<?>, Iterable<ResourceLocation>> namesFunction) {
+    private static SuggestionProvider<CommandSourceStack> suggestFromRegistry(final Function<Registry<?>, Iterable<Identifier>> namesFunction) {
         return (ctx, builder) -> {
             var key = getResourceKey(ctx, "registry", ROOT_REGISTRY_KEY).orElse(null);
             if (key == null)

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/block/ModelBlockRenderer.java
 +++ b/net/minecraft/client/renderer/block/ModelBlockRenderer.java
-@@ -48,7 +_,7 @@
+@@ -49,7 +_,7 @@
          int p_234389_
      ) {
          if (!p_393688_.isEmpty()) {
@@ -9,7 +9,7 @@
              p_234384_.translate(p_234382_.getOffset(p_234383_));
  
              try {
-@@ -322,6 +_,11 @@
+@@ -319,6 +_,11 @@
          }
      }
  
@@ -21,7 +21,7 @@
      public static void renderModel(
          PoseStack.Pose p_111068_,
          VertexConsumer p_111069_,
-@@ -330,9 +_,11 @@
+@@ -327,9 +_,11 @@
          float p_111073_,
          float p_111074_,
          int p_111075_,

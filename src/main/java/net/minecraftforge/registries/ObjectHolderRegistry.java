@@ -10,7 +10,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.ApiStatus;
@@ -27,7 +27,7 @@ class ObjectHolderRegistry {
      * and hashCode function to de-duplicate callers here.
      * The default @ObjectHolder implementation uses the hashCode/equals for the field the annotation is on.
      */
-    static synchronized void addHandler(Consumer<Predicate<ResourceLocation>> ref) {
+    static synchronized void addHandler(Consumer<Predicate<Identifier>> ref) {
         objectHolders.add(ref);
     }
 
@@ -40,7 +40,7 @@ class ObjectHolderRegistry {
      *
      * @return true if handler was matched and removed.
      */
-    static synchronized boolean removeHandler(Consumer<Predicate<ResourceLocation>> ref) {
+    static synchronized boolean removeHandler(Consumer<Predicate<Identifier>> ref) {
         return objectHolders.remove(ref);
     }
 
@@ -49,7 +49,7 @@ class ObjectHolderRegistry {
     //==============================================================
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final Set<Consumer<Predicate<ResourceLocation>>> objectHolders = new HashSet<>();
+    private static final Set<Consumer<Predicate<Identifier>>> objectHolders = new HashSet<>();
 
     static void applyObjectHolders() {
         try {
@@ -62,9 +62,9 @@ class ObjectHolderRegistry {
         }
     }
 
-    static void applyObjectHolders(Predicate<ResourceLocation> filter) {
+    static void applyObjectHolders(Predicate<Identifier> filter) {
         RuntimeException aggregate = new RuntimeException("Failed to apply some object holders, see suppressed exceptions for details");
-        for (Consumer<Predicate<ResourceLocation>> objectHolder : objectHolders) {
+        for (Consumer<Predicate<Identifier>> objectHolder : objectHolders) {
             try {
                 objectHolder.accept(filter);
             } catch (Exception e) {

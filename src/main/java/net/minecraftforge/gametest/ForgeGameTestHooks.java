@@ -9,7 +9,7 @@ import net.minecraft.SharedConstants;
 import net.minecraft.gametest.framework.GameTestEnvironments;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.ApiStatus;
@@ -89,21 +89,21 @@ public class ForgeGameTestHooks {
         throw new IllegalArgumentException("Could not find modid for " + cls.getName());
     }
 
-    private static ResourceLocation key(String namespace, String prefix, String path) {
+    private static Identifier key(String namespace, String prefix, String path) {
         if (path.indexOf(':') != -1) {
-            var rl = ResourceLocation.parse(path);
+            var rl = Identifier.parse(path);
             if (!prefix.isEmpty())
                 return rl.withPrefix(prefix);
             return rl;
         }
 
-        return ResourceLocation.fromNamespaceAndPath(namespace, prefix + path);
+        return Identifier.fromNamespaceAndPath(namespace, prefix + path);
     }
 
-    public record TestReference(Consumer<GameTestHelper> consumer, TestData<ResourceLocation> data) {}
+    public record TestReference(Consumer<GameTestHelper> consumer, TestData<Identifier> data) {}
 
-    public static Map<ResourceLocation, TestReference> gatherTests(Class<?> root, Object instance) {
-        var ret = new HashMap<ResourceLocation, TestReference>();
+    public static Map<Identifier, TestReference> gatherTests(Class<?> root, Object instance) {
+        var ret = new HashMap<Identifier, TestReference>();
         var seen = new HashSet<String>();
         String class_prefix = getPrefix(root);
         String namespace = getNamespace(root);
@@ -131,14 +131,14 @@ public class ForgeGameTestHooks {
                 var name = key(namespace, prefix, gametest.name().isEmpty() ? snake(method.getName()) : gametest.name());
 
                 var structure = GameTest.DEFAULT_STRUCTURE.equals(gametest.structure())
-                    ? ResourceLocation.parse(gametest.structure())
+                    ? Identifier.parse(gametest.structure())
                     : key(namespace, "", gametest.structure());
 
                 var env = GameTestEnvironments.DEFAULT.equals(gametest.environment())
-                    ? ResourceLocation.withDefaultNamespace(gametest.environment())
+                    ? Identifier.withDefaultNamespace(gametest.environment())
                     : key(namespace, "", gametest.environment());
 
-                var data = new TestData<ResourceLocation>(
+                var data = new TestData<Identifier>(
                     env,
                     structure,
                     gametest.maxTicks(),

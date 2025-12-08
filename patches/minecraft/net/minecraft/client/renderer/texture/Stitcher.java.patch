@@ -7,8 +7,8 @@
 +    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
      private static final Comparator<Stitcher.Holder<?>> HOLDER_COMPARATOR = Comparator.<Stitcher.Holder<?>, Integer>comparing(p_118201_ -> -p_118201_.height)
          .thenComparing(p_118199_ -> -p_118199_.width)
-         .thenComparing(p_247945_ -> p_247945_.entry.name());
-@@ -48,6 +_,14 @@
+         .thenComparing(p_448389_ -> p_448389_.entry.name());
+@@ -54,6 +_,14 @@
  
          for (Stitcher.Holder<T> holder : list) {
              if (!this.addToStorage(holder)) {
@@ -23,7 +23,7 @@
                  throw new StitcherException(holder.entry, list.stream().map(p_247946_ -> p_247946_.entry).collect(ImmutableList.toImmutableList()));
              }
          }
-@@ -87,7 +_,7 @@
+@@ -93,7 +_,7 @@
              boolean flag4 = flag2 && j != l;
              boolean flag;
              if (flag3 ^ flag4) {

@@ -7,7 +7,7 @@ package net.minecraftforge.client;
 
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.resources.model.UnbakedGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
@@ -38,7 +38,7 @@ public class ClientForgeMod {
         event.register(forgeRL("item_unlit"), ChunkSectionLayer.TRANSLUCENT, ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get());
     }
 
-    private static ResourceLocation forgeRL(String path) {
-        return ResourceLocation.fromNamespaceAndPath("forge", path);
+    private static Identifier forgeRL(String path) {
+        return Identifier.fromNamespaceAndPath("forge", path);
     }
 }

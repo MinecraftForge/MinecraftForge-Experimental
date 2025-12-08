@@ -6,7 +6,7 @@
 package net.minecraftforge.debug.client;
 
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
 import net.minecraftforge.client.gui.overlay.ForgeLayer;
 import net.minecraftforge.client.gui.overlay.ForgeLayeredDraw;
@@ -28,16 +28,16 @@ import static net.minecraftforge.client.gui.overlay.ForgeLayeredDraw.*;
 public class ModifyOverlayTest extends BaseTestMod {
     public static final String MODID = "modify_overlay_test";
 
-    private static final ResourceLocation myStackName = name("my_stack_name");
+    private static final Identifier myStackName = name("my_stack_name");
     private static final ForgeLayeredDraw myLayerStack = new ForgeLayeredDraw(myStackName);
 
     private static final ForgeLayer notAddedLayer = (gg, tr) -> {};
     private static final ForgeLayer layerA = (gg,tr) -> {};
-    private static final ResourceLocation layerAName = name("layer_a");
+    private static final Identifier layerAName = name("layer_a");
     private static final ForgeLayer layerB = (gg,tr) -> {};
-    private static final ResourceLocation layerBName = name("layer_b");
+    private static final Identifier layerBName = name("layer_b");
     private static final ForgeLayer layerC = (gg,tr) -> {};
-    private static final ResourceLocation layerCName = name("layer_c");
+    private static final Identifier layerCName = name("layer_c");
 
 
     private static final IForgeGameTestHelper.BoolFlag detectConditionFlag = new IForgeGameTestHelper.BoolFlag("det_cond_flag");
@@ -82,16 +82,16 @@ public class ModifyOverlayTest extends BaseTestMod {
     public static void ordered_layers(GameTestHelper helper) {
         // Test that layers are in the correct order.
         List<ForgeLayer> internalLayersList = null;
-        Map<ResourceLocation, ForgeLayer> check = null;
+        Map<Identifier, ForgeLayer> check = null;
         try {
             Class<?> cls = drawStack.getClass();
             var field = cls.getDeclaredField("subLayerStacks");
             var field1 = cls.getDeclaredField("namedLayers");
             field.setAccessible(true);
             field1.setAccessible(true);
-            Map<ResourceLocation, Map.Entry<ForgeLayeredDraw, BooleanSupplier>> VROOT = ((Map<ResourceLocation, Map.Entry<ForgeLayeredDraw, BooleanSupplier>>) field.get(drawStack));
+            Map<Identifier, Map.Entry<ForgeLayeredDraw, BooleanSupplier>> VROOT = ((Map<Identifier, Map.Entry<ForgeLayeredDraw, BooleanSupplier>>) field.get(drawStack));
             var PSS = ((ForgeLayeredDraw) VROOT.get(PRE_SLEEP_STACK).getKey());
-            check = ((Map<ResourceLocation, ForgeLayer>) field1.get(PSS));
+            check = ((Map<Identifier, ForgeLayer>) field1.get(PSS));
             internalLayersList = getInternalLayersList(PSS);
         } catch (Exception e) {
             helper.fail("Threw a " + e.getMessage() + " when trying to get the inner layer list.");
@@ -155,8 +155,8 @@ public class ModifyOverlayTest extends BaseTestMod {
     }
 
 
-    private static ResourceLocation name(String name) {
-        return ResourceLocation.fromNamespaceAndPath(MODID, name);
+    private static Identifier name(String name) {
+        return Identifier.fromNamespaceAndPath(MODID, name);
     }
 
     @SuppressWarnings("unchecked")

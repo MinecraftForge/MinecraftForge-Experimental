@@ -93,7 +93,7 @@ public class BucketPickupHandlerWrapper implements IFluidHandler
                         {
                             //Be loud if something went wrong
                             LOGGER.error("Fluid removed without successfully being picked up. Fluid {} at {} in {} matched requested type, but after performing pickup was {}.",
-                                    ForgeRegistries.FLUIDS.getKey(fluidState.getType()), blockPos, world.dimension().location(), ForgeRegistries.FLUIDS.getKey(bucket.getFluid()));
+                                    ForgeRegistries.FLUIDS.getKey(fluidState.getType()), blockPos, world.dimension().identifier(), ForgeRegistries.FLUIDS.getKey(bucket.getFluid()));
                             return FluidStack.EMPTY;
                         }
                         return extracted;

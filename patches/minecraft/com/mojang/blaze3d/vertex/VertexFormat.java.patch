@@ -9,15 +9,15 @@
      public static final int UNKNOWN_ELEMENT = -1;
      private final List<VertexFormatElement> elements;
      private final List<String> names;
-@@ -31,6 +_,7 @@
-     private GpuBuffer immediateDrawVertexBuffer;
-     @Nullable
-     private GpuBuffer immediateDrawIndexBuffer;
+@@ -29,6 +_,7 @@
+     private final int[] offsetsByElement = new int[32];
+     private @Nullable GpuBuffer immediateDrawVertexBuffer;
+     private @Nullable GpuBuffer immediateDrawIndexBuffer;
 +    private final com.google.common.collect.ImmutableMap<String, VertexFormatElement> elementMapping;
  
      VertexFormat(List<VertexFormatElement> p_343616_, List<String> p_345241_, IntList p_345522_, int p_344162_) {
          this.elements = p_343616_;
-@@ -43,6 +_,11 @@
+@@ -41,6 +_,11 @@
              int j = vertexformatelement != null ? p_343616_.indexOf(vertexformatelement) : -1;
              this.offsetsByElement[i] = j != -1 ? p_345522_.getInt(j) : -1;
          }
@@ -29,7 +29,7 @@
      }
  
      public static VertexFormat.Builder builder() {
-@@ -141,6 +_,9 @@
+@@ -139,6 +_,9 @@
          this.immediateDrawIndexBuffer = uploadToBuffer(this.immediateDrawIndexBuffer, p_391835_, 72, () -> "Immediate index buffer for " + this);
          return this.immediateDrawIndexBuffer;
      }

@@ -1,11 +1,11 @@
 --- a/net/minecraft/client/renderer/entity/layers/WingsLayer.java
 +++ b/net/minecraft/client/renderer/entity/layers/WingsLayer.java
-@@ -59,7 +_,7 @@
+@@ -58,7 +_,7 @@
+         }
      }
  
-     @Nullable
--    private static ResourceLocation getPlayerElytraTexture(HumanoidRenderState p_364125_) {
-+    protected ResourceLocation getPlayerElytraTexture(HumanoidRenderState p_364125_) {
+-    protected static @Nullable Identifier getPlayerElytraTexture(HumanoidRenderState p_364125_) {
++    protected @Nullable Identifier getPlayerElytraTexture(HumanoidRenderState p_364125_) {
          if (p_364125_ instanceof AvatarRenderState avatarrenderstate) {
              PlayerSkin playerskin = avatarrenderstate.skin;
              if (playerskin.elytra() != null) {

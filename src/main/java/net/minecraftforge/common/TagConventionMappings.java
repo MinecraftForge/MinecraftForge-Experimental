@@ -8,7 +8,7 @@ package net.minecraftforge.common;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 
 import java.util.List;
@@ -365,22 +365,22 @@ public final class TagConventionMappings {
      *     Example: {@code legacyToCommon(Registries.BLOCK, forgeRl("cobblestone"), Tags.Blocks.COBBLESTONES)} for {@code forge:cobblestone} -> {@code c:cobblestones}
      * </p>
      * @param registryKey Example: {@link net.minecraft.core.registries.Registries.BLOCK}
-     * @param legacyTagResourceLocation Example: {@code forgeRl("cobblestone")}
+     * @param legacyTagIdentifier Example: {@code forgeRl("cobblestone")}
      * @param replacementTag Example: {@link Tags.Blocks#COBBLESTONES}
      * @return A map entry with the legacy tag's TagKey and the suggested replacement tag ID.
      */
     private static <T, R> Map.Entry<TagKey<T>, String> legacyToCommon(ResourceKey<Registry<T>> registryKey,
-                                                                      ResourceLocation legacyTagResourceLocation,
+                                                                      Identifier legacyTagIdentifier,
                                                                       TagKey<R> replacementTag) {
-        return Map.entry(TagKey.create(registryKey, legacyTagResourceLocation), replacementTag.toString());
+        return Map.entry(TagKey.create(registryKey, legacyTagIdentifier), replacementTag.toString());
     }
 
     /**
-     * Same as {@link #legacyToCommon(ResourceKey, ResourceLocation, TagKey)} but for multiple replacement tags.
+     * Same as {@link #legacyToCommon(ResourceKey, Identifier, TagKey)} but for multiple replacement tags.
      * This is useful when a single legacy tag is intended to be replaced by combining multiple common convention tags.
      */
     private static <T> Map.Entry<TagKey<T>, String> legacyToCommon(ResourceKey<Registry<T>> registryKey,
-                                                                   ResourceLocation legacyTagRessourceLocation,
+                                                                   Identifier legacyTagRessourceLocation,
                                                                    List<TagKey<?>> replacementTags) {
         return Map.entry(
                 TagKey.create(registryKey, legacyTagRessourceLocation),
@@ -388,7 +388,7 @@ public final class TagConventionMappings {
         );
     }
 
-    private static ResourceLocation forgeRl(String path) {
-        return ResourceLocation.fromNamespaceAndPath("forge", path);
+    private static Identifier forgeRl(String path) {
+        return Identifier.fromNamespaceAndPath("forge", path);
     }
 }

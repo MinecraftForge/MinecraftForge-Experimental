@@ -6,7 +6,7 @@
 package net.minecraftforge.client.model.generators;
 
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -34,7 +34,7 @@ public abstract class ItemModelProvider extends ModelProvider<ItemModelBuilder> 
         return basicItem(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(item)));
     }
 
-    public ItemModelBuilder basicItem(ResourceLocation item)
+    public ItemModelBuilder basicItem(Identifier item)
     {
         return getBuilder(item.toString())
                 .parent(new ModelFile.UncheckedModelFile("item/generated"))

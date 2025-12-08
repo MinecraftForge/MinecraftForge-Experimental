@@ -20,7 +20,7 @@ import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.Connection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.ConnectionType;
 import net.minecraftforge.network.NetworkContext;
 
@@ -113,7 +113,7 @@ public final class CommandHelper {
 
         return CommandTreeCleaner.cleanArgumentTypes(root, argType -> {
             ArgumentTypeInfo<?, ?> info = ArgumentTypeInfos.byClass(argType);
-            ResourceLocation id = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getKey(info);
+            Identifier id = BuiltInRegistries.COMMAND_ARGUMENT_TYPE.getKey(info);
             return id != null && (id.getNamespace().equals("minecraft") || id.getNamespace().equals("brigadier"));
         });
     }

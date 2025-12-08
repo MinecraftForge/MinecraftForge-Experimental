@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.AbstractPackResources;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.PackResources;
@@ -88,7 +88,7 @@ public class DelegatingPackResources extends AbstractPackResources {
 
     @Nullable
     @Override
-    public IoSupplier<InputStream> getResource(PackType type, ResourceLocation location) {
+    public IoSupplier<InputStream> getResource(PackType type, Identifier location) {
         for (PackResources pack : getCandidatePacks(type, location)) {
             IoSupplier<InputStream> ioSupplier = pack.getResource(type, location);
             if (ioSupplier != null)
@@ -103,7 +103,7 @@ public class DelegatingPackResources extends AbstractPackResources {
         return delegates;
     }
 
-    private List<PackResources> getCandidatePacks(PackType type, ResourceLocation location) {
+    private List<PackResources> getCandidatePacks(PackType type, Identifier location) {
         Map<String, List<PackResources>> map = type == PackType.CLIENT_RESOURCES ? namespacesAssets : namespacesData;
         List<PackResources> packsWithNamespace = map.get(location.getNamespace());
         return packsWithNamespace == null ? Collections.emptyList() : packsWithNamespace;

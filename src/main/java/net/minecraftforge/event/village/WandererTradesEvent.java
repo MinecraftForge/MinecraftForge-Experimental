@@ -14,7 +14,7 @@ import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.apache.commons.lang3.tuple.Pair;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.world.entity.npc.VillagerTrades.ItemListing;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.server.ServerAboutToStartEvent;

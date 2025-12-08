@@ -7,7 +7,7 @@ package net.minecraftforge.client.model;
 
 import com.google.common.base.Preconditions;
 import com.mojang.math.Transformation;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import org.joml.Vector3f;

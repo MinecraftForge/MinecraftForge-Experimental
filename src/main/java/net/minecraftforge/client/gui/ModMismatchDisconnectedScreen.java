@@ -19,7 +19,7 @@ import net.minecraftforge.client.gui.widget.ScrollPanel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -33,7 +33,7 @@ import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fml.ModList;
@@ -134,7 +134,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
                     )
                 ));
                 int i = 0;
-                for (ResourceLocation mod : data.missing()) {
+                for (Identifier mod : data.missing()) {
                     rawTable.add(Pair.of(
                         toModNameComponent(mod, data.mods().get(mod.getNamespace()).name(), i),
                         Pair.of(
@@ -223,7 +223,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
          * @param color Defines the color of the returned style information. An odd number will result in a yellow, an even one in a gold color. This color variation makes it easier for users to distinguish different mod entries.
          * @return A component with the mod name as the main text component, and an assigned style which will be used for the whole content row.
          */
-        private MutableComponent toModNameComponent(ResourceLocation id, String modName, int color) {
+        private MutableComponent toModNameComponent(Identifier id, String modName, int color) {
             String modId = id.getNamespace();
             String tooltipId = id.getPath().isEmpty() ? id.getNamespace() : id.toString();
             return Component.literal(modName).withStyle(color % 2 == 0 ? ChatFormatting.GOLD : ChatFormatting.YELLOW)

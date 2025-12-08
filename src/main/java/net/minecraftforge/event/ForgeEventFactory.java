@@ -46,7 +46,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ChunkHolder;
@@ -619,7 +619,7 @@ public final class ForgeEventFactory {
         return onProjectileImpactResult(projectile, ray) != ProjectileImpactEvent.ImpactResult.DEFAULT;
     }
 
-    public static @Nullable LootTable onLoadLootTable(ResourceLocation name, LootTable table) {
+    public static @Nullable LootTable onLoadLootTable(Identifier name, LootTable table) {
         var event = new LootTableLoadEvent(name, table);
         return LootTableLoadEvent.BUS.post(event) ? null : event.getTable();
     }
@@ -868,7 +868,7 @@ public final class ForgeEventFactory {
         ConnectionStartEvent.BUS.post(new ConnectionStartEvent(connection));
     }
 
-    public static void onChannelRegistrationChange(Connection connection, ChannelRegistrationChangeEvent.Type changeType, HashSet<ResourceLocation> changed) {
+    public static void onChannelRegistrationChange(Connection connection, ChannelRegistrationChangeEvent.Type changeType, HashSet<Identifier> changed) {
         ChannelRegistrationChangeEvent.BUS.post(new ChannelRegistrationChangeEvent(connection, changeType, changed));
     }
 

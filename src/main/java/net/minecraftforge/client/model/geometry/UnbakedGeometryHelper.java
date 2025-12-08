@@ -7,7 +7,7 @@ package net.minecraftforge.client.model.geometry;
 
 import com.mojang.math.Quadrant;
 import com.mojang.math.Transformation;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.BlockElement;
 import net.minecraft.client.renderer.block.model.BlockElementFace;
@@ -22,7 +22,7 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.IQuadTransformer;
 import net.minecraftforge.client.model.QuadTransformers;
 import net.minecraftforge.client.model.SimpleModelState;
@@ -44,7 +44,7 @@ import java.util.regex.Pattern;
 public class UnbakedGeometryHelper {
     /**
      * Explanation:
-     * This takes anything that looks like a valid resourcepack texture location, and tries to extract a resourcelocation out of it.
+     * This takes anything that looks like a valid resourcepack texture location, and tries to extract a Identifier out of it.
      *  1. it will ignore anything up to and including an /assets/ folder,
      *  2. it will take the next path component as a namespace,
      *  3. it will match but skip the /textures/ part of the path,
@@ -62,7 +62,7 @@ public class UnbakedGeometryHelper {
     private static final Material MISSING_MATERIAL = getMaterial(MissingTextureAtlasSprite.getLocation().toString());
 
     /**
-     * Resolves a material that may have been defined with a filesystem path instead of a proper {@link ResourceLocation}.
+     * Resolves a material that may have been defined with a filesystem path instead of a proper {@link Identifier}.
      * <p>
      * The target atlas will always be {@link TextureAtlas#LOCATION_BLOCKS}.
      */
@@ -73,7 +73,7 @@ public class UnbakedGeometryHelper {
         if (tex.startsWith("#"))
             return textures.getMaterial(tex);
 
-        // Attempt to convert a common (windows/linux/mac) filesystem path to a ResourceLocation.
+        // Attempt to convert a common (windows/linux/mac) filesystem path to a Identifier.
         // This makes no promises, if it doesn't work, too bad, fix your mtl file.
         Matcher match = FILESYSTEM_PATH_TO_RESLOC.matcher(tex);
         if (match.matches()) {
@@ -197,7 +197,7 @@ public class UnbakedGeometryHelper {
 
     @SuppressWarnings("deprecation")
     private static Material getMaterial(String texture) {
-        return new Material(TextureAtlas.LOCATION_BLOCKS, ResourceLocation.parse(texture));
+        return new Material(TextureAtlas.LOCATION_BLOCKS, Identifier.parse(texture));
     }
 
     /**

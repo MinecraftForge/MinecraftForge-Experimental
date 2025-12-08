@@ -15,7 +15,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 
@@ -68,7 +68,7 @@ public abstract class GlobalLootModifierProvider implements DataProvider {
 
         Path forgePath = this.output.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("forge/loot_modifiers/global_loot_modifiers.json");
         Path modifierFolderPath = this.output.getOutputFolder(PackOutput.Target.DATA_PACK).resolve(this.modid).resolve("loot_modifiers");
-        List<ResourceLocation> entries = new ArrayList<>();
+        List<Identifier> entries = new ArrayList<>();
 
         ImmutableList.Builder<CompletableFuture<?>> futuresBuilder = new ImmutableList.Builder<>();
 
@@ -78,14 +78,14 @@ public abstract class GlobalLootModifierProvider implements DataProvider {
 
         toSerialize.forEach(LamdbaExceptionUtils.rethrowBiConsumer((name, instance) -> {
             var json = codec.encodeStart(ops, instance).getOrThrow();
-            entries.add(ResourceLocation.fromNamespaceAndPath(modid, name));
+            entries.add(Identifier.fromNamespaceAndPath(modid, name));
             Path modifierPath = modifierFolderPath.resolve(name + ".json");
             futuresBuilder.add(DataProvider.saveStable(cache, json, modifierPath));
         }));
 
         JsonObject forgeJson = new JsonObject();
         forgeJson.addProperty("replace", this.replace);
-        forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(ResourceLocation::toString).collect(Collectors.toList())));
+        forgeJson.add("entries", GSON.toJsonTree(entries.stream().map(Identifier::toString).collect(Collectors.toList())));
 
         futuresBuilder.add(DataProvider.saveStable(cache, forgeJson, forgePath));
 

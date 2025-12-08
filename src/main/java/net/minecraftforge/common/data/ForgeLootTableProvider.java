@@ -67,9 +67,9 @@ public final class ForgeLootTableProvider extends LootTableProvider {
     }
 
     private LootTableSubProvider replaceAndFilterChangesOnly(LootTableSubProvider subProvider) {
-        return (newConsumer) -> subProvider.generate((resourceLocation, builder) -> {
+        return (newConsumer) -> subProvider.generate((Identifier, builder) -> {
             if (findAndReplaceInLootTableBuilder(builder, Items.SHEARS, ToolActions.SHEARS_DIG)) {
-                newConsumer.accept(resourceLocation, builder);
+                newConsumer.accept(Identifier, builder);
             }
         });
     }

@@ -15,13 +15,13 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public record ItemExistsCondition(ResourceLocation item) implements ICondition {
+public record ItemExistsCondition(Identifier item) implements ICondition {
     public static final MapCodec<ItemExistsCondition> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
-        ResourceLocation.CODEC.fieldOf("item").forGetter(ItemExistsCondition::item)
+        Identifier.CODEC.fieldOf("item").forGetter(ItemExistsCondition::item)
     ).apply(b, ItemExistsCondition::new));
 
     @Override

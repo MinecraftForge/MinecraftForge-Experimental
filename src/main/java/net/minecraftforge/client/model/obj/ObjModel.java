@@ -19,7 +19,7 @@ import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.client.model.IModelBuilder;
@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
  * A model loaded from an OBJ file.
  * <p>
  * Supports positions, texture coordinates, normals and colors. The {@link ObjMaterialLibrary material library}
- * has support for numerous features, including support for {@link ResourceLocation} textures (non-standard).
+ * has support for numerous features, including support for {@link Identifier} textures (non-standard).
  */
 public class ObjModel {
     private static final Vector4f COLOR_WHITE = new Vector4f(1, 1, 1, 1);
@@ -78,7 +78,7 @@ public class ObjModel {
     @Nullable
     public final String mtlOverride;
 
-    public final ResourceLocation modelLocation;
+    public final Identifier modelLocation;
 
     private ObjModel(ModelSettings settings) {
         this.modelLocation = settings.modelLocation;
@@ -119,9 +119,9 @@ public class ObjModel {
         if (materialLibraryOverrideLocation != null) {
             String lib = materialLibraryOverrideLocation;
             if (lib.contains(":"))
-                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.parse(lib));
+                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.parse(lib));
             else
-                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
+                mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.fromNamespaceAndPath(modelDomain, modelPath + lib));
         }
 
         String[] line;
@@ -133,9 +133,9 @@ public class ObjModel {
 
                     String lib = line[1];
                     if (lib.contains(":"))
-                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.parse(lib));
+                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.parse(lib));
                     else
-                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(ResourceLocation.fromNamespaceAndPath(modelDomain, modelPath + lib));
+                        mtllib = ObjLoader.INSTANCE.loadMaterialLibrary(Identifier.fromNamespaceAndPath(modelDomain, modelPath + lib));
                     break;
                 }
                 case "usemtl": { // Sets the current material (starts new mesh)
@@ -555,14 +555,14 @@ public class ObjModel {
                 quads.add(pair.getLeft());
             }
 
-            ResourceLocation textureLocation = UnbakedGeometryHelper.resolveDirtyMaterial(mat.diffuseColorMap, textures).texture();
-            ResourceLocation texturePath = textureLocation.withPath(p -> "textures/" + p + ".png");
+            Identifier textureLocation = UnbakedGeometryHelper.resolveDirtyMaterial(mat.diffuseColorMap, textures).texture();
+            Identifier texturePath = textureLocation.withPath(p -> "textures/" + p + ".png");
 
             builder.addMesh(texturePath, quads);
         }
     }
 
-    public record ModelSettings(@NotNull ResourceLocation modelLocation,
+    public record ModelSettings(@NotNull Identifier modelLocation,
                                 boolean automaticCulling, boolean shadeQuads, boolean flipV,
                                 boolean emissiveAmbient, @Nullable String mtlOverride)
     { }

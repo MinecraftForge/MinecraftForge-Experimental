@@ -5,7 +5,7 @@
 
 package net.minecraftforge.client.model.geometry;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.ModelEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +20,14 @@ import java.util.stream.Collectors;
  * Provides a lookup.
  */
 public final class GeometryLoaderManager {
-    private static Map<ResourceLocation, IGeometryLoader> LOADERS;
+    private static Map<Identifier, IGeometryLoader> LOADERS;
     private static String LOADER_LIST;
 
     /**
      * Finds the {@link IGeometryLoader} for a given name, or null if not found.
      */
     @Nullable
-    public static IGeometryLoader get(ResourceLocation name) {
+    public static IGeometryLoader get(Identifier name) {
         return LOADERS.get(name);
     }
 
@@ -40,10 +40,10 @@ public final class GeometryLoaderManager {
 
     @ApiStatus.Internal
     public static void init() {
-        var loaders = new HashMap<ResourceLocation, IGeometryLoader>();
+        var loaders = new HashMap<Identifier, IGeometryLoader>();
         ModelEvent.RegisterGeometryLoaders.BUS.post(new ModelEvent.RegisterGeometryLoaders(loaders));
         LOADERS = Map.copyOf(loaders);
-        LOADER_LIST = loaders.keySet().stream().map(ResourceLocation::toString).collect(Collectors.joining(", "));
+        LOADER_LIST = loaders.keySet().stream().map(Identifier::toString).collect(Collectors.joining(", "));
     }
 
     private GeometryLoaderManager() {}

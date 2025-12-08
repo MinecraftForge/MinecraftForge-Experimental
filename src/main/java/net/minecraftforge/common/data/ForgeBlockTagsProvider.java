@@ -9,7 +9,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.data.tags.VanillaBlockTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
@@ -72,7 +72,7 @@ public final class ForgeBlockTagsProvider extends VanillaBlockTagsProvider {
     private void addColored(TagKey<Block> group, String pattern) {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (var color : DyeColor.values()) {
-            var key = ResourceLocation.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
+            var key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
             TagKey<Block> tag = getForgeTag(prefix + color.getName());
             var block = ForgeRegistries.BLOCKS.getValue(key);
             if (block == null || block == Blocks.AIR)
@@ -100,7 +100,7 @@ public final class ForgeBlockTagsProvider extends VanillaBlockTagsProvider {
     }
 
     private static TagKey<Block> forgeTagKey(String path) {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("forge", path));
+        return BlockTags.create(Identifier.fromNamespaceAndPath("forge", path));
     }
 
     @Override

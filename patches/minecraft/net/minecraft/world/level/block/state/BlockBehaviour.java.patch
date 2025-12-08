@@ -19,7 +19,7 @@
          }
      }
  
-@@ -347,12 +_,15 @@
+@@ -346,12 +_,15 @@
          if (f == -1.0F) {
              return 0.0F;
          } else {
@@ -37,7 +37,7 @@
      }
  
      protected void attack(BlockState p_60499_, Level p_60500_, BlockPos p_60501_, Player p_60502_) {
-@@ -388,6 +_,8 @@
+@@ -387,6 +_,8 @@
          return this.isRandomlyTicking;
      }
  
@@ -46,7 +46,7 @@
      protected SoundType getSoundType(BlockState p_328629_) {
          return this.soundType;
      }
-@@ -408,6 +_,10 @@
+@@ -407,6 +_,10 @@
          return this.properties.destroyTime;
      }
  
@@ -57,7 +57,7 @@
      public abstract static class BlockStateBase extends StateHolder<Block, BlockState> {
          private static final Direction[] DIRECTIONS = Direction.values();
          private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[DIRECTIONS.length], p_368402_ -> Arrays.fill(p_368402_, Shapes.empty()));
-@@ -560,12 +_,14 @@
+@@ -557,12 +_,14 @@
              return this.useShapeForLightOcclusion;
          }
  
@@ -73,7 +73,7 @@
          }
  
          public boolean ignitedByLava() {
-@@ -578,9 +_,11 @@
+@@ -575,9 +_,11 @@
          }
  
          public MapColor getMapColor(BlockGetter p_285002_, BlockPos p_285293_) {
@@ -86,7 +86,7 @@
          public BlockState rotate(Rotation p_60718_) {
              return this.getBlock().rotate(this.asState(), p_60718_);
          }
-@@ -634,6 +_,8 @@
+@@ -631,6 +_,8 @@
          }
  
          public PushReaction getPistonPushReaction() {
@@ -95,7 +95,7 @@
              return this.pushReaction;
          }
  
-@@ -1002,7 +_,7 @@
+@@ -996,7 +_,7 @@
          BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn = (p_360542_, p_360543_, p_360544_, p_360545_) -> p_360542_.isFaceSturdy(
                  p_360543_, p_360544_, Direction.UP
              )

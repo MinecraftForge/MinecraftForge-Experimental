@@ -5,7 +5,7 @@
 
 package net.minecraftforge.client.textures;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.Resource;
 import com.mojang.serialization.Codec;
@@ -29,7 +29,7 @@ public record ForgeTextureMetadata(@Nullable ITextureAtlasSpriteLoader loader) {
             var ret = TextureAtlasSpriteLoaderManager.getKey(loader);
             return ret == null ? null : ret.toString();
         },
-        name -> TextureAtlasSpriteLoaderManager.get(ResourceLocation.parse(name))
+        name -> TextureAtlasSpriteLoaderManager.get(Identifier.parse(name))
     );
 
     private static final Codec<ForgeTextureMetadata> CODEC = RecordCodecBuilder.create(i ->

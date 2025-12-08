@@ -10,12 +10,12 @@ import java.util.Optional;
 
 import com.mojang.math.Transformation;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public record ForgeBlockModelData(
     Optional<Transformation> transform,
-    Optional<ResourceLocation> renderType,
-    Optional<ResourceLocation> renderTypeFast,
+    Optional<Identifier> renderType,
+    Optional<Identifier> renderTypeFast,
     Optional<Map<String, Boolean>> visibility
 ) {
     public ForgeBlockModelData() {

@@ -19,7 +19,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -48,7 +48,7 @@ public final class CriterionTest extends BaseTestMod {
     private static final DeferredRegister<CriterionTrigger<?>> TRIGGERS = DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES.key(), MOD_ID);
     public static final RegistryObject<BreakWithItemCriterion> CRITERION = TRIGGERS.register("criterion", BreakWithItemCriterion::new);
     public static final String TEST_CRITERION_ID = "break_glass_with_fish";
-    public static final ResourceLocation TEST_ADVANCEMENT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
+    public static final Identifier TEST_ADVANCEMENT_ID = Identifier.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
 
     public CriterionTest(FMLJavaModLoadingContext context) {
         super(context, false, true);
@@ -102,7 +102,7 @@ public final class CriterionTest extends BaseTestMod {
     }
 
     private void gatherData(GatherDataEvent event) {
-        var tag = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "fish"));
+        var tag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "fish"));
 
         event.getGenerator().addProvider(true, new VanillaItemTagsProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), MOD_ID, event.getExistingFileHelper()) {
             @Override
@@ -118,7 +118,7 @@ public final class CriterionTest extends BaseTestMod {
             }
         });
 
-        var STORY_ROOT = new AdvancementHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "story/root"), null);
+        var STORY_ROOT = new AdvancementHolder(Identifier.fromNamespaceAndPath("minecraft", "story/root"), null);
 
         event.getGenerator().addProvider(true,
             new ForgeAdvancementProvider(

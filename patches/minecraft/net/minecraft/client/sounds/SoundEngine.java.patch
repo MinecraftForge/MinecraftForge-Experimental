@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/sounds/SoundEngine.java
 +++ b/net/minecraft/client/sounds/SoundEngine.java
-@@ -81,6 +_,7 @@
+@@ -82,6 +_,7 @@
          this.soundManager = p_120236_;
          this.options = p_120237_;
          this.soundBuffers = new SoundBufferLibrary(p_249332_);
@@ -8,7 +8,7 @@
      }
  
      public void reload() {
-@@ -98,6 +_,7 @@
+@@ -99,6 +_,7 @@
  
          this.destroy();
          this.loadLibrary();
@@ -16,7 +16,7 @@
      }
  
      private synchronized void loadLibrary() {
-@@ -343,6 +_,9 @@
+@@ -339,6 +_,9 @@
          } else if (!p_120313_.canPlaySound()) {
              return SoundEngine.PlayResult.NOT_STARTED;
          } else {
@@ -24,9 +24,9 @@
 +            if (p_120313_ == null || !p_120313_.canPlaySound())
 +                return SoundEngine.PlayResult.NOT_STARTED;
              WeighedSoundEvents weighedsoundevents = p_120313_.resolve(this.soundManager);
-             ResourceLocation resourcelocation = p_120313_.getLocation();
+             Identifier identifier = p_120313_.getIdentifier();
              if (weighedsoundevents == null) {
-@@ -422,15 +_,18 @@
+@@ -418,15 +_,18 @@
                          p_194488_.setSelfPosition(vec3);
                          p_194488_.setRelative(flag);
                      });

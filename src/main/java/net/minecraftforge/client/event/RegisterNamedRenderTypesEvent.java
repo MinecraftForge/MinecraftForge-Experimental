@@ -9,7 +9,7 @@ import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.RenderTypeGroup;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -35,22 +35,22 @@ public final class RegisterNamedRenderTypesEvent extends MutableEvent implements
         return BUS;
     }
 
-    private final Map<ResourceLocation, RenderTypeGroup> renderTypes;
+    private final Map<Identifier, RenderTypeGroup> renderTypes;
 
     @ApiStatus.Internal
-    public RegisterNamedRenderTypesEvent(Map<ResourceLocation, RenderTypeGroup> renderTypes) {
+    public RegisterNamedRenderTypesEvent(Map<Identifier, RenderTypeGroup> renderTypes) {
         this.renderTypes = renderTypes;
     }
 
     /**
      * Registers a named {@link RenderTypeGroup}.
      *
-     * @param resourceLocation The namespace should match your mod's namespace, such as your mod ID
+     * @param Identifier The namespace should match your mod's namespace, such as your mod ID
      * @param blockRenderType  What ChunkSectionLayer to render in
      * @param entityRenderType A {@link RenderType} using {@link DefaultVertexFormat#NEW_ENTITY}
      */
-    public void register(ResourceLocation resourceLocation, ChunkSectionLayer blockRenderType, RenderType entityRenderType) {
-        register(resourceLocation, blockRenderType, entityRenderType, entityRenderType);
+    public void register(Identifier Identifier, ChunkSectionLayer blockRenderType, RenderType entityRenderType) {
+        register(Identifier, blockRenderType, entityRenderType, entityRenderType);
     }
 
     /**
@@ -62,7 +62,7 @@ public final class RegisterNamedRenderTypesEvent extends MutableEvent implements
      * @param fabulousEntityRenderType A {@link RenderType} using {@link DefaultVertexFormat#NEW_ENTITY} for use when
      *                                 "fabulous" rendering is enabled
      */
-    public void register(ResourceLocation key, ChunkSectionLayer blockRenderType, RenderType entityRenderType, RenderType fabulousEntityRenderType) {
+    public void register(Identifier key, ChunkSectionLayer blockRenderType, RenderType entityRenderType, RenderType fabulousEntityRenderType) {
         Preconditions.checkArgument(!renderTypes.containsKey(key), "Render type already registered: " + key);
         Preconditions.checkArgument(entityRenderType.format() == DefaultVertexFormat.NEW_ENTITY, "The entity render type must use the NEW_ENTITY vertex format.");
         Preconditions.checkArgument(fabulousEntityRenderType.format() == DefaultVertexFormat.NEW_ENTITY, "The fabulous entity render type must use the NEW_ENTITY vertex format.");

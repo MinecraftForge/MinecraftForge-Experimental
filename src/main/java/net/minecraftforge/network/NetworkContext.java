@@ -16,7 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 import io.netty.util.AttributeKey;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.Connection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
 import net.minecraftforge.network.packets.ModVersions;
@@ -60,7 +60,7 @@ public class NetworkContext {
         return this.netVersion;
     }
 
-    public Set<ResourceLocation> getRemoteChannels() {
+    public Set<Identifier> getRemoteChannels() {
         return this.remoteChannelsView;
     }
 
@@ -110,18 +110,18 @@ public class NetworkContext {
     }
 
     @ApiStatus.Internal
-    Set<ResourceLocation> remoteChannels = new HashSet<>();
-    private Set<ResourceLocation> remoteChannelsView = Collections.unmodifiableSet(this.remoteChannels);
+    Set<Identifier> remoteChannels = new HashSet<>();
+    private Set<Identifier> remoteChannelsView = Collections.unmodifiableSet(this.remoteChannels);
 
     @ApiStatus.Internal
-    Set<ResourceLocation> sentChannels = new HashSet<>();
+    Set<Identifier> sentChannels = new HashSet<>();
 
     @ApiStatus.Internal
     Map<String, ModVersions.Info> modList = new HashMap<>();
     private Map<String, ModVersions.Info> modListView = Collections.unmodifiableMap(modList);
 
     @ApiStatus.Internal
-    Map<ResourceLocation, Integer> channelList = new Object2IntOpenHashMap<>();
+    Map<Identifier, Integer> channelList = new Object2IntOpenHashMap<>();
 
     // TODO Make this official API? This is to allow us to finish a task in the packet handlers and not the task function itself.
     @ApiStatus.Internal
@@ -147,8 +147,8 @@ public class NetworkContext {
 
     @ApiStatus.Internal
     public record NetworkMismatchData(
-        Map<ResourceLocation, Version> mismatched,
-        Set<ResourceLocation> missing,
+        Map<Identifier, Version> mismatched,
+        Set<Identifier> missing,
         boolean fromServer,
         Map<String, ModVersions.Info> mods
     ) {

@@ -6,7 +6,7 @@
 package net.minecraftforge.network;
 
 import net.minecraft.network.Connection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.Channel.VersionTest;
 
@@ -32,16 +32,16 @@ public final class NetworkInstance {
     // Should this be changed so that modders can fire other channel's handlers?
 
     private Collection<Consumer<CustomPayloadEvent>> listeners = new ArrayList<>();
-    private final ResourceLocation channelName;
+    private final Identifier channelName;
     private final int networkProtocolVersion;
     final VersionTest clientAcceptedVersions;
     final VersionTest serverAcceptedVersions;
     final Map<AttributeKey<?>, Function<Connection, ?>> attributes;
     final Consumer<Connection> channelHandler;
     final ServerStatusPing.ChannelData pingData;
-    private final Set<ResourceLocation> ids = new HashSet<>();
+    private final Set<Identifier> ids = new HashSet<>();
 
-    NetworkInstance(ResourceLocation channelName, int networkProtocolVersion,
+    NetworkInstance(Identifier channelName, int networkProtocolVersion,
         VersionTest clientAcceptedVersions, VersionTest serverAcceptedVersions,
         Map<AttributeKey<?>, Function<Connection, ?>> attributes, Consumer<Connection> channelHandler
     ) {
@@ -68,13 +68,13 @@ public final class NetworkInstance {
      * Registers another name that will have its CustomPayloadEvents redirected to this channel.
      * Like the main name, this must be unique across all channels.
      */
-    public NetworkInstance addChild(ResourceLocation name) {
+    public NetworkInstance addChild(Identifier name) {
         NetworkRegistry.register(this, name);
         this.ids.add(name);
         return this;
     }
 
-    ResourceLocation getChannelName() {
+    Identifier getChannelName() {
         return channelName;
     }
 
@@ -82,7 +82,7 @@ public final class NetworkInstance {
         return networkProtocolVersion;
     }
 
-    void registrationChange(ResourceLocation name, boolean registered) {
+    void registrationChange(Identifier name, boolean registered) {
         // TODO: Expose to listeners?
     }
 

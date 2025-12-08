@@ -8,7 +8,7 @@ package net.minecraftforge.client.model.generators.loaders;
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -21,13 +21,13 @@ import net.minecraftforge.registries.ForgeRegistries;
  */
 public class DynamicFluidContainerModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "fluid_container");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "fluid_container");
     public static <T extends ModelBuilder<T>> DynamicFluidContainerModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper)
     {
         return new DynamicFluidContainerModelBuilder<>(parent, existingFileHelper);
     }
 
-    private ResourceLocation fluid;
+    private Identifier fluid;
     private Boolean flipGas;
     private Boolean applyTint;
     private Boolean coverIsMask;

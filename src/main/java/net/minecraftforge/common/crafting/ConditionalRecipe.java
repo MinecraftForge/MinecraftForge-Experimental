@@ -43,7 +43,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.crafting.conditions.ConditionCodec;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ICondition.IContext;
@@ -82,7 +82,7 @@ public class ConditionalRecipe {
             }
 
             @Override
-            public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, ResourceLocation advancementId, JsonElement advancement) {
+            public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, Identifier advancementId, JsonElement advancement) {
                 AdvancementHolder holder = null;
                 if (advancement != null) {
                     Advancement adv = Advancement.CODEC.parse(JsonOps.INSTANCE, advancement).getOrThrow(JsonParseException::new);
@@ -106,7 +106,7 @@ public class ConditionalRecipe {
         private ICondition mainCondition;
 
         @Nullable
-        private ResourceLocation advancementId;
+        private Identifier advancementId;
 
         public Builder mainCondition(ICondition value) {
             if (this.mainCondition != null)
@@ -137,16 +137,16 @@ public class ConditionalRecipe {
             return this;
         }
 
-        public Builder advancement(ResourceLocation id) {
+        public Builder advancement(Identifier id) {
             this.advancementId = id;
             return this;
         }
 
         public void save(RecipeOutput out, String namespace, String path) {
-            save(out, ResourceLocation.fromNamespaceAndPath(namespace, path));
+            save(out, Identifier.fromNamespaceAndPath(namespace, path));
         }
 
-        public void save(RecipeOutput out, ResourceLocation id) {
+        public void save(RecipeOutput out, Identifier id) {
             if (condition != null)
                 throw new IllegalStateException("Invalid ConditionalRecipe builder, Orphaned conditions");
 

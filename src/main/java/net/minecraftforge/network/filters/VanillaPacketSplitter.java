@@ -14,7 +14,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.network.*;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.*;
 import net.minecraftforge.network.event.EventNetworkChannel;
 
@@ -29,7 +29,7 @@ public class VanillaPacketSplitter {
 
     private static final Logger LOGGER = LogManager.getLogger();
 
-    private static final ResourceLocation CHANNEL = new ResourceLocation("forge", "split");
+    private static final Identifier CHANNEL = new Identifier("forge", "split");
     private static final String VERSION = "1.1";
 
     private static final int PROTOCOL_MAX = CompressionDecoder.MAXIMUM_UNCOMPRESSED_LENGTH;

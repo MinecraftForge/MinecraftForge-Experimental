@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import io.netty.util.AttributeKey;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.Channel.VersionTest;
 import net.minecraftforge.network.payload.PayloadConnection;
 
@@ -23,7 +23,7 @@ import net.minecraftforge.network.payload.PayloadConnection;
  * Builder for constructing impl channels using a builder style API.
  */
 public class ChannelBuilder {
-    private final ResourceLocation name;
+    private final Identifier name;
     private int networkProtocolVersion = 0;
     private Channel.VersionTest clientAcceptedVersions;
     private Channel.VersionTest serverAcceptedVersions;
@@ -36,18 +36,18 @@ public class ChannelBuilder {
      * @param channelName The name of the channel
      */
     public static ChannelBuilder named(String channelName) {
-        return named(ResourceLocation.parse(channelName));
+        return named(Identifier.parse(channelName));
     }
 
     /**
      * Creates a new channel builder, The name of the channel must be unique.
      * @param channelName The name of the channel
      */
-    public static ChannelBuilder named(ResourceLocation channelName) {
+    public static ChannelBuilder named(Identifier channelName) {
         return new ChannelBuilder(channelName);
     }
 
-    private ChannelBuilder(ResourceLocation name) {
+    private ChannelBuilder(Identifier name) {
         this.name = name;
     }
 

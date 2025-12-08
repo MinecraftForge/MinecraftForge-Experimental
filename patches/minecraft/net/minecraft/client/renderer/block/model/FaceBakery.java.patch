@@ -1,18 +1,29 @@
 --- a/net/minecraft/client/renderer/block/model/FaceBakery.java
 +++ b/net/minecraft/client/renderer/block/model/FaceBakery.java
-@@ -65,7 +_,14 @@
-             recalculateWinding(aint, direction);
+@@ -80,7 +_,8 @@
+             recalculateWinding(avector3fc, along, direction);
          }
  
--        return new BakedQuad(aint, p_111603_.tintIndex(), direction, p_111604_, p_111608_, p_364904_);
+-        return new BakedQuad(
 +        var data = p_111603_.data();
-+        var quad = new BakedQuad(aint, p_111603_.tintIndex(), direction, p_111604_, p_111608_, p_364904_, data.ambientOcclusion());
++        var quad = new BakedQuad(
+             avector3fc[0],
+             avector3fc[1],
+             avector3fc[2],
+@@ -93,8 +_,15 @@
+             Objects.requireNonNullElse(direction, Direction.UP),
+             p_111604_,
+             p_111608_,
+-            p_364904_
++            p_364904_,
++            data.ambientOcclusion()
+         );
 +        if (!net.minecraftforge.client.model.ForgeFaceData.DEFAULT.equals(data)) {
-+           quad = net.minecraftforge.client.model.QuadTransformers.applyingLightmap(data.blockLight(), data.skyLight())
-+               .andThen(net.minecraftforge.client.model.QuadTransformers.applyingColor(data.color()))
-+               .process(quad);
++            quad = net.minecraftforge.client.model.QuadTransformers.applyingLightmap(data.blockLight(), data.skyLight())
++                .andThen(net.minecraftforge.client.model.QuadTransformers.applyingColor(data.color()))
++                .process(quad);
 +        }
 +        return quad;
      }
  
-     private static BlockElementFace.UVs shrinkUVs(TextureAtlasSprite p_397002_, BlockElementFace.UVs p_394057_) {
+     private static void bakeVertex(

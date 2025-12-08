@@ -27,7 +27,6 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.crafting.SingleRecipeInput;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
@@ -36,7 +35,6 @@ import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.gametest.GameTest;
@@ -70,7 +68,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
     private static <C extends RecipeInput, T extends Recipe<C>> void assertTrue(GameTestHelper helper, RecipeType<T> type, C container) {
         var recipe = helper.getLevel().recipeAccess().getRecipeFor(type, container, helper.getLevel());
         helper.assertTrue(recipe.isPresent(), "Did not find crafting recipe when expected!");
-        helper.assertTrue(recipe.get().id().location().getNamespace().equals(MODID), "It wasn't our recipe: " + recipe.get().id());
+        helper.assertTrue(recipe.get().id().identifier().getNamespace().equals(MODID), "It wasn't our recipe: " + recipe.get().id());
         helper.succeed();
     }
 

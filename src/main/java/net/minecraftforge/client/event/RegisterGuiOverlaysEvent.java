@@ -7,7 +7,7 @@
 package net.minecraftforge.client.event;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.Cancelable;
@@ -33,11 +33,11 @@ import java.util.Map;
  * /
 public class RegisterGuiOverlaysEvent extends Event implements IModBusEvent
 {
-    private final Map<ResourceLocation, IGuiOverlay> overlays;
-    private final List<ResourceLocation> orderedOverlays;
+    private final Map<Identifier, IGuiOverlay> overlays;
+    private final List<Identifier> orderedOverlays;
 
     @ApiStatus.Internal
-    public RegisterGuiOverlaysEvent(Map<ResourceLocation, IGuiOverlay> overlays, List<ResourceLocation> orderedOverlays)
+    public RegisterGuiOverlaysEvent(Map<Identifier, IGuiOverlay> overlays, List<Identifier> orderedOverlays)
     {
         this.overlays = overlays;
         this.orderedOverlays = orderedOverlays;
@@ -62,7 +62,7 @@ public class RegisterGuiOverlaysEvent extends Event implements IModBusEvent
      * @param id      A unique resource id for this overlay
      * @param overlay The overlay
      * /
-    public void registerBelow(@NotNull ResourceLocation other, @NotNull String id, @NotNull IGuiOverlay overlay)
+    public void registerBelow(@NotNull Identifier other, @NotNull String id, @NotNull IGuiOverlay overlay)
     {
         register(Ordering.BEFORE, other, id, overlay);
     }
@@ -75,7 +75,7 @@ public class RegisterGuiOverlaysEvent extends Event implements IModBusEvent
      * @param id      A unique resource id for this overlay
      * @param overlay The overlay
      * /
-    public void registerAbove(@NotNull ResourceLocation other, @NotNull String id, @NotNull IGuiOverlay overlay)
+    public void registerAbove(@NotNull Identifier other, @NotNull String id, @NotNull IGuiOverlay overlay)
     {
         register(Ordering.AFTER, other, id, overlay);
     }
@@ -91,9 +91,9 @@ public class RegisterGuiOverlaysEvent extends Event implements IModBusEvent
         register(Ordering.AFTER, null, id, overlay);
     }
 
-    private void register(@NotNull Ordering ordering, @Nullable ResourceLocation other, @NotNull String id, @NotNull IGuiOverlay overlay)
+    private void register(@NotNull Ordering ordering, @Nullable Identifier other, @NotNull String id, @NotNull IGuiOverlay overlay)
     {
-        var key = new ResourceLocation(ModLoadingContext.get().getActiveNamespace(), id);
+        var key = new Identifier(ModLoadingContext.get().getActiveNamespace(), id);
         Preconditions.checkArgument(!overlays.containsKey(key), "Overlay already registered: " + key);
 
         int insertPosition;

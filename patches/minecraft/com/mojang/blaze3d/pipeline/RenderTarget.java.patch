@@ -1,17 +1,17 @@
 --- a/com/mojang/blaze3d/pipeline/RenderTarget.java
 +++ b/com/mojang/blaze3d/pipeline/RenderTarget.java
-@@ -86,7 +_,7 @@
+@@ -80,7 +_,7 @@
              this.width = p_83951_;
              this.height = p_83952_;
              if (this.useDepth) {
 -                this.depthTexture = gpudevice.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, p_83951_, p_83952_, 1, 1);
 +                this.depthTexture = gpudevice.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, p_83951_, p_83952_, 1, 1, this.stencilEnabled);
                  this.depthTextureView = gpudevice.createTextureView(this.depthTexture);
-                 this.depthTexture.setTextureFilter(FilterMode.NEAREST, false);
-                 this.depthTexture.setAddressMode(AddressMode.CLAMP_TO_EDGE);
-@@ -155,5 +_,26 @@
-     @Nullable
-     public GpuTextureView getDepthTextureView() {
+             }
+ 
+@@ -126,5 +_,26 @@
+ 
+     public @Nullable GpuTextureView getDepthTextureView() {
          return this.depthTextureView;
 +    }
 +

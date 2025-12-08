@@ -13,7 +13,7 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.RenderTypeGroup;
 
 import java.util.List;
@@ -133,7 +133,7 @@ public interface IModelBuilder<T extends IModelBuilder<T>> {
     }
 
     class Collecting implements IModelBuilder<Collecting> {
-        private static final BlockModelPart EMPTY = new SimpleModelWrapper(QuadCollection.EMPTY, false, new TextureAtlasSprite(ResourceLocation.fromNamespaceAndPath("forge", "empty"), null, 0, 0, 0, 0) {});
+        private static final BlockModelPart EMPTY = new SimpleModelWrapper(QuadCollection.EMPTY, false, new TextureAtlasSprite(Identifier.fromNamespaceAndPath("forge", "empty"), null, 0, 0, 0, 0) {});
         private final List<BakedQuad> quads;
 
         private Collecting(List<BakedQuad> quads) {

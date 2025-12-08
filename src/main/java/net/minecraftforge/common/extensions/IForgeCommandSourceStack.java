@@ -7,7 +7,7 @@ package net.minecraftforge.common.extensions;
 
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.commands.CommandSourceStack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.scores.Scoreboard;
@@ -30,7 +30,7 @@ public interface IForgeCommandSourceStack {
     /**
      * @return the advancement from the id
      */
-    default AdvancementHolder getAdvancement(ResourceLocation id) {
+    default AdvancementHolder getAdvancement(Identifier id) {
         return self().getServer().getAdvancements().get(id);
     }
 

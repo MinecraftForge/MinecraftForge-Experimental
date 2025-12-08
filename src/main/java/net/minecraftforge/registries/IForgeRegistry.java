@@ -9,7 +9,7 @@ import com.mojang.serialization.Codec;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.registries.tags.ITagManager;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,25 +26,25 @@ import java.util.Set;
  */
 public interface IForgeRegistry<V> extends Iterable<V> {
     ResourceKey<Registry<V>> getRegistryKey();
-    ResourceLocation getRegistryName();
+    Identifier getRegistryName();
 
     /**
      * The supplied string key will be prefixed with the currently active mod's mod id.
      * If the supplied name already has a prefix that is different, it will be used and a warning will be logged.
      */
     void register(String key, V value);
-    void register(ResourceLocation key, V value);
+    void register(Identifier key, V value);
 
-    boolean containsKey(ResourceLocation key);
+    boolean containsKey(Identifier key);
     boolean containsValue(V value);
     boolean isEmpty();
 
-    @Nullable V getValue(ResourceLocation key);
-    @Nullable ResourceLocation getKey(V value);
-    @Nullable ResourceLocation getDefaultKey();
+    @Nullable V getValue(Identifier key);
+    @Nullable Identifier getKey(V value);
+    @Nullable Identifier getDefaultKey();
     @NotNull Optional<ResourceKey<V>> getResourceKey(V value);
 
-    @NotNull Set<ResourceLocation>         getKeys();
+    @NotNull Set<Identifier>         getKeys();
     @NotNull Collection<V>                 getValues();
     @NotNull Set<Entry<ResourceKey<V>, V>> getEntries();
 
@@ -64,7 +64,7 @@ public interface IForgeRegistry<V> extends Iterable<V> {
      * This method exists purely as a stopgap for vanilla compatibility.
      * For anything tag related, use {@link #tags()}.
      */
-    @NotNull Optional<Holder<V>> getHolder(ResourceLocation location);
+    @NotNull Optional<Holder<V>> getHolder(Identifier location);
     /**
      * This method exists purely as a stopgap for vanilla compatibility.
      * For anything tag related, use {@link #tags()}.
@@ -78,8 +78,8 @@ public interface IForgeRegistry<V> extends Iterable<V> {
 
     @NotNull Optional<Holder.Reference<V>> getDelegate(ResourceKey<V> rkey);
     @NotNull Holder.Reference<V> getDelegateOrThrow(ResourceKey<V> rkey);
-    @NotNull Optional<Holder.Reference<V>> getDelegate(ResourceLocation key);
-    @NotNull Holder.Reference<V> getDelegateOrThrow(ResourceLocation key);
+    @NotNull Optional<Holder.Reference<V>> getDelegate(Identifier key);
+    @NotNull Holder.Reference<V> getDelegateOrThrow(Identifier key);
     @NotNull Optional<Holder.Reference<V>> getDelegate(V value);
     @NotNull Holder.Reference<V> getDelegateOrThrow(V value);
 
@@ -124,7 +124,7 @@ public interface IForgeRegistry<V> extends Iterable<V> {
      */
     @FunctionalInterface
     interface ValidateCallback<V> {
-        void onValidate(IForgeRegistryInternal<V> owner, RegistryManager stage, int id, ResourceLocation key, V obj);
+        void onValidate(IForgeRegistryInternal<V> owner, RegistryManager stage, int id, Identifier key, V obj);
     }
 
     /**
@@ -137,15 +137,15 @@ public interface IForgeRegistry<V> extends Iterable<V> {
 
     @FunctionalInterface
     interface MissingFactory<V> {
-        V createMissing(ResourceLocation key, boolean isNetwork);
+        V createMissing(Identifier key, boolean isNetwork);
     }
 
-    public record SlaveKey<T>(ResourceLocation name) {
+    public record SlaveKey<T>(Identifier name) {
         public static <X> SlaveKey<X> create(String name) {
-            return create(ResourceLocation.parse(name));
+            return create(Identifier.parse(name));
         }
 
-        public static <X> SlaveKey<X> create(ResourceLocation name) {
+        public static <X> SlaveKey<X> create(Identifier name) {
             return new SlaveKey<X>(name);
         }
     }

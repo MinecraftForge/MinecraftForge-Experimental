@@ -54,7 +54,7 @@
 +                this.creativeSearch.put(entry.getValue(), CompletableFuture.supplyAsync(
                      () -> new FullTextSearchTree<>(
                          p_345254_ -> getTooltipLines(Stream.of(p_345254_), item$tooltipcontext, tooltipflag),
-                         p_344415_ -> p_344415_.getItemHolder().unwrapKey().map(ResourceKey::location).stream(),
+                         p_344415_ -> p_344415_.getItemHolder().unwrapKey().map(ResourceKey::identifier).stream(),
 -                        p_342500_
 +                        items
                      ),

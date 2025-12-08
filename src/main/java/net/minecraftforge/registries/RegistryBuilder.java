@@ -6,7 +6,7 @@
 package net.minecraftforge.registries;
 
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.registries.IForgeRegistry.AddCallback;
 import net.minecraftforge.registries.IForgeRegistry.BakeCallback;
 import net.minecraftforge.registries.IForgeRegistry.ClearCallback;
@@ -27,17 +27,17 @@ public class RegistryBuilder<T> {
     }
 
     public static <T> RegistryBuilder<T> of(String name) {
-        return of(ResourceLocation.parse(name));
+        return of(Identifier.parse(name));
     }
 
-    public static <T> RegistryBuilder<T> of(ResourceLocation name) {
+    public static <T> RegistryBuilder<T> of(Identifier name) {
         return new RegistryBuilder<T>().setName(name);
     }
 
     private static final int MAX_ID = Integer.MAX_VALUE - 1;
 
-    private ResourceLocation registryName;
-    private ResourceLocation optionalDefaultKey;
+    private Identifier registryName;
+    private Identifier optionalDefaultKey;
     private int minId = 0;
     private int maxId = MAX_ID;
     private final List<AddCallback<T>> addCallback = new ArrayList<>();
@@ -51,11 +51,11 @@ public class RegistryBuilder<T> {
     private boolean allowModifications = false;
     private boolean hasWrapper = false;
     private MissingFactory<T> missingFactory;
-    private final Set<ResourceLocation> legacyNames = new HashSet<>();
+    private final Set<Identifier> legacyNames = new HashSet<>();
     @Nullable
     private Function<T, Holder.Reference<T>> intrusiveHolderCallback = null;
 
-    public RegistryBuilder<T> setName(ResourceLocation name) {
+    public RegistryBuilder<T> setName(Identifier name) {
         this.registryName = name;
         return this;
     }
@@ -70,7 +70,7 @@ public class RegistryBuilder<T> {
         return this.setIDRange(0, max);
     }
 
-    public RegistryBuilder<T> setDefaultKey(ResourceLocation key) {
+    public RegistryBuilder<T> setDefaultKey(Identifier key) {
         this.optionalDefaultKey = key;
         return this;
     }
@@ -175,10 +175,10 @@ public class RegistryBuilder<T> {
     }
 
     public RegistryBuilder<T> legacyName(String name) {
-        return legacyName(ResourceLocation.parse(name));
+        return legacyName(Identifier.parse(name));
     }
 
-    public RegistryBuilder<T> legacyName(ResourceLocation name) {
+    public RegistryBuilder<T> legacyName(Identifier name) {
         this.legacyNames.add(name);
         return this;
     }
@@ -284,7 +284,7 @@ public class RegistryBuilder<T> {
     }
 
     @Nullable
-    public ResourceLocation getDefault() {
+    public Identifier getDefault() {
         return this.optionalDefaultKey;
     }
 
@@ -317,7 +317,7 @@ public class RegistryBuilder<T> {
         return sync;
     }
 
-    public Set<ResourceLocation> getLegacyNames() {
+    public Set<Identifier> getLegacyNames() {
         return legacyNames;
     }
 

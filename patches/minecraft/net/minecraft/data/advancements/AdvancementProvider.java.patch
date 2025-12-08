@@ -2,7 +2,7 @@
 +++ b/net/minecraft/data/advancements/AdvancementProvider.java
 @@ -16,6 +_,11 @@
  import net.minecraft.data.PackOutput;
- import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.resources.Identifier;
  
 +/**
 + * @deprecated Forge: Use {@link net.minecraftforge.common.data.ForgeAdvancementProvider} instead,

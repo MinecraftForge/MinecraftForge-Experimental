@@ -5,7 +5,7 @@
 
 package net.minecraftforge.data.loading;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.ClientBootstrap;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.server.Bootstrap;

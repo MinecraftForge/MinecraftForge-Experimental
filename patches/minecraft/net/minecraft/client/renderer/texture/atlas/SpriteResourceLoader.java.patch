@@ -1,12 +1,12 @@
 --- a/net/minecraft/client/renderer/texture/atlas/SpriteResourceLoader.java
 +++ b/net/minecraft/client/renderer/texture/atlas/SpriteResourceLoader.java
-@@ -65,6 +_,9 @@
+@@ -68,6 +_,9 @@
                  framesize = new FrameSize(nativeimage.getWidth(), nativeimage.getHeight());
              }
  
-+            SpriteContents contents = net.minecraftforge.client.ForgeHooksClient.loadSpriteContents(p_421043_, p_421044_, framesize, nativeimage, list);
++            SpriteContents contents = net.minecraftforge.client.ForgeHooksClient.loadSpriteContents(p_448404_, p_448405_, framesize, nativeimage, list);
 +            if (contents != null) return contents;
 +
-             return new SpriteContents(p_421043_, framesize, nativeimage, optional, list);
+             return new SpriteContents(p_448404_, framesize, nativeimage, optional, list, optional1);
          };
      }

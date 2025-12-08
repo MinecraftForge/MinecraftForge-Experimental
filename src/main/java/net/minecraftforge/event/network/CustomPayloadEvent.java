@@ -11,7 +11,7 @@ import io.netty.util.AttributeKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.network.PacketListener;
 import net.minecraft.network.protocol.PacketFlow;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -28,7 +28,7 @@ import java.util.concurrent.CompletableFuture;
  * If they do not handle it, then it is fired on its BUS.
  */
 public record CustomPayloadEvent(
-    ResourceLocation getChannel,
+    Identifier getChannel,
     Object getPayloadObject,
     @Nullable FriendlyByteBuf getPayload,
     Context getSource,
@@ -36,7 +36,7 @@ public record CustomPayloadEvent(
 ) implements RecordEvent {
     public static final EventBus<CustomPayloadEvent> BUS = EventBus.create(CustomPayloadEvent.class);
 
-    public CustomPayloadEvent(ResourceLocation channel, Object payload, Context source, int loginIndex) {
+    public CustomPayloadEvent(Identifier channel, Object payload, Context source, int loginIndex) {
         this(channel, payload, payload instanceof ForgePayload forge ? forge.data() : null, source, loginIndex);
     }
 

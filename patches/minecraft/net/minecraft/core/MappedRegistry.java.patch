@@ -1,7 +1,7 @@
 --- a/net/minecraft/core/MappedRegistry.java
 +++ b/net/minecraft/core/MappedRegistry.java
 @@ -30,6 +_,8 @@
- import net.minecraft.util.RandomSource;
+ import org.jspecify.annotations.Nullable;
  
  public class MappedRegistry<T> implements WritableRegistry<T> {
 +    private static final org.apache.logging.log4j.Logger LOGGER = org.apache.logging.log4j.LogManager.getLogger();
@@ -9,7 +9,7 @@
      private final ResourceKey<? extends Registry<T>> key;
      private final ObjectList<Holder.Reference<T>> byId = new ObjectArrayList<>(256);
      private final Reference2IntMap<T> toId = Util.make(new Reference2IntOpenHashMap<>(), p_308420_ -> p_308420_.defaultReturnValue(-1));
-@@ -85,6 +_,7 @@
+@@ -84,6 +_,7 @@
  
      @Override
      public Holder.Reference<T> register(ResourceKey<T> p_256252_, T p_256591_, RegistrationInfo p_329661_) {
@@ -17,7 +17,7 @@
          this.validateWrite(p_256252_);
          Objects.requireNonNull(p_256252_);
          Objects.requireNonNull(p_256591_);
-@@ -103,6 +_,8 @@
+@@ -102,6 +_,8 @@
                  reference.bindKey(p_256252_);
              } else {
                  reference = this.byKey.computeIfAbsent(p_256252_, p_358082_ -> Holder.Reference.createStandAlone(this, (ResourceKey<T>)p_358082_));
@@ -26,15 +26,15 @@
              }
  
              this.byKey.put(p_256252_, reference);
-@@ -274,7 +_,6 @@
+@@ -268,7 +_,6 @@
              return this;
          } else {
              this.frozen = true;
 -            this.byValue.forEach((p_247989_, p_247990_) -> p_247990_.bindValue((T)p_247989_));
-             List<ResourceLocation> list = this.byKey
+             List<Identifier> list = this.byKey
                  .entrySet()
                  .stream()
-@@ -290,7 +_,8 @@
+@@ -284,7 +_,8 @@
                          throw new IllegalStateException("Some intrusive holders were not registered: " + this.unregisteredIntrusiveHolders.values());
                      }
  
@@ -44,7 +44,7 @@
                  }
  
                  if (this.allTags.isBound()) {
-@@ -304,8 +_,9 @@
+@@ -298,8 +_,9 @@
                          .sorted()
                          .toList();
                      if (!list1.isEmpty()) {
@@ -56,7 +56,7 @@
                          this.allTags = MappedRegistry.TagSet.fromMap(this.frozenTags);
                          this.refreshTagsInHolders();
                          return this;
-@@ -315,6 +_,13 @@
+@@ -309,6 +_,13 @@
          }
      }
  
@@ -70,7 +70,7 @@
      @Override
      public Holder.Reference<T> createIntrusiveHolder(T p_205915_) {
          if (this.unregisteredIntrusiveHolders == null) {
-@@ -389,6 +_,31 @@
+@@ -383,6 +_,31 @@
          };
      }
  
@@ -78,8 +78,8 @@
 +        return this.unregisteredIntrusiveHolders != null;
 +    }
 +
-+    private static final Set<ResourceLocation> KNOWN = new java.util.LinkedHashSet<>();
-+    public static Set<ResourceLocation> getKnownRegistries() {
++    private static final Set<Identifier> KNOWN = new java.util.LinkedHashSet<>();
++    public static Set<Identifier> getKnownRegistries() {
 +        return java.util.Collections.unmodifiableSet(KNOWN);
 +    }
 +
@@ -88,8 +88,8 @@
 +        // So we have to have a last-in ordering. Simplest way is to just remove and re-add our selves.
 +        // A copy of this map is then captured after vanilla bootstraping to freeze it hopefully before Modder's change the order.
 +        // https://github.com/MinecraftForge/MinecraftForge/issues/10179
-+        KNOWN.remove(key().location());
-+        KNOWN.add(key().location());
++        KNOWN.remove(key().identifier());
++        KNOWN.add(key().identifier());
 +    }
 +
 +    /** @deprecated Forge: For internal use only. Use the Register events when registering values. */
@@ -102,7 +102,7 @@
      @Override
      public Registry.PendingTags<T> prepareTagReload(TagLoader.LoadResult<T> p_368827_) {
          if (!this.frozen) {
-@@ -436,6 +_,11 @@
+@@ -430,6 +_,11 @@
                  @Override
                  public HolderLookup.RegistryLookup<T> lookup() {
                      return registrylookup;

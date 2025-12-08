@@ -5,7 +5,7 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.FramePassManager;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -29,7 +29,7 @@ public record AddFramePassEvent() implements RecordEvent {
      * @param definition see usages of {@linkplain com.mojang.blaze3d.framegraph.FramePass} in {@linkplain net.minecraft.client.renderer.LevelRenderer}
      * @throws IllegalArgumentException If the name is a duplicate.
      */
-    public void addPass(ResourceLocation rl, FramePassManager.PassDefinition definition) {
+    public void addPass(Identifier rl, FramePassManager.PassDefinition definition) {
         ForgeHooksClient.addFramePass(rl, definition);
     }
 }

@@ -10,7 +10,7 @@ import com.mojang.blaze3d.framegraph.FramePass;
 import com.mojang.blaze3d.resource.ResourceHandle;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.state.LevelRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.Nullable;
 
@@ -20,7 +20,7 @@ import java.util.List;
 public class FramePassManager {
     private static final List<PassInfo> addedPasses = new ArrayList<>();
 
-    protected static void addPass(ResourceLocation name, PassDefinition pass) {
+    protected static void addPass(Identifier name, PassDefinition pass) {
         if (addedPasses.stream().noneMatch(info -> info.name.equals(name.toString()))) {
             addedPasses.add(new PassInfo(name.toString(), pass));
         } else {

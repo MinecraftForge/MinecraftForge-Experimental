@@ -6,7 +6,7 @@
 package net.minecraftforge.network;
 
 import io.netty.util.AttributeKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.packets.*;
 import org.apache.logging.log4j.LogManager;
@@ -21,9 +21,9 @@ import java.util.function.BiConsumer;
 public final class NetworkInitialization {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("FORGE_NETWORK");
-    public static final ResourceLocation LOGIN_NAME = ResourceLocation.fromNamespaceAndPath("forge", "login");
-    private static final ResourceLocation HANDSHAKE_NAME = ResourceLocation.fromNamespaceAndPath("forge", "handshake");
-    //private static final ResourceLocation PLAY_NAME = new ResourceLocation("forge", "network");
+    public static final Identifier LOGIN_NAME = Identifier.fromNamespaceAndPath("forge", "login");
+    private static final Identifier HANDSHAKE_NAME = Identifier.fromNamespaceAndPath("forge", "handshake");
+    //private static final Identifier PLAY_NAME = new Identifier("forge", "network");
     public static final AttributeKey<ForgePacketHandler> CONTEXT = AttributeKey.newInstance(HANDSHAKE_NAME.toString());
 
     public static final SimpleChannel LOGIN = ChannelBuilder

@@ -88,8 +88,8 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
     private static <C extends RecipeInput, T extends Recipe<C>> void assertRecipeMatch(GameTestHelper helper, RecipeType<T> type, C container, String name) {
         var recipe = helper.getLevel().recipeAccess().getRecipeFor(type, container, helper.getLevel());
         helper.assertTrue(recipe.isPresent(), "Did not find crafting recipe when expected!");
-        helper.assertTrue(recipe.get().id().location().getNamespace().equals(MODID), "It wasn't our recipe: " + recipe.get().id());
-        helper.assertTrue(recipe.get().id().location().getPath().equals(name), "It wasn't the correct recipe expected: " + name  + " got: " + recipe.get().id());
+        helper.assertTrue(recipe.get().id().identifier().getNamespace().equals(MODID), "It wasn't our recipe: " + recipe.get().id());
+        helper.assertTrue(recipe.get().id().identifier().getPath().equals(name), "It wasn't the correct recipe expected: " + name  + " got: " + recipe.get().id());
         helper.succeed();
     }
 

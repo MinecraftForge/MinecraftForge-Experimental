@@ -6,7 +6,7 @@
 package net.minecraftforge.client.model.generators;
 
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.data.ExistingFileHelper;
 
 /**
@@ -24,7 +24,7 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 @Deprecated(since = "1.21.4", forRemoval = true)
 public class BlockModelBuilder extends ModelBuilder<BlockModelBuilder>
 {
-    public BlockModelBuilder(ResourceLocation outputLocation, ExistingFileHelper existingFileHelper)
+    public BlockModelBuilder(Identifier outputLocation, ExistingFileHelper existingFileHelper)
     {
         super(outputLocation, existingFileHelper);
     }

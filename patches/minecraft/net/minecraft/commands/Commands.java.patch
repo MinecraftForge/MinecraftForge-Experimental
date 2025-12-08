@@ -1,6 +1,6 @@
 --- a/net/minecraft/commands/Commands.java
 +++ b/net/minecraft/commands/Commands.java
-@@ -255,7 +_,7 @@
+@@ -264,7 +_,7 @@
              ChaseCommand.register(this.dispatcher);
          }
  
@@ -9,7 +9,7 @@
              RaidCommand.register(this.dispatcher, p_230944_);
              DebugPathCommand.register(this.dispatcher);
              DebugMobSpawningCommand.register(this.dispatcher);
-@@ -288,6 +_,7 @@
+@@ -297,6 +_,7 @@
          if (p_230943_.includeIntegrated) {
              PublishCommand.register(this.dispatcher);
          }
@@ -17,7 +17,7 @@
  
          this.dispatcher.setConsumer(ExecutionCommandSource.resultConsumer());
      }
-@@ -310,9 +_,18 @@
+@@ -319,9 +_,18 @@
      public void performCommand(ParseResults<CommandSourceStack> p_242844_, String p_242841_) {
          CommandSourceStack commandsourcestack = p_242844_.getContext().getSource();
          Profiler.get().push(() -> "/" + p_242841_);
@@ -37,7 +37,7 @@
              if (contextchain != null) {
                  executeCommandInContext(
                      commandsourcestack,
-@@ -403,7 +_,10 @@
+@@ -413,7 +_,10 @@
          Map<CommandNode<CommandSourceStack>, CommandNode<CommandSourceStack>> map = new HashMap<>();
          RootCommandNode<CommandSourceStack> rootcommandnode = new RootCommandNode<>();
          map.put(this.dispatcher.getRoot(), rootcommandnode);

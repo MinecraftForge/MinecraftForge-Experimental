@@ -18,9 +18,8 @@ import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.WritableRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Registry;
-import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.registries.ForgeRegistry.Snapshot;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,13 +30,13 @@ public class RegistryManager {
     public static final RegistryManager ACTIVE = new RegistryManager("ACTIVE");
     public static final RegistryManager VANILLA = new RegistryManager("VANILLA");
     public static final RegistryManager FROZEN = new RegistryManager("FROZEN");
-    private static Set<ResourceLocation> vanillaRegistryKeys = Set.of();
+    private static Set<Identifier> vanillaRegistryKeys = Set.of();
 
-    BiMap<ResourceLocation, ForgeRegistry<?>> registries = HashBiMap.create();
-    private final Map<ResourceLocation, ? extends IForgeRegistry<?>> registryView = Collections.unmodifiableMap(registries);
-    private final Set<ResourceLocation> persisted = new HashSet<>();
-    private final Set<ResourceLocation> synced = new HashSet<>();
-    private final Map<ResourceLocation, ResourceLocation> legacyNames = new HashMap<>();
+    BiMap<Identifier, ForgeRegistry<?>> registries = HashBiMap.create();
+    private final Map<Identifier, ? extends IForgeRegistry<?>> registryView = Collections.unmodifiableMap(registries);
+    private final Set<Identifier> persisted = new HashSet<>();
+    private final Set<Identifier> synced = new HashSet<>();
+    private final Map<Identifier, Identifier> legacyNames = new HashMap<>();
     private final String name;
 
     RegistryManager() {
@@ -57,28 +56,28 @@ public class RegistryManager {
     }
 
     @SuppressWarnings("unchecked")
-    public <V> ForgeRegistry<V> getRegistry(ResourceLocation key) {
+    public <V> ForgeRegistry<V> getRegistry(Identifier key) {
         return (ForgeRegistry<V>)this.registries.get(key);
     }
 
     public <V> ForgeRegistry<V> getRegistry(ResourceKey<? extends Registry<V>> key) {
-        return getRegistry(key.location());
+        return getRegistry(key.identifier());
     }
 
-    public <V> ResourceLocation getName(IForgeRegistry<V> reg) {
+    public <V> Identifier getName(IForgeRegistry<V> reg) {
         return this.registries.inverse().get(reg);
     }
 
-    public Map<ResourceLocation, ? extends IForgeRegistry<?>> getRegistries() {
+    public Map<Identifier, ? extends IForgeRegistry<?>> getRegistries() {
         return this.registryView;
     }
 
-    public static Set<ResourceLocation> getVanillaRegistryKeys() {
+    public static Set<Identifier> getVanillaRegistryKeys() {
         return vanillaRegistryKeys;
     }
 
-    public <V> ResourceLocation updateLegacyName(ResourceLocation legacyName) {
-        ResourceLocation originalName = legacyName;
+    public <V> Identifier updateLegacyName(Identifier legacyName) {
+        Identifier originalName = legacyName;
         while (getRegistry(legacyName) == null) {
             legacyName = legacyNames.get(legacyName);
             if (legacyName == null)
@@ -87,7 +86,7 @@ public class RegistryManager {
         return legacyName;
     }
 
-    public <V> ForgeRegistry<V> getRegistry(ResourceLocation key, RegistryManager other) {
+    public <V> ForgeRegistry<V> getRegistry(Identifier key, RegistryManager other) {
         if (!this.registries.containsKey(key)) {
             ForgeRegistry<V> ot = other.getRegistry(key);
             if (ot == null)
@@ -104,7 +103,7 @@ public class RegistryManager {
         return getRegistry(key);
     }
 
-    <V> ForgeRegistry<V> createRegistry(ResourceLocation name, RegistryBuilder<V> builder) {
+    <V> ForgeRegistry<V> createRegistry(Identifier name, RegistryBuilder<V> builder) {
         if (registries.containsKey(name))
             throw new IllegalArgumentException("Attempted to register a registry for " + name + " but it already exists");
         ForgeRegistry<V> reg = new ForgeRegistry<V>(this, name, builder);
@@ -113,7 +112,7 @@ public class RegistryManager {
             this.persisted.add(name);
         if (builder.getSync())
             this.synced.add(name);
-        for (ResourceLocation legacyName : builder.getLegacyNames())
+        for (Identifier legacyName : builder.getLegacyNames())
             addLegacyName(legacyName, name);
         return getRegistry(name);
     }
@@ -140,16 +139,16 @@ public class RegistryManager {
         dataPackEvent.process();
     }
 
-    private void addLegacyName(ResourceLocation legacyName, ResourceLocation name) {
+    private void addLegacyName(Identifier legacyName, Identifier name) {
         if (this.legacyNames.containsKey(legacyName))
             throw new IllegalArgumentException("Legacy name conflict for registry " + name + ", upgrade path must be linear: " + legacyName);
         this.legacyNames.put(legacyName, name);
     }
 
-    public Map<ResourceLocation, Snapshot> takeSnapshot(boolean savingToDisc) {
-        Map<ResourceLocation, Snapshot> ret = new HashMap<>();
+    public Map<Identifier, Snapshot> takeSnapshot(boolean savingToDisc) {
+        Map<Identifier, Snapshot> ret = new HashMap<>();
         var keys = savingToDisc ? this.persisted : this.synced;
-        for (ResourceLocation key : keys) {
+        for (Identifier key : keys) {
             ret.put(key, getRegistry(key).makeSnapshot());
         }
         return ret;
@@ -164,7 +163,7 @@ public class RegistryManager {
     }
 
     @ApiStatus.Internal
-    public static List<ResourceLocation> getRegistryNamesForSyncToClient() {
+    public static List<Identifier> getRegistryNamesForSyncToClient() {
         return ACTIVE.registries.keySet().stream().filter(ACTIVE.synced::contains).toList();
     }
 }

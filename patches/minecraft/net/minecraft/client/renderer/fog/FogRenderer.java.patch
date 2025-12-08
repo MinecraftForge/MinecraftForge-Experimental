@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/fog/FogRenderer.java
 +++ b/net/minecraft/client/renderer/fog/FogRenderer.java
-@@ -155,6 +_,13 @@
+@@ -151,6 +_,13 @@
                  f2 = Mth.lerp(f6, f2, f2 * f7);
              }
  
@@ -14,7 +14,7 @@
              return new Vector4f(f5, f1, f2, 1.0F);
          }
      }
-@@ -181,6 +_,7 @@
+@@ -177,6 +_,7 @@
          float f2 = Mth.clamp(f1 / 10.0F, 4.0F, 64.0F);
          fogdata.renderDistanceStart = f1 - f2;
          fogdata.renderDistanceEnd = f1;

@@ -5,7 +5,7 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -34,17 +34,17 @@ public final class RegisterEntitySpectatorShadersEvent extends MutableEvent impl
         return BUS;
     }
 
-    private final Map<EntityType<?>, ResourceLocation> shaders;
+    private final Map<EntityType<?>, Identifier> shaders;
 
     @ApiStatus.Internal
-    public RegisterEntitySpectatorShadersEvent(Map<EntityType<?>, ResourceLocation> shaders) {
+    public RegisterEntitySpectatorShadersEvent(Map<EntityType<?>, Identifier> shaders) {
         this.shaders = shaders;
     }
 
     /**
      * Registers a spectator shader for a given entity type.
      */
-    public void register(EntityType<?> entityType, ResourceLocation shader) {
+    public void register(EntityType<?> entityType, Identifier shader) {
         shaders.put(entityType, shader);
     }
 }

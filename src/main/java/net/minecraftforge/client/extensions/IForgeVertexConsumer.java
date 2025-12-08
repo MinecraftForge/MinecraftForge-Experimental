@@ -8,6 +8,9 @@ package net.minecraftforge.client.extensions;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
+
+import net.minecraft.client.model.geom.builders.UVPair;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraftforge.client.model.IQuadTransformer;
 import org.joml.Matrix3f;
@@ -39,18 +42,20 @@ public interface IForgeVertexConsumer {
         self().putBulkData(pose, bakedQuad, new float[] { 1.0F, 1.0F, 1.0F, 1.0F }, red, green, blue, alpha, new int[] { packedLight, packedLight, packedLight, packedLight }, packedOverlay, readExistingColor);
     }
 
-    default int applyBakedLighting(int packedLight, ByteBuffer data) {
-        int bl = packedLight & 0xFFFF;
-        int sl = (packedLight >> 16) & 0xFFFF;
-        int offset = IQuadTransformer.UV2 * 4; // int offset for vertex 0 * 4 bytes per int
-        int blBaked = Short.toUnsignedInt(data.getShort(offset));
-        int slBaked = Short.toUnsignedInt(data.getShort(offset + 2));
-        bl = Math.max(bl, blBaked);
-        sl = Math.max(sl, slBaked);
-        return bl | (sl << 16);
+    default int applyBakedLighting(int packedLight, BakedQuad data, int vertex) {
+        return packedLight;
+        /*
+        long existing = data.packedUV(vertex);
+        float blBaked = UVPair.unpackU(existing);
+        float slBaked = UVPair.unpackV(existing);
+        int bl = Math.max(LightTexture.block(packedLight), blBaked);
+        int sl = Math.max(LightTexture.sky(packedLight), slBaked);
+        return LightTexture.pack(bl, sl);
+        */
     }
 
-    default void applyBakedNormals(Vector3f generated, ByteBuffer data, Matrix3f normalTransform) {
+    default void applyBakedNormals(Vector3f generated, BakedQuad data, int vertex, Matrix3f normalTransform) {
+        /*
         byte nx = data.get(28);
         byte ny = data.get(29);
         byte nz = data.get(30);
@@ -58,5 +63,6 @@ public interface IForgeVertexConsumer {
             generated.set(nx / 127f, ny / 127f, nz / 127f);
             generated.mul(normalTransform);
         }
+        */
     }
 }

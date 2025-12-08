@@ -5,7 +5,7 @@
 
 package net.minecraftforge.server.permission.handler;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraftforge.server.permission.PermissionAPI;
@@ -30,7 +30,7 @@ public interface IPermissionHandler
     /**
      * {@return an identifier for the PermissionHandler}
      */
-    ResourceLocation getIdentifier();
+    Identifier getIdentifier();
 
     /**
      * {@return an unmodifiable view of the collection of registered permission nodes}

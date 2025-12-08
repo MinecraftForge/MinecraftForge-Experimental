@@ -7,7 +7,7 @@ package net.minecraftforge.network;
 
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.LogMessageAdapter;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -58,8 +58,8 @@ public class ForgePacketHandler {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("FORGE_PACKET_HANDLER");
 
-    private Set<ResourceLocation> registriesToReceive;
-    private Map<ResourceLocation, ForgeRegistry.Snapshot> registrySnapshots = new HashMap<>();
+    private Set<Identifier> registriesToReceive;
+    private Map<Identifier, ForgeRegistry.Snapshot> registrySnapshots = new HashMap<>();
     private int nextAckId = 0;
     private Int2ObjectMap<BiConsumer<Acknowledge, CustomPayloadEvent.Context>> pendingAcknowledgments = new Int2ObjectOpenHashMap<>();
 
@@ -110,7 +110,7 @@ public class ForgePacketHandler {
 
     void handleChannelVersions(ChannelVersions list, CustomPayloadEvent.Context ctx) {
         ctx.setPacketHandled(true);
-        LOGGER.debug(MARKER, "Received {} connection with channels [{}]", ctx.isClientSide() ? "server" : "client", list.channels().keySet().stream().map(ResourceLocation::toString).sorted().collect(Collectors.joining(", ")));
+        LOGGER.debug(MARKER, "Received {} connection with channels [{}]", ctx.isClientSide() ? "server" : "client", list.channels().keySet().stream().map(Identifier::toString).sorted().collect(Collectors.joining(", ")));
         var nctx = NetworkContext.get(ctx.getConnection());
         nctx.channelList.clear();
         nctx.channelList.putAll(list.channels());
@@ -152,8 +152,8 @@ public class ForgePacketHandler {
         var clientDataPackRegistries = DataPackRegistriesHooks.getSyncedCustomRegistries();
         for (var key : list.datapacks()) {
             if (!clientDataPackRegistries.contains(key)) {
-                LOGGER.error(MARKER, "Missing required datapack registry: {}", key.location());
-                missing.add(key.location().toString());
+                LOGGER.error(MARKER, "Missing required datapack registry: {}", key.identifier());
+                missing.add(key.identifier().toString());
             }
         }
 
@@ -209,13 +209,13 @@ public class ForgePacketHandler {
                 // The error screen just wants mods, so lets guess based on registry entry namespaces
                 // TODO: Make this sane... and fully test
                 var missingMods = missingData.values().stream()
-                    .map(ResourceLocation::getNamespace)
+                    .map(Identifier::getNamespace)
                     .distinct()
                     .toList();
-                var mismatched = new HashMap<ResourceLocation, NetworkMismatchData.Version>();
-                var missing = new HashSet<ResourceLocation>();
+                var mismatched = new HashMap<Identifier, NetworkMismatchData.Version>();
+                var missing = new HashSet<Identifier>();
                 for (var id : missingMods) {
-                    var key = ResourceLocation.fromNamespaceAndPath(id, "");
+                    var key = Identifier.fromNamespaceAndPath(id, "");
                     var container = ModList.get().getModContainerById(id).orElse(null);
                     if (container != null)
                         mismatched.put(key, new NetworkMismatchData.Version(container.getModInfo().getVersion().toString(), ""));

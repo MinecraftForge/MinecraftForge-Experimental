@@ -17,15 +17,13 @@ import com.mojang.blaze3d.textures.GpuTexture;
 import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.textures.TextureFormat;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderStateShard.TextureStateShard;
-import net.minecraft.client.renderer.RenderType;
-
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.util.NonNullLazy;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.fml.earlydisplay.DisplayWindow;
@@ -56,42 +54,42 @@ public enum ForgeRenderTypes {
     public static boolean enableTextTextureLinearFiltering = false;
 
     @SuppressWarnings("deprecation")
-    private static ResourceLocation blockAtlas() {
+    private static Identifier blockAtlas() {
         return TextureAtlas.LOCATION_BLOCKS;
     }
 
     /**
      * @return A RenderType fit for multi-layer solid item rendering.
      */
-    public static RenderType getItemLayeredSolid(ResourceLocation textureLocation) {
+    public static RenderType getItemLayeredSolid(Identifier textureLocation) {
         return Internal.LAYERED_ITEM_SOLID.apply(textureLocation);
     }
 
     /**
      * @return A RenderType fit for multi-layer cutout item item rendering.
      */
-    public static RenderType getItemLayeredCutout(ResourceLocation textureLocation) {
+    public static RenderType getItemLayeredCutout(Identifier textureLocation) {
         return Internal.LAYERED_ITEM_CUTOUT.apply(textureLocation);
     }
 
     /**
      * @return A RenderType fit for multi-layer cutout-mipped item rendering.
      */
-    public static RenderType getItemLayeredCutoutMipped(ResourceLocation textureLocation) {
+    public static RenderType getItemLayeredCutoutMipped(Identifier textureLocation) {
         return Internal.LAYERED_ITEM_CUTOUT_MIPPED.apply(textureLocation);
     }
 
     /**
      * @return A RenderType fit for multi-layer translucent item rendering.
      */
-    public static RenderType getItemLayeredTranslucent(ResourceLocation textureLocation) {
+    public static RenderType getItemLayeredTranslucent(Identifier textureLocation) {
         return Internal.LAYERED_ITEM_TRANSLUCENT.apply(textureLocation);
     }
 
     /**
      * @return A RenderType fit for translucent item/entity rendering, but with depth sorting disabled.
      */
-    public static RenderType getUnsortedTranslucent(ResourceLocation textureLocation) {
+    public static RenderType getUnsortedTranslucent(Identifier textureLocation) {
         return Internal.UNSORTED_TRANSLUCENT.apply(textureLocation);
     }
 
@@ -99,7 +97,7 @@ public enum ForgeRenderTypes {
      * @return A RenderType fit for translucent item/entity rendering, but with diffuse lighting disabled
      * so that fullbright quads look correct.
      */
-    public static RenderType getUnlitTranslucent(ResourceLocation textureLocation) {
+    public static RenderType getUnlitTranslucent(Identifier textureLocation) {
         return Internal.UNLIT_TRANSLUCENT_SORTED.apply(textureLocation);
     }
 
@@ -108,68 +106,68 @@ public enum ForgeRenderTypes {
      * so that fullbright quads look correct.
      * @param sortingEnabled If false, depth sorting will not be performed.
      */
-    public static RenderType getUnlitTranslucent(ResourceLocation textureLocation, boolean sortingEnabled) {
+    public static RenderType getUnlitTranslucent(Identifier textureLocation, boolean sortingEnabled) {
         return (sortingEnabled ? Internal.UNLIT_TRANSLUCENT_SORTED : Internal.UNLIT_TRANSLUCENT_UNSORTED).apply(textureLocation);
     }
 
     /**
-     * @return Same as {@link RenderType#entityCutout(ResourceLocation)}, but with mipmapping enabled.
+     * @return Same as {@link RenderType#entityCutout(Identifier)}, but with mipmapping enabled.
      */
-    public static RenderType getEntityCutoutMipped(ResourceLocation textureLocation) {
+    public static RenderType getEntityCutoutMipped(Identifier textureLocation) {
         return Internal.LAYERED_ITEM_CUTOUT_MIPPED.apply(textureLocation);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#text(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#text(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getText(ResourceLocation locationIn) {
+    public static RenderType getText(Identifier locationIn) {
         return Internal.TEXT.apply(locationIn);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#textIntensity(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#textIntensity(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getTextIntensity(ResourceLocation locationIn) {
+    public static RenderType getTextIntensity(Identifier locationIn) {
         return Internal.TEXT_INTENSITY.apply(locationIn);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#textPolygonOffset(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#textPolygonOffset(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getTextPolygonOffset(ResourceLocation locationIn) {
+    public static RenderType getTextPolygonOffset(Identifier locationIn) {
         return Internal.TEXT_POLYGON_OFFSET.apply(locationIn);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#textIntensityPolygonOffset(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#textIntensityPolygonOffset(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getTextIntensityPolygonOffset(ResourceLocation locationIn) {
+    public static RenderType getTextIntensityPolygonOffset(Identifier locationIn) {
         return Internal.TEXT_INTENSITY_POLYGON_OFFSET.apply(locationIn);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#textSeeThrough(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#textSeeThrough(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getTextSeeThrough(ResourceLocation locationIn) {
+    public static RenderType getTextSeeThrough(Identifier locationIn) {
         return Internal.TEXT_SEETHROUGH.apply(locationIn);
     }
 
     /**
      * @see #enableTextTextureLinearFiltering
      *
-     * @return Replacement of {@link RenderType#textIntensitySeeThrough(ResourceLocation)}, but with optional linear texture filtering.
+     * @return Replacement of {@link RenderType#textIntensitySeeThrough(Identifier)}, but with optional linear texture filtering.
      */
-    public static RenderType getTextIntensitySeeThrough(ResourceLocation locationIn) {
+    public static RenderType getTextIntensitySeeThrough(Identifier locationIn) {
         return Internal.TEXT_INTENSITY_SEE_THROUGH.apply(locationIn);
     }
 
@@ -209,8 +207,8 @@ public enum ForgeRenderTypes {
             throw new IllegalStateException("This class must not be instantiated");
         }
 
-        public static Function<ResourceLocation, RenderType> UNSORTED_TRANSLUCENT = Util.memoize(Internal::unsortedTranslucent);
-        private static RenderType unsortedTranslucent(ResourceLocation textureLocation) {
+        public static Function<Identifier, RenderType> UNSORTED_TRANSLUCENT = Util.memoize(Internal::unsortedTranslucent);
+        private static RenderType unsortedTranslucent(Identifier textureLocation) {
             return create("forge_unsorted_translucent",
                           TRANSIENT_BUFFER_SIZE,
                           true,
@@ -223,8 +221,8 @@ public enum ForgeRenderTypes {
                                         .createCompositeState(true));
         }
 
-        public static Function<ResourceLocation, RenderType> UNLIT_TRANSLUCENT_SORTED = Util.memoize(Internal::unlitTranslucentSorted);
-        private static RenderType unlitTranslucentSorted(ResourceLocation textureLocation) {
+        public static Function<Identifier, RenderType> UNLIT_TRANSLUCENT_SORTED = Util.memoize(Internal::unlitTranslucentSorted);
+        private static RenderType unlitTranslucentSorted(Identifier textureLocation) {
             return create("forge_unlit_translucent_sorted",
                           TRANSIENT_BUFFER_SIZE,
                           true,
@@ -237,8 +235,8 @@ public enum ForgeRenderTypes {
                                         .createCompositeState(true));
         }
 
-        public static Function<ResourceLocation, RenderType> UNLIT_TRANSLUCENT_UNSORTED = Util.memoize(Internal::unlitTranslucentUnsorted);
-        private static RenderType unlitTranslucentUnsorted(ResourceLocation textureLocation) {
+        public static Function<Identifier, RenderType> UNLIT_TRANSLUCENT_UNSORTED = Util.memoize(Internal::unlitTranslucentUnsorted);
+        private static RenderType unlitTranslucentUnsorted(Identifier textureLocation) {
             return create("forge_unlit_translucent_sorted",
                           TRANSIENT_BUFFER_SIZE,
                           true,
@@ -251,8 +249,8 @@ public enum ForgeRenderTypes {
                                         .createCompositeState(true));
         }
 
-        public static Function<ResourceLocation, RenderType> LAYERED_ITEM_SOLID = Util.memoize(Internal::layeredItemSolid);
-        private static RenderType layeredItemSolid(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> LAYERED_ITEM_SOLID = Util.memoize(Internal::layeredItemSolid);
+        private static RenderType layeredItemSolid(Identifier locationIn) {
             return create(
                     "forge_layered_item_soild",
                     TRANSIENT_BUFFER_SIZE,
@@ -267,8 +265,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> LAYERED_ITEM_CUTOUT = Util.memoize(Internal::layeredItemCutout);
-        private static RenderType layeredItemCutout(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> LAYERED_ITEM_CUTOUT = Util.memoize(Internal::layeredItemCutout);
+        private static RenderType layeredItemCutout(Identifier locationIn) {
             return create(
                     "forge_layered_item_cutout",
                     TRANSIENT_BUFFER_SIZE,
@@ -283,8 +281,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> LAYERED_ITEM_CUTOUT_MIPPED = Util.memoize(Internal::layeredItemCutoutMipped);
-        private static RenderType layeredItemCutoutMipped(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> LAYERED_ITEM_CUTOUT_MIPPED = Util.memoize(Internal::layeredItemCutoutMipped);
+        private static RenderType layeredItemCutoutMipped(Identifier locationIn) {
             return create(
                     "forge_layered_item_cutout_mipped",
                     TRANSIENT_BUFFER_SIZE,
@@ -299,8 +297,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> LAYERED_ITEM_TRANSLUCENT = Util.memoize(Internal::layeredItemTranslucent);
-        private static RenderType layeredItemTranslucent(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> LAYERED_ITEM_TRANSLUCENT = Util.memoize(Internal::layeredItemTranslucent);
+        private static RenderType layeredItemTranslucent(Identifier locationIn) {
             return create(
                     "forge_layered_item_translucent",
                     TRANSIENT_BUFFER_SIZE,
@@ -315,8 +313,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT = Util.memoize(Internal::getText);
-        private static RenderType getText(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT = Util.memoize(Internal::getText);
+        private static RenderType getText(Identifier locationIn) {
             return create(
                     "forge_text",
                     SMALL_BUFFER_SIZE,
@@ -330,8 +328,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT_INTENSITY = Util.memoize(Internal::getTextIntensity);
-        private static RenderType getTextIntensity(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT_INTENSITY = Util.memoize(Internal::getTextIntensity);
+        private static RenderType getTextIntensity(Identifier locationIn) {
             return create(
                     "forge_text_intensity",
                     SMALL_BUFFER_SIZE,
@@ -345,8 +343,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT_POLYGON_OFFSET = Util.memoize(Internal::getTextPolygonOffset);
-        private static RenderType getTextPolygonOffset(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT_POLYGON_OFFSET = Util.memoize(Internal::getTextPolygonOffset);
+        private static RenderType getTextPolygonOffset(Identifier locationIn) {
             return create(
                     "forge_text_polygon_offset",
                     TRANSIENT_BUFFER_SIZE,
@@ -360,8 +358,8 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT_INTENSITY_POLYGON_OFFSET = Util.memoize(Internal::getTextIntensityPolygonOffset);
-        private static RenderType getTextIntensityPolygonOffset(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT_INTENSITY_POLYGON_OFFSET = Util.memoize(Internal::getTextIntensityPolygonOffset);
+        private static RenderType getTextIntensityPolygonOffset(Identifier locationIn) {
             return create(
                     "forge_text_intensity_polygon_offset",
                     TRANSIENT_BUFFER_SIZE,
@@ -375,13 +373,13 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT_SEE_THROUGH = Util.memoize(Internal::getTextSeeThrough);
+        public static Function<Identifier, RenderType> TEXT_SEE_THROUGH = Util.memoize(Internal::getTextSeeThrough);
         /**
          * Use {@link #TEXT_SEE_THROUGH} instead.
          */
         @Deprecated
-        public static Function<ResourceLocation, RenderType> TEXT_SEETHROUGH = TEXT_SEE_THROUGH;
-        private static RenderType getTextSeeThrough(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT_SEETHROUGH = TEXT_SEE_THROUGH;
+        private static RenderType getTextSeeThrough(Identifier locationIn) {
             return create(
                     "forge_text_see_through",
                     TRANSIENT_BUFFER_SIZE,
@@ -395,14 +393,14 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<ResourceLocation, RenderType> TEXT_INTENSITY_SEE_THROUGH = Util.memoize(Internal::getTextIntensitySeeThrough);
+        public static Function<Identifier, RenderType> TEXT_INTENSITY_SEE_THROUGH = Util.memoize(Internal::getTextIntensitySeeThrough);
         /**
          * Use {@link #TEXT_INTENSITY_SEE_THROUGH} instead.
          */
         @SuppressWarnings("unused")
         @Deprecated(forRemoval = true, since = "1.21.5")
-        public static Function<ResourceLocation, RenderType> TEXT_INTENSITY_SEETHROUGH = TEXT_INTENSITY_SEE_THROUGH;
-        private static RenderType getTextIntensitySeeThrough(ResourceLocation locationIn) {
+        public static Function<Identifier, RenderType> TEXT_INTENSITY_SEETHROUGH = TEXT_INTENSITY_SEE_THROUGH;
+        private static RenderType getTextIntensitySeeThrough(Identifier locationIn) {
             return create(
                     "forge_text_intensity_see_through",
                     TRANSIENT_BUFFER_SIZE,
@@ -438,7 +436,7 @@ public enum ForgeRenderTypes {
     }
 
     private static class CustomizableTextureState extends TextureStateShard {
-        private CustomizableTextureState(ResourceLocation resLoc, boolean mipmap) {
+        private CustomizableTextureState(Identifier resLoc, boolean mipmap) {
             super(resLoc, mipmap);
             this.setupState = () -> {
                 TextureManager manager = Minecraft.getInstance().getTextureManager();
@@ -450,7 +448,7 @@ public enum ForgeRenderTypes {
     }
 
     private static class LoadingOverlayTextureState extends TextureStateShard {
-        private static final ResourceLocation LOADING_TEXTURE = ResourceLocation.fromNamespaceAndPath("forge", "loading_overlay");
+        private static final Identifier LOADING_TEXTURE = Identifier.fromNamespaceAndPath("forge", "loading_overlay");
         private final GpuTexture texture;
         private final GpuTextureView textureView;
 

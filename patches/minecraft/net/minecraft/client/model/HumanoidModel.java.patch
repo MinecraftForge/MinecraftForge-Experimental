@@ -1,36 +1,36 @@
 --- a/net/minecraft/client/model/HumanoidModel.java
 +++ b/net/minecraft/client/model/HumanoidModel.java
-@@ -290,6 +_,8 @@
-             case BRUSH:
-                 this.rightArm.xRot = this.rightArm.xRot * 0.5F - (float) (Math.PI / 5);
-                 this.rightArm.yRot = 0.0F;
+@@ -308,6 +_,8 @@
+                 break;
+             case SPEAR:
+                 SpearAnimations.thirdPersonHandUse(this.rightArm, this.head, true, p_362371_.getUseItemStackForArm(HumanoidArm.RIGHT), p_362371_);
 +            default:
-+                p_366231_.applyTransform(this, p_362371_, net.minecraft.world.entity.HumanoidArm.RIGHT);
++                p_362371_.rightArmPose.applyTransform(this, p_362371_, net.minecraft.world.entity.HumanoidArm.RIGHT);
          }
      }
  
-@@ -334,6 +_,8 @@
-             case BRUSH:
-                 this.leftArm.xRot = this.leftArm.xRot * 0.5F - (float) (Math.PI / 5);
-                 this.leftArm.yRot = 0.0F;
+@@ -355,6 +_,8 @@
+                 break;
+             case SPEAR:
+                 SpearAnimations.thirdPersonHandUse(this.leftArm, this.head, false, p_363560_.getUseItemStackForArm(HumanoidArm.LEFT), p_363560_);
 +            default:
-+                p_370002_.applyTransform(this, p_363560_, net.minecraft.world.entity.HumanoidArm.LEFT);
++                p_363560_.leftArmPose.applyTransform(this, p_363560_, net.minecraft.world.entity.HumanoidArm.LEFT);
          }
      }
  
-@@ -402,7 +_,7 @@
+@@ -427,7 +_,7 @@
      }
  
      @OnlyIn(Dist.CLIENT)
 -    public static enum ArmPose {
 +    public static enum ArmPose implements net.minecraftforge.common.IExtensibleEnum {
-         EMPTY(false),
-         ITEM(false),
-         BLOCK(false),
-@@ -418,10 +_,28 @@
- 
-         private ArmPose(final boolean p_102896_) {
+         EMPTY(false, false),
+         ITEM(false, false),
+         BLOCK(false, false),
+@@ -453,10 +_,29 @@
+         ArmPose(final boolean p_102896_, final boolean p_456170_) {
              this.twoHanded = p_102896_;
+             this.affectsOffhandPose = p_456170_;
 +            this.forgeArmPose = null;
          }
  
@@ -41,18 +41,19 @@
 +        @javax.annotation.Nullable
 +        private final net.minecraftforge.client.IArmPoseTransformer forgeArmPose;
 +
-+        private ArmPose(boolean twoHanded, @javax.annotation.Nonnull net.minecraftforge.client.IArmPoseTransformer forgeArmPose) {
++        private ArmPose(boolean twoHanded, boolean affectsOffhandPose, @javax.annotation.Nonnull net.minecraftforge.client.IArmPoseTransformer forgeArmPose) {
 +            this.twoHanded = twoHanded;
++            this.affectsOffhandPose = affectsOffhandPose;
 +            com.google.common.base.Preconditions.checkNotNull(forgeArmPose, "Cannot create new ArmPose with null transformer!");
 +            this.forgeArmPose = forgeArmPose;
 +        }
 +
-+        public static ArmPose create(String name, boolean twoHanded, @javax.annotation.Nonnull net.minecraftforge.client.IArmPoseTransformer forgeArmPose) {
++        public static ArmPose create(String name, boolean twoHanded, boolean affectsOffhandPose, @javax.annotation.Nonnull net.minecraftforge.client.IArmPoseTransformer forgeArmPose) {
 +            throw new IllegalStateException("Enum not extended");
 +        }
 +
 +        public <T extends HumanoidRenderState> void applyTransform(HumanoidModel<T> model, T state, net.minecraft.world.entity.HumanoidArm arm) {
 +            if (this.forgeArmPose != null) this.forgeArmPose.applyTransform(model, state, arm);
          }
-     }
- }
+ 
+         public boolean affectsOffhandPose() {

@@ -34,7 +34,7 @@ import net.minecraft.stats.StatType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
@@ -68,7 +68,7 @@ public class ForgeRegistries {
     }
     static final List<DeferredRegister<?>> registries = new ArrayList<>();
     private static final <T> RegistryHolder<T> registry(ResourceKey<Registry<T>> key, Supplier<RegistryBuilder<T>> factory) {
-        var dr = DeferredRegister.create(key, key.location().getNamespace());
+        var dr = DeferredRegister.create(key, key.identifier().getNamespace());
         registries.add(dr);
         return dr.makeRegistry(factory);
     }
@@ -171,7 +171,7 @@ public class ForgeRegistries {
         public static final ResourceKey<Registry<StructureModifier>> STRUCTURE_MODIFIERS = key("forge:structure_modifier");
 
         private static <T> ResourceKey<Registry<T>> key(String name) {
-            return ResourceKey.createRegistryKey(ResourceLocation.parse(name));
+            return ResourceKey.createRegistryKey(Identifier.parse(name));
         }
 
         private static void init() {}

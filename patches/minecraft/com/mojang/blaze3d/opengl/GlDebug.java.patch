@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/opengl/GlDebug.java
 +++ b/com/mojang/blaze3d/opengl/GlDebug.java
-@@ -23,6 +_,14 @@
+@@ -24,6 +_,14 @@
  
  @OnlyIn(Dist.CLIENT)
  public class GlDebug {
@@ -24,10 +24,10 @@
      }
  
      public List<String> getLastOpenGlDebugMessages() {
-@@ -121,6 +_,7 @@
+@@ -120,6 +_,7 @@
+     }
  
-     @Nullable
-     public static GlDebug enableDebugCallback(int p_394351_, boolean p_393026_, Set<String> p_393339_) {
+     public static @Nullable GlDebug enableDebugCallback(int p_394351_, boolean p_393026_, Set<String> p_393339_) {
 +        p_393026_ |= PRINT_STACKTRACE_ON_ERROR;
          if (p_394351_ <= 0) {
              return null;

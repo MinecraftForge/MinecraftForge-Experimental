@@ -8,7 +8,7 @@ package net.minecraftforge.client.event;
 import com.google.common.base.Preconditions;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -102,8 +102,8 @@ public sealed interface ModelEvent {
             return BUS;
         }
 
-        private final Map<ResourceLocation, StateDefinition<Block, BlockState>> states = new HashMap<>();
-        private final Map<ResourceLocation, StateDefinition<Block, BlockState>> view = Collections.unmodifiableMap(states);
+        private final Map<Identifier, StateDefinition<Block, BlockState>> states = new HashMap<>();
+        private final Map<Identifier, StateDefinition<Block, BlockState>> view = Collections.unmodifiableMap(states);
 
         @ApiStatus.Internal
         public RegisterModelStateDefinitions() {}
@@ -111,14 +111,14 @@ public sealed interface ModelEvent {
         /**
          * Returns a read only view of the extra registered models
          */
-        public Map<ResourceLocation, StateDefinition<Block, BlockState>> getStates() {
+        public Map<Identifier, StateDefinition<Block, BlockState>> getStates() {
             return this.view;
         }
 
         /**
          * Registers a StateDefinition for a synthetic block.
          */
-        public void register(ResourceLocation key, StateDefinition<Block, BlockState> value) {
+        public void register(Identifier key, StateDefinition<Block, BlockState> value) {
             states.put(key, value);
         }
     }
@@ -138,20 +138,20 @@ public sealed interface ModelEvent {
             return BUS;
         }
 
-        private final Map<ResourceLocation, IGeometryLoader> loaders;
+        private final Map<Identifier, IGeometryLoader> loaders;
 
         @ApiStatus.Internal
-        public RegisterGeometryLoaders(Map<ResourceLocation, IGeometryLoader> loaders) {
+        public RegisterGeometryLoaders(Map<Identifier, IGeometryLoader> loaders) {
             this.loaders = loaders;
         }
 
         /**
          * Registers a new geometry loader.
-         * @param resourceLocation The namespace should match your mod's namespace, such as your mod ID
+         * @param Identifier The namespace should match your mod's namespace, such as your mod ID
          */
-        public void register(ResourceLocation resourceLocation, IGeometryLoader loader) {
-            Preconditions.checkArgument(!loaders.containsKey(resourceLocation), "Geometry loader already registered: " + resourceLocation);
-            loaders.put(resourceLocation, loader);
+        public void register(Identifier Identifier, IGeometryLoader loader) {
+            Preconditions.checkArgument(!loaders.containsKey(Identifier), "Geometry loader already registered: " + Identifier);
+            loaders.put(Identifier, loader);
         }
     }
 }

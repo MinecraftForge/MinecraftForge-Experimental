@@ -1,16 +1,15 @@
 --- a/net/minecraft/client/renderer/block/model/multipart/MultiPartModel.java
 +++ b/net/minecraft/client/renderer/block/model/multipart/MultiPartModel.java
-@@ -26,6 +_,9 @@
+@@ -25,6 +_,8 @@
+     private final MultiPartModel.SharedBakedState shared;
      private final BlockState blockState;
-     @Nullable
-     private List<BlockStateModel> models;
+     private @Nullable List<BlockStateModel> models;
 +    private boolean cacheKey = false;
-+    @Nullable
-+    private java.util.Collection<net.minecraft.client.renderer.chunk.ChunkSectionLayer> cache;
++    private java.util.@Nullable Collection<net.minecraft.client.renderer.chunk.ChunkSectionLayer> cache;
  
      MultiPartModel(MultiPartModel.SharedBakedState p_391554_, BlockState p_397918_) {
          this.shared = p_391554_;
-@@ -38,6 +_,11 @@
+@@ -37,6 +_,11 @@
      }
  
      @Override
@@ -22,7 +21,7 @@
      public void collectParts(RandomSource p_391247_, List<BlockModelPart> p_397207_) {
          if (this.models == null) {
              this.models = this.shared.selectModels(this.blockState);
-@@ -51,6 +_,33 @@
+@@ -50,6 +_,33 @@
          }
      }
  
@@ -56,7 +55,7 @@
      @OnlyIn(Dist.CLIENT)
      public record Selector<T>(Predicate<BlockState> condition, T model) {
          public <S> MultiPartModel.Selector<S> with(S p_393772_) {
-@@ -62,6 +_,7 @@
+@@ -61,6 +_,7 @@
      static final class SharedBakedState {
          private final List<MultiPartModel.Selector<BlockStateModel>> selectors;
          final TextureAtlasSprite particleIcon;
@@ -64,7 +63,7 @@
          private final Map<BitSet, List<BlockStateModel>> subsets = new ConcurrentHashMap<>();
  
          private static BlockStateModel getFirstModel(List<MultiPartModel.Selector<BlockStateModel>> p_392132_) {
-@@ -74,8 +_,8 @@
+@@ -73,8 +_,8 @@
  
          public SharedBakedState(List<MultiPartModel.Selector<BlockStateModel>> p_393647_) {
              this.selectors = p_393647_;

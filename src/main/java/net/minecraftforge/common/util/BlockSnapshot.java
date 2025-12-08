@@ -177,7 +177,7 @@ public class BlockSnapshot {
         if (toString == null) {
             this.toString =
                 "BlockSnapshot[" +
-                "World:" + this.dim.location() + ',' +
+                "World:" + this.dim.identifier() + ',' +
                 "Pos: " + this.pos + ',' +
                 "State: " + this.block + ',' +
                 "Flags: " + this.flags + ',' +

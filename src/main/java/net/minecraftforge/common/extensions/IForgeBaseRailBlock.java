@@ -5,18 +5,16 @@
 
 package net.minecraftforge.common.extensions;
 
-import net.minecraft.world.entity.vehicle.MinecartFurnace;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.entity.vehicle.AbstractMinecart;
 import net.minecraft.world.level.block.state.properties.RailShape;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.vehicle.minecart.AbstractMinecart;
+import net.minecraft.world.entity.vehicle.minecart.MinecartFurnace;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-public interface IForgeBaseRailBlock
-{
-
+public interface IForgeBaseRailBlock {
     /**
      * Return true if the rail can make corners.
      * Used by placement logic.
@@ -33,8 +31,7 @@ public interface IForgeBaseRailBlock
      * @param pos Block's position in level
      * @return True if the rail can make slopes.
      */
-    default boolean canMakeSlopes(BlockState state, BlockGetter level, BlockPos pos)
-    {
+    default boolean canMakeSlopes(BlockState state, BlockGetter level, BlockPos pos) {
         return true;
     }
 
@@ -59,8 +56,7 @@ public interface IForgeBaseRailBlock
      * @param pos Block's position in level
      * @return The max speed of the current rail.
      */
-    default float getRailMaxSpeed(BlockState state, Level level, BlockPos pos, AbstractMinecart cart)
-    {
+    default float getRailMaxSpeed(BlockState state, Level level, BlockPos pos, AbstractMinecart cart) {
         if (cart instanceof MinecartFurnace) return cart.isInWater() ? 0.15f : 0.2f;
         else return cart.isInWater() ? 0.2f : 0.4f;
     }
@@ -82,8 +78,7 @@ public interface IForgeBaseRailBlock
      * @param shape The new RailShape
      * @return True when the given RailShape is valid
      */
-    default boolean isValidRailShape(RailShape shape)
-    {
+    default boolean isValidRailShape(RailShape shape) {
         return true;
     }
 }

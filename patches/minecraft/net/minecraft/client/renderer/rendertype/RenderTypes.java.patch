@@ -1,0 +1,11 @@
+--- a/net/minecraft/client/renderer/rendertype/RenderTypes.java
++++ b/net/minecraft/client/renderer/rendertype/RenderTypes.java
+@@ -562,7 +_,7 @@
+     }
+ 
+     public static RenderType textSeeThrough(Identifier p_452096_) {
+-        return TEXT_SEE_THROUGH.apply(p_452096_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextSeeThrough(p_452096_);
+     }
+ 
+     public static RenderType textBackgroundSeeThrough() {

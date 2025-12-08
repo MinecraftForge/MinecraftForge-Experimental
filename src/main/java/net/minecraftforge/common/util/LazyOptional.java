@@ -10,9 +10,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraftforge.common.capabilities.Capability;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -21,6 +18,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 /**
  * This object encapsulates a lazy value, with typical transformation operations
@@ -38,8 +36,7 @@ import org.jetbrains.annotations.Nullable;
  *
  * @param <T> The type of the optional value.
  */
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NullMarked
 public class LazyOptional<T> {
     private final NonNullSupplier<T> supplier;
     private final Object lock = new Object();

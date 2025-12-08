@@ -10,7 +10,7 @@ import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public final class RegistryObject<T> implements Supplier<T> {
     @Nullable
-    private final ResourceLocation name;
+    private final Identifier name;
     @Nullable
     private final ResourceKey<T> key;
     private final boolean optionalRegistry;
@@ -40,7 +40,7 @@ public final class RegistryObject<T> implements Supplier<T> {
      * @param registry the forge registry
      * @return a {@link RegistryObject} that stores the value of an object from the provided forge registry once it is ready
      */
-    public static <T, U extends T> RegistryObject<U> create(final ResourceLocation name, IForgeRegistry<T> registry) {
+    public static <T, U extends T> RegistryObject<U> create(final Identifier name, IForgeRegistry<T> registry) {
         return new RegistryObject<U>(name, registry);
     }
 
@@ -48,18 +48,18 @@ public final class RegistryObject<T> implements Supplier<T> {
      * Factory for a {@link RegistryObject} that stores the value of an object from a registry once it is ready based on a lookup of the provided registry key.
      * <p>
      * If a registry with the given key cannot be found, an exception will be thrown when trying to fill this RegistryObject.
-     * Use {@link #createOptional(ResourceLocation, ResourceKey, String)} for RegistryObjects of optional registries.
+     * Use {@link #createOptional(Identifier, ResourceKey, String)} for RegistryObjects of optional registries.
      *
      * @param name the name of the object to look up in a registry
      * @param registryKey the key of the registry. Supports lookups on {@link BuiltInRegistries} and {@link RegistryManager#ACTIVE}.
      * @param modid the mod id calling context
      * @return a {@link RegistryObject} that stores the value of an object from a registry once it is ready
-     * @see #createOptional(ResourceLocation, ResourceKey, String)
-     * @see #create(ResourceLocation, IForgeRegistry)
-     * @see #create(ResourceLocation, ResourceLocation, String)
+     * @see #createOptional(Identifier, ResourceKey, String)
+     * @see #create(Identifier, IForgeRegistry)
+     * @see #create(Identifier, Identifier, String)
      */
-    public static <T, U extends T> RegistryObject<U> create(final ResourceLocation name, final ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new RegistryObject<>(name, registryKey.location(), modid, false);
+    public static <T, U extends T> RegistryObject<U> create(final Identifier name, final ResourceKey<? extends Registry<T>> registryKey, String modid) {
+        return new RegistryObject<>(name, registryKey.identifier(), modid, false);
     }
 
     /**
@@ -67,35 +67,35 @@ public final class RegistryObject<T> implements Supplier<T> {
      * based on a lookup of the provided registry key.
      * <p>
      * If a registry with the given key cannot be found, it will be silently ignored and this RegistryObject will not be filled.
-     * Use {@link #create(ResourceLocation, ResourceKey, String)} for RegistryObjects that should throw exceptions on missing registry.
+     * Use {@link #create(Identifier, ResourceKey, String)} for RegistryObjects that should throw exceptions on missing registry.
      *
      * @param name the name of the object to look up in a registry
      * @param registryKey the key of the registry. Supports lookups on {@link BuiltInRegistries} and {@link RegistryManager#ACTIVE}.
      * @param modid the mod id calling context
      * @return a {@link RegistryObject} that stores the value of an object from a registry once it is ready
-     * @see #create(ResourceLocation, ResourceKey, String)
-     * @see #create(ResourceLocation, IForgeRegistry)
-     * @see #create(ResourceLocation, ResourceLocation, String)
+     * @see #create(Identifier, ResourceKey, String)
+     * @see #create(Identifier, IForgeRegistry)
+     * @see #create(Identifier, Identifier, String)
      */
-    public static <T, U extends T> RegistryObject<U> createOptional(final ResourceLocation name, final ResourceKey<? extends Registry<T>> registryKey, String modid) {
-        return new RegistryObject<>(name, registryKey.location(), modid, true);
+    public static <T, U extends T> RegistryObject<U> createOptional(final Identifier name, final ResourceKey<? extends Registry<T>> registryKey, String modid) {
+        return new RegistryObject<>(name, registryKey.identifier(), modid, true);
     }
 
     /**
      * Factory for a {@link RegistryObject} that stores the value of an object from a registry once it is ready based on a lookup of the provided registry name.
      * <p>
      * If a registry with the given name cannot be found, an exception will be thrown when trying to fill this RegistryObject.
-     * Use {@link #createOptional(ResourceLocation, ResourceLocation, String)} for RegistryObjects of optional registries.
+     * Use {@link #createOptional(Identifier, Identifier, String)} for RegistryObjects of optional registries.
      *
      * @param name the name of the object to look up in a registry
      * @param registryName the name of the registry. Supports lookups on {@link BuiltInRegistries} and {@link RegistryManager#ACTIVE}.
      * @param modid the mod id calling context
      * @return a {@link RegistryObject} that stores the value of an object from a registry once it is ready
-     * @see #createOptional(ResourceLocation, ResourceLocation, String)
-     * @see #create(ResourceLocation, IForgeRegistry)
-     * @see #create(ResourceLocation, ResourceKey, String)
+     * @see #createOptional(Identifier, Identifier, String)
+     * @see #create(Identifier, IForgeRegistry)
+     * @see #create(Identifier, ResourceKey, String)
      */
-    public static <T, U extends T> RegistryObject<U> create(final ResourceLocation name, final ResourceLocation registryName, String modid) {
+    public static <T, U extends T> RegistryObject<U> create(final Identifier name, final Identifier registryName, String modid) {
         return new RegistryObject<>(name, registryName, modid, false);
     }
 
@@ -104,17 +104,17 @@ public final class RegistryObject<T> implements Supplier<T> {
      * based on a lookup of the provided registry name.
      * <p>
      * If a registry with the given name cannot be found, it will be silently ignored and this RegistryObject will not be filled.
-     * Use {@link #create(ResourceLocation, ResourceLocation, String)} for RegistryObjects that should throw exceptions on missing registry.
+     * Use {@link #create(Identifier, Identifier, String)} for RegistryObjects that should throw exceptions on missing registry.
      *
      * @param name the name of the object to look up in a registry
      * @param registryName the name of the registry. Supports lookups on {@link BuiltInRegistries} and {@link RegistryManager#ACTIVE}.
      * @param modid the mod id calling context
      * @return a {@link RegistryObject} that stores the value of an object from a registry once it is ready
-     * @see #create(ResourceLocation, ResourceLocation, String)
-     * @see #create(ResourceLocation, IForgeRegistry)
-     * @see #create(ResourceLocation, ResourceKey, String)
+     * @see #create(Identifier, Identifier, String)
+     * @see #create(Identifier, IForgeRegistry)
+     * @see #create(Identifier, ResourceKey, String)
      */
-    public static <T, U extends T> RegistryObject<U> createOptional(final ResourceLocation name, final ResourceLocation registryName, String modid) {
+    public static <T, U extends T> RegistryObject<U> createOptional(final Identifier name, final Identifier registryName, String modid) {
         return new RegistryObject<>(name, registryName, modid, true);
     }
 
@@ -133,7 +133,7 @@ public final class RegistryObject<T> implements Supplier<T> {
     }
 
     @SuppressWarnings("unchecked")
-    private RegistryObject(ResourceLocation name, IForgeRegistry<?> registry) {
+    private RegistryObject(Identifier name, IForgeRegistry<?> registry) {
         if (registry == null)
             throw new IllegalArgumentException("Invalid registry argument, must not be null");
         this.name = name;
@@ -146,7 +146,7 @@ public final class RegistryObject<T> implements Supplier<T> {
         this.updateReference((IForgeRegistry<? extends T>) registry);
     }
 
-    private RegistryObject(final ResourceLocation name, final ResourceLocation registryName, final String modid, boolean optionalRegistry) {
+    private RegistryObject(final Identifier name, final Identifier registryName, final String modid, boolean optionalRegistry) {
         this.name = name;
         this.key = ResourceKey.create(ResourceKey.createRegistryKey(registryName), name);
         this.optionalRegistry = optionalRegistry;
@@ -156,7 +156,7 @@ public final class RegistryObject<T> implements Supplier<T> {
             private boolean invalidRegistry = false;
 
             @Override
-            public void accept(Predicate<ResourceLocation> pred) {
+            public void accept(Predicate<Identifier> pred) {
                 if (invalidRegistry)
                     return;
 
@@ -176,7 +176,7 @@ public final class RegistryObject<T> implements Supplier<T> {
     }
 
     /** Internal constructor used for {@link DeferredRegisterData} */
-    RegistryObject(final ResourceLocation name, final ResourceKey<? extends Registry<? super T>> registry, final String modid) {
+    RegistryObject(final Identifier name, final ResourceKey<? extends Registry<? super T>> registry, final String modid) {
         this.name = name;
         @SuppressWarnings("unchecked")
         var typed = (ResourceKey<Registry<T>>)registry;
@@ -240,7 +240,7 @@ public final class RegistryObject<T> implements Supplier<T> {
     }
 
     @SuppressWarnings("unchecked")
-    void updateReference(ResourceLocation registryName) {
+    void updateReference(Identifier registryName) {
         if (this.name == null)
             return;
 
@@ -279,12 +279,12 @@ public final class RegistryObject<T> implements Supplier<T> {
         this.holder = holder;
     }
 
-    private static boolean registryExists(ResourceLocation registryName) {
+    private static boolean registryExists(Identifier registryName) {
         return RegistryManager.ACTIVE.getRegistry(registryName) != null
                 || BuiltInRegistries.REGISTRY.containsKey(registryName);
     }
 
-    public ResourceLocation getId() {
+    public Identifier getId() {
         return this.name;
     }
 

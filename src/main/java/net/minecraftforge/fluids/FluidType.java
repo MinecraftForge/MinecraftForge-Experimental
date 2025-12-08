@@ -6,21 +6,21 @@
 package net.minecraftforge.fluids;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.vehicle.AbstractBoat;
+import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
@@ -787,7 +787,7 @@ public class FluidType {
      * @see BucketItem#emptyContents(LivingEntity, Level, BlockPos, BlockHitResult)
      */
     public boolean isVaporizedOnPlacement(Level level, BlockPos pos, FluidStack stack) {
-        if (level.dimensionType().ultraWarm()) {
+        if (level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos)) {
             return this == ForgeMod.WATER_TYPE.get() || this.getStateForPlacement(level, pos, stack).is(FluidTags.WATER);
         }
         return false;
@@ -815,7 +815,7 @@ public class FluidType {
 
     @Override
     public String toString() {
-        @Nullable ResourceLocation name = ForgeRegistries.FLUID_TYPES.get().getKey(this);
+        @Nullable Identifier name = ForgeRegistries.FLUID_TYPES.get().getKey(this);
         return name != null ? name.toString() : "Unregistered FluidType";
     }
 

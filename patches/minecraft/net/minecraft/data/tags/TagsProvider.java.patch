@@ -3,7 +3,7 @@
 @@ -32,26 +_,57 @@
      private final CompletableFuture<TagsProvider.TagLookup<T>> parentProvider;
      protected final ResourceKey<? extends Registry<T>> registryKey;
-     protected final Map<ResourceLocation, TagBuilder> builders = Maps.newLinkedHashMap();
+     protected final Map<Identifier, TagBuilder> builders = Maps.newLinkedHashMap();
 +    protected final String modId;
 +    @org.jetbrains.annotations.Nullable
 +    protected final net.minecraftforge.common.data.ExistingFileHelper existingFileHelper;
@@ -50,14 +50,14 @@
 +
 +    // Forge: Allow customizing the path for a given tag or returning null
 +    @org.jetbrains.annotations.Nullable
-+    protected Path getPath(ResourceLocation id) {
++    protected Path getPath(Identifier id) {
 +        return this.pathProvider.json(id);
      }
  
      @Override
      public String getName() {
--        return "Tags for " + this.registryKey.location();
-+        return "Tags for " + this.registryKey.location() + " mod id " + this.modId;
+-        return "Tags for " + this.registryKey.identifier();
++        return "Tags for " + this.registryKey.identifier() + " mod id " + this.modId;
      }
  
      protected abstract void addTags(HolderLookup.Provider p_256380_);
@@ -69,15 +69,15 @@
 +                    HolderLookup.RegistryLookup<T> registrylookup = p_325926_.contents.lookup(this.registryKey).orElseThrow(() -> {
 +                       // FORGE: Throw a more descriptive error message if this is a Forge registry without tags enabled
 +                       if (net.minecraftforge.registries.RegistryManager.ACTIVE.getRegistry(this.registryKey) != null) {
-+                          return new IllegalStateException("Forge registry " + this.registryKey.location() + " does not have support for tags");
++                          return new IllegalStateException("Forge registry " + this.registryKey.identifier() + " does not have support for tags");
 +                       }
-+                       return new IllegalStateException("Registry " + this.registryKey.location() + " not found");
++                       return new IllegalStateException("Registry " + this.registryKey.identifier() + " not found");
 +                    });
-                     Predicate<ResourceLocation> predicate = p_255496_ -> registrylookup.get(ResourceKey.create(this.registryKey, p_255496_)).isPresent();
-                     Predicate<ResourceLocation> predicate1 = p_274776_ -> this.builders.containsKey(p_274776_)
-                         || p_325926_.parent.contains(TagKey.create(this.registryKey, p_274776_));
+                     Predicate<Identifier> predicate = p_448741_ -> registrylookup.get(ResourceKey.create(this.registryKey, p_448741_)).isPresent();
+                     Predicate<Identifier> predicate1 = p_448739_ -> this.builders.containsKey(p_448739_)
+                         || p_325926_.parent.contains(TagKey.create(this.registryKey, p_448739_));
 @@ -82,7 +_,7 @@
-                                     ResourceLocation resourcelocation = p_325931_.getKey();
+                                     Identifier identifier = p_325931_.getKey();
                                      TagBuilder tagbuilder = p_325931_.getValue();
                                      List<TagEntry> list = tagbuilder.build();
 -                                    List<TagEntry> list1 = list.stream().filter(p_274771_ -> !p_274771_.verifyIfPresent(predicate, predicate1)).toList();
@@ -89,9 +89,9 @@
                                              )
                                          );
                                      } else {
--                                        Path path = this.pathProvider.json(resourcelocation);
+-                                        Path path = this.pathProvider.json(identifier);
 -                                        return DataProvider.saveStable(p_253684_, p_325926_.contents, TagFile.CODEC, new TagFile(list, false), path);
-+                                        Path path = this.getPath(resourcelocation);
++                                        Path path = this.getPath(identifier);
 +                                        if (path == null) {
 +                                            return CompletableFuture.completedFuture(null); // Forge: Allow running this data provider without writing it. Recipe provider needs valid tags.
 +                                        }
@@ -103,10 +103,10 @@
      }
  
      protected TagBuilder getOrCreateRawBuilder(TagKey<T> p_236452_) {
--        return this.builders.computeIfAbsent(p_236452_.location(), p_236442_ -> TagBuilder.create());
-+        return this.builders.computeIfAbsent(p_236452_.location(), p_236442_ -> {
+-        return this.builders.computeIfAbsent(p_236452_.location(), p_460082_ -> TagBuilder.create());
++        return this.builders.computeIfAbsent(p_236452_.location(), p_460082_ -> {
 +            if (existingFileHelper != null) {
-+                existingFileHelper.trackGenerated(p_236442_, resourceType);
++                existingFileHelper.trackGenerated(p_460082_, resourceType);
 +            }
 +            return TagBuilder.create();
 +        });

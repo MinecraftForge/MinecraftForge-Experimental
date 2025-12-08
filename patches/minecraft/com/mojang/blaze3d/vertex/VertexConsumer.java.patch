@@ -1,7 +1,7 @@
 --- a/com/mojang/blaze3d/vertex/VertexConsumer.java
 +++ b/com/mojang/blaze3d/vertex/VertexConsumer.java
-@@ -15,7 +_,7 @@
- import org.lwjgl.system.MemoryStack;
+@@ -14,7 +_,7 @@
+ import org.joml.Vector3fc;
  
  @OnlyIn(Dist.CLIENT)
 -public interface VertexConsumer {
@@ -9,15 +9,15 @@
      VertexConsumer addVertex(float p_344294_, float p_342213_, float p_344859_);
  
      VertexConsumer setColor(int p_342749_, int p_344324_, int p_343336_, int p_342831_);
-@@ -131,9 +_,11 @@
- 
-                 int j1 = ARGB.color(k, (int)f3, (int)f4, (int)f5);
-                 int k1 = LightTexture.lightCoordsWithEmission(p_331444_[i1], l);
-+                k1 = applyBakedLighting(k1, bytebuffer);
-                 float f10 = bytebuffer.getFloat(16);
-                 float f9 = bytebuffer.getFloat(20);
-                 Vector3f vector3f1 = matrix4f.transformPosition(f, f1, f2, new Vector3f());
-+                applyBakedNormals(vector3f, bytebuffer, p_85988_.normal());
-                 this.addVertex(vector3f1.x(), vector3f1.y(), vector3f1.z(), j1, f10, f9, p_85993_, k1, vector3f.x(), vector3f.y(), vector3f.z());
-             }
+@@ -102,9 +_,11 @@
+             float f = p_331915_[j];
+             int l = ARGB.colorFromFloat(p_335371_, f * p_85990_, f * p_85991_, f * p_85992_);
+             int i1 = LightTexture.lightCoordsWithEmission(p_331444_[j], i);
++            i1 = applyBakedLighting(i1, p_85989_, j);
+             Vector3f vector3f1 = matrix4f.transformPosition(vector3fc1, new Vector3f());
+             float f1 = UVPair.unpackU(k);
+             float f2 = UVPair.unpackV(k);
++            applyBakedNormals(vector3f, p_85989_, j, p_85988_.normal());
+             this.addVertex(vector3f1.x(), vector3f1.y(), vector3f1.z(), l, f1, f2, p_85993_, i1, vector3f.x(), vector3f.y(), vector3f.z());
          }
+     }

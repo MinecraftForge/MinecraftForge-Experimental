@@ -38,8 +38,8 @@
                          p_358460_.listElements()
 +                            .filter(holder -> shouldDump(holder.key()))
                              .map(
-                                 p_256105_ -> dumpValue(
-                                     packoutput$pathprovider.json(p_256105_.key().location()),
+                                 p_448721_ -> dumpValue(
+                                     packoutput$pathprovider.json(p_448721_.key().identifier()),
 @@ -65,6 +_,10 @@
                      );
                  }
@@ -47,7 +47,7 @@
 +    }
 +
 +    protected boolean shouldDump(ResourceKey<?> key) {
-+        return this.namespacePredicate.test(key.location().getNamespace());
++        return this.namespacePredicate.test(key.identifier().getNamespace());
      }
  
      private static <E> CompletableFuture<?> dumpValue(

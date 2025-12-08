@@ -6,7 +6,7 @@
 package net.minecraftforge.network;
 
 import net.minecraft.network.Connection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.network.Channel.VersionTest;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData;
@@ -41,8 +41,8 @@ public class NetworkRegistry {
     static final Logger LOGGER = LogManager.getLogger();
     static final Marker NETREGISTRY = MarkerManager.getMarker("NETREGISTRY");
 
-    private static Map<ResourceLocation, NetworkInstance> instances = Collections.synchronizedMap(new HashMap<>());
-    private static Map<ResourceLocation, NetworkInstance> byName = Collections.synchronizedMap(new HashMap<>());
+    private static Map<Identifier, NetworkInstance> instances = Collections.synchronizedMap(new HashMap<>());
+    private static Map<Identifier, NetworkInstance> byName = Collections.synchronizedMap(new HashMap<>());
 
     public static boolean acceptsVanillaClientConnections() {
         return listRejectedVanillaMods(n -> n.clientAcceptedVersions).isEmpty() && DataPackRegistriesHooks.getSyncedCustomRegistries().isEmpty();
@@ -53,12 +53,12 @@ public class NetworkRegistry {
     }
 
     @Nullable
-    public static NetworkInstance findTarget(ResourceLocation resourceLocation) {
-        return byName.get(resourceLocation);
+    public static NetworkInstance findTarget(Identifier Identifier) {
+        return byName.get(Identifier);
     }
 
-    static Map<ResourceLocation, ServerStatusPing.ChannelData> buildChannelVersionsForListPing() {
-        var ret = new HashMap<ResourceLocation, ServerStatusPing.ChannelData>();
+    static Map<Identifier, ServerStatusPing.ChannelData> buildChannelVersionsForListPing() {
+        var ret = new HashMap<Identifier, ServerStatusPing.ChannelData>();
         for (var channel : instances.values()) {
             ret.put(channel.getChannelName(), channel.pingData);
         }
@@ -84,11 +84,11 @@ public class NetworkRegistry {
     }
 
     @Nullable
-    public static NetworkMismatchData validateChannels(Map<ResourceLocation, Integer> incoming, boolean fromClient) {
+    public static NetworkMismatchData validateChannels(Map<Identifier, Integer> incoming, boolean fromClient) {
         var originName = fromClient ? "client" : "server";
 
-        Set<ResourceLocation> missing = new HashSet<>();
-        Map<ResourceLocation, NetworkMismatchData.Version> results = new HashMap<>();
+        Set<Identifier> missing = new HashSet<>();
+        Map<Identifier, NetworkMismatchData.Version> results = new HashMap<>();
         for (var net : instances.values()) {
             var name = net.getChannelName();
             VersionTest test = fromClient ? net.clientAcceptedVersions : net.serverAcceptedVersions;
@@ -121,8 +121,8 @@ public class NetworkRegistry {
         return null;
     }
 
-    public static boolean checkListPingCompatibilityForClient(Map<ResourceLocation, ServerStatusPing.ChannelData> incoming) {
-        Set<ResourceLocation> handled = new HashSet<>();
+    public static boolean checkListPingCompatibilityForClient(Map<Identifier, ServerStatusPing.ChannelData> incoming) {
+        Set<Identifier> handled = new HashSet<>();
         var rejected = new ArrayList<String>();
 
         for (var net : instances.values()) {
@@ -178,23 +178,23 @@ public class NetworkRegistry {
         }
     }
 
-    public static Map<ResourceLocation, Integer> buildChannelVersions() {
-        var ret = new Object2IntOpenHashMap<ResourceLocation>(instances.size());
+    public static Map<Identifier, Integer> buildChannelVersions() {
+        var ret = new Object2IntOpenHashMap<Identifier>(instances.size());
         for (var net : instances.values()) {
             ret.put(net.getChannelName(), net.getNetworkProtocolVersion());
         }
         return ret;
     }
 
-    static List<ResourceLocation> buildRegisterList() {
-        var ret = new ArrayList<ResourceLocation>(byName.keySet().size());
+    static List<Identifier> buildRegisterList() {
+        var ret = new ArrayList<Identifier>(byName.keySet().size());
         for (var name : byName.keySet())
             if (!"minecraft".equals(name.getNamespace()))
                 ret.add(name);
         return ret;
     }
 
-    static void register(NetworkInstance instance, ResourceLocation name) {
+    static void register(NetworkInstance instance, Identifier name) {
         checkLock(instance);
         if (NetworkRegistry.byName.containsKey(name))
             error("Payload name " + name + " already registered.");

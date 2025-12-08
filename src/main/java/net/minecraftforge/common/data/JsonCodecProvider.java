@@ -21,7 +21,7 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.data.ExistingFileHelper.ResourceType;
@@ -46,8 +46,8 @@ public class JsonCodecProvider<T> implements DataProvider
     protected final PackType packType;
     protected final String directory;
     protected final Codec<T> codec;
-    protected final Map<ResourceLocation, T> entries;
-    protected Map<ResourceLocation, ICondition[]> conditions = Collections.emptyMap();
+    protected final Map<Identifier, T> entries;
+    protected Map<Identifier, ICondition[]> conditions = Collections.emptyMap();
 
     /**
      * @param output {@linkplain PackOutput} provided by the {@link DataGenerator}.
@@ -55,14 +55,14 @@ public class JsonCodecProvider<T> implements DataProvider
      * @param packType PackType specifying whether to generate entries in assets or data.
      * @param directory String representing the directory to generate jsons in, e.g. "dimension" or "cheesemod/cheese".
      * @param codec Codec to encode values to jsons with using the provided DynamicOps.
-     * @param entries Map of named entries to serialize to jsons. Paths for values are derived from the ResourceLocation's entryid:entrypath as specified above.
+     * @param entries Map of named entries to serialize to jsons. Paths for values are derived from the Identifier's entryid:entrypath as specified above.
      */
     public JsonCodecProvider(PackOutput output, ExistingFileHelper existingFileHelper, String modid, DynamicOps<JsonElement> dynamicOps, PackType packType,
-          String directory, Codec<T> codec, Map<ResourceLocation, T> entries)
+          String directory, Codec<T> codec, Map<Identifier, T> entries)
     {
         // Track generated data so other dataproviders can validate if needed.
         final ResourceType resourceType = new ResourceType(packType, ".json", directory);
-        for (ResourceLocation id : entries.keySet())
+        for (Identifier id : entries.keySet())
         {
             existingFileHelper.trackGenerated(id, resourceType);
         }
@@ -108,7 +108,7 @@ public class JsonCodecProvider<T> implements DataProvider
         return CompletableFuture.allOf(futuresBuilder.build().toArray(CompletableFuture[]::new));
     }
 
-    protected void gather(BiConsumer<ResourceLocation, T> consumer)
+    protected void gather(BiConsumer<Identifier, T> consumer)
     {
         this.entries.forEach(consumer);
     }
@@ -125,7 +125,7 @@ public class JsonCodecProvider<T> implements DataProvider
      * Null or empty arrays will not be written, and if the top-level json type is not JsonObject, attempting to add conditions will error.
      * @param conditions The name->condition map to apply.
      */
-    public JsonCodecProvider<T> setConditions(Map<ResourceLocation, ICondition[]> conditions)
+    public JsonCodecProvider<T> setConditions(Map<Identifier, ICondition[]> conditions)
     {
         this.conditions = conditions;
         return this;

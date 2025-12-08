@@ -7,7 +7,7 @@ package net.minecraftforge.common;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
@@ -398,11 +398,11 @@ public class Tags {
         //endregion
 
         private static TagKey<Block> cTag(String name) {
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return BlockTags.create(Identifier.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Block> forgeTag(String name) {
-            return BlockTags.create(ResourceLocation.fromNamespaceAndPath("forge", name));
+            return BlockTags.create(Identifier.fromNamespaceAndPath("forge", name));
         }
     }
 
@@ -432,7 +432,7 @@ public class Tags {
         //endregion
 
         private static TagKey<EntityType<?>> cTag(String name) {
-            return TagKey.create(Registries.ENTITY_TYPE, ResourceLocation.fromNamespaceAndPath("c", name));
+            return TagKey.create(Registries.ENTITY_TYPE, Identifier.fromNamespaceAndPath("c", name));
         }
     }
 
@@ -1103,11 +1103,11 @@ public class Tags {
         //endregion
 
         private static TagKey<Item> cTag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return ItemTags.create(Identifier.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Item> forgeTag(String name) {
-            return ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", name));
+            return ItemTags.create(Identifier.fromNamespaceAndPath("forge", name));
         }
     }
 
@@ -1179,11 +1179,11 @@ public class Tags {
         //endregion
 
         private static TagKey<Fluid> cTag(String name) {
-            return FluidTags.create(ResourceLocation.fromNamespaceAndPath("c", name));
+            return FluidTags.create(Identifier.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Fluid> forgeTag(String name) {
-            return FluidTags.create(ResourceLocation.fromNamespaceAndPath("forge", name));
+            return FluidTags.create(Identifier.fromNamespaceAndPath("forge", name));
         }
     }
 
@@ -1223,7 +1223,7 @@ public class Tags {
         //endregion
 
         private static TagKey<Enchantment> cTag(String name) {
-            return TagKey.create(Registries.ENCHANTMENT, ResourceLocation.fromNamespaceAndPath("c", name));
+            return TagKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath("c", name));
         }
     }
 
@@ -1497,11 +1497,11 @@ public class Tags {
         //endregion
 
         private static TagKey<Biome> cTag(String name) {
-            return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("c", name));
+            return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("c", name));
         }
 
         private static TagKey<Biome> forgeTag(String name) {
-            return TagKey.create(Registries.BIOME, ResourceLocation.fromNamespaceAndPath("forge", name));
+            return TagKey.create(Registries.BIOME, Identifier.fromNamespaceAndPath("forge", name));
         }
     }
 
@@ -1525,7 +1525,7 @@ public class Tags {
         //endregion
 
         private static TagKey<Structure> cTag(String name) {
-            return TagKey.create(Registries.STRUCTURE, ResourceLocation.fromNamespaceAndPath("c", name));
+            return TagKey.create(Registries.STRUCTURE, Identifier.fromNamespaceAndPath("c", name));
         }
     }
 }

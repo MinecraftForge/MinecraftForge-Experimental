@@ -6,16 +6,13 @@
 package net.minecraftforge.common.world;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Set;
 
-import net.minecraft.Util;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.entity.MobCategory;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.Unmodifiable;
 
 public class MobSpawnSettingsBuilder extends MobSpawnSettings.Builder {
     private final Set<MobCategory> typesView = Collections.unmodifiableSet(this.spawners.keySet());

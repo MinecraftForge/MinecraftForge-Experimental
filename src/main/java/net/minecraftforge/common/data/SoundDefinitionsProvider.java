@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -84,7 +84,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
      * @param name The name of the sound to create.
      * @param type The type of sound to create.
      */
-    protected static SoundDefinition.Sound sound(final ResourceLocation name, final SoundDefinition.SoundType type) {
+    protected static SoundDefinition.Sound sound(final Identifier name, final SoundDefinition.SoundType type) {
         return SoundDefinition.Sound.sound(name, type);
     }
 
@@ -94,7 +94,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
      *
      * @param name The name of the sound to create.
      */
-    protected static SoundDefinition.Sound sound(final ResourceLocation name) {
+    protected static SoundDefinition.Sound sound(final Identifier name) {
         return sound(name, SoundDefinition.SoundType.SOUND);
     }
 
@@ -105,7 +105,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
      * @param type The type of sound to create.
      */
     protected static SoundDefinition.Sound sound(final String name, final SoundDefinition.SoundType type) {
-        return sound(ResourceLocation.parse(name), type);
+        return sound(Identifier.parse(name), type);
     }
 
     /**
@@ -115,7 +115,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
      * @param name The name of the sound to create.
      */
     protected static SoundDefinition.Sound sound(final String name) {
-        return sound(ResourceLocation.parse(name));
+        return sound(Identifier.parse(name));
     }
 
     // Addition methods
@@ -149,13 +149,13 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
     }
 
     /**
-     * Adds the {@link SoundEvent} referenced by the given {@link ResourceLocation} with the
+     * Adds the {@link SoundEvent} referenced by the given {@link Identifier} with the
      * {@link SoundDefinition} to the list.
      *
-     * @param soundEvent The {@link ResourceLocation} that identifies the event.
+     * @param soundEvent The {@link Identifier} that identifies the event.
      * @param definition The {@link SoundDefinition} that defines the given event.
      */
-    protected void add(final ResourceLocation soundEvent, final SoundDefinition definition) {
+    protected void add(final Identifier soundEvent, final SoundDefinition definition) {
         this.addSounds(soundEvent.getPath(), definition);
     }
 
@@ -172,7 +172,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
      * @param definition The {@link SoundDefinition} that defines the given event.
      */
     protected void add(final String soundEvent, final SoundDefinition definition) {
-        this.add(ResourceLocation.parse(soundEvent), definition);
+        this.add(Identifier.parse(soundEvent), definition);
     }
 
     private void addSounds(final String soundEvent, final SoundDefinition definition) {
@@ -207,7 +207,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
         throw new IllegalArgumentException("The given sound '" + sound.name() + "' does not have a valid type: expected either SOUND or EVENT, but found " + sound.type());
     }
 
-    private boolean validateSound(final String soundName, final ResourceLocation name) {
+    private boolean validateSound(final String soundName, final Identifier name) {
         final boolean valid = this.helper.exists(name, PackType.CLIENT_RESOURCES, ".ogg", "sounds");
         if (!valid) {
             final String path = name.getNamespace() + ":sounds/" + name.getPath() + ".ogg";
@@ -216,7 +216,7 @@ public abstract class SoundDefinitionsProvider implements DataProvider {
         return valid;
     }
 
-    private boolean validateEvent(final String soundName, final ResourceLocation name) {
+    private boolean validateEvent(final String soundName, final Identifier name) {
         final boolean valid = this.sounds.containsKey(soundName) || ForgeRegistries.SOUND_EVENTS.containsKey(name);
         if (!valid)
             LOGGER.warn("Unable to find event '{}' referenced from '{}'", name, soundName);

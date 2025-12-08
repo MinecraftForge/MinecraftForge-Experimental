@@ -6,7 +6,7 @@
 /** Forge 1.20.5 - Removed, Mojang created a layered rendering system that should make this all obsolete finally.. - Lex 042724
 package net.minecraftforge.client.gui.overlay;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 
 /**
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * Users should not be instantiating this themselves. Retrieve from {@link GuiOverlayManager}.
  * /
-public record NamedGuiOverlay(ResourceLocation id, IGuiOverlay overlay)
+public record NamedGuiOverlay(Identifier id, IGuiOverlay overlay)
 {
     @ApiStatus.Internal
     public NamedGuiOverlay

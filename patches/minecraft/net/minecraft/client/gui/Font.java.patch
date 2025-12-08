@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/gui/Font.java
 +++ b/net/minecraft/client/gui/Font.java
-@@ -31,7 +_,7 @@
- import org.joml.Matrix4f;
+@@ -32,7 +_,7 @@
+ import org.jspecify.annotations.Nullable;
  
  @OnlyIn(Dist.CLIENT)
 -public class Font {

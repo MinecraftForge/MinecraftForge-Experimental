@@ -13,7 +13,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload.Type;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.event.network.CustomPayloadEvent.Context;
 import net.minecraftforge.network.simple.handler.SimplePacket;
@@ -37,7 +37,7 @@ import java.util.function.BiConsumer;
 final class PayloadChannel extends Channel<CustomPacketPayload> {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker MARKER = MarkerManager.getMarker("PAYLOAD_CHANNEL");
-    private final Map<ResourceLocation, Message<?, ?>> payloads;
+    private final Map<Identifier, Message<?, ?>> payloads;
 
     @ApiStatus.Internal
     private PayloadChannel(Builder builder) {
@@ -53,7 +53,7 @@ final class PayloadChannel extends Channel<CustomPacketPayload> {
     private final static class Builder implements PayloadConnection<CustomPacketPayload> {
         private final NetworkInstance instance;
         private boolean built = false;
-        private final Map<ResourceLocation, Message<?, ?>> payloads = new HashMap<>();
+        private final Map<Identifier, Message<?, ?>> payloads = new HashMap<>();
 
         private Builder(NetworkInstance instance) {
             this.instance = instance;
@@ -194,7 +194,7 @@ final class PayloadChannel extends Channel<CustomPacketPayload> {
         BiConsumer<MSG, CustomPayloadEvent.Context> consumer
     ){ };
 
-    private Message<CustomPacketPayload, FriendlyByteBuf> get(ResourceLocation type, boolean send) {
+    private Message<CustomPacketPayload, FriendlyByteBuf> get(Identifier type, boolean send) {
         @SuppressWarnings("unchecked")
         var msg = (Message<CustomPacketPayload, FriendlyByteBuf>)payloads.get(type);
 
@@ -229,7 +229,7 @@ final class PayloadChannel extends Channel<CustomPacketPayload> {
     }
 
     @Override
-    ResourceLocation getName(CustomPacketPayload packet) {
+    Identifier getName(CustomPacketPayload packet) {
         return packet.type().id();
     }
 

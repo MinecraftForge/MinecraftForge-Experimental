@@ -7,7 +7,7 @@ package net.minecraftforge.common;
 
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.RegistryAccess;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.fml.loading.FMLLoader;
@@ -46,7 +46,7 @@ public final class TagConventionMigrationHelper {
 
     private static void run(RegistryAccess.Frozen registryAccess) {
         registryAccess.registries().forEach(registryEntry -> {
-            if (registryEntry.key().location().getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE)) {
+            if (registryEntry.key().identifier().getNamespace().equals(Identifier.DEFAULT_NAMESPACE)) {
                 FOUND_LEGACY_TAGS.addAll(
                     registryEntry.value().getTags()
                         .map(HolderSet.Named::key)

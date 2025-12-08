@@ -35,10 +35,10 @@ public sealed interface TextureStitchEvent {
     //  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
     //  */
     // public static class Pre extends TextureStitchEvent {
-    //     private final Set<ResourceLocation> sprites;
+    //     private final Set<Identifier> sprites;
     //
     //     @ApiStatus.Internal
-    //     public Pre(TextureAtlas map, Set<ResourceLocation> sprites) {
+    //     public Pre(TextureAtlas map, Set<Identifier> sprites) {
     //         super(map);
     //         this.sprites = sprites;
     //     }
@@ -51,7 +51,7 @@ public sealed interface TextureStitchEvent {
     //      *
     //      * @param sprite the location of the sprite
     //      */
-    //     public boolean addSprite(ResourceLocation sprite) {
+    //     public boolean addSprite(Identifier sprite) {
     //         return this.sprites.add(sprite);
     //     }
     // }

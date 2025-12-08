@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.util.StringUtil;
 import net.minecraft.world.effect.MobEffects;
@@ -274,9 +274,9 @@ public class ForgeGui extends Gui {
         FoodData stats = minecraft.player.getFoodData();
         int level = stats.getFoodLevel();
 
-        ResourceLocation empty = FOOD_EMPTY_SPRITE;
-        ResourceLocation half = FOOD_HALF_SPRITE;
-        ResourceLocation full = FOOD_FULL_SPRITE;
+        Identifier empty = FOOD_EMPTY_SPRITE;
+        Identifier half = FOOD_HALF_SPRITE;
+        Identifier full = FOOD_FULL_SPRITE;
 
         if (player.hasEffect(MobEffects.HUNGER)) {
            empty = FOOD_EMPTY_HUNGER_SPRITE;

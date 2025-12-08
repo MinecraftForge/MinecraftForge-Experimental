@@ -106,7 +106,7 @@ public class ChunkGenWorker implements IWorker {
         }
 
         if (queue.isEmpty()) {
-            listener.sendSuccess(() -> Component.translatable("commands.forge.gen.complete", genned, total, dim.dimension().location()), true);
+            listener.sendSuccess(() -> Component.translatable("commands.forge.gen.complete", genned, total, dim.dimension().identifier()), true);
             return false;
         }
         return true;

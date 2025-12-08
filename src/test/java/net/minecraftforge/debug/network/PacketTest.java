@@ -15,7 +15,7 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.ClientboundCustomPayloadPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.network.CommonListenerCookie;
 import net.minecraft.world.phys.Vec3;
@@ -152,7 +152,7 @@ public class PacketTest extends BaseTestMod {
     }
 
     private static class TestChannel {
-        private static final ResourceLocation CHANNEL_NAME = rl(PacketTest.MODID, "main_channel");
+        private static final Identifier CHANNEL_NAME = rl(PacketTest.MODID, "main_channel");
         private static final int PROTOCOL_VERSION = 1;
 
         private static final SimpleChannel CHANNEL = ChannelBuilder

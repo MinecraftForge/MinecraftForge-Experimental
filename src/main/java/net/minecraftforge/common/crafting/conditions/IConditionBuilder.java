@@ -7,7 +7,7 @@ package net.minecraftforge.common.crafting.conditions;
 
 import java.util.List;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 
@@ -33,7 +33,7 @@ public interface IConditionBuilder {
     }
 
     default ICondition itemExists(String namespace, String path) {
-        return new ItemExistsCondition(ResourceLocation.fromNamespaceAndPath(namespace, path));
+        return new ItemExistsCondition(Identifier.fromNamespaceAndPath(namespace, path));
     }
 
     default ICondition modLoaded(String modid) {

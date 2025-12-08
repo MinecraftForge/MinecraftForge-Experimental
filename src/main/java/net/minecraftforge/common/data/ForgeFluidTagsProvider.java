@@ -8,7 +8,7 @@ package net.minecraftforge.common.data;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.FluidTagsProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.material.Fluid;
@@ -29,8 +29,8 @@ public final class ForgeFluidTagsProvider extends FluidTagsProvider {
         tag(WATER).add(net.minecraft.world.level.material.Fluids.WATER).add(net.minecraft.world.level.material.Fluids.FLOWING_WATER);
         tag(LAVA).add(net.minecraft.world.level.material.Fluids.LAVA).add(net.minecraft.world.level.material.Fluids.FLOWING_LAVA);
         tag(MILK)
-            .addOptional(ForgeMod.MILK.getKey().location())
-            .addOptional(ForgeMod.FLOWING_MILK.getKey().location());
+            .addOptional(ForgeMod.MILK.getKey().identifier())
+            .addOptional(ForgeMod.FLOWING_MILK.getKey().identifier());
         tag(GASEOUS);
         tag(HONEY);
         tag(POTION);
@@ -43,12 +43,12 @@ public final class ForgeFluidTagsProvider extends FluidTagsProvider {
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
         // TODO: Remove backwards compat tag entries in 1.22
         tag(forgeTagKey("milk"))
-            .addOptional(ForgeMod.MILK.getKey().location())
-            .addOptional(ForgeMod.FLOWING_MILK.getKey().location());
+            .addOptional(ForgeMod.MILK.getKey().identifier())
+            .addOptional(ForgeMod.FLOWING_MILK.getKey().identifier());
     }
 
     private static TagKey<Fluid> forgeTagKey(String path) {
-        return FluidTags.create(ResourceLocation.fromNamespaceAndPath("forge", path));
+        return FluidTags.create(Identifier.fromNamespaceAndPath("forge", path));
     }
 
     @Override

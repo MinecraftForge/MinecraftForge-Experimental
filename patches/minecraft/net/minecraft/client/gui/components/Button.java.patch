@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/components/Button.java
 +++ b/net/minecraft/client/gui/components/Button.java
-@@ -32,6 +_,12 @@
+@@ -33,6 +_,12 @@
          this.createNarration = p_259552_;
      }
  
@@ -17,10 +17,10 @@
          }
  
          public Button build() {
--            Button button = new Button(this.x, this.y, this.width, this.height, this.message, this.onPress, this.createNarration);
+-            Button button = new Button.Plain(this.x, this.y, this.width, this.height, this.message, this.onPress, this.createNarration);
 -            button.setTooltip(this.tooltip);
 -            return button;
-+            return build(Button::new);
++            return build(Button.Plain::new);
 +        }
 +
 +        // Forge (GH-9238)
@@ -29,3 +29,14 @@
          }
      }
  
+@@ -118,6 +_,10 @@
+             int p_455297_, int p_455388_, int p_459653_, int p_452847_, Component p_459347_, Button.OnPress p_453378_, Button.CreateNarration p_456163_
+         ) {
+             super(p_455297_, p_455388_, p_459653_, p_452847_, p_459347_, p_453378_, p_456163_);
++        }
++
++        protected Plain(Builder builder) {
++            super(builder);
+         }
+ 
+         @Override

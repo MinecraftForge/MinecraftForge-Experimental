@@ -18,7 +18,7 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.ints.IntOpenHashSet;
 import it.unimi.dsi.fastutil.ints.IntSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.ForgeFaceData;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
@@ -31,15 +31,15 @@ import net.minecraftforge.common.data.ExistingFileHelper;
  */
 public class ItemLayerModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "item_layers");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "item_layers");
     public static <T extends ModelBuilder<T>> ItemLayerModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper)
     {
         return new ItemLayerModelBuilder<>(parent, existingFileHelper);
     }
 
     private final Int2ObjectMap<ForgeFaceData> faceData = new Int2ObjectOpenHashMap<>();
-    private final Map<ResourceLocation, IntSet> renderTypes = new LinkedHashMap<>();
-    private final Map<ResourceLocation, IntSet> renderTypesFast = new LinkedHashMap<>();
+    private final Map<Identifier, IntSet> renderTypes = new LinkedHashMap<>();
+    private final Map<Identifier, IntSet> renderTypesFast = new LinkedHashMap<>();
     private final IntSet layersWithRenderTypes = new IntOpenHashSet();
 
     protected ItemLayerModelBuilder(T parent, ExistingFileHelper existingFileHelper)
@@ -114,9 +114,9 @@ public class ItemLayerModelBuilder<T extends ModelBuilder<T>> extends CustomLoad
     public ItemLayerModelBuilder<T> renderType(String renderType, int... layers)
     {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
-        ResourceLocation asLoc;
+        Identifier asLoc;
         if (renderType.contains(":"))
-            asLoc = ResourceLocation.parse(renderType);
+            asLoc = Identifier.parse(renderType);
         else
             asLoc = parent.getLocation().withPath(renderType);
         return renderType(asLoc, layers);
@@ -126,14 +126,14 @@ public class ItemLayerModelBuilder<T extends ModelBuilder<T>> extends CustomLoad
     {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
         Preconditions.checkNotNull(renderTypeFast, "Fast graphics render type must not be null");
-        ResourceLocation asLoc;
+        Identifier asLoc;
         if (renderType.contains(":"))
-            asLoc = ResourceLocation.parse(renderType);
+            asLoc = Identifier.parse(renderType);
         else
             asLoc = parent.getLocation().withPath(renderType);
-        ResourceLocation asLocFast;
+        Identifier asLocFast;
         if (renderTypeFast.contains(":"))
-            asLocFast = ResourceLocation.parse(renderTypeFast);
+            asLocFast = Identifier.parse(renderTypeFast);
         else
             asLocFast = parent.getLocation().withPath(renderTypeFast);
         return renderType(asLoc, asLocFast, layers);
@@ -152,7 +152,7 @@ public class ItemLayerModelBuilder<T extends ModelBuilder<T>> extends CustomLoad
      * @throws IllegalArgumentException if any entry in {@code layers} is smaller than 0
      * @throws IllegalArgumentException if any entry in {@code layers} already has a render type
      */
-    public ItemLayerModelBuilder<T> renderType(ResourceLocation renderType, int... layers)
+    public ItemLayerModelBuilder<T> renderType(Identifier renderType, int... layers)
     {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
         Preconditions.checkNotNull(layers, "Layers must not be null");
@@ -168,7 +168,7 @@ public class ItemLayerModelBuilder<T extends ModelBuilder<T>> extends CustomLoad
         return this;
     }
 
-    public ItemLayerModelBuilder<T> renderType(ResourceLocation renderType, ResourceLocation renderTypeFast, int... layers)
+    public ItemLayerModelBuilder<T> renderType(Identifier renderType, Identifier renderTypeFast, int... layers)
     {
         Preconditions.checkNotNull(renderType, "Render type must not be null");
         Preconditions.checkNotNull(renderTypeFast, "Fast graphics render type must not be null");

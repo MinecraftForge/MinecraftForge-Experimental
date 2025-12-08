@@ -8,7 +8,7 @@ package net.minecraftforge.client.gui.overlay;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
@@ -216,17 +216,17 @@ public enum VanillaGuiOverlay {
         gui.renderPlayerList(screenWidth, screenHeight, guiGraphics);
     });
 
-    private final ResourceLocation id;
+    private final Identifier id;
     final IGuiOverlay overlay;
     NamedGuiOverlay type;
 
     VanillaGuiOverlay(String id, IGuiOverlay overlay) {
-        this.id = new ResourceLocation("minecraft", id);
+        this.id = new Identifier("minecraft", id);
         this.overlay = overlay;
     }
 
     @NotNull
-    public ResourceLocation id() {
+    public Identifier id() {
         return id;
     }
 

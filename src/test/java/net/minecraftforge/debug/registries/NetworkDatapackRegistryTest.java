@@ -17,7 +17,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.gametest.GameTest;
@@ -34,7 +34,7 @@ public class NetworkDatapackRegistryTest extends BaseTestMod {
     public static final String MODID = "network_data_registry";
     private static final ResourceKey<Registry<DataObject>> REGISTRY_KEY = ResourceKey.createRegistryKey(rl("registry"));
 
-    private static final ResourceLocation TEST_VALUE = rl("test_value_new");
+    private static final Identifier TEST_VALUE = rl("test_value_new");
 
     private static final DeferredRegisterData<DataObject> REGISTRY = DeferredRegisterData.create(REGISTRY_KEY, smodid());
     private static final RegistryObject<DataObject> REGISTRY_ENTRY = REGISTRY.register("test_entry", () -> new DataObject(TEST_VALUE));
@@ -62,16 +62,16 @@ public class NetworkDatapackRegistryTest extends BaseTestMod {
         var mc = Minecraft.getInstance();
         var level = mc.level;
         var reg = level.registryAccess().lookup(REGISTRY_KEY);
-        helper.assertTrue(reg.isPresent(), "Failed to find " + REGISTRY_KEY.location());
+        helper.assertTrue(reg.isPresent(), "Failed to find " + REGISTRY_KEY.identifier());
         var entry = reg.get().getValue(REGISTRY_ENTRY.getKey());
         if (entry == null)
             helper.fail("Failed to find " + REGISTRY_ENTRY.getKey());
         helper.assertValueEqual(entry.value, TEST_VALUE, Component.literal("Loaded entry does not contain expected value"));
     }
 
-    public static record DataObject(ResourceLocation value) {
+    public static record DataObject(Identifier value) {
         public static final Codec<DataObject> DIRECT_CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                ResourceLocation.CODEC.fieldOf("value").forGetter(DataObject::value)
+                Identifier.CODEC.fieldOf("value").forGetter(DataObject::value)
             ).apply(instance, DataObject::new));
     }
 }

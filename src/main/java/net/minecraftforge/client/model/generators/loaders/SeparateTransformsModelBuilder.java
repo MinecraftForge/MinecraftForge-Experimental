@@ -7,7 +7,7 @@ package net.minecraftforge.client.model.generators.loaders;
 
 import com.google.common.base.Preconditions;
 import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraftforge.client.model.generators.CustomLoaderBuilder;
 import net.minecraftforge.client.model.generators.ModelBuilder;
@@ -23,7 +23,7 @@ import java.util.Map;
  */
 public class SeparateTransformsModelBuilder<T extends ModelBuilder<T>> extends CustomLoaderBuilder<T>
 {
-    private static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "separate_transforms");
+    private static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "separate_transforms");
 
     public static <T extends ModelBuilder<T>> SeparateTransformsModelBuilder<T> begin(T parent, ExistingFileHelper existingFileHelper)
     {

@@ -15,7 +15,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
@@ -35,7 +35,7 @@ public class ConditionalAdvancement {
     }
 
     public static class Builder {
-        private static final ResourceLocation DOESNT_MATTER = ResourceLocation.fromNamespaceAndPath("doesnt", "matter");
+        private static final Identifier DOESNT_MATTER = Identifier.fromNamespaceAndPath("doesnt", "matter");
 
         private List<Adv> advancements = new ArrayList<>();
         private ICondition condition;

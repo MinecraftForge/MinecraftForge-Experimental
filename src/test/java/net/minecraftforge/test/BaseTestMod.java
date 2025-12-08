@@ -29,7 +29,7 @@ import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
@@ -51,7 +51,7 @@ public abstract class BaseTestMod {
     protected final List<Map<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>> dataRegistries = new ArrayList<>();
     protected final Set<DeferredRegisterData<?>> myDataRegistries = new HashSet<>();
 
-    protected final Map<ResourceLocation, ForgeGameTestHooks.TestReference> tests;
+    protected final Map<Identifier, ForgeGameTestHooks.TestReference> tests;
 
     public BaseTestMod(FMLJavaModLoadingContext context) {
         this(context, true, true);
@@ -132,13 +132,13 @@ public abstract class BaseTestMod {
         return mod.value();
     }
 
-    protected static ResourceLocation rl(String path) {
+    protected static Identifier rl(String path) {
         var modid = modid(StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass());
-        return ResourceLocation.fromNamespaceAndPath(modid, path);
+        return Identifier.fromNamespaceAndPath(modid, path);
     }
 
-    protected static ResourceLocation rl(String namespace, String path) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, path);
+    protected static Identifier rl(String namespace, String path) {
+        return Identifier.fromNamespaceAndPath(namespace, path);
     }
 
     protected static BlockBehaviour.Properties name(String namespace, String name, BlockBehaviour.Properties peops) {
@@ -255,7 +255,7 @@ public abstract class BaseTestMod {
 
             @Override
             protected boolean shouldDump(ResourceKey<?> key) {
-                return tests.containsKey(key.location());
+                return tests.containsKey(key.identifier());
             }
         });
     }

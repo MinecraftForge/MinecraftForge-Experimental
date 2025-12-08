@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/entity/HumanoidMobRenderer.java
 +++ b/net/minecraft/client/renderer/entity/HumanoidMobRenderer.java
-@@ -51,7 +_,7 @@
+@@ -61,7 +_,7 @@
          p_369040_.isCrouching = p_362179_.isCrouching();
          p_369040_.isFallFlying = p_362179_.isFallFlying();
          p_369040_.isVisuallySwimming = p_362179_.isVisuallySwimming();

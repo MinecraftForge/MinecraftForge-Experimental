@@ -5,7 +5,7 @@
 
 package net.minecraftforge.common.capabilities;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.Logging;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
@@ -39,19 +39,19 @@ public final class CapabilityManager {
      * distinguish between them. It is generally not safe to return your generic implementation for the root type when this is requested.
      */
     public static <T> Capability<T> get(CapabilityToken<T> type, String modid, String name) {
-        return get(type, ResourceLocation.fromNamespaceAndPath(modid, name));
+        return get(type, Identifier.fromNamespaceAndPath(modid, name));
     }
 
     /**
      * Retrieves a named capability of the specified type. This is useful when providers supply multiple instances of the same interface and want to
      * distinguish between them. It is generally not safe to return your generic implementation for the root type when this is requested.
      */
-    public static <T> Capability<T> get(CapabilityToken<T> type, ResourceLocation name) {
+    public static <T> Capability<T> get(CapabilityToken<T> type, Identifier name) {
         return get(type.getType(), name, false);
     }
 
     @SuppressWarnings("unchecked")
-    static <T> Capability<T> get(String type, ResourceLocation name, boolean registering) {
+    static <T> Capability<T> get(String type, Identifier name, boolean registering) {
         Capability<T> cap;
 
         synchronized (providers) {
@@ -84,7 +84,7 @@ public final class CapabilityManager {
     }
 
     private static final Type AUTO_REGISTER = Type.getType(AutoRegisterCapability.class);
-    private record Key(String type, ResourceLocation name) {};
+    private record Key(String type, Identifier name) {};
     private static final Map<Key, Capability<?>> providers = new HashMap<>();
 
     @ApiStatus.Internal

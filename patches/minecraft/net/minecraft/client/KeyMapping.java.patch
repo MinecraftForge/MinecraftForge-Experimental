@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/KeyMapping.java
 +++ b/net/minecraft/client/KeyMapping.java
 @@ -19,9 +_,9 @@
- import net.minecraftforge.api.distmarker.OnlyIn;
+ import org.jspecify.annotations.Nullable;
  
  @OnlyIn(Dist.CLIENT)
 -public class KeyMapping implements Comparable<KeyMapping> {
@@ -12,7 +12,7 @@
      private final String name;
      private final InputConstants.Key defaultKey;
      private final KeyMapping.Category category;
-@@ -38,7 +_,7 @@
+@@ -39,7 +_,7 @@
      }
  
      private static void forAllKeyMappings(InputConstants.Key p_424096_, Consumer<KeyMapping> p_427756_) {
@@ -21,7 +21,7 @@
          if (list != null && !list.isEmpty()) {
              for (KeyMapping keymapping : list) {
                  p_427756_.accept(keymapping);
-@@ -100,7 +_,7 @@
+@@ -106,7 +_,7 @@
      }
  
      public boolean isDown() {
@@ -30,12 +30,13 @@
      }
  
      public KeyMapping.Category getCategory() {
-@@ -140,7 +_,16 @@
-     public int compareTo(KeyMapping p_90841_) {
-         return this.category == p_90841_.category
-             ? I18n.get(this.name).compareTo(I18n.get(p_90841_.name))
--            : Integer.compare(KeyMapping.Category.SORT_ORDER.indexOf(this.category), KeyMapping.Category.SORT_ORDER.indexOf(p_90841_.category));
-+            : compareSort(this.category, p_90841_.category);
+@@ -149,8 +_,17 @@
+                 ? I18n.get(this.name).compareTo(I18n.get(p_90841_.name))
+                 : Integer.compare(this.order, p_90841_.order);
+         } else {
+-            return Integer.compare(KeyMapping.Category.SORT_ORDER.indexOf(this.category), KeyMapping.Category.SORT_ORDER.indexOf(p_90841_.category));
++            return compareSort(this.category, p_90841_.category);
+         }
 +    }
 +
 +    private static int compareSort(Category c1, Category c2) {
@@ -48,7 +49,7 @@
      }
  
      public static Supplier<Component> createNameSupplier(String p_90843_) {
-@@ -149,6 +_,20 @@
+@@ -159,6 +_,20 @@
      }
  
      public boolean same(KeyMapping p_90851_) {
@@ -69,7 +70,7 @@
          return this.key.equals(p_90851_.key);
      }
  
-@@ -167,11 +_,13 @@
+@@ -177,11 +_,13 @@
      }
  
      public Component getTranslatedKeyMessage() {
@@ -84,7 +85,7 @@
      }
  
      public String saveString() {
-@@ -183,12 +_,94 @@
+@@ -193,11 +_,94 @@
      }
  
      private void registerMapping(InputConstants.Key p_423386_) {
@@ -92,8 +93,7 @@
 +        MAP.put(p_423386_, this);
      }
  
-     @Nullable
-     public static KeyMapping get(String p_378660_) {
+     public static @Nullable KeyMapping get(String p_378660_) {
          return ALL.get(p_378660_);
 +    }
 +
@@ -104,28 +104,28 @@
 +    /**
 +     * Convenience constructor for creating KeyBindings with keyConflictContext set.
 +     */
-+    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, final InputConstants.Type inputType, final int keyCode, Category category) {
-+        this(description, keyConflictContext, inputType.getOrCreate(keyCode), category);
++    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, final InputConstants.Type inputType, final int keyCode, Category category, int order) {
++        this(description, keyConflictContext, inputType.getOrCreate(keyCode), category, order);
 +    }
 +
 +    /**
 +     * Convenience constructor for creating KeyBindings with keyConflictContext set.
 +     */
-+    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, InputConstants.Key keyCode, Category category) {
-+        this(description, keyConflictContext, net.minecraftforge.client.settings.KeyModifier.NONE, keyCode, category);
++    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, InputConstants.Key keyCode, Category category, int order) {
++        this(description, keyConflictContext, net.minecraftforge.client.settings.KeyModifier.NONE, keyCode, category, order);
 +    }
 +
 +    /**
 +     * Convenience constructor for creating KeyBindings with keyConflictContext and keyModifier set.
 +     */
-+    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, net.minecraftforge.client.settings.KeyModifier keyModifier, final InputConstants.Type inputType, final int keyCode, Category category) {
-+        this(description, keyConflictContext, keyModifier, inputType.getOrCreate(keyCode), category);
++    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, net.minecraftforge.client.settings.KeyModifier keyModifier, final InputConstants.Type inputType, final int keyCode, Category category, int order) {
++        this(description, keyConflictContext, keyModifier, inputType.getOrCreate(keyCode), category, order);
 +    }
 +
 +    /**
 +     * Convenience constructor for creating KeyBindings with keyConflictContext and keyModifier set.
 +     */
-+    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, net.minecraftforge.client.settings.KeyModifier keyModifier, InputConstants.Key keyCode, Category category) {
++    public KeyMapping(String description, net.minecraftforge.client.settings.IKeyConflictContext keyConflictContext, net.minecraftforge.client.settings.KeyModifier keyModifier, InputConstants.Key keyCode, Category category, int order) {
 +       this.name = description;
 +       this.key = keyCode;
 +       this.defaultKey = keyCode;
@@ -133,6 +133,7 @@
 +       this.keyConflictContext = keyConflictContext;
 +       this.keyModifier = keyModifier;
 +       this.keyModifierDefault = keyModifier;
++       this.order = order;
 +       if (this.keyModifier.matches(keyCode))
 +          this.keyModifier = net.minecraftforge.client.settings.KeyModifier.NONE;
 +       ALL.put(description, this);

@@ -6,7 +6,7 @@
 package net.minecraftforge.client.event;
 
 import net.minecraft.client.renderer.DimensionSpecialEffects;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -33,17 +33,17 @@ public final class RegisterDimensionSpecialEffectsEvent extends MutableEvent imp
         return BUS;
     }
 
-    private final Map<ResourceLocation, DimensionSpecialEffects> effects;
+    private final Map<Identifier, DimensionSpecialEffects> effects;
 
     @ApiStatus.Internal
-    public RegisterDimensionSpecialEffectsEvent(Map<ResourceLocation, DimensionSpecialEffects> effects) {
+    public RegisterDimensionSpecialEffectsEvent(Map<Identifier, DimensionSpecialEffects> effects) {
         this.effects = effects;
     }
 
     /**
      * Registers the effects for a given dimension type.
      */
-    public void register(ResourceLocation dimensionType, DimensionSpecialEffects effects) {
+    public void register(Identifier dimensionType, DimensionSpecialEffects effects) {
         this.effects.put(dimensionType, effects);
     }
 }

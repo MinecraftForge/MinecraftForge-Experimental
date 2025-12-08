@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/LoadingOverlay.java
 +++ b/net/minecraft/client/gui/screens/LoadingOverlay.java
-@@ -62,6 +_,8 @@
+@@ -63,6 +_,8 @@
          return p_169325_ & 16777215 | p_169326_ << 24;
      }
  
@@ -9,7 +9,7 @@
      @Override
      public void render(GuiGraphics p_281839_, int p_282704_, int p_283650_, float p_283394_) {
          int i = p_281839_.guiWidth();
-@@ -102,6 +_,7 @@
+@@ -103,6 +_,7 @@
              f2 = 1.0F;
          }
  
@@ -17,7 +17,7 @@
          int l2 = (int)(p_281839_.guiWidth() * 0.5);
          int i1 = (int)(p_281839_.guiHeight() * 0.5);
          double d0 = Math.min(p_281839_.guiWidth() * 0.75, (double)p_281839_.guiHeight()) * 0.25;
-@@ -117,6 +_,7 @@
+@@ -118,6 +_,7 @@
          if (f < 1.0F) {
              this.drawProgressBar(p_281839_, i / 2 - k1, i2 - 5, i / 2 + k1, i2 + 5, 1.0F - Mth.clamp(f, 0.0F, 1.0F));
          }
@@ -25,7 +25,7 @@
  
          if (f >= 2.0F) {
              this.minecraft.setOverlay(null);
-@@ -126,6 +_,7 @@
+@@ -127,6 +_,7 @@
      @Override
      public void tick() {
          if (this.fadeOutStart == -1L && this.reload.isDone() && this.isReadyToFadeOut()) {
@@ -33,11 +33,11 @@
              try {
                  this.reload.checkExceptions();
                  this.onFinish.accept(Optional.empty());
-@@ -133,7 +_,6 @@
+@@ -134,7 +_,6 @@
                  this.onFinish.accept(Optional.of(throwable));
              }
  
 -            this.fadeOutStart = Util.getMillis();
              if (this.minecraft.screen != null) {
                  Window window = this.minecraft.getWindow();
-                 this.minecraft.screen.init(this.minecraft, window.getGuiScaledWidth(), window.getGuiScaledHeight());
+                 this.minecraft.screen.init(window.getGuiScaledWidth(), window.getGuiScaledHeight());

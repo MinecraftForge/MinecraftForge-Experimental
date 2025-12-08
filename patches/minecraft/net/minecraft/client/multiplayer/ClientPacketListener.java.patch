@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientPacketListener.java
 +++ b/net/minecraft/client/multiplayer/ClientPacketListener.java
-@@ -514,6 +_,7 @@
+@@ -527,6 +_,7 @@
          this.debugSubscriber.clear();
          this.minecraft.levelRenderer.debugRenderer.refreshRendererList();
          this.minecraft.player.resetPos();
@@ -8,7 +8,7 @@
          this.minecraft.player.setId(p_105030_.playerId());
          this.level.addEntity(this.minecraft.player);
          this.minecraft.player.input = new KeyboardInput(this.minecraft.options);
-@@ -1321,6 +_,8 @@
+@@ -1334,6 +_,8 @@
              localplayer1.getAttributes().assignBaseValues(localplayer.getAttributes());
          }
  
@@ -17,7 +17,7 @@
          this.level.addEntity(localplayer1);
          localplayer1.input = new KeyboardInput(this.minecraft.options);
          this.minecraft.gameMode.adjustPlayer(localplayer1);
-@@ -1469,7 +_,7 @@
+@@ -1489,7 +_,7 @@
              ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(p_404890_.problemPath(), LOGGER);
  
              try {
@@ -26,7 +26,7 @@
              } catch (Throwable throwable1) {
                  try {
                      problemreporter$scopedcollector.close();
-@@ -1646,7 +_,9 @@
+@@ -1666,7 +_,9 @@
      @Override
      public void handleCommands(ClientboundCommandsPacket p_104990_) {
          PacketUtils.ensureRunningOnSameThread(p_104990_, this, this.minecraft.packetProcessor());
@@ -37,7 +37,7 @@
      }
  
      @Override
-@@ -1747,6 +_,7 @@
+@@ -1767,6 +_,7 @@
          if (this.minecraft.screen instanceof RecipeUpdateListener recipeupdatelistener) {
              recipeupdatelistener.recipesUpdated();
          }
@@ -45,7 +45,7 @@
      }
  
      @Override
-@@ -1785,6 +_,8 @@
+@@ -1805,6 +_,8 @@
          this.fuelValues = FuelValues.vanillaBurnTimes(this.registryAccess, this.enabledFeatures);
          List<ItemStack> list1 = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
          this.searchTrees.updateCreativeTags(list1);
@@ -54,7 +54,7 @@
      }
  
      @Override
-@@ -2614,6 +_,8 @@
+@@ -2631,6 +_,8 @@
      }
  
      public void sendChat(String p_249888_) {
@@ -63,7 +63,7 @@
          Instant instant = Instant.now();
          long i = Crypt.SaltSupplier.getLong();
          LastSeenMessagesTracker.Update lastseenmessagestracker$update = this.lastSeenMessages.generateAndApplyUpdate();
-@@ -2622,6 +_,7 @@
+@@ -2639,6 +_,7 @@
      }
  
      public void sendCommand(String p_250092_) {
@@ -71,7 +71,7 @@
          SignableCommand<ClientSuggestionProvider> signablecommand = SignableCommand.of(this.commands.parse(p_250092_, this.suggestionsProvider));
          if (signablecommand.arguments().isEmpty()) {
              this.send(new ServerboundChatCommandPacket(p_250092_));
-@@ -2638,6 +_,7 @@
+@@ -2655,6 +_,7 @@
      }
  
      public void sendUnattendedCommand(String p_407213_, @Nullable Screen p_406262_) {

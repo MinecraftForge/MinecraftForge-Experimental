@@ -5,11 +5,11 @@
 
 package net.minecraftforge.registries;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public interface IForgeRegistryInternal<V> extends IForgeRegistry<V> {
     <T> void setSlaveMap(SlaveKey<T> name, T obj);
 
-    void register(int id, ResourceLocation key, V value);
+    void register(int id, Identifier key, V value);
     V getValue(int id);
 }

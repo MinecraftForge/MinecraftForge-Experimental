@@ -7,7 +7,7 @@ package net.minecraftforge.registries;
 
 import com.google.common.collect.Iterators;
 import net.minecraft.core.HolderSet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.registries.tags.IReverseTag;
 import net.minecraftforge.registries.tags.ITag;
@@ -100,14 +100,14 @@ class ForgeRegistryTagManager<V> implements ITagManager<V> {
 
     @NotNull
     @Override
-    public TagKey<V> createTagKey(@NotNull ResourceLocation location) {
+    public TagKey<V> createTagKey(@NotNull Identifier location) {
         Objects.requireNonNull(location);
         return TagKey.create(this.owner.getRegistryKey(), location);
     }
 
     @NotNull
     @Override
-    public TagKey<V> createOptionalTagKey(@NotNull ResourceLocation location, @NotNull Set<? extends Supplier<V>> defaults) {
+    public TagKey<V> createOptionalTagKey(@NotNull Identifier location, @NotNull Set<? extends Supplier<V>> defaults) {
         TagKey<V> tagKey = createTagKey(location);
 
         addOptionalTagDefaults(tagKey, defaults);

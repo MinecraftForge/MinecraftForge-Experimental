@@ -21,11 +21,11 @@
      }
  
 +    protected Stream<Block> getKnownBlocks() {
-+         return BuiltInRegistries.BLOCK.stream().filter(block -> "minecraft".equals(block.builtInRegistryHolder().key().location().getNamespace()));
++         return BuiltInRegistries.BLOCK.stream().filter(block -> "minecraft".equals(block.builtInRegistryHolder().key().identifier().getNamespace()));
 +    }
 +
 +    protected Stream<Item> getKnownItems() {
-+        return BuiltInRegistries.ITEM.stream().filter(item -> "minecraft".equals(item.builtInRegistryHolder().key().location().getNamespace()));
++        return BuiltInRegistries.ITEM.stream().filter(item -> "minecraft".equals(item.builtInRegistryHolder().key().identifier().getNamespace()));
 +    }
 +
 +    protected BlockModelGenerators getBlockModelGenerators(BlockStateGeneratorCollector blocks, ItemInfoCollector items, SimpleModelCollector models) {
@@ -46,7 +46,7 @@
 +        private final Supplier<Stream<Block>> known;
 +
 +        public BlockStateGeneratorCollector() {
-+            this(() -> BuiltInRegistries.BLOCK.stream().filter(block -> "minecraft".equals(block.builtInRegistryHolder().key().location().getNamespace())));
++            this(() -> BuiltInRegistries.BLOCK.stream().filter(block -> "minecraft".equals(block.builtInRegistryHolder().key().identifier().getNamespace())));
 +        }
 +
 +        public BlockStateGeneratorCollector(Supplier<Stream<Block>> known) {
@@ -61,8 +61,8 @@
          public void validate() {
 -            Stream<Holder.Reference<Block>> stream = BuiltInRegistries.BLOCK.listElements().filter(p_376480_ -> true);
 +            Stream<Holder.Reference<Block>> stream = known.get().map(Block::builtInRegistryHolder);
-             List<ResourceLocation> list = stream.filter(p_378423_ -> !this.generators.containsKey(p_378423_.value()))
-                 .map(p_378200_ -> p_378200_.key().location())
+             List<Identifier> list = stream.filter(p_378423_ -> !this.generators.containsKey(p_378423_.value()))
+                 .map(p_447940_ -> p_447940_.key().identifier())
                  .toList();
 @@ -97,6 +_,15 @@
      public static class ItemInfoCollector implements ItemModelOutput {
@@ -71,7 +71,7 @@
 +        private final Supplier<Stream<Item>> known;
 +
 +        public ItemInfoCollector() {
-+            this(() -> BuiltInRegistries.ITEM.stream().filter(item -> "minecraft".equals(item.builtInRegistryHolder().key().location().getNamespace())));
++            this(() -> BuiltInRegistries.ITEM.stream().filter(item -> "minecraft".equals(item.builtInRegistryHolder().key().identifier().getNamespace())));
 +        }
 +
 +        public ItemInfoCollector(Supplier<Stream<Item>> known) {
@@ -79,16 +79,16 @@
 +        }
  
          @Override
-         public void accept(Item p_376450_, ItemModel.Unbaked p_378513_) {
+         public void accept(Item p_376450_, ItemModel.Unbaked p_378513_, ClientItem.Properties p_455809_) {
 @@ -115,7 +_,7 @@
              this.copies.put(p_376965_, p_377438_);
          }
  
 -        public void finalizeAndValidate() {
 +        public void generateDefaultBlockModels() {
-             BuiltInRegistries.ITEM.forEach(p_378629_ -> {
-                 if (!this.copies.containsKey(p_378629_)) {
-                     if (p_378629_ instanceof BlockItem blockitem && !this.itemInfos.containsKey(blockitem)) {
+             BuiltInRegistries.ITEM.forEach(p_447944_ -> {
+                 if (!this.copies.containsKey(p_447944_)) {
+                     if (p_447944_ instanceof BlockItem blockitem && !this.itemInfos.containsKey(blockitem)) {
 @@ -124,6 +_,8 @@
                      }
                  }
@@ -102,10 +102,10 @@
                      this.register(p_376289_, clientitem);
                  }
              });
--            List<ResourceLocation> list = BuiltInRegistries.ITEM
+-            List<Identifier> list = BuiltInRegistries.ITEM
 -                .listElements()
-+            List<ResourceLocation> list = known.get()
++            List<Identifier> list = known.get()
 +                .map(item -> item.builtInRegistryHolder())
                  .filter(p_377225_ -> !this.itemInfos.containsKey(p_377225_.value()))
-                 .map(p_378591_ -> p_378591_.key().location())
+                 .map(p_447943_ -> p_447943_.key().identifier())
                  .toList();

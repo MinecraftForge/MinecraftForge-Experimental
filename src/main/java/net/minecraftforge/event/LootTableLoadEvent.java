@@ -5,7 +5,7 @@
 
 package net.minecraftforge.event;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -27,15 +27,15 @@ import org.jspecify.annotations.Nullable;
 public final class LootTableLoadEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<LootTableLoadEvent> BUS = CancellableEventBus.create(LootTableLoadEvent.class);
 
-    private final ResourceLocation name;
+    private final Identifier name;
     private @Nullable LootTable table;
 
-    public LootTableLoadEvent(ResourceLocation name, LootTable table) {
+    public LootTableLoadEvent(Identifier name, LootTable table) {
         this.name = name;
         this.table = table;
     }
 
-    public ResourceLocation getName() {
+    public Identifier getName() {
         return this.name;
     }
 

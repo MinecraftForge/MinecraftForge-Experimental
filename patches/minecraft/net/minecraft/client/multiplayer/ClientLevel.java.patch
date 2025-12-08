@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientLevel.java
 +++ b/net/minecraft/client/multiplayer/ClientLevel.java
-@@ -145,6 +_,7 @@
+@@ -143,6 +_,7 @@
          p_389331_.put(BiomeColors.FOLIAGE_COLOR_RESOLVER, new BlockTintCache(p_194177_ -> this.calculateBlockTint(p_194177_, BiomeColors.FOLIAGE_COLOR_RESOLVER)));
          p_389331_.put(BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER, new BlockTintCache(p_389335_ -> this.calculateBlockTint(p_389335_, BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER)));
          p_389331_.put(BiomeColors.WATER_COLOR_RESOLVER, new BlockTintCache(p_194168_ -> this.calculateBlockTint(p_194168_, BiomeColors.WATER_COLOR_RESOLVER)));
@@ -8,7 +8,7 @@
      });
      private final ClientChunkCache chunkSource;
      private final Deque<Runnable> lightUpdateQueue = Queues.newArrayDeque();
-@@ -156,6 +_,8 @@
+@@ -155,6 +_,8 @@
      private final int seaLevel;
      private boolean tickDayTime;
      private static final Set<Item> MARKER_PARTICLE_ITEMS = Set.of(Items.BARRIER, Items.LIGHT);
@@ -17,16 +17,16 @@
  
      public void handleBlockChangedAck(int p_233652_) {
          if (SharedConstants.DEBUG_BLOCK_BREAK) {
-@@ -239,6 +_,8 @@
-         this.serverSimulationDistance = p_364305_;
-         this.updateSkyBrightness();
-         this.prepareWeather();
+@@ -240,6 +_,8 @@
+         if (this.canHaveWeather()) {
+             this.prepareWeather();
+         }
 +        this.gatherCapabilities();
 +        net.minecraftforge.event.ForgeEventFactory.onLevelLoad(this);
      }
  
-     public void queueLightUpdate(Runnable p_194172_) {
-@@ -343,6 +_,7 @@
+     private EnvironmentAttributeSystem.Builder addEnvironmentAttributeLayers(EnvironmentAttributeSystem.Builder p_450625_) {
+@@ -350,6 +_,7 @@
          p_104640_.setOldPosAndRot();
          p_104640_.tickCount++;
          Profiler.get().push(() -> BuiltInRegistries.ENTITY_TYPE.getKey(p_104640_.getType()).toString());
@@ -34,7 +34,7 @@
          p_104640_.tick();
          Profiler.get().pop();
  
-@@ -394,8 +_,10 @@
+@@ -401,8 +_,10 @@
      }
  
      public void addEntity(Entity p_104741_) {
@@ -71,7 +71,7 @@
          if (p_263536_ == this.minecraft.player) {
              this.minecraft.getSoundManager().play(new EntityBoundSoundInstance(p_263518_.value(), p_263487_, p_263538_, p_263524_, p_396496_, p_263509_));
          }
-@@ -1032,7 +_,7 @@
+@@ -954,7 +_,7 @@
  
      @Override
      public void addDestroyBlockEffect(BlockPos p_171667_, BlockState p_171668_) {
@@ -80,7 +80,7 @@
              VoxelShape voxelshape = p_171668_.getShape(this, p_171667_);
              double d0 = 0.25;
              voxelshape.forAllBoxes(
-@@ -1067,6 +_,7 @@
+@@ -989,6 +_,7 @@
                                              p_171668_,
                                              p_171667_
                                          )
@@ -88,7 +88,7 @@
                                      );
                              }
                          }
-@@ -1076,6 +_,13 @@
+@@ -998,6 +_,13 @@
          }
      }
  
@@ -102,7 +102,7 @@
      public void addBreakingBlockEffect(BlockPos p_425440_, Direction p_431745_) {
          BlockState blockstate = this.getBlockState(p_425440_);
          if (blockstate.getRenderShape() != RenderShape.INVISIBLE && blockstate.shouldSpawnTerrainParticles()) {
-@@ -1111,7 +_,7 @@
+@@ -1033,7 +_,7 @@
                  d0 = i + aabb.maxX + 0.1F;
              }
  
@@ -111,7 +111,7 @@
          }
      }
  
-@@ -1175,6 +_,16 @@
+@@ -1097,6 +_,16 @@
          this.explosionTracker.track(p_429129_, p_428744_, p_431051_, p_431683_);
      }
  
@@ -128,7 +128,7 @@
      @OnlyIn(Dist.CLIENT)
      public static class ClientLevelData implements WritableLevelData {
          private final boolean hardcore;
-@@ -1256,6 +_,7 @@
+@@ -1178,6 +_,7 @@
          }
  
          public void setDifficulty(Difficulty p_104852_) {
@@ -136,7 +136,7 @@
              this.difficulty = p_104852_;
          }
  
-@@ -1298,6 +_,12 @@
+@@ -1220,6 +_,12 @@
                      break;
                  default:
              }
@@ -149,7 +149,7 @@
          }
  
          public void onTrackingEnd(Entity p_171716_) {
-@@ -1310,6 +_,15 @@
+@@ -1232,6 +_,15 @@
                      ClientLevel.this.dragonParts.removeAll(Arrays.asList(enderdragon.getSubEntities()));
                      break;
                  default:

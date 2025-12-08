@@ -39,8 +39,8 @@ import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Size2i;
 import net.minecraftforge.common.ForgeI18n;
@@ -59,7 +59,7 @@ import net.minecraft.network.chat.Style;
 import org.slf4j.Logger;
 
 public class ModListScreen extends Screen {
-    private static final ResourceLocation LOGO = ResourceLocation.fromNamespaceAndPath("forge", "mod_logo");
+    private static final Identifier LOGO = Identifier.fromNamespaceAndPath("forge", "mod_logo");
     private static String stripControlCodes(String value) { return net.minecraft.util.StringUtil.stripColor(value); }
     private static final Logger LOGGER = LogUtils.getLogger();
     private enum SortType implements Comparator<IModInfo> {
@@ -112,7 +112,7 @@ public class ModListScreen extends Screen {
     }
 
     class InfoPanel extends ScrollPanel {
-        private ResourceLocation logoPath;
+        private Identifier logoPath;
         private Size2i logoDims = new Size2i(0, 0);
         private List<FormattedCharSequence> lines = Collections.emptyList();
 
@@ -120,7 +120,7 @@ public class ModListScreen extends Screen {
             super(mcIn, widthIn, heightIn, topIn, modList.getRight() + PADDING);
         }
 
-        void setInfo(List<String> lines, ResourceLocation logoPath, Size2i logoDims) {
+        void setInfo(List<String> lines, Identifier logoPath, Size2i logoDims) {
             this.logoPath = logoPath;
             this.logoDims = logoDims;
             this.lines = resizeContent(lines);
@@ -382,7 +382,7 @@ public class ModListScreen extends Screen {
         updateCache();
     }
 
-    record Logo(ResourceLocation texture, Size2i size) {}
+    record Logo(Identifier texture, Size2i size) {}
     private static final Logo NONE = new Logo(null, new Size2i(0, 0));
 
     private void updateCache() {

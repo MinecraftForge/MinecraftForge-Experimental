@@ -6,7 +6,7 @@
 package net.minecraftforge.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 
 import java.util.function.Consumer;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
  * {@link CustomPayloadEvent.Context#enqueueWork(Runnable)} can be used to handle the message on the main server or client
  * thread.
  *
- * @see ChannelBuilder#newEventChannel(ResourceLocation, Supplier, Predicate, Predicate)
+ * @see ChannelBuilder#newEventChannel(Identifier, Supplier, Predicate, Predicate)
  */
 public class EventNetworkChannel extends Channel<FriendlyByteBuf> {
     EventNetworkChannel(NetworkInstance instance) {

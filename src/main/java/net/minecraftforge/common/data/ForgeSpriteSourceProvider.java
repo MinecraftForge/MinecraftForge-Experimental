@@ -7,7 +7,7 @@ package net.minecraftforge.common.data;
 
 import net.minecraft.client.renderer.texture.atlas.sources.SingleFile;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.Optional;
 
@@ -21,6 +21,6 @@ public class ForgeSpriteSourceProvider extends SpriteSourceProvider
     @Override
     protected void addSources()
     {
-        atlas(SpriteSourceProvider.BLOCKS_ATLAS).addSource(new SingleFile(ResourceLocation.parse("forge:white"), Optional.empty()));
+        atlas(SpriteSourceProvider.BLOCKS_ATLAS).addSource(new SingleFile(Identifier.parse("forge:white"), Optional.empty()));
     }
 }

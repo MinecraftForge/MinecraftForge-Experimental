@@ -1,8 +1,8 @@
 --- a/net/minecraft/core/RegistrySetBuilder.java
 +++ b/net/minecraft/core/RegistrySetBuilder.java
 @@ -22,7 +_,8 @@
- import net.minecraft.tags.TagKey;
  import org.apache.commons.lang3.mutable.MutableObject;
+ import org.jspecify.annotations.Nullable;
  
 -public class RegistrySetBuilder {
 +public class RegistrySetBuilder implements net.minecraftforge.common.extensions.IForgeRegistrySetBuilder {
@@ -56,7 +56,7 @@
          RegistrySetBuilder.BuildState registrysetbuilder$buildstate = RegistrySetBuilder.BuildState.create(
              p_256400_, this.entries.stream().map(RegistrySetBuilder.RegistryStub::key)
 @@ -180,14 +_,16 @@
-             throw new NullPointerException("No cloner for " + p_313093_.location());
+             throw new NullPointerException("No cloner for " + p_313093_.identifier());
          } else {
              Map<ResourceKey<T>, Holder.Reference<T>> map = new HashMap<>();
 -            HolderLookup.RegistryLookup<T> registrylookup = p_311682_.lookupOrThrow(p_313093_);
@@ -64,7 +64,7 @@
              registrylookup.listElements().forEach(p_308453_ -> {
                  ResourceKey<T> resourcekey = p_308453_.key();
                  RegistrySetBuilder.LazyHolder<T> lazyholder = new RegistrySetBuilder.LazyHolder<>(p_312548_, resourcekey);
-                 lazyholder.supplier = () -> cloner.clone((T)p_308453_.value(), p_311682_, p_311605_.getValue());
+                 lazyholder.supplier = () -> cloner.clone((T)p_308453_.value(), p_311682_, p_311605_.get());
                  map.put(resourcekey, lazyholder);
              });
 -            HolderLookup.RegistryLookup<T> registrylookup1 = p_313198_.lookupOrThrow(p_313093_);
@@ -87,12 +87,12 @@
 @@ -265,6 +_,11 @@
                  @Override
                  public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> p_255961_) {
-                     return (HolderGetter<S>)BuildState.this.registries.getOrDefault(p_255961_.location(), BuildState.this.lookup);
+                     return (HolderGetter<S>)BuildState.this.registries.getOrDefault(p_255961_.identifier(), BuildState.this.lookup);
 +                }
 +
 +                @Override
 +                public <S> Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
-+                   return Optional.ofNullable((HolderLookup.RegistryLookup<S>) BuildState.this.registries.get(registry.location()));
++                   return Optional.ofNullable((HolderLookup.RegistryLookup<S>) BuildState.this.registries.get(registry.identifier()));
                  }
              };
          }
