@@ -11,15 +11,15 @@
              @Override
 @@ -90,23 +_,25 @@
              if (!itemstack.isEmpty() && itemstack.isEnchantable()) {
-                 this.access.execute((p_341515_, p_341516_) -> {
-                     IdMap<Holder<Enchantment>> idmap = p_341515_.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
+                 this.access.execute((p_449765_, p_449766_) -> {
+                     IdMap<Holder<Enchantment>> idmap = p_449765_.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
 -                    int j = 0;
 +                    float j = 0;
  
                      for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
-                         if (EnchantingTableBlock.isValidBookShelf(p_341515_, p_341516_, blockpos)) {
+                         if (EnchantingTableBlock.isValidBookShelf(p_449765_, p_449766_, blockpos)) {
                              j++;
-+                            j += p_341515_.getBlockState(p_341516_.offset(blockpos)).getEnchantPowerBonus(p_341515_, p_341516_.offset(blockpos));
++                            j += p_449765_.getBlockState(p_449766_.offset(blockpos)).getEnchantPowerBonus(p_449765_, p_449766_.offset(blockpos));
                          }
                      }
  
@@ -33,7 +33,7 @@
                          if (this.costs[k] < k + 1) {
                              this.costs[k] = 0;
                          }
-+                        this.costs[k] = net.minecraftforge.event.ForgeEventFactory.onEnchantmentLevelSet(p_341515_, p_341516_, k, (int)j, itemstack, costs[k]);
++                        this.costs[k] = net.minecraftforge.event.ForgeEventFactory.onEnchantmentLevelSet(p_449765_, p_449766_, k, (int)j, itemstack, costs[k]);
                      }
  
                      for (int l = 0; l < 3; l++) {

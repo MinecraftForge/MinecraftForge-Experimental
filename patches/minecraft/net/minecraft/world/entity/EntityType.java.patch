@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityType.java
 +++ b/net/minecraft/world/entity/EntityType.java
-@@ -961,6 +_,11 @@
+@@ -979,6 +_,11 @@
      private final FeatureFlagSet requiredFeatures;
      private final boolean allowedInPeaceful;
  
@@ -12,7 +12,7 @@
      private static <T extends Entity> EntityType<T> register(ResourceKey<EntityType<?>> p_368406_, EntityType.Builder<T> p_363129_) {
          return Registry.register(BuiltInRegistries.ENTITY_TYPE, p_368406_, p_363129_.build(p_368406_));
      }
-@@ -996,7 +_,8 @@
+@@ -1014,7 +_,8 @@
          String p_367006_,
          Optional<ResourceKey<LootTable>> p_364691_,
          FeatureFlagSet p_273518_,
@@ -22,7 +22,7 @@
      ) {
          this.factory = p_273268_;
          this.category = p_272918_;
-@@ -1013,6 +_,10 @@
+@@ -1031,6 +_,10 @@
          this.lootTable = p_364691_;
          this.requiredFeatures = p_273518_;
          this.allowedInPeaceful = p_430684_;
@@ -32,8 +32,8 @@
 +        this.customClientFactory = builder == null ? null : builder.customClientFactory;
      }
  
-     @Nullable
-@@ -1316,14 +_,26 @@
+     public @Nullable T spawn(
+@@ -1325,14 +_,26 @@
      }
  
      public int clientTrackingRange() {
@@ -60,7 +60,7 @@
          return this != PLAYER
              && this != LLAMA_SPIT
              && this != WITHER
-@@ -1383,6 +_,12 @@
+@@ -1391,6 +_,12 @@
          return OP_ONLY_CUSTOM_DATA.contains(this);
      }
  
@@ -73,9 +73,9 @@
      public static class Builder<T extends Entity> {
          private final EntityType.EntityFactory<T> factory;
          private final MobCategory category;
-@@ -1402,6 +_,10 @@
+@@ -1410,6 +_,10 @@
          );
-         private final DependantName<EntityType<?>, String> descriptionId = p_358878_ -> Util.makeDescriptionId("entity", p_358878_.location());
+         private final DependantName<EntityType<?>, String> descriptionId = p_449414_ -> Util.makeDescriptionId("entity", p_449414_.identifier());
          private boolean allowedInPeaceful = true;
 +        private java.util.function.Predicate<EntityType<?>> velocityUpdateSupplier = EntityType::defaultVelocitySupplier;
 +        private java.util.function.ToIntFunction<EntityType<?>> trackingRangeSupplier = EntityType::defaultTrackingRangeSupplier;
@@ -84,7 +84,7 @@
  
          private Builder(EntityType.EntityFactory<T> p_20696_, MobCategory p_20697_) {
              this.factory = p_20696_;
-@@ -1520,6 +_,30 @@
+@@ -1528,6 +_,30 @@
              return this;
          }
  
@@ -114,8 +114,8 @@
 +
          public EntityType<T> build(ResourceKey<EntityType<?>> p_369693_) {
              if (this.serialize) {
-                 Util.fetchChoiceType(References.ENTITY_TREE, p_369693_.location().toString());
-@@ -1540,7 +_,8 @@
+                 Util.fetchChoiceType(References.ENTITY_TREE, p_369693_.identifier().toString());
+@@ -1548,7 +_,8 @@
                  this.descriptionId.get(p_369693_),
                  this.lootTable.get(p_369693_),
                  this.requiredFeatures,

@@ -6,21 +6,21 @@
  
 -    private void hurtEntities() {
 +    private void hurtEntities(List<BlockPos> blocks) {
-         float f = this.radius * 2.0F;
-         int i = Mth.floor(this.center.x - f - 1.0);
-         int j = Mth.floor(this.center.x + f + 1.0);
-@@ -178,7 +_,9 @@
-         int i1 = Mth.floor(this.center.z - f - 1.0);
-         int j1 = Mth.floor(this.center.z + f + 1.0);
+         if (!(this.radius < 1.0E-5F)) {
+             float f = this.radius * 2.0F;
+             int i = Mth.floor(this.center.x - f - 1.0);
+@@ -179,7 +_,9 @@
+             int i1 = Mth.floor(this.center.z - f - 1.0);
+             int j1 = Mth.floor(this.center.z + f + 1.0);
  
--        for (Entity entity : this.level.getEntities(this.source, new AABB(i, k, i1, j, l, j1))) {
-+        var entities = this.level.getEntities(this.source, new AABB(i, k, i1, j, l, j1));
-+        net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.level, this, blocks, entities, f);
-+        for (Entity entity : entities) {
-             if (!entity.ignoreExplosion(this)) {
-                 double d0 = Math.sqrt(entity.distanceToSqr(this.center)) / f;
-                 if (!(d0 > 1.0)) {
-@@ -233,7 +_,7 @@
+-            for (Entity entity : this.level.getEntities(this.source, new AABB(i, k, i1, j, l, j1))) {
++            var entities = this.level.getEntities(this.source, new AABB(i, k, i1, j, l, j1));
++            net.minecraftforge.event.ForgeEventFactory.onExplosionDetonate(this.level, this, blocks, entities, f);
++            for (Entity entity : entities) {
+                 if (!entity.ignoreExplosion(this)) {
+                     double d0 = Math.sqrt(entity.distanceToSqr(this.center)) / f;
+                     if (!(d0 > 1.0)) {
+@@ -235,7 +_,7 @@
      public int explode() {
          this.level.gameEvent(this.source, GameEvent.EXPLODE, this.center);
          List<BlockPos> list = this.calculateExplodedPositions();

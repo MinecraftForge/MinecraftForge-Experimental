@@ -2,9 +2,9 @@
 +++ b/net/minecraft/world/entity/decoration/HangingEntity.java
 @@ -85,6 +_,8 @@
          } else {
-             boolean flag = BlockPos.betweenClosedStream(this.calculateSupportBox()).allMatch(p_421846_ -> {
-                 BlockState blockstate = this.level().getBlockState(p_421846_);
-+                if (net.minecraft.world.level.block.Block.canSupportCenter(this.level(), p_421846_, this.getDirection()))
+             boolean flag = BlockPos.betweenClosedStream(this.calculateSupportBox()).allMatch(p_449679_ -> {
+                 BlockState blockstate = this.level().getBlockState(p_449679_);
++                if (net.minecraft.world.level.block.Block.canSupportCenter(this.level(), p_449679_, this.getDirection()))
 +                    return true;
                  return blockstate.isSolid() || DiodeBlock.isDiode(blockstate);
              });

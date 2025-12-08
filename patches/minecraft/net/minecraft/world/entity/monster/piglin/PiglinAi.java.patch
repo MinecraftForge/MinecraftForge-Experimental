@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/monster/piglin/PiglinAi.java
 +++ b/net/minecraft/world/entity/monster/piglin/PiglinAi.java
-@@ -634,7 +_,7 @@
+@@ -640,7 +_,7 @@
  
      public static boolean isWearingSafeArmor(LivingEntity p_365495_) {
          for (EquipmentSlot equipmentslot : EquipmentSlotGroup.ARMOR) {
@@ -9,7 +9,7 @@
                  return true;
              }
          }
-@@ -778,7 +_,7 @@
+@@ -784,7 +_,7 @@
      }
  
      private static boolean hasCrossbow(LivingEntity p_34919_) {
@@ -18,7 +18,7 @@
      }
  
      private static void admireGoldItem(LivingEntity p_34939_) {
-@@ -790,7 +_,7 @@
+@@ -796,7 +_,7 @@
      }
  
      private static boolean isBarterCurrency(ItemStack p_149968_) {

@@ -4,15 +4,15 @@
      }
  
      static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(String p_331650_) {
--        return new CustomPacketPayload.Type<>(ResourceLocation.withDefaultNamespace(p_331650_));
-+        return new CustomPacketPayload.Type<>(ResourceLocation.parse(p_331650_));
+-        return new CustomPacketPayload.Type<>(Identifier.withDefaultNamespace(p_331650_));
++        return new CustomPacketPayload.Type<>(Identifier.parse(p_331650_));
 +    }
 +
 +    static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(String namespace, String path) {
-+        return new CustomPacketPayload.Type<>(ResourceLocation.fromNamespaceAndPath(namespace, path));
++        return new CustomPacketPayload.Type<>(Identifier.fromNamespaceAndPath(namespace, path));
 +    }
 +
-+    static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(ResourceLocation name) {
++    static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(Identifier name) {
 +        return new CustomPacketPayload.Type<>(name);
      }
  

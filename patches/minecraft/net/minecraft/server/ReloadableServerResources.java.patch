@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/ReloadableServerResources.java
 +++ b/net/minecraft/server/ReloadableServerResources.java
-@@ -26,6 +_,7 @@
+@@ -27,6 +_,7 @@
      private final ServerAdvancementManager advancements;
      private final ServerFunctionLibrary functionLibrary;
      private final List<Registry.PendingTags<?>> postponedTags;
@@ -8,7 +8,7 @@
  
      private ReloadableServerResources(
          LayeredRegistryAccess<RegistryLayer> p_368059_,
-@@ -37,9 +_,11 @@
+@@ -38,9 +_,11 @@
      ) {
          this.fullRegistryHolder = new ReloadableServerRegistries.Holder(p_368059_.compositeAccess());
          this.postponedTags = p_364269_;
@@ -19,22 +19,22 @@
 +        this.context = new net.minecraftforge.common.crafting.conditions.ConditionContext(this.postponedTags);
 +        this.recipes = new RecipeManager(p_363207_, this.context);
 +        this.advancements = new ServerAdvancementManager(p_363207_, this.context);
-         this.functionLibrary = new ServerFunctionLibrary(p_206859_, this.commands.getDispatcher());
+         this.functionLibrary = new ServerFunctionLibrary(p_453006_, this.commands.getDispatcher());
      }
  
-@@ -83,8 +_,10 @@
+@@ -84,8 +_,10 @@
                      ReloadableServerResources reloadableserverresources = new ReloadableServerResources(
-                         p_358539_.layers(), p_358539_.lookupWithUpdatedTags(), p_250212_, p_249301_, p_366334_, p_251126_
+                         p_448843_.layers(), p_448843_.lookupWithUpdatedTags(), p_250212_, p_249301_, p_366334_, p_457868_
                      );
 +                    var listeners = new java.util.ArrayList<>(reloadableserverresources.listeners());
-+                    listeners.addAll(net.minecraftforge.event.ForgeEventFactory.onResourceReload(reloadableserverresources, p_358539_.lookupWithUpdatedTags()));
++                    listeners.addAll(net.minecraftforge.event.ForgeEventFactory.onResourceReload(reloadableserverresources, p_448843_.lookupWithUpdatedTags()));
                      return SimpleReloadInstance.create(
 -                            p_248588_, reloadableserverresources.listeners(), p_249136_, p_249601_, DATA_RELOAD_INITIAL_TASK, LOGGER.isDebugEnabled()
 +                            p_248588_, listeners, p_249136_, p_249601_, DATA_RELOAD_INITIAL_TASK, LOGGER.isDebugEnabled()
                          )
                          .done()
                          .thenApply(p_214306_ -> reloadableserverresources);
-@@ -94,5 +_,14 @@
+@@ -95,5 +_,14 @@
  
      public void updateStaticRegistryTags() {
          this.postponedTags.forEach(Registry.PendingTags::apply);

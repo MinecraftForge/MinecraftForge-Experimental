@@ -1,0 +1,11 @@
+--- a/net/minecraft/world/entity/projectile/hurtingprojectile/AbstractHurtingProjectile.java
++++ b/net/minecraft/world/entity/projectile/hurtingprojectile/AbstractHurtingProjectile.java
+@@ -89,7 +_,7 @@
+                 this.igniteForSeconds(1.0F);
+             }
+ 
+-            if (hitresult.getType() != HitResult.Type.MISS && this.isAlive()) {
++            if (hitresult.getType() != HitResult.Type.MISS && this.isAlive() && !net.minecraftforge.event.ForgeEventFactory.onProjectileImpact(this, hitresult)) {
+                 this.hitTargetOrDeflectSelf(hitresult);
+             }
+ 

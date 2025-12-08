@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -281,7 +_,7 @@
+@@ -284,7 +_,7 @@
  
      public static <S extends MinecraftServer> S spin(Function<Thread, S> p_129873_) {
          AtomicReference<S> atomicreference = new AtomicReference<>();
@@ -9,15 +9,15 @@
          thread.setUncaughtExceptionHandler((p_177909_, p_177910_) -> LOGGER.error("Uncaught exception in server thread", p_177910_));
          if (Runtime.getRuntime().availableProcessors() > 4) {
              thread.setPriority(8);
-@@ -408,6 +_,7 @@
-         DimensionDataStorage dimensiondatastorage = serverlevel.getDataStorage();
-         this.readScoreboard(dimensiondatastorage);
+@@ -407,6 +_,7 @@
+         this.scoreboard.load(dimensiondatastorage.computeIfAbsent(ScoreboardSaveData.TYPE).getData());
          this.commandStorage = new CommandStorage(dimensiondatastorage);
+         this.stopwatches = dimensiondatastorage.computeIfAbsent(Stopwatches.TYPE);
 +        net.minecraftforge.event.ForgeEventFactory.onLevelLoad(levels.get(Level.OVERWORLD));
          if (!serverleveldata.isInitialized()) {
              try {
                  setInitialSpawn(serverlevel, serverleveldata, worldoptions.generateBonusChest(), flag, this.levelLoadListener);
-@@ -448,6 +_,7 @@
+@@ -447,6 +_,7 @@
                      this, this.executor, this.storageSource, derivedleveldata, resourcekey1, entry.getValue(), flag, j, ImmutableList.of(), false, randomsequences
                  );
                  this.levels.put(resourcekey1, serverlevel1);
@@ -25,7 +25,7 @@
              } else {
                  serverlevel1 = serverlevel;
              }
-@@ -491,6 +_,7 @@
+@@ -492,6 +_,7 @@
              p_177898_.setSpawn(LevelData.RespawnData.of(p_177897_.dimension(), BlockPos.ZERO.above(80), 0.0F, 0.0F));
          } else {
              ServerChunkCache serverchunkcache = p_177897_.getChunkSource();
@@ -33,7 +33,7 @@
              ChunkPos chunkpos = new ChunkPos(serverchunkcache.randomState().sampler().findSpawnPosition());
              p_431711_.start(LevelLoadListener.Stage.PREPARE_GLOBAL_SPAWN, 0);
              p_431711_.updateFocus(p_177897_.dimension(), chunkpos);
-@@ -675,6 +_,7 @@
+@@ -677,6 +_,7 @@
          for (ServerLevel serverlevel2 : this.getAllLevels()) {
              if (serverlevel2 != null) {
                  try {
@@ -41,7 +41,7 @@
                      serverlevel2.close();
                  } catch (IOException ioexception1) {
                      LOGGER.error("Exception closing the level", (Throwable)ioexception1);
-@@ -721,9 +_,11 @@
+@@ -723,9 +_,11 @@
                  throw new IllegalStateException("Failed to initialize server");
              }
  
@@ -53,7 +53,7 @@
  
              while (this.running) {
                  long i;
-@@ -778,6 +_,8 @@
+@@ -774,6 +_,8 @@
                  this.isReady = true;
                  JvmProfiler.INSTANCE.onServerTick(this.smoothedTickTimeMillis);
              }
@@ -62,7 +62,7 @@
          } catch (Throwable throwable2) {
              LOGGER.error("Encountered an unexpected exception", throwable2);
              CrashReport crashreport = constructOrExtractCrashReport(throwable2);
-@@ -789,6 +_,7 @@
+@@ -785,6 +_,7 @@
                  LOGGER.error("We were unable to save this crash report to disk.");
              }
  
@@ -70,7 +70,7 @@
              this.onServerCrash(crashreport);
          } finally {
              try {
-@@ -797,6 +_,7 @@
+@@ -793,6 +_,7 @@
              } catch (Throwable throwable) {
                  LOGGER.error("Exception stopping the server", throwable);
              } finally {
@@ -78,7 +78,7 @@
                  this.onServerExit();
              }
          }
-@@ -994,12 +_,14 @@
+@@ -995,12 +_,14 @@
              }
          }
  
@@ -93,15 +93,15 @@
          }
  
          this.ticksUntilAutosave--;
-@@ -1017,6 +_,7 @@
+@@ -1018,6 +_,7 @@
          this.smoothedTickTimeMillis = this.smoothedTickTimeMillis * 0.8F + (float)k / (float)TimeUtil.NANOSECONDS_PER_MILLISECOND * 0.19999999F;
          this.logTickMethodTime(i);
          profilerfiller.pop();
 +        net.minecraftforge.event.ForgeEventFactory.onPostServerTick(p_129871_, this);
      }
  
-     private void autoSave() {
-@@ -1066,7 +_,8 @@
+     public void processPacketsAndTick(boolean p_452829_) {
+@@ -1079,7 +_,8 @@
              Optional.of(serverstatus$players),
              Optional.of(ServerStatus.Version.current()),
              Optional.ofNullable(this.statusIcon),
@@ -111,17 +111,17 @@
          );
      }
  
-@@ -1098,7 +_,8 @@
+@@ -1111,7 +_,8 @@
          profilerfiller.popPush("levels");
          this.updateEffectiveRespawnData();
  
 -        for (ServerLevel serverlevel : this.getAllLevels()) {
 +        for (ServerLevel serverlevel : this.getWorldArray()) {
 +            long tickStart = Util.getNanos();
-             profilerfiller.push(() -> serverlevel + " " + serverlevel.dimension().location());
+             profilerfiller.push(() -> serverlevel + " " + serverlevel.dimension().identifier());
              if (this.tickCount % 20 == 0) {
                  profilerfiller.push("timeSync");
-@@ -1107,6 +_,7 @@
+@@ -1120,6 +_,7 @@
              }
  
              profilerfiller.push("tick");
@@ -129,7 +129,7 @@
  
              try {
                  serverlevel.tick(p_129954_);
-@@ -1115,9 +_,11 @@
+@@ -1128,9 +_,11 @@
                  serverlevel.fillReportDetails(crashreport);
                  throw new ReportedException(crashreport);
              }
@@ -141,7 +141,7 @@
          }
  
          profilerfiller.popPush("connection");
-@@ -1126,7 +_,7 @@
+@@ -1139,7 +_,7 @@
          this.playerList.tick();
          profilerfiller.popPush("debugSubscribers");
          this.debugSubscribers.tick();
@@ -150,7 +150,7 @@
              profilerfiller.popPush("gameTests");
              GameTestTicker.SINGLETON.tick();
          }
-@@ -1229,7 +_,7 @@
+@@ -1238,7 +_,7 @@
  
      @DontObfuscate
      public String getServerModName() {
@@ -159,7 +159,7 @@
      }
  
      public SystemReport fillSystemReport(SystemReport p_177936_) {
-@@ -1579,6 +_,7 @@
+@@ -1564,6 +_,7 @@
                  this.functionManager.replaceLibrary(this.resources.managers.getFunctionLibrary());
                  this.structureTemplateManager.onResourceManagerReload(this.resources.resourceManager);
                  this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
@@ -167,7 +167,7 @@
              }, this);
          if (this.isSameThread()) {
              this.managedBlock(completablefuture::isDone);
-@@ -1588,12 +_,15 @@
+@@ -1573,12 +_,15 @@
      }
  
      public static WorldDataConfiguration configurePackRepository(PackRepository p_248681_, WorldDataConfiguration p_331931_, boolean p_249869_, boolean p_330480_) {
@@ -184,7 +184,7 @@
          } else {
              Set<String> set = Sets.newLinkedHashSet();
  
-@@ -2158,6 +_,48 @@
+@@ -2172,6 +_,48 @@
  
      public ServerLinks serverLinks() {
          return ServerLinks.EMPTY;

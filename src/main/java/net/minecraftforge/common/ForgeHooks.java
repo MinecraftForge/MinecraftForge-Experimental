@@ -99,6 +99,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.context.UseOnContext;
@@ -988,7 +989,7 @@ public final class ForgeHooks {
     }
 
     public static boolean canUseEntitySelectors(SharedSuggestionProvider provider) {
-        if (EntitySelectorParser.allowSelectors(provider))
+        if (provider.permissions().hasPermission(Permissions.COMMANDS_ENTITY_SELECTORS))
             return true;
         else if (provider instanceof CommandSourceStack source && source.source instanceof ServerPlayer player)
             return PermissionAPI.getPermission(player, ForgeMod.USE_SELECTORS_PERMISSION);

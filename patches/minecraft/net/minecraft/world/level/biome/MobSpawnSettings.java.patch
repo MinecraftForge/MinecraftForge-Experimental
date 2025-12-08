@@ -18,7 +18,7 @@
      }
  
      public WeightedList<MobSpawnSettings.SpawnerData> getMobs(MobCategory p_151799_) {
-@@ -64,6 +_,14 @@
+@@ -63,6 +_,14 @@
  
      public float getCreatureProbability() {
          return this.creatureGenerationProbability;

@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -86,6 +_,17 @@
+@@ -84,6 +_,17 @@
          OptionSpec<Void> optionspec13 = optionparser.accepts("jfrProfile");
          OptionSpec<Path> optionspec14 = optionparser.accepts("pidFile").withRequiredArg().withValuesConvertedBy(new PathConverter());
          OptionSpec<String> optionspec15 = optionparser.nonOptions();
@@ -18,7 +18,7 @@
  
          try {
              OptionSet optionset = optionparser.parse(p_129699_);
-@@ -94,6 +_,14 @@
+@@ -92,6 +_,14 @@
                  return;
              }
  
@@ -33,7 +33,7 @@
              Path path = optionset.valueOf(optionspec14);
              if (path != null) {
                  writePidFile(path);
-@@ -108,24 +_,29 @@
+@@ -106,24 +_,29 @@
              Bootstrap.validate();
              Util.startTimerHackThread();
              Path path1 = Paths.get("server.properties");
@@ -70,7 +70,7 @@
              LevelStorageSource levelstoragesource = LevelStorageSource.createDefault(file1.toPath());
              LevelStorageSource.LevelStorageAccess levelstoragesource$levelstorageaccess = levelstoragesource.validateAndCreateAccess(s);
              Dynamic<?> dynamic;
-@@ -176,6 +_,10 @@
+@@ -174,6 +_,10 @@
  
              PackRepository packrepository = ServerPacksSource.createPackRepository(levelstoragesource$levelstorageaccess);
  
@@ -81,7 +81,7 @@
              WorldStem worldstem;
              try {
                  WorldLoader.InitConfig worldloader$initconfig = loadOrCreateConfig(dedicatedserversettings.getProperties(), dynamic1, flag, packrepository);
-@@ -224,17 +_,18 @@
+@@ -222,17 +_,18 @@
              }
  
              levelstoragesource$levelstorageaccess.saveDataTag(registryaccess$frozen, worlddata);
@@ -104,7 +104,7 @@
                      }
  
                      return dedicatedserver1;
-@@ -244,6 +_,7 @@
+@@ -242,6 +_,7 @@
                  @Override
                  public void run() {
                      dedicatedserver.halt(true);
@@ -112,7 +112,7 @@
                  }
              };
              thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER));
-@@ -277,6 +_,16 @@
+@@ -275,6 +_,16 @@
              worldoptions = p_427999_ ? dedicatedserverproperties.worldOptions.withBonusChest(true) : dedicatedserverproperties.worldOptions;
              worlddimensions = dedicatedserverproperties.createDimensions(p_423661_.datapackWorldgen());
          }

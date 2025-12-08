@@ -4,7 +4,7 @@
          return stringbuilder.toString();
      }
  
-+    public ResourceLocation getId() {
++    public Identifier getId() {
 +        return id;
 +    }
 +
@@ -17,5 +17,5 @@
 +    }
 +
      public interface Lookup<T> {
-         @Nullable
-         T element(ResourceLocation p_215956_, boolean p_362986_);
+         @Nullable T element(Identifier p_459727_, boolean p_362986_);
+ 

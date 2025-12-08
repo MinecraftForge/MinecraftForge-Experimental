@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/item/DispensibleContainerItem.java
 +++ b/net/minecraft/world/item/DispensibleContainerItem.java
 @@ -6,9 +_,10 @@
- import net.minecraft.world.level.Level;
  import net.minecraft.world.phys.BlockHitResult;
+ import org.jspecify.annotations.Nullable;
  
 -public interface DispensibleContainerItem {
 +public interface DispensibleContainerItem extends net.minecraftforge.common.extensions.IForgeDispensibleContainerItem {

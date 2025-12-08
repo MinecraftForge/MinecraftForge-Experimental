@@ -1,14 +1,14 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -84,7 +_,7 @@
- import net.minecraft.world.scores.Scoreboard;
+@@ -85,7 +_,7 @@
  import org.apache.commons.lang3.mutable.MutableBoolean;
+ import org.jspecify.annotations.Nullable;
  
 -public abstract class Level implements LevelAccessor, AutoCloseable {
 +public abstract class Level extends net.minecraftforge.common.capabilities.CapabilityProvider.Levels implements LevelAccessor, AutoCloseable, net.minecraftforge.common.extensions.IForgeLevel {
      public static final Codec<ResourceKey<Level>> RESOURCE_KEY_CODEC = ResourceKey.codec(Registries.DIMENSION);
-     public static final ResourceKey<Level> OVERWORLD = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("overworld"));
-     public static final ResourceKey<Level> NETHER = ResourceKey.create(Registries.DIMENSION, ResourceLocation.withDefaultNamespace("the_nether"));
+     public static final ResourceKey<Level> OVERWORLD = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("overworld"));
+     public static final ResourceKey<Level> NETHER = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("the_nether"));
 @@ -125,6 +_,11 @@
      private final DamageSources damageSources;
      private final PalettedContainerFactory palettedContainerFactory;
@@ -28,8 +28,8 @@
 +        super();
          this.levelData = p_270739_;
          this.dimensionTypeRegistration = p_270240_;
-         DimensionType dimensiontype = p_270240_.value();
-@@ -210,11 +_,35 @@
+         this.dimension = p_270683_;
+@@ -207,11 +_,35 @@
          } else {
              LevelChunk levelchunk = this.getChunkAt(p_46605_);
              Block block = p_46606_.getBlock();
@@ -65,7 +65,7 @@
                  if (blockstate1 == p_46606_) {
                      if (blockstate != blockstate1) {
                          this.setBlocksDirty(p_46605_, blockstate, blockstate1);
-@@ -241,9 +_,8 @@
+@@ -238,9 +_,8 @@
                      }
  
                      this.updatePOIOnBlockStateChange(p_46605_, blockstate, blockstate1);
@@ -76,7 +76,7 @@
              }
          }
      }
-@@ -491,8 +_,28 @@
+@@ -474,8 +_,28 @@
          (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers).add(p_151526_);
      }
  
@@ -105,7 +105,7 @@
          if (!this.pendingBlockEntityTickers.isEmpty()) {
              this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
              this.pendingBlockEntityTickers.clear();
-@@ -515,12 +_,19 @@
+@@ -498,12 +_,19 @@
  
      public <T extends Entity> void guardEntityTick(Consumer<T> p_46654_, T p_46655_) {
          try {
@@ -125,7 +125,7 @@
          }
      }
  
-@@ -677,6 +_,7 @@
+@@ -659,6 +_,7 @@
          if (!this.isOutsideBuildHeight(p_46748_)) {
              this.getChunkAt(p_46748_).removeBlockEntity(p_46748_);
          }
@@ -133,7 +133,7 @@
      }
  
      public boolean isLoaded(BlockPos p_46750_) {
-@@ -755,9 +_,9 @@
+@@ -733,9 +_,9 @@
              }
          });
  
@@ -145,7 +145,7 @@
                  && p_46538_.test(enderdragonpart)
                  && p_46537_.intersects(enderdragonpart.getBoundingBox())) {
                  list.add(enderdragonpart);
-@@ -790,8 +_,8 @@
+@@ -768,8 +_,8 @@
                  }
              }
  
@@ -156,7 +156,7 @@
                      T t = p_261885_.tryCast(enderdragonpart);
                      if (t != null && p_261688_.test(t)) {
                          p_262071_.add(t);
-@@ -973,17 +_,16 @@
+@@ -942,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
      public void updateNeighbourForOutputSignal(BlockPos p_46718_, Block p_46719_) {
@@ -179,10 +179,10 @@
                      }
                  }
              }
-@@ -1080,6 +_,20 @@
+@@ -1037,6 +_,20 @@
      }
  
-     public abstract PotionBrewing potionBrewing();
+     public abstract EnvironmentAttributeSystem environmentAttributes();
 +
 +    private double maxEntityRadius = 2.0D;
 +
@@ -198,5 +198,5 @@
 +       return maxEntityRadius;
 +    }
  
-     public abstract FuelValues fuelValues();
+     public abstract PotionBrewing potionBrewing();
  

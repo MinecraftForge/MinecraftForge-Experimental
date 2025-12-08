@@ -6,10 +6,12 @@
 package net.minecraftforge.event.entity.player;
 
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This event will fire when the player is opped or deopped.
@@ -19,7 +21,7 @@ import org.jspecify.annotations.NullMarked;
  * @param getOldLevel The old permission level.
  */
 @NullMarked
-public record PermissionsChangedEvent(ServerPlayer getEntity, int getNewLevel, int getOldLevel)
+public record PermissionsChangedEvent(ServerPlayer getEntity, @Nullable LevelBasedPermissionSet getNewLevel, @Nullable LevelBasedPermissionSet getOldLevel)
         implements Cancellable, PlayerEvent, RecordEvent {
     public static final CancellableEventBus<PermissionsChangedEvent> BUS = CancellableEventBus.create(PermissionsChangedEvent.class);
 }

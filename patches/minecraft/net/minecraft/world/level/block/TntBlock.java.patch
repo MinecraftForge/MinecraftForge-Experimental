@@ -38,7 +38,7 @@
  
 +    @Deprecated //Forge: Prefer using IForgeBlock#onCaughtFire
      private static boolean prime(Level p_396831_, BlockPos p_393566_, @Nullable LivingEntity p_395667_) {
-         if (p_396831_ instanceof ServerLevel serverlevel && serverlevel.getGameRules().getBoolean(GameRules.RULE_TNT_EXPLODES)) {
+         if (p_396831_ instanceof ServerLevel serverlevel && serverlevel.getGameRules().get(GameRules.TNT_EXPLODES)) {
              PrimedTnt primedtnt = new PrimedTnt(p_396831_, p_393566_.getX() + 0.5, p_393566_.getY(), p_393566_.getZ() + 0.5, p_395667_);
 @@ -102,7 +_,7 @@
          if (!p_329029_.is(Items.FLINT_AND_STEEL) && !p_329029_.is(Items.FIRE_CHARGE)) {

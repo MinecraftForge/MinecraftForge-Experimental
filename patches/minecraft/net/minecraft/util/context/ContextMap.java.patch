@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/context/ContextMap.java
 +++ b/net/minecraft/util/context/ContextMap.java
-@@ -39,6 +_,10 @@
+@@ -37,6 +_,10 @@
          return (T)this.params.getOrDefault(p_368195_, p_368521_);
      }
  
@@ -11,7 +11,7 @@
      public static class Builder {
          private final Map<ContextKey<?>, Object> params = new IdentityHashMap<>();
  
-@@ -83,6 +_,10 @@
+@@ -80,6 +_,10 @@
                      return new ContextMap(this.params);
                  }
              }

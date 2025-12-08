@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/chunk/ImposterProtoChunk.java
 +++ b/net/minecraft/world/level/chunk/ImposterProtoChunk.java
-@@ -284,4 +_,9 @@
+@@ -278,4 +_,9 @@
      public ChunkSkyLightSources getSkyLightSources() {
          return this.wrapped.getSkyLightSources();
      }

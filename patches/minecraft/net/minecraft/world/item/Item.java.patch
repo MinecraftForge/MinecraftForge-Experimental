@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/item/Item.java
 +++ b/net/minecraft/world/item/Item.java
-@@ -86,7 +_,7 @@
- import net.minecraft.world.phys.Vec3;
+@@ -95,7 +_,7 @@
+ import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
 -public class Item implements FeatureElement, ItemLike {
@@ -9,16 +9,16 @@
      public static final Codec<Holder<Item>> CODEC = BuiltInRegistries.ITEM
          .holderByNameCodec()
          .validate(
-@@ -96,7 +_,7 @@
+@@ -105,7 +_,7 @@
          );
      public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.ITEM);
      private static final Logger LOGGER = LogUtils.getLogger();
 -    public static final Map<Block, Item> BY_BLOCK = Maps.newHashMap();
 +    public static final Map<Block, Item> BY_BLOCK = net.minecraftforge.registries.GameData.ItemCallbacks.getBlockItemMap();
-     public static final ResourceLocation BASE_ATTACK_DAMAGE_ID = ResourceLocation.withDefaultNamespace("base_attack_damage");
-     public static final ResourceLocation BASE_ATTACK_SPEED_ID = ResourceLocation.withDefaultNamespace("base_attack_speed");
+     public static final Identifier BASE_ATTACK_DAMAGE_ID = Identifier.withDefaultNamespace("base_attack_damage");
+     public static final Identifier BASE_ATTACK_SPEED_ID = Identifier.withDefaultNamespace("base_attack_speed");
      public static final int DEFAULT_MAX_STACK_SIZE = 64;
-@@ -134,6 +_,7 @@
+@@ -142,6 +_,7 @@
                  LOGGER.error("Item classes should end with Item and {} doesn't.", s);
              }
          }
@@ -26,7 +26,7 @@
      }
  
      @Deprecated
-@@ -141,17 +_,25 @@
+@@ -149,17 +_,25 @@
          return this.builtInRegistryHolder;
      }
  
@@ -54,7 +54,7 @@
      public void onDestroyed(ItemEntity p_150887_) {
      }
  
-@@ -264,6 +_,8 @@
+@@ -276,6 +_,8 @@
          return BuiltInRegistries.ITEM.wrapAsHolder(this).getRegisteredName();
      }
  
@@ -63,7 +63,7 @@
      public final ItemStack getCraftingRemainder() {
          return this.craftingRemainingItem == null ? ItemStack.EMPTY : new ItemStack(this.craftingRemainingItem);
      }
-@@ -354,6 +_,30 @@
+@@ -366,6 +_,30 @@
          return false;
      }
  
@@ -92,9 +92,9 @@
 +    public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) { }
 +
      public static class Properties {
-         private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = p_367498_ -> Util.makeDescriptionId("block", p_367498_.location());
-         private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = p_367603_ -> Util.makeDescriptionId("item", p_367603_.location());
-@@ -599,6 +_,11 @@
+         private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = p_449793_ -> Util.makeDescriptionId("block", p_449793_.identifier());
+         private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = p_449792_ -> Util.makeDescriptionId("item", p_449792_.identifier());
+@@ -683,6 +_,11 @@
  
          boolean isPeaceful();
  
@@ -103,10 +103,10 @@
 +            return null;
 +        }
 +
-         static Item.TooltipContext of(@Nullable final Level p_332083_) {
+         static Item.TooltipContext of(final @Nullable Level p_332083_) {
              return p_332083_ == null ? EMPTY : new Item.TooltipContext() {
                  @Override
-@@ -619,6 +_,11 @@
+@@ -703,6 +_,11 @@
                  @Override
                  public boolean isPeaceful() {
                      return p_332083_.getDifficulty() == Difficulty.PEACEFUL;

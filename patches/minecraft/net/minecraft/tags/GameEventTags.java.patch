@@ -2,14 +2,14 @@
 +++ b/net/minecraft/tags/GameEventTags.java
 @@ -14,4 +_,12 @@
      private static TagKey<GameEvent> create(String p_203853_) {
-         return TagKey.create(Registries.GAME_EVENT, ResourceLocation.withDefaultNamespace(p_203853_));
+         return TagKey.create(Registries.GAME_EVENT, Identifier.withDefaultNamespace(p_203853_));
      }
 +
 +    public static TagKey<GameEvent> create(String namepsace, String path) {
-+        return create(ResourceLocation.fromNamespaceAndPath(namepsace, path));
++        return create(Identifier.fromNamespaceAndPath(namepsace, path));
 +    }
 +
-+    public static TagKey<GameEvent> create(ResourceLocation name) {
++    public static TagKey<GameEvent> create(Identifier name) {
 +        return TagKey.create(Registries.GAME_EVENT, name);
 +    }
  }

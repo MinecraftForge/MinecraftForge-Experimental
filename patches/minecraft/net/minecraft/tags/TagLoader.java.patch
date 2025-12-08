@@ -6,7 +6,7 @@
                      tagfile.entries().forEach(p_215997_ -> list.add(new TagLoader.EntryWithSource(p_215997_, s)));
 +                    tagfile.remove().forEach(e -> list.add(new TagLoader.EntryWithSource(e, s, true)));
                  } catch (Exception exception) {
-                     LOGGER.error("Couldn't read tag list {} from {} in data pack {}", resourcelocation1, resourcelocation, resource.sourcePackId(), exception);
+                     LOGGER.error("Couldn't read tag list {} from {} in data pack {}", identifier1, identifier, resource.sourcePackId(), exception);
                  }
 @@ -74,16 +_,17 @@
      }
@@ -28,17 +28,17 @@
 +        return list.isEmpty() ? Either.right(List.copyOf(builder)) : Either.left(list);
      }
  
-     public Map<ResourceLocation, List<T>> build(Map<ResourceLocation, List<TagLoader.EntryWithSource>> p_203899_) {
-@@ -111,7 +_,7 @@
+     public Map<Identifier, List<T>> build(Map<Identifier, List<TagLoader.EntryWithSource>> p_203899_) {
+@@ -109,7 +_,7 @@
                      p_358772_ -> LOGGER.error(
                          "Couldn't load tag {} as it is missing following references: {}",
-                         p_358780_,
+                         p_450305_,
 -                        p_358772_.stream().map(Objects::toString).collect(Collectors.joining(", "))
 +                        p_358772_.stream().map(Objects::toString).collect(Collectors.joining(", \n\t"))
                      )
                  )
-                 .ifRight(p_369415_ -> map.put(p_358780_, (List<T>)p_369415_))
-@@ -188,7 +_,11 @@
+                 .ifRight(p_369415_ -> map.put(p_450305_, (List<T>)p_369415_))
+@@ -185,7 +_,11 @@
          }
      }
  

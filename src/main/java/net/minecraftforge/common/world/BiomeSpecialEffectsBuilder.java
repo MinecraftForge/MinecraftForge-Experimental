@@ -6,14 +6,8 @@
 package net.minecraftforge.common.world;
 
 import java.util.Optional;
+import java.util.OptionalInt;
 
-import net.minecraft.core.Holder;
-import net.minecraft.sounds.Music;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.util.random.WeightedList;
-import net.minecraft.world.level.biome.AmbientAdditionsSettings;
-import net.minecraft.world.level.biome.AmbientMoodSettings;
-import net.minecraft.world.level.biome.AmbientParticleSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
 
 /**
@@ -22,75 +16,69 @@ import net.minecraft.world.level.biome.BiomeSpecialEffects;
  */
 public class BiomeSpecialEffectsBuilder extends BiomeSpecialEffects.Builder {
     public static BiomeSpecialEffectsBuilder copyOf(BiomeSpecialEffects baseEffects) {
-        BiomeSpecialEffectsBuilder builder = BiomeSpecialEffectsBuilder.create(baseEffects.getFogColor(), baseEffects.getWaterColor(), baseEffects.getWaterFogColor(), baseEffects.getSkyColor());
-        builder.grassColorModifier = baseEffects.getGrassColorModifier();
-        baseEffects.getFoliageColorOverride().ifPresent(builder::foliageColorOverride);
-        baseEffects.getGrassColorOverride().ifPresent(builder::grassColorOverride);
-        baseEffects.getAmbientParticleSettings().ifPresent(builder::ambientParticle);
-        baseEffects.getAmbientLoopSoundEvent().ifPresent(builder::ambientLoopSound);
-        baseEffects.getAmbientMoodSettings().ifPresent(builder::ambientMoodSound);
-        baseEffects.getAmbientAdditionsSettings().ifPresent(builder::ambientAdditionsSound);
-        baseEffects.getBackgroundMusic().ifPresent(builder::backgroundMusic);
-        return builder;
+        var ret = create()
+            .waterColor(baseEffects.waterColor())
+            .grassColorModifier(baseEffects.grassColorModifier())
+            ;
+
+        if (baseEffects.foliageColorOverride().isPresent())
+            ret = ret.foliageColorOverride(baseEffects.foliageColorOverride().get());
+        if (baseEffects.dryFoliageColorOverride().isPresent())
+            ret = ret.dryFoliageColorOverride(baseEffects.dryFoliageColorOverride().get());
+        if (baseEffects.grassColorOverride().isPresent())
+            ret = ret.grassColorOverride(baseEffects.grassColorOverride().get());
+        return ret;
     }
 
-    public static BiomeSpecialEffectsBuilder create(int fogColor, int waterColor, int waterFogColor, int skyColor) {
-        return new BiomeSpecialEffectsBuilder(fogColor, waterColor, waterFogColor, skyColor);
+    public static BiomeSpecialEffectsBuilder create() {
+        return new BiomeSpecialEffectsBuilder();
     }
 
-    protected BiomeSpecialEffectsBuilder(int fogColor, int waterColor, int waterFogColor, int skyColor) {
-        super();
-        this.fogColor(fogColor);
-        this.waterColor(waterColor);
-        this.waterFogColor(waterFogColor);
-        this.skyColor(skyColor);
+    protected BiomeSpecialEffectsBuilder() {
     }
 
-    public int getFogColor() {
-        return this.fogColor.getAsInt();
+    public BiomeSpecialEffectsBuilder waterColor(int value) {
+        super.waterColor(value);
+        return this;
     }
 
-    public int waterColor() {
-        return this.waterColor.getAsInt();
+    public OptionalInt waterColor() {
+        return this.waterColor;
     }
 
-    public int getWaterFogColor() {
-        return this.waterFogColor.getAsInt();
+    public BiomeSpecialEffectsBuilder foliageColorOverride(int value) {
+        super.foliageColorOverride(value);
+        return this;
     }
 
-    public int getSkyColor() {
-        return this.skyColor.getAsInt();
+    public Optional<Integer> foliageColorOverride() {
+        return this.foliageColorOverride;
+    }
+
+    public BiomeSpecialEffectsBuilder dryFoliageColorOverride(int value) {
+        super.dryFoliageColorOverride(value);
+        return this;
+    }
+
+    public Optional<Integer> dryFoliageColorOverride() {
+        return this.dryFoliageColorOverride;
+    }
+
+    public BiomeSpecialEffectsBuilder grassColorOverride(int value) {
+        super.grassColorOverride(value);
+        return this;
+    }
+
+    public Optional<Integer> grassColorOverride() {
+        return this.grassColorOverride;
+    }
+
+    public BiomeSpecialEffectsBuilder grassColorModifier(BiomeSpecialEffects.GrassColorModifier value) {
+        super.grassColorModifier(value);
+        return this;
     }
 
     public BiomeSpecialEffects.GrassColorModifier getGrassColorModifier() {
         return this.grassColorModifier;
-    }
-
-    public Optional<Integer> getFoliageColorOverride() {
-        return this.foliageColorOverride;
-    }
-
-    public Optional<Integer> getGrassColorOverride() {
-        return this.grassColorOverride;
-    }
-
-    public Optional<AmbientParticleSettings> getAmbientParticle() {
-        return this.ambientParticle;
-    }
-
-    public Optional<Holder<SoundEvent>> getAmbientLoopSound() {
-        return this.ambientLoopSoundEvent;
-    }
-
-    public Optional<AmbientMoodSettings> getAmbientMoodSound() {
-        return this.ambientMoodSettings;
-    }
-
-    public Optional<AmbientAdditionsSettings> getAmbientAdditionsSound() {
-        return this.ambientAdditionsSettings;
-    }
-
-    public Optional<WeightedList<Music>> getBackgroundMusic() {
-        return this.backgroundMusic;
     }
 }

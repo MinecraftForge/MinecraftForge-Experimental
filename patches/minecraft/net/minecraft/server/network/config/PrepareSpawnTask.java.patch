@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/config/PrepareSpawnTask.java
 +++ b/net/minecraft/server/network/config/PrepareSpawnTask.java
-@@ -184,6 +_,7 @@
+@@ -181,6 +_,7 @@
                      .loadPlayerData(PrepareSpawnTask.this.nameAndId)
                      .map(p_423730_ -> TagValueInput.create(problemreporter$scopedcollector, PrepareSpawnTask.this.server.registryAccess(), p_423730_));
                  optional.ifPresent(serverplayer::load);

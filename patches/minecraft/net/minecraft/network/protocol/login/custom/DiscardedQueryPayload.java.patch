@@ -2,14 +2,14 @@
 +++ b/net/minecraft/network/protocol/login/custom/DiscardedQueryPayload.java
 @@ -3,9 +_,21 @@
  import net.minecraft.network.FriendlyByteBuf;
- import net.minecraft.resources.ResourceLocation;
+ import net.minecraft.resources.Identifier;
  
--public record DiscardedQueryPayload(ResourceLocation id) implements CustomQueryPayload {
-+public record DiscardedQueryPayload(ResourceLocation id,
+-public record DiscardedQueryPayload(Identifier id) implements CustomQueryPayload {
++public record DiscardedQueryPayload(Identifier id,
 +    @org.jetbrains.annotations.Nullable FriendlyByteBuf data,
 +    java.util.function.Consumer<net.minecraft.network.FriendlyByteBuf> encoder
 +) implements CustomQueryPayload {
-+    public DiscardedQueryPayload(ResourceLocation id) {
++    public DiscardedQueryPayload(Identifier id) {
 +        this(id, null, buf -> {});
 +    }
 +

@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/BaseRailBlock.java
 +++ b/net/minecraft/world/level/block/BaseRailBlock.java
 @@ -24,7 +_,7 @@
- import net.minecraft.world.phys.shapes.CollisionContext;
  import net.minecraft.world.phys.shapes.VoxelShape;
+ import org.jspecify.annotations.Nullable;
  
 -public abstract class BaseRailBlock extends Block implements SimpleWaterloggedBlock {
 +public abstract class BaseRailBlock extends Block implements SimpleWaterloggedBlock, net.minecraftforge.common.extensions.IForgeBaseRailBlock {
@@ -51,7 +51,7 @@
 +    }
 +
 +    @Override
-+    public RailShape getRailDirection(BlockState state, BlockGetter world, BlockPos pos, @org.jetbrains.annotations.Nullable net.minecraft.world.entity.vehicle.AbstractMinecart cart) {
++    public RailShape getRailDirection(BlockState state, BlockGetter world, BlockPos pos, net.minecraft.world.entity.vehicle.minecart.@Nullable AbstractMinecart cart) {
 +        return state.getValue(getShapeProperty());
      }
  }

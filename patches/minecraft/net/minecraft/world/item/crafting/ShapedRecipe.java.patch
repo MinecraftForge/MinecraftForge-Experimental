@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/item/crafting/ShapedRecipe.java
 +++ b/net/minecraft/world/item/crafting/ShapedRecipe.java
 @@ -18,7 +_,19 @@
- import net.minecraft.world.item.crafting.display.SlotDisplay;
  import net.minecraft.world.level.Level;
+ import org.jspecify.annotations.Nullable;
  
 -public class ShapedRecipe implements CraftingRecipe {
 +public class ShapedRecipe implements CraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInput> {
@@ -21,7 +21,7 @@
      final ShapedRecipePattern pattern;
      final ItemStack result;
      final String group;
-@@ -66,6 +_,16 @@
+@@ -65,6 +_,16 @@
          }
  
          return this.placementInfo;

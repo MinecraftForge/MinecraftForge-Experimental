@@ -1,15 +1,15 @@
 --- a/net/minecraft/tags/BiomeTags.java
 +++ b/net/minecraft/tags/BiomeTags.java
-@@ -84,4 +_,12 @@
+@@ -80,4 +_,12 @@
      private static TagKey<Biome> create(String p_207631_) {
-         return TagKey.create(Registries.BIOME, ResourceLocation.withDefaultNamespace(p_207631_));
+         return TagKey.create(Registries.BIOME, Identifier.withDefaultNamespace(p_207631_));
      }
 +
 +    public static TagKey<Biome> create(String namepsace, String path) {
-+        return create(ResourceLocation.fromNamespaceAndPath(namepsace, path));
++        return create(Identifier.fromNamespaceAndPath(namepsace, path));
 +    }
 +
-+    public static TagKey<Biome> create(ResourceLocation name) {
++    public static TagKey<Biome> create(Identifier name) {
 +        return TagKey.create(Registries.BIOME, name);
 +    }
  }

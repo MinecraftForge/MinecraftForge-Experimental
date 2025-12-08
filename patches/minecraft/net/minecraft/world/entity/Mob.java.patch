@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
 @@ -137,6 +_,9 @@
-     private Leashable.LeashData leashData;
+     private Leashable.@Nullable LeashData leashData;
      private BlockPos homePosition = BlockPos.ZERO;
      private int homeRadius = -1;
 +    @Nullable
@@ -10,7 +10,7 @@
  
      protected Mob(EntityType<? extends Mob> p_21368_, Level p_21369_) {
          super(p_21368_, p_21369_);
-@@ -233,7 +_,10 @@
+@@ -230,7 +_,10 @@
      }
  
      public void setTarget(@Nullable LivingEntity p_21544_) {
@@ -22,7 +22,7 @@
      }
  
      @Override
-@@ -373,6 +_,10 @@
+@@ -369,6 +_,10 @@
          if (this.isNoAi()) {
              p_409238_.putBoolean("NoAI", this.isNoAi());
          }
@@ -33,7 +33,7 @@
      }
  
      @Override
-@@ -391,6 +_,13 @@
+@@ -387,6 +_,13 @@
          this.lootTable = p_408489_.read("DeathLootTable", LootTable.KEY_CODEC);
          this.lootTableSeed = p_408489_.getLongOr("DeathLootTableSeed", 0L);
          this.setNoAi(p_408489_.getBooleanOr("NoAI", false));
@@ -51,12 +51,12 @@
              && this.canPickUpLoot()
              && this.isAlive()
              && !this.dead
--            && serverlevel.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+-            && serverlevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
 +            && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, this)) {
              Vec3i vec3i = this.getPickupReach();
  
              for (ItemEntity itementity : this.level()
-@@ -606,6 +_,14 @@
+@@ -641,6 +_,14 @@
              this.discard();
          } else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence()) {
              Entity entity = this.level().getNearestPlayer(this, -1.0);
@@ -71,7 +71,7 @@
              if (entity != null) {
                  double d0 = entity.distanceToSqr(this);
                  int i = this.getType().getCategory().getDespawnDistance();
-@@ -998,6 +_,16 @@
+@@ -1032,6 +_,16 @@
          }
      }
  
@@ -85,10 +85,10 @@
 +     */
 +    @Deprecated
 +    @org.jetbrains.annotations.ApiStatus.OverrideOnly
-     @Nullable
-     public SpawnGroupData finalizeSpawn(ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, EntitySpawnReason p_369316_, @Nullable SpawnGroupData p_21437_) {
-         RandomSource randomsource = p_21434_.getRandom();
-@@ -1009,6 +_,7 @@
+     public @Nullable SpawnGroupData finalizeSpawn(
+         ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, EntitySpawnReason p_369316_, @Nullable SpawnGroupData p_21437_
+     ) {
+@@ -1044,6 +_,7 @@
          }
  
          this.setLeftHanded(randomsource.nextFloat() < 0.05F);
@@ -96,8 +96,8 @@
          return p_21437_;
      }
  
-@@ -1328,15 +_,25 @@
-         return false;
+@@ -1350,15 +_,25 @@
+         return flag;
      }
  
 +    @Deprecated // FORGE: use jumpInFluid instead
@@ -123,8 +123,8 @@
      @VisibleForTesting
      public void removeFreeWill() {
          this.removeAllGoals(p_341273_ -> true);
-@@ -1364,6 +_,41 @@
-     public ItemStack getPickResult() {
+@@ -1385,6 +_,41 @@
+     public @Nullable ItemStack getPickResult() {
          SpawnEggItem spawneggitem = SpawnEggItem.byId(this.getType());
          return spawneggitem == null ? null : new ItemStack(spawneggitem);
 +    }

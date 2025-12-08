@@ -1,16 +1,16 @@
 --- a/net/minecraft/world/level/storage/loot/LootTable.java
 +++ b/net/minecraft/world/level/storage/loot/LootTable.java
 @@ -41,7 +_,7 @@
-             p_327557_ -> p_327557_.group(
+             p_450068_ -> p_450068_.group(
                      LootContextParamSets.CODEC.lenientOptionalFieldOf("type", DEFAULT_PARAM_SET).forGetter(p_297013_ -> p_297013_.paramSet),
-                     ResourceLocation.CODEC.optionalFieldOf("random_sequence").forGetter(p_297014_ -> p_297014_.randomSequence),
+                     Identifier.CODEC.optionalFieldOf("random_sequence").forGetter(p_297014_ -> p_297014_.randomSequence),
 -                    LootPool.CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(p_297012_ -> p_297012_.pools),
 +                    LootPool.CONDITIONAL_CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(p_297012_ -> p_297012_.pools),
                      LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(p_297010_ -> p_297010_.functions)
                  )
-                 .apply(p_327557_, LootTable::new)
+                 .apply(p_450068_, LootTable::new)
 @@ -58,7 +_,7 @@
-     LootTable(ContextKeySet p_365565_, Optional<ResourceLocation> p_298628_, List<LootPool> p_298771_, List<LootItemFunction> p_301234_) {
+     LootTable(ContextKeySet p_365565_, Optional<Identifier> p_298628_, List<LootPool> p_298771_, List<LootItemFunction> p_301234_) {
          this.paramSet = p_365565_;
          this.randomSequence = p_298628_;
 -        this.pools = p_298771_;
@@ -66,15 +66,15 @@
          return new LootTable.Builder();
 +    }
 +
-+    private ResourceLocation lootTableId;
-+    public void setLootTableId(final ResourceLocation id) {
++    private Identifier lootTableId;
++    public void setLootTableId(final Identifier id) {
 +        if (this.lootTableId != null) {
 +            throw new IllegalStateException("Attempted to rename loot table from '" + this.lootTableId + "' to '" + id + "': this is not supported");
 +        }
 +        this.lootTableId = java.util.Objects.requireNonNull(id);
 +    }
 +
-+    public ResourceLocation getLootTableId() {
++    public Identifier getLootTableId() {
 +        return this.lootTableId;
 +    }
 +
