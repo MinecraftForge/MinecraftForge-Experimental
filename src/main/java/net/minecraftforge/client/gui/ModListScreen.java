@@ -480,11 +480,11 @@ public class ModListScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft mc, int width, int height) {
+    public void resize(int width, int height) {
         String s = this.search.getValue();
         SortType sort = this.sortType;
         ModListWidget.ModEntry selected = this.selected;
-        this.init(mc, width, height);
+        this.init(width, height);
         this.search.setValue(s);
         this.selected = selected;
 

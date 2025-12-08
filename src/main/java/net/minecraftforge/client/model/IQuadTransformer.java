@@ -5,6 +5,7 @@
 
 package net.minecraftforge.client.model;
 
+/*
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.VertexFormatElement;
 import net.minecraft.client.renderer.block.model.BakedQuad;
@@ -14,7 +15,7 @@ import java.util.List;
  * Transformer for {@link BakedQuad baked quads}.
  *
  * @see QuadTransformers
- */
+ * /
 @FunctionalInterface
 public interface IQuadTransformer {
     int STRIDE = DefaultVertexFormat.BLOCK.getVertexSize() / 4;
@@ -41,3 +42,4 @@ public interface IQuadTransformer {
         return index < 0 ? -1 : index / 4;
     }
 }
+*/

@@ -25,7 +25,7 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 class DimensionsCommand {
     static ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal("dimensions")
-            .requires(cs->cs.hasPermission(0)) //permission
+            .requires(Commands.hasPermission(Commands.LEVEL_ALL)) //permission
             .executes(ctx -> {
                 ctx.getSource().sendSuccess(() -> Component.translatable("commands.forge.dimensions.list"), true);
                 final Registry<DimensionType> reg = ctx.getSource().registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE);

@@ -50,7 +50,7 @@ class EntityCommand
         static ArgumentBuilder<CommandSourceStack, ?> register()
         {
             return Commands.literal("list")
-                .requires(cs->cs.hasPermission(2)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("filter", StringArgumentType.string())
                     .suggests((ctx, builder) -> SharedSuggestionProvider.suggest(ForgeRegistries.ENTITY_TYPES.getKeys().stream().map(Identifier::toString).map(StringArgumentType::escapeIfRequired), builder))
                     .then(Commands.argument("dim", DimensionArgument.dimension())

@@ -9,6 +9,8 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Dynamic;
+
+import net.minecraft.world.attribute.EnvironmentAttribute;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.BehaviorControl;
@@ -17,7 +19,6 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.sensing.Sensor;
 import net.minecraft.world.entity.ai.sensing.SensorType;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraft.world.entity.schedule.Schedule;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
 
 /**
  * This object is used to encapsulate state found inside a {@link Brain} instance,
@@ -44,7 +46,7 @@ public class BrainBuilder<E extends LivingEntity> {
     private final Collection<MemoryModuleType<?>> memoryTypes = new HashSet<>();
     private final Collection<SensorType<? extends Sensor<? super E>>> sensorTypes = new HashSet<>();
     private final Map<Integer, Map<Activity, Set<BehaviorControl<? super E>>>> availableBehaviorsByPriority = Maps.newTreeMap();
-    private Schedule schedule = Schedule.EMPTY;
+    private @Nullable EnvironmentAttribute<Activity> schedule;
     private final Map<Activity, Set<Pair<MemoryModuleType<?>, MemoryStatus>>> activityRequirements = Maps.newHashMap();
     private final Map<Activity, Set<MemoryModuleType<?>>> activityMemoriesToEraseWhenStopped = Maps.newHashMap();
     private final Set<Activity> coreActivities = Sets.newHashSet();
@@ -69,11 +71,11 @@ public class BrainBuilder<E extends LivingEntity> {
         return this.availableBehaviorsByPriority;
     }
 
-    public Schedule getSchedule() {
+    public @Nullable EnvironmentAttribute<Activity> getSchedule() {
         return this.schedule;
     }
 
-    public void setSchedule(Schedule schedule) {
+    public void setSchedule(@Nullable EnvironmentAttribute<Activity> schedule) {
         this.schedule = schedule;
     }
 

@@ -29,7 +29,7 @@ public class ConfigCommand {
     public static class ShowFile {
         static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("showfile").
-                    requires(cs->cs.hasPermission(0)).
+                    requires(Commands.hasPermission(Commands.LEVEL_ALL)).
                     then(Commands.argument("mod", ModIdArgument.modIdArgument()).
                         then(Commands.argument("type", EnumArgument.enumArgument(ModConfig.Type.class)).
                             executes(ShowFile::showFile)

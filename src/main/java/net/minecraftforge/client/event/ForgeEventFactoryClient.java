@@ -5,16 +5,13 @@
 
 package net.minecraftforge.client.event;
 
-import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import net.minecraftforge.client.gui.overlay.ForgeLayeredDraw;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.fml.ModLoader;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import com.google.common.collect.ImmutableMap;
@@ -27,19 +24,17 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.entity.ClientMannequin;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.model.SkullModelBase;
 import net.minecraft.client.model.geom.EntityModelSet;
+import net.minecraft.client.model.object.skull.SkullModelBase;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
@@ -60,7 +55,6 @@ import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EntityType;
@@ -68,7 +62,6 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.PlayerModelType;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SkullBlock.Type;
 import net.minecraftforge.client.event.sound.PlaySoundSourceEvent;
@@ -201,7 +194,7 @@ public final class ForgeEventFactoryClient {
     }
 
     public static ViewportEvent.ComputeCameraAngles fireComputeCameraAngles(GameRenderer renderer, Camera camera, float partial) {
-        return ViewportEvent.ComputeCameraAngles.BUS.fire(new ViewportEvent.ComputeCameraAngles(renderer, camera, partial, camera.getYRot(), camera.getXRot(), 0));
+        return ViewportEvent.ComputeCameraAngles.BUS.fire(new ViewportEvent.ComputeCameraAngles(renderer, camera, partial, camera.yRot(), camera.xRot(), 0));
     }
 
     public static <T extends LivingEntity, S extends LivingEntityRenderState, M extends EntityModel<? super S>> boolean onRenderLivingPre(S state, LivingEntityRenderer<T, S, M> renderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {

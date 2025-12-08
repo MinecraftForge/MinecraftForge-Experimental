@@ -39,7 +39,7 @@ class TrackCommand {
     private static class StartTrackingCommand {
         static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("start")
-                .requires(cs->cs.hasPermission(2)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("te")
                     .then(Commands.argument("duration", IntegerArgumentType.integer(1))
                         .executes(ctx -> {
@@ -68,7 +68,7 @@ class TrackCommand {
     private static class ResetTrackingCommand {
         static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("reset")
-                .requires(cs->cs.hasPermission(2)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("te")
                     .executes(ctx -> {
                         TimeTracker.BLOCK_ENTITY_UPDATE.reset();

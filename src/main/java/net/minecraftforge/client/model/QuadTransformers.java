@@ -4,13 +4,14 @@
  */
 
 package net.minecraftforge.client.model;
-
+/*
 import com.google.common.base.Preconditions;
 import com.mojang.math.Transformation;
 import net.minecraft.util.Util;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 import org.joml.Vector4f;
 
 import java.util.Arrays;
@@ -19,7 +20,7 @@ import java.util.Arrays;
  * A collection of {@link IQuadTransformer} implementations.
  *
  * @see IQuadTransformer
- */
+ * /
 public final class QuadTransformers {
     private static final IQuadTransformer EMPTY = quad -> quad;
     private static final IQuadTransformer[] EMISSIVE_TRANSFORMERS = Util.make(new IQuadTransformer[16], array -> {
@@ -28,14 +29,14 @@ public final class QuadTransformers {
 
     /**
      * {@return a {@link BakedQuad} transformer that does nothing}
-     */
+     * /
     public static IQuadTransformer empty() {
         return EMPTY;
     }
 
     /**
      * {@return a new {@link BakedQuad} transformer that applies the specified {@link Transformation}}
-     */
+     * /
     public static IQuadTransformer applying(Transformation transform) {
         if (transform.isIdentity())
             return empty();
@@ -75,13 +76,15 @@ public final class QuadTransformers {
                 }
             }
 
-            return new BakedQuad(vertices, quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission(), quad.ambientOcclusion());
+            return new BakedQuad(vertices[0], vertices[1], vertices[2], vertices[3],
+                    quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(),
+                    quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission(), quad.ambientOcclusion());
         };
     }
 
     /**
      * @return A new {@link BakedQuad} transformer that applies the specified packed light value.
-     */
+     * /
     public static IQuadTransformer applyingLightmap(int packedLight) {
         return quad -> {
             var vertices = Arrays.copyOf(quad.vertices(), quad.vertices().length);
@@ -93,14 +96,14 @@ public final class QuadTransformers {
 
     /**
      * @return A new {@link BakedQuad} transformer that applies the specified block and sky light values.
-     */
+     * /
     public static IQuadTransformer applyingLightmap(int blockLight, int skyLight) {
         return applyingLightmap(LightTexture.pack(blockLight, skyLight));
     }
 
     /**
      * @return A {@link BakedQuad} transformer that sets the lightmap to the given emissivity (0-15)
-     */
+     * /
     public static IQuadTransformer settingEmissivity(int emissivity) {
         Preconditions.checkArgument(emissivity >= 0 && emissivity < 16, "Emissivity must be between 0 and 15.");
         return EMISSIVE_TRANSFORMERS[emissivity];
@@ -108,7 +111,7 @@ public final class QuadTransformers {
 
     /**
      * @return A {@link BakedQuad} transformer that sets the lightmap to its max value
-     */
+     * /
     public static IQuadTransformer settingMaxEmissivity() {
         return EMISSIVE_TRANSFORMERS[15];
     }
@@ -116,7 +119,7 @@ public final class QuadTransformers {
     /**
      * @param color The color in ARGB format.
      * @return A {@link BakedQuad} transformer that sets the color to the specified value.
-     */
+     * /
     public static IQuadTransformer applyingColor(int color) {
         final int fixedColor = toABGR(color);
         return quad -> {
@@ -135,7 +138,7 @@ public final class QuadTransformers {
      * @param green The green value (0-255)
      * @param blue The blue value (0-255)
      * @return A {@link BakedQuad} transformer that sets the color to the specified value.
-     */
+     * /
     public static IQuadTransformer applyingColor(int red, int green, int blue) {
         return applyingColor(255, red, green, blue);
     }
@@ -146,7 +149,7 @@ public final class QuadTransformers {
      * @param green The green value (0-255)
      * @param blue The blue value (0-255)
      * @return A {@link BakedQuad} transformer that sets the color to the specified value.
-     */
+     * /
     public static IQuadTransformer applyingColor(int alpha, int red, int green, int blue) {
         return applyingColor(alpha << 24 | red << 16 | green << 8 | blue);
     }
@@ -156,7 +159,7 @@ public final class QuadTransformers {
      * This function doubles as its own inverse.
      * @param argb ARGB color
      * @return ABGR color
-     */
+     * /
     public static int toABGR(int argb) {
         return (argb & 0xFF00FF00) // alpha and green same spot
              | ((argb >> 16) & 0x000000FF) // red moves to blue
@@ -165,3 +168,4 @@ public final class QuadTransformers {
 
     private QuadTransformers() { }
 }
+*/

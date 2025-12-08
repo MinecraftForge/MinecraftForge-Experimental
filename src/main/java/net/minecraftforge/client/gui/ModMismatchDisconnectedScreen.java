@@ -20,8 +20,10 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
+import net.minecraft.world.entity.Display.TextDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -102,7 +104,8 @@ public class ModMismatchDisconnectedScreen extends Screen {
         this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         int textYOffset = hasMismatches ? 18 : 0;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset - 9 * 2, 0xAAAAAA);
-        this.message.render(guiGraphics, MultiLineLabel.Align.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, true, -1);
+        var lineCollector = guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.notClickable(false));
+        this.message.visitLines(TextAlignment.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, lineCollector);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 

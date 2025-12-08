@@ -68,13 +68,13 @@ public class VillagerTypeTestMod extends BaseTestMod {
 
         // Should be a successful trade for dirt for our test villager
         var test = new Villager(EntityType.VILLAGER, helper.getLevel(), TEST_VILLAGER_TYPE.getKey());
-        var test_offer = trade.getOffer(test, rnd);
+        var test_offer = trade.getOffer(helper.getLevel(), test, rnd);
         helper.assertFalse(test_offer == null, "Failed to retreive trade value for test profession");
         helper.assertValueEqual(test_offer.getItemCostA().itemStack().getItem(), Items.DIRT, Component.literal("Offer did not return the expected item"));
 
         var plains = new Villager(EntityType.VILLAGER, helper.getLevel(), VillagerType.PLAINS);
         // This will NPE on unpatched code, we need to test that it returns null correctly
-        var plains_offer = trade.getOffer(plains, rnd);
+        var plains_offer = trade.getOffer(helper.getLevel(), plains, rnd);
         helper.assertTrue(plains_offer == null, "Offer should not be available for a plains villager");
 
         helper.succeed();

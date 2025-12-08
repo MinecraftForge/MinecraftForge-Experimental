@@ -192,7 +192,7 @@ public class ForgeHooksClient {
     private static final Stack<Screen> guiLayers = new Stack<>();
 
     public static void resizeGuiLayers(Minecraft minecraft, int width, int height) {
-        guiLayers.forEach(screen -> screen.resize(minecraft, width, height));
+        guiLayers.forEach(screen -> screen.resize(width, height));
     }
 
     public static void clearGuiLayers(Minecraft minecraft) {
@@ -210,7 +210,7 @@ public class ForgeHooksClient {
         if (minecraft.screen != null)
             guiLayers.push(minecraft.screen);
         minecraft.screen = Objects.requireNonNull(screen);
-        screen.init(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
+        screen.init(minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
         minecraft.getNarrator().saySystemNow(screen.getNarrationMessage());
     }
 
@@ -337,9 +337,9 @@ public class ForgeHooksClient {
 
     public static Vector3f getFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance, float darkenWorldAmount, float fogRed, float fogGreen, float fogBlue) {
         // Modify fog color depending on the fluid
-        FluidState state = level.getFluidState(camera.getBlockPosition());
+        FluidState state = level.getFluidState(camera.blockPosition());
         Vector3f fluidFogColor = new Vector3f(fogRed, fogGreen, fogBlue);
-        if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(level, camera.getBlockPosition())))
+        if (camera.position().y < (double)((float)camera.blockPosition().getY() + state.getHeight(level, camera.blockPosition())))
             fluidFogColor = IClientFluidTypeExtensions.of(state).modifyFogColor(camera, partialTick, level, renderDistance, darkenWorldAmount, fluidFogColor);
 
         var event = ViewportEvent.ComputeFogColor.BUS.fire(new ViewportEvent.ComputeFogColor(camera, partialTick, fluidFogColor.x(), fluidFogColor.y(), fluidFogColor.z()));
@@ -350,8 +350,8 @@ public class ForgeHooksClient {
 
     public static Vector4f setupFog(FogType type, Camera camera, DeltaTracker delta, FogData data, Vector4f color) {
         // Modify fog rendering depending on the fluid
-        FluidState state = camera.getEntity().level().getFluidState(camera.getBlockPosition());
-        if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(camera.getEntity().level(), camera.getBlockPosition())))
+        FluidState state = camera.entity().level().getFluidState(camera.blockPosition());
+        if (camera.position().y < (double)((float)camera.blockPosition().getY() + state.getHeight(camera.entity().level(), camera.blockPosition())))
             IClientFluidTypeExtensions.of(state).modifyFogRender(camera, type, delta.getRealtimeDeltaTicks(), data, color);
 
         ViewportEvent.RenderFog.BUS.post(new ViewportEvent.RenderFog(type, camera, delta.getRealtimeDeltaTicks(), data, color));
@@ -793,7 +793,7 @@ public class ForgeHooksClient {
         EntitySpectatorShaderManager.init();
         ForgeHooksClient.onRegisterKeyMappings(mc.options);
         //GuiOverlayManager.init();
-        DimensionSpecialEffectsManager.init();
+        //DimensionSpecialEffectsManager.init();
         NamedRenderTypeManager.init();
         ColorResolverManager.init();
         ItemDecoratorHandler.init();

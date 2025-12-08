@@ -73,7 +73,7 @@ class TagsCommand {
          * /forge tags <registry> query <element> [page]
          */
         return Commands.literal("tags")
-                .requires(cs -> cs.hasPermission(2))
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.argument("registry", ResourceKeyArgument.key(ROOT_REGISTRY_KEY))
                         .suggests(TagsCommand::suggestRegistries)
                         .then(Commands.literal("list")

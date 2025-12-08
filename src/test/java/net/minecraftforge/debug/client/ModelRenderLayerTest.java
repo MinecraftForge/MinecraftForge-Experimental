@@ -116,13 +116,13 @@ public class ModelRenderLayerTest extends BaseTestMod {
         var state = BLOCK.get().defaultBlockState();
         var random = helper.getLevel().random;
         boolean originalRenderState = ItemBlockRenderTypes.isFancy();
-        helper.addCleanup(passed -> ItemBlockRenderTypes.setFancy(originalRenderState));
+        helper.addCleanup(passed -> ItemBlockRenderTypes.setCutoutLeaves(originalRenderState));
 
-        ItemBlockRenderTypes.setFancy(true);
+        ItemBlockRenderTypes.setCutoutLeaves(true);
         var layer = model.getRenderTypes(state, random, ModelData.EMPTY);
         helper.assertTrue(layer.contains(ChunkSectionLayer.CUTOUT), "Block model does not contain the correct render type for fancy graphics. Expected: cutout");
 
-        ItemBlockRenderTypes.setFancy(false);
+        ItemBlockRenderTypes.setCutoutLeaves(false);
         layer = model.getRenderTypes(state, random, ModelData.EMPTY);
         helper.assertTrue(layer.contains(ChunkSectionLayer.SOLID), "Block model does not contain the correct render type for fast graphics. Expected: solid");
 
@@ -140,13 +140,13 @@ public class ModelRenderLayerTest extends BaseTestMod {
 
         var random = helper.getLevel().random;
         boolean originalRenderState = ItemBlockRenderTypes.isFancy();
-        helper.addCleanup(passed -> ItemBlockRenderTypes.setFancy(originalRenderState));
+        helper.addCleanup(passed -> ItemBlockRenderTypes.setCutoutLeaves(originalRenderState));
 
-        ItemBlockRenderTypes.setFancy(true);
+        ItemBlockRenderTypes.setCutoutLeaves(true);
         var layer = model.getRenderTypes(state, random, ModelData.EMPTY);
-        helper.assertTrue(layer.contains(ChunkSectionLayer.CUTOUT_MIPPED), "Block model does not contain the correct render type for fancy graphics. Expected: cutout_mipped");
+        helper.assertTrue(layer.contains(ChunkSectionLayer.CUTOUT), "Block model does not contain the correct render type for fancy graphics. Expected: cutout_mipped");
 
-        ItemBlockRenderTypes.setFancy(false);
+        ItemBlockRenderTypes.setCutoutLeaves(false);
         layer = model.getRenderTypes(state, random, ModelData.EMPTY);
         helper.assertTrue(layer.contains(ChunkSectionLayer.SOLID), "Block model does not contain the correct render type for fast graphics. Expected: solid");
 

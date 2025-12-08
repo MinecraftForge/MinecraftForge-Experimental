@@ -23,8 +23,6 @@ import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
-import net.minecraftforge.client.model.IQuadTransformer;
-import net.minecraftforge.client.model.QuadTransformers;
 import net.minecraftforge.client.model.SimpleModelState;
 
 import org.jetbrains.annotations.ApiStatus;
@@ -160,13 +158,6 @@ public class UnbakedGeometryHelper {
      * Bakes a list of {@linkplain BlockElement block elements} and returns a {@link QuadCollection}.
      */
     public static QuadCollection bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState) {
-        return bakeElements(elements, spriteGetter, modelState, QuadTransformers.empty());
-    }
-
-    /**
-     * Bakes a list of {@linkplain BlockElement block elements} and returns a {@link QuadCollection}.
-     */
-    public static QuadCollection bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, IQuadTransformer transformer) {
         var builder = new QuadCollection.Builder();
         bakeElements(elements, spriteGetter, modelState, builder);
         return builder.build();
@@ -176,13 +167,6 @@ public class UnbakedGeometryHelper {
      * Adds a list of {@linkplain BlockElement block elements} int a {@link QuadCollection.Builder}.
      */
     public static void bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, QuadCollection.Builder builder) {
-        bakeElements(elements, spriteGetter, modelState, QuadTransformers.empty(), builder);
-    }
-
-    /**
-     * Adds a list of {@linkplain BlockElement block elements} int a {@link QuadCollection.Builder}.
-     */
-    public static void bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, IQuadTransformer transformer, QuadCollection.Builder builder) {
         for (var element : elements) {
             element.faces().forEach((side, face) -> {
                 var sprite = spriteGetter.apply(getMaterial(face.texture()));
@@ -215,6 +199,7 @@ public class UnbakedGeometryHelper {
      * @return an {@code IQuadTransformer} that applies the root transform to a baked quad that already has the
      * transformation of the given {@code ModelState} applied to it
      */
+    /*
     public static IQuadTransformer applyRootTransform(ModelState modelState, Transformation rootTransform) {
         // Move the origin of the ModelState transform and its inverse from the negative corner to the block center
         // to replicate the way the ModelState transform is applied in the FaceBakery by moving the vertices such that
@@ -222,6 +207,7 @@ public class UnbakedGeometryHelper {
         Transformation transform = modelState.transformation().applyOrigin(new Vector3f(.5F, .5F, .5F));
         return QuadTransformers.applying(transform.compose(rootTransform).compose(transform.inverse()));
     }
+    */
 
     /**
      * {@return a {@link ModelState} that combines the existing model state and the {@linkplain Transformation root transform}}
