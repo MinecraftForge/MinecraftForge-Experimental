@@ -51,6 +51,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
@@ -890,6 +891,16 @@ public class ForgeHooksClient {
         @Override
         public <T> T compute(SharedOperationKey<T> p_395456_) {
             return parent.compute(p_395456_);
+        }
+
+        @Override
+        public BlockModelPart missingBlockModelPart() {
+            return parent.missingBlockModelPart();
+        }
+
+        @Override
+        public PartCache parts() {
+            return parent.parts();
         }
     }
 

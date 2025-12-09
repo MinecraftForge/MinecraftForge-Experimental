@@ -12,7 +12,6 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.minecraftforge.client.gui.widget.ScrollPanel;
@@ -20,7 +19,6 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
-import net.minecraft.world.entity.Display.TextDisplay;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.TextAlignment;
@@ -34,7 +32,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.common.ForgeI18n;
@@ -43,7 +40,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData;
 import net.minecraftforge.network.packets.ModVersions;
 
-//TODO: Oh god... Whoever wrote this was on something very very strong.
+//TODO: [Forge][Rendering] Rewrite entire ModMismatch screen
+//Oh god... Whoever wrote this was on something very very strong.
 public class ModMismatchDisconnectedScreen extends Screen {
     private final Component reason;
     private MultiLineLabel message = MultiLineLabel.EMPTY;
@@ -260,7 +258,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
                 FormattedCharSequence name = line.getLeft();
                 Pair<FormattedCharSequence, FormattedCharSequence> versions = line.getRight();
                 //Since font#draw does not respect the color of the given component, we have to read it out here and then use it as the last parameter
-                int color = Optional.ofNullable(font.getSplitter().componentStyleAtWidth(name, 0)).map(Style::getColor).map(TextColor::getValue).orElse(0xFFFFFF);
+                int color = 0xFFFFFF; //Optional.ofNullable(font.substrByWidth(name, 0)).map(Style::getColor).map(TextColor::getValue).orElse(0xFFFFFF);
                 //Only indent the given name if a version string is present. This makes it easier to distinguish table section headers and mod entries
                 int nameLeft = left + border + (versions == null ? 0 : nameIndent);
                 guiGraphics.drawString(font, name, nameLeft, relativeY + i * 12, color, false);
@@ -288,8 +286,8 @@ public class ModMismatchDisconnectedScreen extends Screen {
                 if (slotIndex < contentSize) {
                     //The relative x needs to take the potentially missing indent of the row into account. It does that by checking if the line has a version associated to it
                     double relativeX = x - left - border - (lineTable.get(slotIndex).getRight() == null ? 0 : nameIndent);
-                    if (relativeX >= 0)
-                        return font.getSplitter().componentStyleAtWidth(lineTable.get(slotIndex).getLeft(), (int)relativeX);
+                    //if (relativeX >= 0)
+                    //    return font.getSplitter().componentStyleAtWidth(lineTable.get(slotIndex).getLeft(), (int)relativeX);
                 }
             }
 
@@ -300,7 +298,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
         public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
             Style style = getComponentStyleAt(info.x(), info.y());
             if (style != null) {
-                handleComponentClicked(style);
+                //handleComponentClicked(style);
                 return true;
             }
             return super.mouseClicked(info, recent);

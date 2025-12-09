@@ -22,10 +22,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
-import net.minecraftforge.client.model.IModelBuilder;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
 import net.minecraftforge.client.model.geometry.UnbakedGeometryHelper;
-import net.minecraftforge.client.model.pipeline.QuadBakingVertexConsumer;
+import net.minecraftforge.client.model.pipeline.BakedQuadBuilder;
 import net.minecraftforge.client.model.renderable.CompositeRenderable;
 import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
 import org.apache.commons.lang3.tuple.Pair;
@@ -307,7 +306,7 @@ public class ObjModel {
             faceNormal = abs;
         }
 
-        var quadBaker = new QuadBakingVertexConsumer.Buffered();
+        var quadBaker = new BakedQuadBuilder.Single();
 
         quadBaker.setSprite(texture);
         quadBaker.setTintIndex(tintIndex);

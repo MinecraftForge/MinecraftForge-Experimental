@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.core.Direction;
@@ -157,20 +158,20 @@ public class UnbakedGeometryHelper {
     /**
      * Bakes a list of {@linkplain BlockElement block elements} and returns a {@link QuadCollection}.
      */
-    public static QuadCollection bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState) {
+    public static QuadCollection bakeElements(ModelBaker.PartCache cache, List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState) {
         var builder = new QuadCollection.Builder();
-        bakeElements(elements, spriteGetter, modelState, builder);
+        bakeElements(cache, elements, spriteGetter, modelState, builder);
         return builder.build();
     }
 
     /**
      * Adds a list of {@linkplain BlockElement block elements} int a {@link QuadCollection.Builder}.
      */
-    public static void bakeElements(List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, QuadCollection.Builder builder) {
+    public static void bakeElements(ModelBaker.PartCache cache, List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, QuadCollection.Builder builder) {
         for (var element : elements) {
             element.faces().forEach((side, face) -> {
                 var sprite = spriteGetter.apply(getMaterial(face.texture()));
-                var quad = bakeElementFace(element, face, sprite, side, modelState, element.lightEmission());
+                var quad = bakeElementFace(cache, element, face, sprite, side, modelState, element.lightEmission());
                 if (face.cullForDirection() == null)
                     builder.addUnculledFace(quad);
                 else
@@ -187,8 +188,8 @@ public class UnbakedGeometryHelper {
     /**
      * Turns a single {@link BlockElementFace} into a {@link BakedQuad}.
      */
-    public static BakedQuad bakeElementFace(BlockElement element, BlockElementFace face, TextureAtlasSprite sprite, Direction direction, ModelState state, int lightEmission) {
-        return FaceBakery.bakeQuad(element.from(), element.to(), face, sprite, direction, state, element.rotation(), element.shade(), lightEmission);
+    public static BakedQuad bakeElementFace(ModelBaker.PartCache cache, BlockElement element, BlockElementFace face, TextureAtlasSprite sprite, Direction direction, ModelState state, int lightEmission) {
+        return FaceBakery.bakeQuad(cache, element.from(), element.to(), face, sprite, direction, state, element.rotation(), element.shade(), lightEmission);
     }
 
     /**

@@ -69,7 +69,7 @@ public class ItemLayerGeometry implements UnbakedGeometry {
             elements.addAll(ItemModelGenerator.processFrames(i, layer, contents));
         }
 
-        return SimpleUnbakedGeometry.bake(elements, textures, baker.sprites(), state, name);
+        return SimpleUnbakedGeometry.bake(elements, textures, baker, state, name);
         /*
         Material particleMaterial = spriteGetter.getMaterial("particle");
         var particle = baker.sprites().get(particleMaterial  == null ? textures.get(0) : particleMaterial, name);
