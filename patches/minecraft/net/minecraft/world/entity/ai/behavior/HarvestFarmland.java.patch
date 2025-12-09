@@ -5,7 +5,7 @@
  
      protected boolean checkExtraStartConditions(ServerLevel p_23174_, Villager p_460921_) {
 -        if (!p_23174_.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(p_23174_, p_23175_)) {
++        if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(p_23174_, p_460921_)) {
              return false;
          } else if (!p_460921_.getVillagerData().profession().is(VillagerProfession.FARMER)) {
              return false;

@@ -283,7 +283,23 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.ARMORS)
                 .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR)
                 .addOptionalTag(forgeItemTagKey("armors"));
-        tag(Tags.Items.ENCHANTABLES).addTags(ItemTags.ARMOR_ENCHANTABLE, ItemTags.EQUIPPABLE_ENCHANTABLE, ItemTags.WEAPON_ENCHANTABLE, ItemTags.SWORD_ENCHANTABLE, ItemTags.MINING_ENCHANTABLE, ItemTags.MINING_LOOT_ENCHANTABLE, ItemTags.FISHING_ENCHANTABLE, ItemTags.TRIDENT_ENCHANTABLE, ItemTags.BOW_ENCHANTABLE, ItemTags.CROSSBOW_ENCHANTABLE, ItemTags.MACE_ENCHANTABLE, ItemTags.FIRE_ASPECT_ENCHANTABLE, ItemTags.DURABILITY_ENCHANTABLE, ItemTags.VANISHING_ENCHANTABLE);
+        tag(Tags.Items.ENCHANTABLES)
+            .addTags(
+                ItemTags.ARMOR_ENCHANTABLE,
+                ItemTags.EQUIPPABLE_ENCHANTABLE,
+                ItemTags.WEAPON_ENCHANTABLE,
+                ItemTags.SHARP_WEAPON_ENCHANTABLE,
+                ItemTags.MINING_ENCHANTABLE,
+                ItemTags.MINING_LOOT_ENCHANTABLE,
+                ItemTags.FISHING_ENCHANTABLE,
+                ItemTags.TRIDENT_ENCHANTABLE,
+                ItemTags.BOW_ENCHANTABLE,
+                ItemTags.CROSSBOW_ENCHANTABLE,
+                ItemTags.MACE_ENCHANTABLE,
+                ItemTags.FIRE_ASPECT_ENCHANTABLE,
+                ItemTags.DURABILITY_ENCHANTABLE,
+                ItemTags.VANISHING_ENCHANTABLE
+            );
 
         tag(forgeItemTagKey("bones")).add(Items.BONE);
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.

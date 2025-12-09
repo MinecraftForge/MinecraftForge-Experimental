@@ -20,7 +20,7 @@
          p_330342_.define(DATA_PHASE, EnderDragonPhase.HOVERING.getId());
      }
  
-+    private @Nullable net.minecraft.world.entity.EntityReference<Player> unlimitedLastHurtByPlayer = null;
++    private net.minecraft.world.entity.@Nullable EntityReference<Player> unlimitedLastHurtByPlayer = null;
 +    private @Nullable Player getUnlimitedLastHurtByPlayer() {
 +        return net.minecraft.world.entity.EntityReference.get(this.unlimitedLastHurtByPlayer, this.level(), Player.class);
 +    }

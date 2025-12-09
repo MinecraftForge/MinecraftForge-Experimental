@@ -21,7 +21,9 @@ public enum KeyModifier {
     CONTROL {
         @Override
         public boolean matches(InputConstants.Key key) {
-            return key.getValue() == InputQuirks.EDIT_SHORTCUT_KEY_LEFT || key.getValue() == InputQuirks.EDIT_SHORTCUT_KEY_RIGHT;
+            if (InputQuirks.REPLACE_CTRL_KEY_WITH_CMD_KEY)
+                return key.getValue() == 343 || key.getValue() == 347;
+            return key.getValue() == 341 || key.getValue() == 345;
         }
 
         @Override

@@ -108,7 +108,7 @@
              return this;
          }
  
-@@ -180,13 +_,78 @@
+@@ -180,13 +_,80 @@
              return this;
          }
  
@@ -168,14 +168,16 @@
 +        /** Define tabs that should come <i>before</i> this tab. This tab will be placed <strong>after</strong> the {@code tabs}. **/
 +        @SafeVarargs
 +        public final CreativeModeTab.Builder withTabsBefore(net.minecraft.resources.ResourceKey<CreativeModeTab>... tabs) {
-+            java.util.stream.Stream.of(tabs).map(net.minecraft.resources.ResourceKey::location).forEach(this.tabsBefore::add);
++            for (var tab : tabs)
++                this.tabsBefore.add(tab.identifier());
 +            return this;
 +        }
 +
 +        /** Define tabs that should come <i>after</i> this tab. This tab will be placed <strong>before</strong> the {@code tabs}.**/
 +        @SafeVarargs
 +        public final CreativeModeTab.Builder withTabsAfter(net.minecraft.resources.ResourceKey<CreativeModeTab>... tabs) {
-+            java.util.stream.Stream.of(tabs).map(net.minecraft.resources.ResourceKey::location).forEach(this.tabsAfter::add);
++            for (var tab : tabs)
++                this.tabsAfter.add(tab.identifier());
 +            return this;
 +        }
 +

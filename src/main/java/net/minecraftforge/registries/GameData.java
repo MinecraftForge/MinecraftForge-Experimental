@@ -131,7 +131,6 @@ public class GameData {
         makeRegistry(Keys.POI_TYPES).addCallback(PoiTypeCallbacks.INSTANCE).disableSync().create();
         makeRegistry(Keys.MEMORY_MODULE_TYPES, "dummy").disableSync().create();
         makeRegistry(Keys.SENSOR_TYPES, "dummy").disableSaving().disableSync().create();
-        makeRegistry(Keys.SCHEDULES).disableSaving().disableSync().create();
         makeRegistry(Keys.ACTIVITIES).disableSaving().disableSync().create();
 
         // Worldgen

@@ -1,9 +1,22 @@
 --- a/net/minecraft/world/entity/ai/Brain.java
 +++ b/net/minecraft/world/entity/ai/Brain.java
-@@ -495,6 +_,30 @@
-         return this.memories.isEmpty() && this.sensors.isEmpty() && this.availableBehaviorsByPriority.isEmpty();
+@@ -232,6 +_,10 @@
+         this.schedule = p_455227_;
      }
  
++    public EnvironmentAttribute<Activity> getSchedule() {
++        return this.schedule;
++    }
++
+     public void setCoreActivities(Set<Activity> p_21931_) {
+         this.coreActivities = p_21931_;
+     }
+@@ -493,6 +_,30 @@
+ 
+     public boolean isBrainDead() {
+         return this.memories.isEmpty() && this.sensors.isEmpty() && this.availableBehaviorsByPriority.isEmpty();
++    }
++
 +    public net.minecraftforge.common.util.BrainBuilder<E> createBuilder() {
 +        var builder = new net.minecraftforge.common.util.BrainBuilder<>(this);
 +        builder.getMemoryTypes().addAll(this.memories.keySet());
@@ -26,8 +39,6 @@
 +        this.setCoreActivities(builder.getCoreActivities());
 +        this.setDefaultActivity(builder.getDefaultActivity());
 +        this.activeActivities.addAll(builder.getActiveActivites());
-+    }
-+
+     }
+ 
      static final class MemoryValue<U> {
-         private final MemoryModuleType<U> type;
-         private final Optional<? extends ExpirableValue<U>> value;

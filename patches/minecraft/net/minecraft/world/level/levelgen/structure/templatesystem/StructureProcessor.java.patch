@@ -12,7 +12,7 @@
      public StructureTemplate.@Nullable StructureBlockInfo processBlock(
          LevelReader p_74416_,
          BlockPos p_74417_,
-@@ -29,5 +_,22 @@
+@@ -29,5 +_,21 @@
          StructurePlaceSettings p_277497_
      ) {
          return p_278053_;
@@ -30,8 +30,7 @@
 +       return entityInfo;
 +    }
 +
-+    @Nullable
-+    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos seed, BlockPos offset, StructureTemplate.StructureBlockInfo rawBlock, StructureTemplate.StructureBlockInfo block, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
++    public StructureTemplate.@Nullable StructureBlockInfo process(LevelReader level, BlockPos seed, BlockPos offset, StructureTemplate.StructureBlockInfo rawBlock, StructureTemplate.StructureBlockInfo block, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
 +       return processBlock(level, seed, offset, rawBlock, block, settings);
      }
  }

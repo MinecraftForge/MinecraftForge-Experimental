@@ -6,7 +6,6 @@
 package net.minecraftforge.common;
 
 import net.minecraft.DetectedVersion;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -521,7 +520,7 @@ public class ForgeMod {
     }
 
     public static final PermissionNode<Boolean> USE_SELECTORS_PERMISSION = new PermissionNode<>("forge", "use_entity_selectors",
-            PermissionTypes.BOOLEAN, (player, uuid, contexts) -> player != null && player.hasPermissions(Commands.LEVEL_GAMEMASTERS));
+            PermissionTypes.BOOLEAN, (player, uuid, contexts) -> player != null && Commands.LEVEL_GAMEMASTERS.check(player.permissions()));
 
     /**
      * TODO: Remove when {@link ForgeRegistry#addAlias(Identifier, Identifier)} is elevated to {@link IForgeRegistry}.

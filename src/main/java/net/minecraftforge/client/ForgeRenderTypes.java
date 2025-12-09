@@ -5,24 +5,22 @@
 
 package net.minecraftforge.client;
 
-import com.mojang.blaze3d.opengl.GlConst;
 import com.mojang.blaze3d.pipeline.BlendFunction;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
-import com.mojang.blaze3d.systems.GpuDevice;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.GpuTexture;
-import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.textures.AddressMode;
+import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.blaze3d.textures.GpuSampler;
 import com.mojang.blaze3d.textures.TextureFormat;
 
 import net.minecraft.util.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.util.NonNullLazy;
 import net.minecraftforge.common.util.NonNullSupplier;
@@ -30,7 +28,6 @@ import net.minecraftforge.fml.earlydisplay.DisplayWindow;
 
 import java.util.function.Function;
 import org.jetbrains.annotations.ApiStatus;
-import org.lwjgl.opengl.GL30C;
 
 public enum ForgeRenderTypes {
     ITEM_LAYERED_SOLID(()-> getItemLayeredSolid(blockAtlas())),
@@ -159,7 +156,7 @@ public enum ForgeRenderTypes {
      * @return Replacement of {@link RenderType#textSeeThrough(Identifier)}, but with optional linear texture filtering.
      */
     public static RenderType getTextSeeThrough(Identifier locationIn) {
-        return Internal.TEXT_SEETHROUGH.apply(locationIn);
+        return Internal.TEXT_SEE_THROUGH.apply(locationIn);
     }
 
     /**
@@ -200,217 +197,175 @@ public enum ForgeRenderTypes {
     //             This was done for the sake of consistency, but it may be wrong. Need validation.
     //             Additionally, I am unsure if I have set all the flags correctly. Most of these don't have full docs on
     //             what they are meant to be used for, so I had to guess how to remap them to the new system.
-    private static abstract class Internal extends RenderType {
-        // TODO: [VEN] This is really just here because argument names are stripped I guess? Just as a weird doc thing?
-        private Internal(String name, int bufferSize, boolean affectsCrumbling, boolean sortOnUpload, Runnable setupState, Runnable clearState) {
-            super(name, bufferSize, affectsCrumbling, sortOnUpload, setupState, clearState);
-            throw new IllegalStateException("This class must not be instantiated");
-        }
-
+    private static abstract class Internal {
         public static Function<Identifier, RenderType> UNSORTED_TRANSLUCENT = Util.memoize(Internal::unsortedTranslucent);
-        private static RenderType unsortedTranslucent(Identifier textureLocation) {
-            return create("forge_unsorted_translucent",
-                          TRANSIENT_BUFFER_SIZE,
-                          true,
-                          false,
-                          RenderPipelines.ENTITY_TRANSLUCENT,
-                          CompositeState.builder()
-                                        .setTextureState(new TextureStateShard(textureLocation, false))
-                                        .setLightmapState(LIGHTMAP)
-                                        .setOverlayState(OVERLAY)
-                                        .createCompositeState(true));
+        private static RenderType unsortedTranslucent(Identifier texture) {
+            return RenderType.create("forge_unsorted_translucent",
+                RenderSetup.builder(RenderPipelines.ENTITY_TRANSLUCENT)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .withTexture("Sampler0", texture)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .useLightmap()
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
+            );
         }
 
         public static Function<Identifier, RenderType> UNLIT_TRANSLUCENT_SORTED = Util.memoize(Internal::unlitTranslucentSorted);
-        private static RenderType unlitTranslucentSorted(Identifier textureLocation) {
-            return create("forge_unlit_translucent_sorted",
-                          TRANSIENT_BUFFER_SIZE,
-                          true,
-                          true,
-                          RenderPipelines.ENTITY_TRANSLUCENT,
-                          CompositeState.builder()
-                                        .setTextureState(new TextureStateShard(textureLocation, false))
-                                        .setLightmapState(NO_LIGHTMAP)
-                                        .setOverlayState(OVERLAY)
-                                        .createCompositeState(true));
+        private static RenderType unlitTranslucentSorted(Identifier texture) {
+            return RenderType.create("forge_unlit_translucent_sorted",
+                RenderSetup.builder(RenderPipelines.ENTITY_TRANSLUCENT)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .sortOnUpload()
+                    .withTexture("Sampler0", texture)
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
+            );
         }
 
         public static Function<Identifier, RenderType> UNLIT_TRANSLUCENT_UNSORTED = Util.memoize(Internal::unlitTranslucentUnsorted);
-        private static RenderType unlitTranslucentUnsorted(Identifier textureLocation) {
-            return create("forge_unlit_translucent_sorted",
-                          TRANSIENT_BUFFER_SIZE,
-                          true,
-                          false,
-                          RenderPipelines.ENTITY_TRANSLUCENT,
-                          CompositeState.builder()
-                                        .setTextureState(new TextureStateShard(textureLocation, false))
-                                        .setLightmapState(NO_LIGHTMAP)
-                                        .setOverlayState(OVERLAY)
-                                        .createCompositeState(true));
+        private static RenderType unlitTranslucentUnsorted(Identifier texture) {
+            return RenderType.create("forge_unlit_translucent_sorted",
+                RenderSetup.builder(RenderPipelines.ENTITY_TRANSLUCENT)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .withTexture("Sampler0", texture)
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
+            );
         }
 
         public static Function<Identifier, RenderType> LAYERED_ITEM_SOLID = Util.memoize(Internal::layeredItemSolid);
-        private static RenderType layeredItemSolid(Identifier locationIn) {
-            return create(
-                    "forge_layered_item_soild",
-                    TRANSIENT_BUFFER_SIZE,
-                    true,
-                    false,
-                    RenderPipelines.ENTITY_SOLID,
-                    CompositeState.builder()
-                                  .setTextureState(new TextureStateShard(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .setOverlayState(OVERLAY)
-                                  .createCompositeState(true)
+        private static RenderType layeredItemSolid(Identifier texture) {
+            return RenderType.create("forge_layered_item_soild",
+                RenderSetup.builder(RenderPipelines.ENTITY_SOLID)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> LAYERED_ITEM_CUTOUT = Util.memoize(Internal::layeredItemCutout);
-        private static RenderType layeredItemCutout(Identifier locationIn) {
-            return create(
-                    "forge_layered_item_cutout",
-                    TRANSIENT_BUFFER_SIZE,
-                    true,
-                    false,
-                    RenderPipelines.ENTITY_CUTOUT,
-                    CompositeState.builder()
-                                  .setTextureState(new TextureStateShard(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .setOverlayState(OVERLAY)
-                                  .createCompositeState(true)
+        private static RenderType layeredItemCutout(Identifier texture) {
+            return RenderType.create("forge_layered_item_cutout",
+                RenderSetup.builder(RenderPipelines.ENTITY_CUTOUT)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> LAYERED_ITEM_CUTOUT_MIPPED = Util.memoize(Internal::layeredItemCutoutMipped);
-        private static RenderType layeredItemCutoutMipped(Identifier locationIn) {
-            return create(
-                    "forge_layered_item_cutout_mipped",
-                    TRANSIENT_BUFFER_SIZE,
-                    true,
-                    false,
-                    RenderPipelines.ENTITY_SMOOTH_CUTOUT,
-                    CompositeState.builder()
-                                  .setTextureState(new TextureStateShard(locationIn, true))
-                                  .setLightmapState(LIGHTMAP)
-                                  .setOverlayState(OVERLAY)
-                                  .createCompositeState(true)
+        private static RenderType layeredItemCutoutMipped(Identifier texture) {
+            return RenderType.create("forge_layered_item_cutout_mipped",
+                RenderSetup.builder(RenderPipelines.ENTITY_SMOOTH_CUTOUT)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .withTexture("Sampler0", texture) // Used to have mipmap = true
+                    .useLightmap()
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> LAYERED_ITEM_TRANSLUCENT = Util.memoize(Internal::layeredItemTranslucent);
-        private static RenderType layeredItemTranslucent(Identifier locationIn) {
-            return create(
-                    "forge_layered_item_translucent",
-                    TRANSIENT_BUFFER_SIZE,
-                    true,
-                    true,
-                    RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL,
-                    CompositeState.builder()
-                                  .setTextureState(new TextureStateShard(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .setOverlayState(OVERLAY)
-                                  .createCompositeState(true)
+        private static RenderType layeredItemTranslucent(Identifier texture) {
+            return RenderType.create("forge_layered_item_translucent",
+                RenderSetup.builder(RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .affectsCrumbling()
+                    .sortOnUpload()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .useOverlay()
+                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT = Util.memoize(Internal::getText);
-        private static RenderType getText(Identifier locationIn) {
-            return create(
-                    "forge_text",
-                    SMALL_BUFFER_SIZE,
-                    false,
-                    true,
-                    RenderPipelines.TEXT,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getText(Identifier texture) {
+            return RenderType.create(
+                "forge_text",
+                RenderSetup.builder(RenderPipelines.TEXT)
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .bufferSize(RenderType.SMALL_BUFFER_SIZE)
+                    .sortOnUpload() // This is what is different from RenderTypes.TEXT
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT_INTENSITY = Util.memoize(Internal::getTextIntensity);
-        private static RenderType getTextIntensity(Identifier locationIn) {
-            return create(
-                    "forge_text_intensity",
-                    SMALL_BUFFER_SIZE,
-                    false,
-                    false,
-                    RenderPipelines.TEXT_INTENSITY,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getTextIntensity(Identifier texture) {
+            return RenderType.create("forge_text_intensity",
+                RenderSetup.builder(RenderPipelines.TEXT_INTENSITY)
+                    .bufferSize(RenderType.SMALL_BUFFER_SIZE)
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .useOverlay()
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT_POLYGON_OFFSET = Util.memoize(Internal::getTextPolygonOffset);
-        private static RenderType getTextPolygonOffset(Identifier locationIn) {
-            return create(
-                    "forge_text_polygon_offset",
-                    TRANSIENT_BUFFER_SIZE,
-                    false,
-                    true,
-                    RenderPipelines.TEXT_POLYGON_OFFSET,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn,  false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getTextPolygonOffset(Identifier texture) {
+            return RenderType.create("forge_text_polygon_offset",
+                RenderSetup.builder(RenderPipelines.TEXT_POLYGON_OFFSET)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .sortOnUpload()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT_INTENSITY_POLYGON_OFFSET = Util.memoize(Internal::getTextIntensityPolygonOffset);
-        private static RenderType getTextIntensityPolygonOffset(Identifier locationIn) {
-            return create(
-                    "forge_text_intensity_polygon_offset",
-                    TRANSIENT_BUFFER_SIZE,
-                    false,
-                    true,
-                    RenderPipelines.TEXT_INTENSITY,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getTextIntensityPolygonOffset(Identifier texture) {
+            return RenderType.create("forge_text_intensity_polygon_offset",
+                RenderSetup.builder(RenderPipelines.TEXT_INTENSITY)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .sortOnUpload()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT_SEE_THROUGH = Util.memoize(Internal::getTextSeeThrough);
-        /**
-         * Use {@link #TEXT_SEE_THROUGH} instead.
-         */
-        @Deprecated
-        public static Function<Identifier, RenderType> TEXT_SEETHROUGH = TEXT_SEE_THROUGH;
-        private static RenderType getTextSeeThrough(Identifier locationIn) {
-            return create(
-                    "forge_text_see_through",
-                    TRANSIENT_BUFFER_SIZE,
-                    false,
-                    false,
-                    RenderPipelines.TEXT_SEE_THROUGH,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getTextSeeThrough(Identifier texture) {
+            return RenderType.create("forge_text_see_through",
+                RenderSetup.builder(RenderPipelines.TEXT_SEE_THROUGH)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .createRenderSetup()
             );
         }
 
         public static Function<Identifier, RenderType> TEXT_INTENSITY_SEE_THROUGH = Util.memoize(Internal::getTextIntensitySeeThrough);
-        /**
-         * Use {@link #TEXT_INTENSITY_SEE_THROUGH} instead.
-         */
-        @SuppressWarnings("unused")
-        @Deprecated(forRemoval = true, since = "1.21.5")
-        public static Function<Identifier, RenderType> TEXT_INTENSITY_SEETHROUGH = TEXT_INTENSITY_SEE_THROUGH;
-        private static RenderType getTextIntensitySeeThrough(Identifier locationIn) {
-            return create(
-                    "forge_text_intensity_see_through",
-                    TRANSIENT_BUFFER_SIZE,
-                    false,
-                    true,
-                    RenderPipelines.TEXT_INTENSITY_SEE_THROUGH,
-                    CompositeState.builder()
-                                  .setTextureState(new CustomizableTextureState(locationIn, false))
-                                  .setLightmapState(LIGHTMAP)
-                                  .createCompositeState(false)
+        private static RenderType getTextIntensitySeeThrough(Identifier texture) {
+            return RenderType.create("forge_text_intensity_see_through",
+                RenderSetup.builder(RenderPipelines.TEXT_INTENSITY_SEE_THROUGH)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .sortOnUpload()
+                    .withTexture("Sampler0", texture)
+                    .useLightmap()
+                    .createRenderSetup()
             );
         }
 
@@ -421,51 +376,22 @@ public enum ForgeRenderTypes {
                 .withDepthWrite(false)
                 .build();
 
-        public static RenderType getLoadingOverlay(DisplayWindow window) {
-            return create(
-                "forge_loading_overlay",
-                TRANSIENT_BUFFER_SIZE,
-                false,
-                false,
-                LOADING_PIPELINE,
-                CompositeState.builder()
-                    .setTextureState(new LoadingOverlayTextureState(window))
-                    .createCompositeState(false)
-            );
-        }
-    }
-
-    private static class CustomizableTextureState extends TextureStateShard {
-        private CustomizableTextureState(Identifier resLoc, boolean mipmap) {
-            super(resLoc, mipmap);
-            this.setupState = () -> {
-                TextureManager manager = Minecraft.getInstance().getTextureManager();
-                var texture = manager.getTexture(resLoc);
-                texture.setFilter(enableTextTextureLinearFiltering, this.mipmap);
-                RenderSystem.setShaderTexture(0, texture.getTextureView());
-            };
-        }
-    }
-
-    private static class LoadingOverlayTextureState extends TextureStateShard {
+        private static final GpuSampler LOADING_SAMPLER = RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.NEAREST, FilterMode.NEAREST, false);
         private static final Identifier LOADING_TEXTURE = Identifier.fromNamespaceAndPath("forge", "loading_overlay");
-        private final GpuTexture texture;
-        private final GpuTextureView textureView;
 
-        private LoadingOverlayTextureState(DisplayWindow window) {
-            super(LOADING_TEXTURE, false);
-
-            GpuDevice gpu = RenderSystem.getDevice();
-            this.texture = gpu.createTexture(LOADING_TEXTURE.toString(), 5, TextureFormat.RGBA8,
+        public static RenderType getLoadingOverlay(DisplayWindow window) {
+            var gpu = RenderSystem.getDevice();
+            var texture = gpu.createTexture(LOADING_TEXTURE.toString(), 5, TextureFormat.RGBA8,
                     window.context().width(), window.context().height(),
                     1, window.getFramebufferTextureId());
-            this.textureView = gpu.createTextureView(this.texture);
+            var textureView = gpu.createTextureView(texture);
 
-            this.setupState = () -> {
-                GL30C.glTexParameterIi(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MIN_FILTER, GlConst.GL_NEAREST);
-                GL30C.glTexParameterIi(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_MAG_FILTER, GlConst.GL_NEAREST);
-                RenderSystem.setShaderTexture(0, this.textureView);
-            };
+            return RenderType.create("forge_loading_overlay",
+                RenderSetup.builder(LOADING_PIPELINE)
+                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
+                    .withTexture("Sampler0", textureView, LOADING_SAMPLER)
+                    .createRenderSetup()
+            );
         }
     }
 }

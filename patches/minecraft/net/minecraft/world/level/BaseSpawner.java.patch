@@ -19,7 +19,7 @@
                                  }
  
                                  spawndata.getEquipment().ifPresent(mob::equip);
-@@ -277,5 +_,15 @@
+@@ -277,5 +_,14 @@
  
      public double getOSpin() {
          return this.oSpin;
@@ -30,8 +30,7 @@
 +       return null;
 +    }
 +
-+    @Nullable
-+    public net.minecraft.world.level.block.entity.BlockEntity getSpawnerBlockEntity() {
++    public net.minecraft.world.level.block.entity.@Nullable BlockEntity getSpawnerBlockEntity() {
 +        return null;
      }
  }

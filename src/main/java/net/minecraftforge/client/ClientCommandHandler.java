@@ -129,7 +129,7 @@ public class ClientCommandHandler {
             },
             player.position(),
             player.getRotationVector(),
-            player.getPermissionLevel(),
+            player.permissions(),
             player.getName().getString(),
             player.getDisplayName(),
             player

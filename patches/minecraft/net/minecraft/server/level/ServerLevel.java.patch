@@ -23,7 +23,7 @@
 +
 +    protected void initCapabilities() {
 +        this.gatherCapabilities();
-+        capabilityData = this.getDataStorage().computeIfAbsent(net.minecraftforge.common.util.LevelCapabilityData.TYPE);
++        capabilityData = this.getDataStorage().computeIfAbsent(net.minecraftforge.common.util.LevelCapabilityData.type(this));
 +    }
 +
 +    /** Forge: Internal method only for out capability storage system */

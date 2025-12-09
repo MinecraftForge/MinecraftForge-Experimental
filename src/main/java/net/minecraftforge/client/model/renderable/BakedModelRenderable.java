@@ -67,7 +67,7 @@ public class BakedModelRenderable implements IRenderable<BakedModelRenderable.Co
         for (var part : parts) {
             for (var direction : Direction.valuesView()) {
                 for (var quad : part.getQuads(direction)) {
-                    buffer.putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay, true);
+                    buffer.putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay);
                 }
             }
         }

@@ -36,7 +36,6 @@ import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources.PathResourcesSupplier;
 import net.minecraft.server.packs.VanillaPackResources;
 import net.minecraft.resources.Identifier;
-import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModFileInfo;
