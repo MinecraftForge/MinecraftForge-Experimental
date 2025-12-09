@@ -5,7 +5,6 @@
 
 package net.minecraftforge.client;
 
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.RegisterNamedRenderTypesEvent;
@@ -43,9 +42,6 @@ public final class NamedRenderTypeManager {
     private static void preRegisterVanillaRenderTypes(Map<Identifier, RenderTypeGroup> blockRenderTypes) {
         blockRenderTypes.put(rl("solid"), new RenderTypeGroup(ChunkSectionLayer.SOLID, ForgeRenderTypes.ITEM_LAYERED_SOLID.get()));
         blockRenderTypes.put(rl("cutout"), new RenderTypeGroup(ChunkSectionLayer.CUTOUT, ForgeRenderTypes.ITEM_LAYERED_CUTOUT.get()));
-        // Generally entity/item rendering shouldn't use mipmaps, so cutout_mipped has them off by default. To enforce them, use cutout_mipped_all.
-        blockRenderTypes.put(rl("cutout_mipped"), new RenderTypeGroup(ChunkSectionLayer.CUTOUT_MIPPED, ForgeRenderTypes.ITEM_LAYERED_CUTOUT.get()));
-        blockRenderTypes.put(rl("cutout_mipped_all"), new RenderTypeGroup(ChunkSectionLayer.CUTOUT_MIPPED, ForgeRenderTypes.ITEM_LAYERED_CUTOUT_MIPPED.get()));
         blockRenderTypes.put(rl("translucent_moving_block"), new RenderTypeGroup(ChunkSectionLayer.TRANSLUCENT, ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
         blockRenderTypes.put(rl("tripwire"), new RenderTypeGroup(ChunkSectionLayer.TRIPWIRE, ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
     }

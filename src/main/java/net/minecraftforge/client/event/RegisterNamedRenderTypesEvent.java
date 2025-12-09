@@ -7,16 +7,14 @@ package net.minecraftforge.client.event;
 
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.RenderTypeGroup;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 
 import java.util.Map;
@@ -28,12 +26,6 @@ import java.util.Map;
  */
 public final class RegisterNamedRenderTypesEvent extends MutableEvent implements SelfDestructing {
     public static final EventBus<RegisterNamedRenderTypesEvent> BUS = EventBus.create(RegisterNamedRenderTypesEvent.class);
-
-    /** @deprecated {@link RegisterNamedRenderTypesEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<RegisterNamedRenderTypesEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 
     private final Map<Identifier, RenderTypeGroup> renderTypes;
 

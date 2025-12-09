@@ -29,8 +29,10 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.multiplayer.chat.ChatListener;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
 
@@ -199,15 +201,31 @@ public class ModListScreen extends Screen {
 
             FormattedCharSequence line = lines.get(lineIdx);
             if (line != null)
-                return font.getSplitter().componentStyleAtWidth(line, mouseX - left - border);
+                return Style.EMPTY; //font.getSplitter().componentStyleAtWidth(line, mouseX - left - border);
             return null;
         }
 
         @Override
         public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
-            final Style component = findTextLine((int)info.x(), (int)info.y());
-            if (component != null) {
-                ModListScreen.this.handleComponentClicked(component);
+            final Style style = findTextLine((int)info.x(), (int)info.y());
+            if (style != null) {
+                ClickEvent clickevent = style.getClickEvent();
+                if (this.client.hasShiftDown()) {
+                    if (style.getInsertion() != null) {
+                        ModListScreen.this.insertText(style.getInsertion(), false);
+                    }
+                } else if (clickevent != null) {
+                    if (clickevent instanceof ClickEvent.Custom clickevent$custom && clickevent$custom.id().equals(ChatComponent.QUEUE_EXPAND_ID)) {
+                        ChatListener chatlistener = this.client.getChatListener();
+                        if (chatlistener.queueSize() != 0L) {
+                            chatlistener.acceptNextDelayedMessage();
+                        }
+                    } else if (this.client.player == null) {
+                        defaultHandleClickEvent(clickevent, this.client, ModListScreen.this);
+                    } else {
+                        defaultHandleGameClickEvent(clickevent, this.client, ModListScreen.this);
+                    }
+                }
                 return true;
             }
             return super.mouseClicked(info, recent);
@@ -500,13 +518,5 @@ public class ModListScreen extends Screen {
     @Override
     public void onClose() {
         this.minecraft.setScreen(this.parentScreen);
-    }
-
-    @Override
-    protected void handleClickEvent(Minecraft mc, ClickEvent event) {
-        if (mc.player == null)
-            defaultHandleClickEvent(event, mc, this);
-        else
-            defaultHandleGameClickEvent(event, mc, this);
     }
 }

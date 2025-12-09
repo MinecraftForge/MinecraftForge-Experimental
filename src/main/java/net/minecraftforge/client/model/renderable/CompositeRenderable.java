@@ -76,7 +76,7 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, ITextureRenderTypeLookup textureRenderTypeLookup, int lightmap, int overlay) {
             var consumer = bufferSource.getBuffer(textureRenderTypeLookup.get(texture));
             for (var quad : quads)
-                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay, true);
+                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay);
         }
     }
 
