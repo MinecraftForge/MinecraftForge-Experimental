@@ -29,7 +29,7 @@
          this.levelData = p_270739_;
          this.dimensionTypeRegistration = p_270240_;
          this.dimension = p_270683_;
-@@ -207,11 +_,35 @@
+@@ -217,11 +_,35 @@
          } else {
              LevelChunk levelchunk = this.getChunkAt(p_46605_);
              Block block = p_46606_.getBlock();
@@ -65,7 +65,7 @@
                  if (blockstate1 == p_46606_) {
                      if (blockstate != blockstate1) {
                          this.setBlocksDirty(p_46605_, blockstate, blockstate1);
-@@ -238,9 +_,8 @@
+@@ -248,9 +_,8 @@
                      }
  
                      this.updatePOIOnBlockStateChange(p_46605_, blockstate, blockstate1);
@@ -76,7 +76,7 @@
              }
          }
      }
-@@ -474,8 +_,28 @@
+@@ -484,8 +_,28 @@
          (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers).add(p_151526_);
      }
  
@@ -105,7 +105,7 @@
          if (!this.pendingBlockEntityTickers.isEmpty()) {
              this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
              this.pendingBlockEntityTickers.clear();
-@@ -498,12 +_,19 @@
+@@ -508,12 +_,19 @@
  
      public <T extends Entity> void guardEntityTick(Consumer<T> p_46654_, T p_46655_) {
          try {
@@ -125,15 +125,15 @@
          }
      }
  
-@@ -659,6 +_,7 @@
-         if (!this.isOutsideBuildHeight(p_46748_)) {
+@@ -669,6 +_,7 @@
+         if (this.isInValidBounds(p_46748_)) {
              this.getChunkAt(p_46748_).removeBlockEntity(p_46748_);
          }
 +        this.updateNeighbourForOutputSignal(p_46748_, getBlockState(p_46748_).getBlock()); //Notify neighbors of changes
      }
  
      public boolean isLoaded(BlockPos p_46750_) {
-@@ -733,9 +_,9 @@
+@@ -743,9 +_,9 @@
              }
          });
  
@@ -145,7 +145,7 @@
                  && p_46538_.test(enderdragonpart)
                  && p_46537_.intersects(enderdragonpart.getBoundingBox())) {
                  list.add(enderdragonpart);
-@@ -768,8 +_,8 @@
+@@ -778,8 +_,8 @@
                  }
              }
  
@@ -156,7 +156,7 @@
                      T t = p_261885_.tryCast(enderdragonpart);
                      if (t != null && p_261688_.test(t)) {
                          p_262071_.add(t);
-@@ -942,17 +_,16 @@
+@@ -952,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
      public void updateNeighbourForOutputSignal(BlockPos p_46718_, Block p_46719_) {
@@ -179,7 +179,7 @@
                      }
                  }
              }
-@@ -1037,6 +_,20 @@
+@@ -1047,6 +_,20 @@
      }
  
      public abstract EnvironmentAttributeSystem environmentAttributes();
