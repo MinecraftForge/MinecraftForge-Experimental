@@ -11,13 +11,3 @@
      public IntStream getUniqueFrames() {
          return this.animatedTexture != null ? this.animatedTexture.getUniqueFrames() : IntStream.of(1);
      }
-@@ -255,6 +_,9 @@
-                 int k = this.getFrameY(i) * SpriteContents.this.height;
- 
-                 for (int l = 0; l < SpriteContents.this.byMipLevel.length; l++) {
-+                    // Forge: Skip uploading if the texture would be made invalid by mip level
-+                    if ((SpriteContents.this.width >> i) <= 0 || (SpriteContents.this.height >> i) <= 0)
-+                        break;
-                     RenderSystem.getDevice()
-                         .createCommandEncoder()
-                         .writeToTexture(

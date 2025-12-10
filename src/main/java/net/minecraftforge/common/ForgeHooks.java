@@ -1118,7 +1118,7 @@ public final class ForgeHooks {
         var connection = event.getSource().getConnection();
         var expectedSide = connection.getReceiving() == PacketFlow.CLIENTBOUND ? LogicalSide.CLIENT : LogicalSide.SERVER;
         if (expectedSide != EffectiveSide.get()) {
-            connection.disconnect(Component.literal("Illegal packet received, terminating connection"));
+            connection.disconnect(Component.literal("Illegal packet received " + event.getChannel() + " on wrong side " + EffectiveSide.get().name() + ", terminating connection"));
             return false;
         }
 

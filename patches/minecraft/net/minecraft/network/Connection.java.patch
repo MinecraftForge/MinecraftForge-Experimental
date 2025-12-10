@@ -93,14 +93,24 @@
          return new Bootstrap().group(p_450865_.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
              @Override
              protected void initChannel(Channel p_129552_) {
-@@ -493,6 +_,7 @@
+@@ -493,14 +_,15 @@
  
      public static Connection connectToLocalServer(SocketAddress p_129494_) {
          final Connection connection = new Connection(PacketFlow.CLIENTBOUND);
+-        new Bootstrap().group(EventLoopGroupHolder.local().eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
 +        connection.activationHandler = net.minecraftforge.network.NetworkRegistry::onConnectionStart;
-         new Bootstrap().group(EventLoopGroupHolder.local().eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
++        new Bootstrap().group(EventLoopGroupHolder.localClient().eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
              @Override
              protected void initChannel(Channel p_332618_) {
+                 ChannelPipeline channelpipeline = p_332618_.pipeline();
+                 Connection.configureInMemoryPipeline(channelpipeline, PacketFlow.CLIENTBOUND);
+                 connection.configurePacketHandler(channelpipeline);
+             }
+-        }).channel(EventLoopGroupHolder.local().channelCls()).connect(p_129494_).syncUninterruptibly();
++        }).channel(EventLoopGroupHolder.localClient().channelCls()).connect(p_129494_).syncUninterruptibly();
+         return connection;
+     }
+ 
 @@ -584,6 +_,22 @@
  
      public float getAverageSentPackets() {
