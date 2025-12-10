@@ -4,7 +4,7 @@
  
              if (this.destroyBlocksTick > 0) {
                  this.destroyBlocksTick--;
--                if (this.destroyBlocksTick == 0 && p_363567_.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING)) {
+-                if (this.destroyBlocksTick == 0 && p_363567_.getGameRules().get(GameRules.MOB_GRIEFING)) {
 +                if (this.destroyBlocksTick == 0 && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(p_363567_, this)) {
                      boolean flag = false;
                      int l = Mth.floor(this.getBbWidth() / 2.0F + 1.0F);

@@ -9,7 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 
@@ -66,17 +66,17 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
     }
 
     private static class Mesh {
-        private final ResourceLocation texture;
+        private final Identifier texture;
         private final List<BakedQuad> quads = new ArrayList<>();
 
-        public Mesh(ResourceLocation texture) {
+        public Mesh(Identifier texture) {
             this.texture = texture;
         }
 
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, ITextureRenderTypeLookup textureRenderTypeLookup, int lightmap, int overlay) {
             var consumer = bufferSource.getBuffer(textureRenderTypeLookup.get(texture));
             for (var quad : quads)
-                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay, true);
+                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay);
         }
     }
 
@@ -111,7 +111,7 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
             return new PartBuilder<>(this, child);
         }
 
-        public PartBuilder<T> addMesh(ResourceLocation texture, List<BakedQuad> quads) {
+        public PartBuilder<T> addMesh(Identifier texture, List<BakedQuad> quads) {
             var mesh = new Mesh(texture);
             mesh.quads.addAll(quads);
             component.meshes.add(mesh);

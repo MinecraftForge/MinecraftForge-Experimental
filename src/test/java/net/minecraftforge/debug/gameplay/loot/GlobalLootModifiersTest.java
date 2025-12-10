@@ -10,10 +10,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-import net.minecraft.advancements.critereon.DataComponentMatchers;
-import net.minecraft.advancements.critereon.EnchantmentPredicate;
-import net.minecraft.advancements.critereon.ItemPredicate;
-import net.minecraft.advancements.critereon.MinMaxBounds;
+import net.minecraft.advancements.criterion.DataComponentMatchers;
+import net.minecraft.advancements.criterion.EnchantmentPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
+import net.minecraft.advancements.criterion.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.RegistrySetBuilder;
@@ -32,7 +32,7 @@ import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -62,7 +62,6 @@ import net.minecraftforge.common.data.GlobalLootModifierProvider;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
 import net.minecraftforge.common.loot.LootTableIdCondition;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.test.BaseTestMod;
@@ -93,7 +92,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
         GLM.register("silk_touch_bamboo", SilkTouchTestModifier.CODEC);
     }
 
-    private static final ResourceKey<Enchantment> SMELT = ResourceKey.create(Registries.ENCHANTMENT, ResourceLocation.fromNamespaceAndPath(MODID, "smelt"));
+    private static final ResourceKey<Enchantment> SMELT = ResourceKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(MODID, "smelt"));
     private static final Supplier<RegistrySetBuilder> ENCHANTMENTS = () -> new RegistrySetBuilder()
         .add(Registries.ENCHANTMENT, ctx -> {
             ctx.register(SMELT, Enchantment.enchantment(
@@ -101,7 +100,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
                     ctx.lookup(Registries.ITEM).getOrThrow(ItemTags.MINING_LOOT_ENCHANTABLE), 1, 1,
                     Enchantment.constantCost(15), Enchantment.constantCost(15), 5, EquipmentSlotGroup.MAINHAND
                 )
-            ).build(SMELT.location()));
+            ).build(SMELT.identifier()));
         });
 
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
@@ -247,7 +246,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
             // Tested by verifying that we drop 2 test blocks when broken instead of the default 1
             add("multiply_loot", new MultiplyDropsModifier(
                 new LootItemCondition[] {
-                    LootTableIdCondition.builder(TEST_BLOCK.get().getLootTable().get().location()).build()
+                    LootTableIdCondition.builder(TEST_BLOCK.get().getLootTable().get().identifier()).build()
                 }, 2)
             );
 

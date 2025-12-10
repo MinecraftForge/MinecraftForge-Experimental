@@ -294,7 +294,7 @@ public interface IForgeItem {
      */
     /*
     @Nullable
-    default ResourceLocation getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, EquipmentModel.Layer layer, boolean inner) {
+    default Identifier getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, EquipmentModel.Layer layer, boolean inner) {
         return null;
     }
     */

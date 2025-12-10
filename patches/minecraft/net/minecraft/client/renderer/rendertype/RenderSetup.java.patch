@@ -1,0 +1,67 @@
+--- a/net/minecraft/client/renderer/rendertype/RenderSetup.java
++++ b/net/minecraft/client/renderer/rendertype/RenderSetup.java
+@@ -32,6 +_,7 @@
+     final boolean sortOnUpload;
+     final int bufferSize;
+     final LayeringTransform layeringTransform;
++    final Map<String, RenderSetup.TextureAndSampler> texturesWithSamplers;
+ 
+     RenderSetup(
+         RenderPipeline p_455545_,
+@@ -44,7 +_,8 @@
+         RenderSetup.OutlineProperty p_454071_,
+         boolean p_455910_,
+         boolean p_450946_,
+-        int p_453755_
++        int p_453755_,
++        Map<String, RenderSetup.TextureAndSampler> texturesWithSamplers
+     ) {
+         this.pipeline = p_455545_;
+         this.textures = p_455652_;
+@@ -57,6 +_,7 @@
+         this.affectsCrumbling = p_455910_;
+         this.sortOnUpload = p_450946_;
+         this.bufferSize = p_453755_;
++        this.texturesWithSamplers = texturesWithSamplers;
+     }
+ 
+     @Override
+@@ -114,6 +_,8 @@
+                 );
+             }
+ 
++            map.putAll(this.texturesWithSamplers);
++
+             return map;
+         }
+     }
+@@ -149,6 +_,7 @@
+         private int bufferSize = 1536;
+         private RenderSetup.OutlineProperty outlineProperty = RenderSetup.OutlineProperty.NONE;
+         private final Map<String, RenderSetup.TextureBinding> textures = new HashMap<>();
++        private final Map<String, RenderSetup.TextureAndSampler> texturesWithSamplers = new HashMap<>();
+ 
+         RenderSetupBuilder(RenderPipeline p_453804_) {
+             this.pipeline = p_453804_;
+@@ -164,6 +_,11 @@
+             return this;
+         }
+ 
++        public RenderSetup.RenderSetupBuilder withTexture(String name, GpuTextureView textureView, GpuSampler sampler) {
++            this.texturesWithSamplers.put(name, new RenderSetup.TextureAndSampler(textureView, sampler));
++            return this;
++        }
++
+         public RenderSetup.RenderSetupBuilder useLightmap() {
+             this.useLightmap = true;
+             return this;
+@@ -221,7 +_,8 @@
+                 this.outlineProperty,
+                 this.affectsCrumbling,
+                 this.sortOnUpload,
+-                this.bufferSize
++                this.bufferSize,
++                this.texturesWithSamplers
+             );
+         }
+     }

@@ -8,7 +8,7 @@ package net.minecraftforge.client.model.geometry;
 import com.mojang.math.Transformation;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiPredicate;
@@ -17,7 +17,7 @@ import java.util.function.BiPredicate;
  * A {@linkplain IGeometryBakingContext geometry baking context} that is not bound to block/item model loading.
  */
 public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
-    public static final ResourceLocation LOCATION = ResourceLocation.fromNamespaceAndPath("forge", "standalone");
+    public static final Identifier LOCATION = Identifier.fromNamespaceAndPath("forge", "standalone");
 
     public static final StandaloneGeometryBakingContext INSTANCE = builder().build();
 
@@ -27,16 +27,16 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
     private final ItemTransforms transforms;
     private final Transformation rootTransform;
     @Nullable
-    private final ResourceLocation renderTypeHint;
+    private final Identifier renderTypeHint;
     @Nullable
-    private final ResourceLocation renderTypeFastHint;
+    private final Identifier renderTypeFastHint;
     private final BiPredicate<String, Boolean> visibilityTest;
 
     private StandaloneGeometryBakingContext(
         boolean isGui3d,
         boolean useBlockLight, boolean useAmbientOcclusion,
         ItemTransforms transforms, Transformation rootTransform,
-        @Nullable ResourceLocation renderTypeHint,
+        @Nullable Identifier renderTypeHint,
         BiPredicate<String, Boolean> visibilityTest
     ) {
         this(isGui3d, useBlockLight, useAmbientOcclusion, transforms, rootTransform, renderTypeHint, null, visibilityTest);
@@ -46,8 +46,8 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
         boolean isGui3d,
         boolean useBlockLight, boolean useAmbientOcclusion,
         ItemTransforms transforms, Transformation rootTransform,
-        @Nullable ResourceLocation renderTypeHint,
-        @Nullable ResourceLocation renderTypeFastHint,
+        @Nullable Identifier renderTypeHint,
+        @Nullable Identifier renderTypeFastHint,
         BiPredicate<String, Boolean> visibilityTest
     ) {
         this.isGui3d = isGui3d;
@@ -87,13 +87,13 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
 
     @Nullable
     @Override
-    public ResourceLocation getRenderTypeHint() {
+    public Identifier getRenderTypeHint() {
         return renderTypeHint;
     }
 
     @Nullable
     @Override
-    public ResourceLocation getRenderTypeFastHint() {
+    public Identifier getRenderTypeFastHint() {
         return renderTypeFastHint;
     }
 
@@ -117,9 +117,9 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
         private ItemTransforms transforms = ItemTransforms.NO_TRANSFORMS;
         private Transformation rootTransform = Transformation.identity();
         @Nullable
-        private ResourceLocation renderTypeHint;
+        private Identifier renderTypeHint;
         @Nullable
-        private ResourceLocation renderTypeFastHint;
+        private Identifier renderTypeFastHint;
         private BiPredicate<String, Boolean> visibilityTest = (c, def) -> def;
 
         private Builder() { }
@@ -160,12 +160,12 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
             return this;
         }
 
-        public Builder withRenderTypeHint(ResourceLocation renderTypeHint) {
+        public Builder withRenderTypeHint(Identifier renderTypeHint) {
             this.renderTypeHint = renderTypeHint;
             return this;
         }
 
-        public Builder withRenderTypeHint(ResourceLocation renderTypeHint, ResourceLocation renderTypeFastHint) {
+        public Builder withRenderTypeHint(Identifier renderTypeHint, Identifier renderTypeFastHint) {
             this.renderTypeHint = renderTypeHint;
             this.renderTypeFastHint = renderTypeFastHint;
             return this;

@@ -1,12 +1,12 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -1175,9 +_,10 @@
-             switch (serverboundplayeractionpacket$action) {
+@@ -1213,9 +_,10 @@
+                     }
                  case SWAP_ITEM_WITH_OFFHAND:
                      if (!this.player.isSpectator()) {
--                        ItemStack itemstack = this.player.getItemInHand(InteractionHand.OFF_HAND);
+-                        ItemStack itemstack1 = this.player.getItemInHand(InteractionHand.OFF_HAND);
 -                        this.player.setItemInHand(InteractionHand.OFF_HAND, this.player.getItemInHand(InteractionHand.MAIN_HAND));
--                        this.player.setItemInHand(InteractionHand.MAIN_HAND, itemstack);
+-                        this.player.setItemInHand(InteractionHand.MAIN_HAND, itemstack1);
 +                        var event = net.minecraftforge.event.ForgeEventFactory.onLivingSwapHandItems(this.player);
 +                        if (event == null) return;
 +                        this.player.setItemInHand(InteractionHand.OFF_HAND, event.getItemSwappedToOffHand());
@@ -14,7 +14,7 @@
                          this.player.stopUsingItem();
                      }
  
-@@ -1376,8 +_,9 @@
+@@ -1414,8 +_,9 @@
                  }
  
                  CompletableFuture<FilteredText> completablefuture = this.filterTextPacket(playerchatmessage.signedContent());
@@ -25,7 +25,7 @@
                      PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(p_296589_.mask());
                      this.broadcastChatMessage(playerchatmessage1);
                  });
-@@ -1707,7 +_,7 @@
+@@ -1745,7 +_,7 @@
  
                              @Override
                              public void onInteraction(InteractionHand p_143682_, Vec3 p_143683_) {
@@ -34,7 +34,7 @@
                              }
  
                              @Override
-@@ -2021,6 +_,7 @@
+@@ -2063,6 +_,7 @@
  
      @Override
      public void handleCustomPayload(ServerboundCustomPayloadPacket p_329963_) {

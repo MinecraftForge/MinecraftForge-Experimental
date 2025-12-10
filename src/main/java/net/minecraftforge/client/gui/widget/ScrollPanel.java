@@ -19,7 +19,7 @@ import java.util.List;
  * Abstract scroll panel class.
  */
 public abstract class ScrollPanel extends AbstractContainerEventHandler implements Renderable, NarratableEntry {
-    private final Minecraft client;
+    protected final Minecraft client;
     protected final int width;
     protected final int height;
     protected final int top;

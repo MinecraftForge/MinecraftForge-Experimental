@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/item/MobBucketItem.java
 +++ b/net/minecraft/world/item/MobBucketItem.java
 @@ -18,13 +_,18 @@
- import net.minecraft.world.level.material.Fluid;
+ import org.jspecify.annotations.Nullable;
  
  public class MobBucketItem extends BucketItem {
 -    private final EntityType<? extends Mob> type;

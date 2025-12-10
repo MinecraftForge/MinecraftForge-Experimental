@@ -21,7 +21,7 @@ import java.util.Comparator;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.Resource;
@@ -49,7 +49,7 @@ import java.util.stream.Collectors;
 
 public final class CreativeModeTabRegistry {
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final ResourceLocation CREATIVE_MODE_TAB_ORDERING_JSON = ResourceLocation.fromNamespaceAndPath("forge", "creative_mode_tab_ordering.json");
+    private static final Identifier CREATIVE_MODE_TAB_ORDERING_JSON = Identifier.fromNamespaceAndPath("forge", "creative_mode_tab_ordering.json");
     private static final List<CreativeModeTab> SORTED_TABS = new ArrayList<>();
     private static final List<CreativeModeTab> SORTED_TABS_VIEW = Collections.unmodifiableList(SORTED_TABS);
     private static final List<CreativeModeTab> DEFAULT_TABS = new ArrayList<>();
@@ -71,7 +71,7 @@ public final class CreativeModeTabRegistry {
      * @param name the name to look up
      */
     @Nullable
-    public static CreativeModeTab getTab(ResourceLocation name) {
+    public static CreativeModeTab getTab(Identifier name) {
         return BuiltInRegistries.CREATIVE_MODE_TAB.getValue(name);
     }
 
@@ -81,11 +81,11 @@ public final class CreativeModeTabRegistry {
      * @param tab the tab to look up
      */
     @Nullable
-    public static ResourceLocation getName(CreativeModeTab tab) {
+    public static Identifier getName(CreativeModeTab tab) {
         return BuiltInRegistries.CREATIVE_MODE_TAB.getKey(tab);
     }
 
-    private static final Multimap<ResourceLocation, ResourceLocation> edges = HashMultimap.create();
+    private static final Multimap<Identifier, Identifier> edges = HashMultimap.create();
 
     static PreparableReloadListener getReloadListener() {
         return new SimplePreparableReloadListener<JsonObject>() {
@@ -113,7 +113,7 @@ public final class CreativeModeTabRegistry {
                         JsonArray order = GsonHelper.getAsJsonArray(data, "order");
                         List<CreativeModeTab> customOrder = new ArrayList<>();
                         for (JsonElement entry : order) {
-                            ResourceLocation id = ResourceLocation.parse(entry.getAsString());
+                            Identifier id = Identifier.parse(entry.getAsString());
                             CreativeModeTab CreativeModeTab = getTab(id);
                             if (CreativeModeTab == null)
                                 throw new IllegalStateException("CreativeModeTab not found with name " + id);
@@ -192,24 +192,24 @@ public final class CreativeModeTabRegistry {
         for (int i = 0; i < vanillaTabs; i++) { // Vanilla ordering
             final Holder<CreativeModeTab> value = indexed.get(i);
             final CreativeModeTab tab = value.get();
-            final ResourceLocation name = value.unwrapKey().orElseThrow().location();
+            final Identifier name = value.unwrapKey().orElseThrow().identifier();
 
             if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
                 addTabOrder(tab, name);
             else {
                 // If there is no order specified ensure vanilla ordering by specifying the previous and next indexed tab as edges
                 if (i != 0)
-                    edges.put(indexed.get(i - 1).unwrapKey().orElseThrow().location(), name);
+                    edges.put(indexed.get(i - 1).unwrapKey().orElseThrow().identifier(), name);
                 if (i + 1 < indexed.size())
-                    edges.put(name, indexed.get(i + 1).unwrapKey().orElseThrow().location());
+                    edges.put(name, indexed.get(i + 1).unwrapKey().orElseThrow().identifier());
             }
         }
 
-        ResourceLocation lastVanilla = indexed.get(vanillaTabs - 1).unwrapKey().orElseThrow().location();
+        Identifier lastVanilla = indexed.get(vanillaTabs - 1).unwrapKey().orElseThrow().identifier();
         for (int i = vanillaTabs; i < indexed.size(); i++) {
             final Holder<CreativeModeTab> value = indexed.get(i);
             final CreativeModeTab tab = value.get();
-            final ResourceLocation name = value.unwrapKey().orElseThrow().location();
+            final Identifier name = value.unwrapKey().orElseThrow().identifier();
 
             if (!tab.tabsBefore.isEmpty() || !tab.tabsAfter.isEmpty())
                 addTabOrder(tab, name);
@@ -220,7 +220,7 @@ public final class CreativeModeTabRegistry {
         recalculateItemCreativeModeTabs();
     }
 
-    private static void addTabOrder(CreativeModeTab tab, ResourceLocation name) {
+    private static void addTabOrder(CreativeModeTab tab, Identifier name) {
         for (var after : tab.tabsAfter) {
             edges.put(name, after);
         }

@@ -9,7 +9,7 @@ import com.mojang.serialization.MapCodec;
 
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.world.entity.decoration.PaintingVariant;
+import net.minecraft.world.entity.decoration.painting.PaintingVariant;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
@@ -17,9 +17,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.schedule.Activity;
-import net.minecraft.world.entity.schedule.Schedule;
 import net.minecraft.world.entity.ai.sensing.SensorType;
-import net.minecraft.world.entity.npc.VillagerProfession;
+import net.minecraft.world.entity.npc.villager.VillagerProfession;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.server.Bootstrap;
@@ -34,7 +33,7 @@ import net.minecraft.stats.StatType;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.chunk.status.ChunkStatus;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
@@ -68,7 +67,7 @@ public class ForgeRegistries {
     }
     static final List<DeferredRegister<?>> registries = new ArrayList<>();
     private static final <T> RegistryHolder<T> registry(ResourceKey<Registry<T>> key, Supplier<RegistryBuilder<T>> factory) {
-        var dr = DeferredRegister.create(key, key.location().getNamespace());
+        var dr = DeferredRegister.create(key, key.identifier().getNamespace());
         registries.add(dr);
         return dr.makeRegistry(factory);
     }
@@ -96,7 +95,6 @@ public class ForgeRegistries {
     public static final IForgeRegistry<PoiType> POI_TYPES = active(Keys.POI_TYPES);
     public static final IForgeRegistry<MemoryModuleType<?>> MEMORY_MODULE_TYPES = active(Keys.MEMORY_MODULE_TYPES);
     public static final IForgeRegistry<SensorType<?>> SENSOR_TYPES = active(Keys.SENSOR_TYPES);
-    public static final IForgeRegistry<Schedule> SCHEDULES = active(Keys.SCHEDULES);
     public static final IForgeRegistry<Activity> ACTIVITIES = active(Keys.ACTIVITIES);
 
     // Worldgen
@@ -143,7 +141,6 @@ public class ForgeRegistries {
         public static final ResourceKey<Registry<PoiType>> POI_TYPES = key("point_of_interest_type");
         public static final ResourceKey<Registry<MemoryModuleType<?>>> MEMORY_MODULE_TYPES = key("memory_module_type");
         public static final ResourceKey<Registry<SensorType<?>>> SENSOR_TYPES = key("sensor_type");
-        public static final ResourceKey<Registry<Schedule>> SCHEDULES = key("schedule");
         public static final ResourceKey<Registry<Activity>> ACTIVITIES = key("activity");
         public static final ResourceKey<Registry<WorldCarver<?>>> WORLD_CARVERS = key("worldgen/carver");
         public static final ResourceKey<Registry<Feature<?>>> FEATURES = key("worldgen/feature");
@@ -171,7 +168,7 @@ public class ForgeRegistries {
         public static final ResourceKey<Registry<StructureModifier>> STRUCTURE_MODIFIERS = key("forge:structure_modifier");
 
         private static <T> ResourceKey<Registry<T>> key(String name) {
-            return ResourceKey.createRegistryKey(ResourceLocation.parse(name));
+            return ResourceKey.createRegistryKey(Identifier.parse(name));
         }
 
         private static void init() {}

@@ -11,7 +11,7 @@ import java.util.Set;
 
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData.Version;
 
@@ -20,8 +20,8 @@ import net.minecraftforge.network.NetworkContext.NetworkMismatchData.Version;
  * This packet also sends the data of a channel mismatch (currently, the ids and versions of the mismatched channels) to the client for it to display the correct information in said screen.
  */
 public record MismatchData(
-    Map<ResourceLocation, Version> mismatched,
-    Set<ResourceLocation> missing
+    Map<Identifier, Version> mismatched,
+    Set<Identifier> missing
 ) {
     public static final StreamCodec<FriendlyByteBuf, MismatchData> STREAM_CODEC = StreamCodec.ofMember(MismatchData::encode, MismatchData::decode);
     private static final int MAX_LENGTH = 0x100;
@@ -32,14 +32,14 @@ public record MismatchData(
 
     public static MismatchData decode(FriendlyByteBuf buf) {
         var mismatched = buf.readMap(
-            i -> ResourceLocation.parse(i.readUtf(MAX_LENGTH)),
+            i -> Identifier.parse(i.readUtf(MAX_LENGTH)),
             i -> new Version(
                 i.readUtf(MAX_LENGTH),
                 i.readUtf(MAX_LENGTH)
             )
         );
         var missing = buf.readCollection(HashSet::new,
-            i -> ResourceLocation.parse(i.readUtf(MAX_LENGTH))
+            i -> Identifier.parse(i.readUtf(MAX_LENGTH))
         );
         return new MismatchData(mismatched, missing);
     }

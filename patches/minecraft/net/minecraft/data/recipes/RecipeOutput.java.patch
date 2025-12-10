@@ -1,7 +1,7 @@
 --- a/net/minecraft/data/recipes/RecipeOutput.java
 +++ b/net/minecraft/data/recipes/RecipeOutput.java
 @@ -7,7 +_,19 @@
- import net.minecraft.world.item.crafting.Recipe;
+ import org.jspecify.annotations.Nullable;
  
  public interface RecipeOutput {
 -    void accept(ResourceKey<Recipe<?>> p_367162_, Recipe<?> p_360758_, @Nullable AdvancementHolder p_361155_);
@@ -15,7 +15,7 @@
 +        }
 +    }
 +
-+    void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, @Nullable net.minecraft.resources.ResourceLocation advancementId, @Nullable com.google.gson.JsonElement advancement);
++    void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, net.minecraft.resources.@Nullable Identifier advancementId, com.google.gson.@Nullable JsonElement advancement);
 +
 +    net.minecraft.core.HolderLookup.Provider registry();
  

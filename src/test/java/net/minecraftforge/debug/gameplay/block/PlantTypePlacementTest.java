@@ -5,7 +5,7 @@
 
 package net.minecraftforge.debug.gameplay.block;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -136,7 +136,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
     public void coverage(GameTestHelper helper) {
         var vanilla = helper.registryLookup(Registries.BLOCK).entrySet()
             .stream()
-            .filter(e -> e.getValue() instanceof IPlantable && e.getKey().location().getNamespace().equals("minecraft"))
+            .filter(e -> e.getValue() instanceof IPlantable && e.getKey().identifier().getNamespace().equals("minecraft"))
             .map(Map.Entry::getValue)
             .collect(Collectors.groupingBy(Object::getClass));
 
@@ -501,7 +501,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
     private static List<Block> testTag(GameTestHelper helper, TagKey<Block> tag, List<Block> expected) {
         var lookup = helper.registryLookup(Registries.BLOCK);
         var values = lookup.getOrThrow(tag).stream()
-            .filter(h -> h.unwrapKey().orElseThrow().location().getNamespace().equals("minecraft")) // Only vanilla entries
+            .filter(h -> h.unwrapKey().orElseThrow().identifier().getNamespace().equals("minecraft")) // Only vanilla entries
             .map(Holder::get)
             .toList();
         helper.assertValueEqual(sort(expected), sort(values), tag.location().toString(), "Tag does not have expected values");

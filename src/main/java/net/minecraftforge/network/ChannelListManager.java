@@ -6,12 +6,12 @@
 package net.minecraftforge.network;
 
 import com.mojang.logging.LogUtils;
-import net.minecraft.ResourceLocationException;
+import net.minecraft.IdentifierException;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.network.ChannelRegistrationChangeEvent;
 import net.minecraftforge.event.network.CustomPayloadEvent;
@@ -31,7 +31,7 @@ import java.util.List;
 public class ChannelListManager {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public static final ResourceLocation NAME = ResourceLocation.fromNamespaceAndPath("forge", "channel_registration");
+    public static final Identifier NAME = Identifier.fromNamespaceAndPath("forge", "channel_registration");
 
     static final Channel<CustomPacketPayload> CHANNEL = ChannelBuilder
         .named(NAME)
@@ -86,11 +86,11 @@ public class ChannelListManager {
         addChannels(connection, NetworkRegistry.buildRegisterList());
     }
 
-    public static void addChannels(Connection connection, ResourceLocation... channels) {
+    public static void addChannels(Connection connection, Identifier... channels) {
         addChannels(connection, Arrays.asList(channels));
     }
 
-    public static void addChannels(Connection connection, Collection<ResourceLocation> channels) {
+    public static void addChannels(Connection connection, Collection<Identifier> channels) {
         var list = NetworkContext.get(connection);
         var toSend = new HashSet<String>();
         for (var channel : channels) {
@@ -102,11 +102,11 @@ public class ChannelListManager {
             CHANNEL.send(new Register(toSend.stream().sorted().toList()), connection);
     }
 
-    public static void removeChannels(Connection connection, ResourceLocation... channels) {
+    public static void removeChannels(Connection connection, Identifier... channels) {
         removeChannels(connection, Arrays.asList(channels));
     }
 
-    public static void removeChannels(Connection connection, Collection<ResourceLocation> channels) {
+    public static void removeChannels(Connection connection, Collection<Identifier> channels) {
         var list = NetworkContext.get(connection);
         var toSend = new HashSet<String>();
         for (var channel : channels) {
@@ -146,15 +146,15 @@ public class ChannelListManager {
     }
 
     private static void updateFrom(CustomPayloadEvent.Context source, List<String> channels, final ChannelRegistrationChangeEvent.Type changeType) {
-        var changed = new HashSet<ResourceLocation>();
+        var changed = new HashSet<Identifier>();
         for (var channel : channels) {
             // It also says nothing about the format of channels so ignore bad channels.
             if (channel.isEmpty())
                 continue;
 
             try {
-                changed.add(ResourceLocation.parse(channel));
-            } catch (ResourceLocationException ex) {
+                changed.add(Identifier.parse(channel));
+            } catch (IdentifierException ex) {
                 // Vanilla packet deserializers now force this to be a resource location, so we should never get this, but just in case.
                 LOGGER.warn("Invalid channel name received: {}. Ignoring", channel);
             }

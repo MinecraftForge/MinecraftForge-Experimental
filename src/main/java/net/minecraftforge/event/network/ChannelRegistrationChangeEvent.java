@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import net.minecraft.network.Connection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 
@@ -24,7 +24,7 @@ import net.minecraftforge.eventbus.api.event.RecordEvent;
 public record ChannelRegistrationChangeEvent(
         Connection getSource,
         Type getType,
-        Set<ResourceLocation> getChannels
+        Set<Identifier> getChannels
 ) implements RecordEvent {
     public static final EventBus<ChannelRegistrationChangeEvent> BUS = EventBus.create(ChannelRegistrationChangeEvent.class);
 

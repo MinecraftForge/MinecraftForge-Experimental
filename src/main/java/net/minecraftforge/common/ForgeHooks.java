@@ -63,6 +63,7 @@ import net.minecraft.network.chat.TextColor;
 import net.minecraft.network.chat.contents.PlainTextContents.LiteralContents;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.util.GsonHelper;
@@ -98,6 +99,7 @@ import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.permissions.Permissions;
 import net.minecraft.world.inventory.AnvilMenu;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.context.UseOnContext;
@@ -181,7 +183,7 @@ import org.apache.logging.log4j.MarkerManager;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
@@ -282,6 +284,8 @@ public final class ForgeHooks {
     public static Optional<BlockPos> isLivingOnLadder(@NotNull BlockState state, @NotNull Level level, @NotNull BlockPos pos, @NotNull LivingEntity entity) {
         boolean isSpectator = (entity instanceof Player && entity.isSpectator());
         if (isSpectator) return Optional.empty();
+        if (entity.isFallFlying() && state.is(BlockTags.CAN_GLIDE_THROUGH))
+            return Optional.empty();
         if (!ForgeConfig.SERVER.fullBoundingBoxLadders.get())
             return state.isLadder(level, pos, entity) ? Optional.of(pos) : Optional.empty();
         else {
@@ -678,7 +682,7 @@ public final class ForgeHooks {
     @Nullable
     public static String getDefaultCreatorModId(@NotNull ItemStack itemStack) {
         Item item = itemStack.getItem();
-        ResourceLocation registryName = ForgeRegistries.ITEMS.getKey(item);
+        Identifier registryName = ForgeRegistries.ITEMS.getKey(item);
         String modId = registryName == null ? null : registryName.getNamespace();
         if ("minecraft".equals(modId)) {
             if (itemStack.is(Items.ENCHANTED_BOOK)) {
@@ -687,18 +691,18 @@ public final class ForgeHooks {
                     var enchant = enchants.keySet().iterator().next();
                     var name = enchant.unwrapKey();
                     if (name.isPresent())
-                        return name.get().location().getNamespace();
+                        return name.get().identifier().getNamespace();
                 }
             } else if (itemStack.has(DataComponents.POTION_CONTENTS)) {
                 var potion = itemStack.get(DataComponents.POTION_CONTENTS).potion().orElse(null);
                 if (potion != null && potion.unwrapKey().isPresent())
-                    return potion.unwrapKey().get().location().getNamespace();
+                    return potion.unwrapKey().get().identifier().getNamespace();
             } else if (item instanceof SpawnEggItem) {
                 var data = item.components().get(DataComponents.ENTITY_DATA);
                 if (data != null && data.type() != null) {
-                    var resourceLocation = EntityType.getKey(data.type());
-                    if (resourceLocation != null)
-                        return resourceLocation.getNamespace();
+                    var Identifier = EntityType.getKey(data.type());
+                    if (Identifier != null)
+                        return Identifier.getNamespace();
                 }
             }
         }
@@ -817,7 +821,7 @@ public final class ForgeHooks {
         fmlData.put("Registries", registries);
         LOGGER.debug(WORLDPERSISTENCE, "Gathering id map for writing to world save {}", worldData.getLevelName());
 
-        for (Map.Entry<ResourceLocation, ForgeRegistry.Snapshot> e : RegistryManager.ACTIVE.takeSnapshot(true).entrySet())
+        for (Map.Entry<Identifier, ForgeRegistry.Snapshot> e : RegistryManager.ACTIVE.takeSnapshot(true).entrySet())
             registries.put(e.getKey().toString(), e.getValue().write());
         LOGGER.debug(WORLDPERSISTENCE, "ID Map collection complete {}", worldData.getLevelName());
         levelTag.put("fml", fmlData);
@@ -907,13 +911,13 @@ public final class ForgeHooks {
             }
         }
 
-        Multimap<ResourceLocation, ResourceLocation> failedElements = null;
+        Multimap<Identifier, Identifier> failedElements = null;
 
         if (tag.contains("Registries")) {
-            Map<ResourceLocation, ForgeRegistry.Snapshot> snapshot = new HashMap<>();
+            Map<Identifier, ForgeRegistry.Snapshot> snapshot = new HashMap<>();
             CompoundTag regs = tag.getCompoundOrEmpty("Registries");
             for (String key : regs.keySet())
-                snapshot.put(ResourceLocation.parse(key), ForgeRegistry.Snapshot.read(regs.getCompoundOrEmpty(key)));
+                snapshot.put(Identifier.parse(key), ForgeRegistry.Snapshot.read(regs.getCompoundOrEmpty(key)));
             failedElements = GameData.injectSnapshot(snapshot, true, true);
         }
 
@@ -980,12 +984,12 @@ public final class ForgeHooks {
      * @hidden For internal use only.
      */
     public static boolean checkStructureNamespace(String biome) {
-        @Nullable ResourceLocation biomeLocation = ResourceLocation.tryParse(biome);
-        return biomeLocation != null && !biomeLocation.getNamespace().equals(ResourceLocation.DEFAULT_NAMESPACE);
+        @Nullable Identifier biomeLocation = Identifier.tryParse(biome);
+        return biomeLocation != null && !biomeLocation.getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
     }
 
     public static boolean canUseEntitySelectors(SharedSuggestionProvider provider) {
-        if (EntitySelectorParser.allowSelectors(provider))
+        if (provider.permissions().hasPermission(Permissions.COMMANDS_ENTITY_SELECTORS))
             return true;
         else if (provider instanceof CommandSourceStack source && source.source instanceof ServerPlayer player)
             return PermissionAPI.getPermission(player, ForgeMod.USE_SELECTORS_PERMISSION);
@@ -1073,7 +1077,7 @@ public final class ForgeHooks {
     }
 
     @ApiStatus.Internal
-    public static <B extends FriendlyByteBuf> StreamCodec<B, ? extends CustomPacketPayload> getCustomPayloadCodec(ResourceLocation id, int max) {
+    public static <B extends FriendlyByteBuf> StreamCodec<B, ? extends CustomPacketPayload> getCustomPayloadCodec(Identifier id, int max) {
         var channel = NetworkRegistry.findTarget(id);
         if (channel == null)
             return DiscardedPayload.codec(id, max);
@@ -1111,13 +1115,6 @@ public final class ForgeHooks {
 
     @ApiStatus.Internal
     public static boolean onCustomPayload(CustomPayloadEvent event) {
-        var connection = event.getSource().getConnection();
-        var expectedSide = connection.getReceiving() == PacketFlow.CLIENTBOUND ? LogicalSide.CLIENT : LogicalSide.SERVER;
-        if (expectedSide != EffectiveSide.get()) {
-            connection.disconnect(Component.literal("Illegal packet received, terminating connection"));
-            return false;
-        }
-
         var channel = NetworkRegistry.findTarget(event.getChannel());
         if (channel != null && channel.dispatch(event))
             return true;
@@ -1216,7 +1213,7 @@ public final class ForgeHooks {
                         throw new IllegalArgumentException("Tried to write unregistered Ingredient to network: " + value);
 
                     buf.writeVarInt(-1); // Our Marker
-                    buf.writeResourceLocation(key);
+                    buf.writeIdentifier(key);
                 }
                 serializer.write(buf, value);
             },
@@ -1227,7 +1224,7 @@ public final class ForgeHooks {
                 if (size != -1) {
                     buf.resetReaderIndex();
                 } else {
-                    var key = buf.readResourceLocation();
+                    var key = buf.readIdentifier();
                     serializer = ForgeRegistries.INGREDIENT_SERIALIZERS.get().getValue(key);
                     if (serializer == null)
                         throw new DecoderException("Could not read ingredient of type: " + key);
@@ -1257,7 +1254,7 @@ public final class ForgeHooks {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T onJsonDataParsed(Codec<T> codec, ResourceLocation key, T value) {
+    public static <T> T onJsonDataParsed(Codec<T> codec, Identifier key, T value) {
         if (codec == LootDataType.TABLE.codec()) {
             var table = (LootTable)value;
             table.setLootTableId(key);
@@ -1274,7 +1271,7 @@ public final class ForgeHooks {
      *
      *  This is useful for game tests that need a structure, but want to create the contents in code.
      */
-    public static Optional<StructureTemplate> createEmptyStructure(ResourceLocation name) {
+    public static Optional<StructureTemplate> createEmptyStructure(Identifier name) {
         if (name== null || !"forge".equals(name.getNamespace()))
             return Optional.empty();
 

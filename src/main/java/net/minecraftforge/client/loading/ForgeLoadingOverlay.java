@@ -10,7 +10,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.LoadingOverlay;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.server.packs.resources.ReloadInstance;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -33,6 +33,7 @@ import java.util.function.Supplier;
  *
  * It is somewhat a copy of the superclass render method.
  */
+@SuppressWarnings("unused")
 public class ForgeLoadingOverlay extends LoadingOverlay {
     private static final boolean ENABLE = false; //Boolean.parseBoolean("forge.enableForgeLoadingOverlay");
     private final Minecraft minecraft;

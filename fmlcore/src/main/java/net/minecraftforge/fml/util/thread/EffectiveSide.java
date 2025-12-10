@@ -7,8 +7,11 @@ package net.minecraftforge.fml.util.thread;
 
 import net.minecraftforge.fml.LogicalSide;
 
-public class EffectiveSide
-{
+/**
+ * Attempts to determine the effect side of the current thread, based on know threads in networking.
+ * This is not guaranteed to be correct, and modders should use other methods to determine the logical side when possible.
+ */
+public class EffectiveSide {
     public static LogicalSide get() {
         final ThreadGroup group = Thread.currentThread().getThreadGroup();
         return group instanceof SidedThreadGroup ? ((SidedThreadGroup) group).getSide() : LogicalSide.CLIENT;

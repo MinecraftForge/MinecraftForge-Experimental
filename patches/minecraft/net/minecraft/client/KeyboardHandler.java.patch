@@ -1,12 +1,15 @@
 --- a/net/minecraft/client/KeyboardHandler.java
 +++ b/net/minecraft/client/KeyboardHandler.java
-@@ -499,12 +_,12 @@
+@@ -497,7 +_,7 @@
              if (screen != null) {
                  try {
                      if (p_90895_ != 1 && p_90895_ != 2) {
 -                        if (p_90895_ == 0 && screen.keyReleased(p_423534_)) {
 +                        if (p_90895_ == 0 && net.minecraftforge.client.ForgeHooksClient.onScreenKeyReleased(screen, p_423534_)) {
-                             return;
+                             if (options.keyDebugModifier.matches(p_423534_)) {
+                                 this.usedDebugKeyAsModifier = false;
+                             }
+@@ -506,7 +_,7 @@
                          }
                      } else {
                          screen.afterKeyboardAction();
@@ -15,7 +18,7 @@
                              if (this.minecraft.screen == null) {
                                  InputConstants.Key inputconstants$key = InputConstants.getKey(p_423534_);
                                  KeyMapping.set(inputconstants$key, false);
-@@ -568,6 +_,7 @@
+@@ -582,6 +_,7 @@
                      }
                  }
              }
@@ -23,7 +26,7 @@
          }
      }
  
-@@ -576,7 +_,7 @@
+@@ -590,7 +_,7 @@
              Screen screen = this.minecraft.screen;
              if (screen != null && this.minecraft.getOverlay() == null) {
                  try {

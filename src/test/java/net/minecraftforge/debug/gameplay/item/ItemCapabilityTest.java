@@ -14,7 +14,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -57,7 +57,7 @@ public class ItemCapabilityTest extends BaseTestMod {
     private static void onEvent(AttachCapabilitiesEvent.ItemStacks event) {
         if (event.getObject().getItem() == Items.COPPER_INGOT) {
             event.addCapability(
-                    ResourceLocation.fromNamespaceAndPath("forge", "test"),
+                    Identifier.fromNamespaceAndPath("forge", "test"),
                     new MyProvider(event.getObject())
             );
         }

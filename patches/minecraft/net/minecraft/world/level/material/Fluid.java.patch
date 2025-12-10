@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/material/Fluid.java
 +++ b/net/minecraft/world/level/material/Fluid.java
 @@ -24,7 +_,7 @@
- import net.minecraft.world.phys.Vec3;
  import net.minecraft.world.phys.shapes.VoxelShape;
+ import org.jspecify.annotations.Nullable;
  
 -public abstract class Fluid {
 +public abstract class Fluid implements net.minecraftforge.common.extensions.IForgeFluid {
@@ -17,8 +17,8 @@
 +            p_395108_.apply(net.minecraft.world.entity.InsideBlockEffectType.EXTINGUISH);
      }
  
-     @Nullable
-@@ -132,5 +_,12 @@
+     protected @Nullable ParticleOptions getDripParticle() {
+@@ -130,5 +_,12 @@
      @Deprecated
      public Holder.Reference<Fluid> builtInRegistryHolder() {
          return this.builtInRegistryHolder;

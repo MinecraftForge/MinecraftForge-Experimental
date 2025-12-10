@@ -3,10 +3,7 @@
  * SPDX-License-Identifier: LGPL-2.1-only
  */
 
-@ParametersAreNonnullByDefault
-@MethodsReturnNonnullByDefault
+@NullMarked
 package net.minecraftforge.client.model.pipeline;
 
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

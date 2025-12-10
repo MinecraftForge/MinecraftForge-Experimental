@@ -23,7 +23,7 @@ public interface IForgePackResources {
      * Gets a collection of {@code PackResource} instances nested inside this pack.
      * Used to merge several packs into one entry in the resource pack selection UI without
      * losing the ability for each pack to return a resource in
-     * {@link ResourceManager#getResourceStack(ResourceLocation)}
+     * {@link ResourceManager#getResourceStack(Identifier)}
      * @return Collection of nested {@code PackResource}, or null if this pack has no children
      * @see DelegatingPackResources
      */

@@ -6,7 +6,6 @@
 package net.minecraftforge.common;
 
 import net.minecraft.DetectedVersion;
-import net.minecraft.SharedConstants;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
@@ -22,6 +21,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.pack.PackMetadataSection;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.commands.Commands;
@@ -95,7 +95,7 @@ import org.apache.logging.log4j.Logger;
 
 import net.minecraft.data.DataGenerator;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.conditions.AndCondition;
 import net.minecraftforge.common.crafting.conditions.FalseCondition;
@@ -232,29 +232,29 @@ public class ForgeMod {
                 @Override
                 public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
                     consumer.accept(new IClientFluidTypeExtensions() {
-                        private static final ResourceLocation UNDERWATER_LOCATION = ResourceLocation.withDefaultNamespace("textures/misc/underwater.png");
-                        private static final ResourceLocation WATER_STILL = ResourceLocation.withDefaultNamespace("block/water_still");
-                        private static final ResourceLocation WATER_FLOW = ResourceLocation.withDefaultNamespace("block/water_flow");
-                        private static final ResourceLocation WATER_OVERLAY = ResourceLocation.withDefaultNamespace("block/water_overlay");
+                        private static final Identifier UNDERWATER_LOCATION = Identifier.withDefaultNamespace("textures/misc/underwater.png");
+                        private static final Identifier WATER_STILL = Identifier.withDefaultNamespace("block/water_still");
+                        private static final Identifier WATER_FLOW = Identifier.withDefaultNamespace("block/water_flow");
+                        private static final Identifier WATER_OVERLAY = Identifier.withDefaultNamespace("block/water_overlay");
 
                         @Override
-                        public ResourceLocation getStillTexture() {
+                        public Identifier getStillTexture() {
                             return WATER_STILL;
                         }
 
                         @Override
-                        public ResourceLocation getFlowingTexture() {
+                        public Identifier getFlowingTexture() {
                             return WATER_FLOW;
                         }
 
                         @Nullable
                         @Override
-                        public ResourceLocation getOverlayTexture() {
+                        public Identifier getOverlayTexture() {
                             return WATER_OVERLAY;
                         }
 
                         @Override
-                        public ResourceLocation getRenderOverlayTexture(Minecraft mc) {
+                        public Identifier getRenderOverlayTexture(Minecraft mc) {
                             return UNDERWATER_LOCATION;
                         }
 
@@ -287,7 +287,7 @@ public class ForgeMod {
             {
                 @Override
                 public double motionScale(Entity entity) {
-                    return entity.level().dimensionType().ultraWarm() ? 0.007D : 0.0023333333333333335D;
+                    return entity.level().environmentAttributes().getDimensionValue(EnvironmentAttributes.WATER_EVAPORATES) ? 0.007D : 0.0023333333333333335D;
                 }
 
                 @Override
@@ -299,16 +299,16 @@ public class ForgeMod {
                 @Override
                 public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
                     consumer.accept(new IClientFluidTypeExtensions() {
-                        private static final ResourceLocation LAVA_STILL = ResourceLocation.withDefaultNamespace("block/lava_still");
-                        private static final ResourceLocation LAVA_FLOW = ResourceLocation.withDefaultNamespace("block/lava_flow");
+                        private static final Identifier LAVA_STILL = Identifier.withDefaultNamespace("block/lava_still");
+                        private static final Identifier LAVA_FLOW = Identifier.withDefaultNamespace("block/lava_flow");
 
                         @Override
-                        public ResourceLocation getStillTexture() {
+                        public Identifier getStillTexture() {
                             return LAVA_STILL;
                         }
 
                         @Override
-                        public ResourceLocation getFlowingTexture() {
+                        public Identifier getFlowingTexture() {
                             return LAVA_FLOW;
                         }
                     });
@@ -349,11 +349,11 @@ public class ForgeMod {
 
 
     private static boolean enableMilkFluid = false;
-    public static final RegistryObject<SoundEvent> BUCKET_EMPTY_MILK = RegistryObject.create(ResourceLocation.withDefaultNamespace("item.bucket.empty_milk"), ForgeRegistries.SOUND_EVENTS);
-    public static final RegistryObject<SoundEvent> BUCKET_FILL_MILK = RegistryObject.create(ResourceLocation.withDefaultNamespace("item.bucket.fill_milk"), ForgeRegistries.SOUND_EVENTS);
-    public static final RegistryObject<FluidType> MILK_TYPE = RegistryObject.createOptional(ResourceLocation.withDefaultNamespace("milk"), ForgeRegistries.Keys.FLUID_TYPES.location(), "minecraft");
-    public static final RegistryObject<Fluid> MILK = RegistryObject.create(ResourceLocation.withDefaultNamespace("milk"), ForgeRegistries.FLUIDS);
-    public static final RegistryObject<Fluid> FLOWING_MILK = RegistryObject.create(ResourceLocation.withDefaultNamespace("flowing_milk"), ForgeRegistries.FLUIDS);
+    public static final RegistryObject<SoundEvent> BUCKET_EMPTY_MILK = RegistryObject.create(Identifier.withDefaultNamespace("item.bucket.empty_milk"), ForgeRegistries.SOUND_EVENTS);
+    public static final RegistryObject<SoundEvent> BUCKET_FILL_MILK = RegistryObject.create(Identifier.withDefaultNamespace("item.bucket.fill_milk"), ForgeRegistries.SOUND_EVENTS);
+    public static final RegistryObject<FluidType> MILK_TYPE = RegistryObject.createOptional(Identifier.withDefaultNamespace("milk"), ForgeRegistries.Keys.FLUID_TYPES.identifier(), "minecraft");
+    public static final RegistryObject<Fluid> MILK = RegistryObject.create(Identifier.withDefaultNamespace("milk"), ForgeRegistries.FLUIDS);
+    public static final RegistryObject<Fluid> FLOWING_MILK = RegistryObject.create(Identifier.withDefaultNamespace("flowing_milk"), ForgeRegistries.FLUIDS);
 
     private static ForgeMod INSTANCE;
     public static ForgeMod getInstance() {
@@ -419,8 +419,8 @@ public class ForgeMod {
         ForgeRegistries.ITEMS.tags().addOptionalTagDefaults(Tags.Items.ENCHANTING_FUELS, Set.of(ForgeRegistries.ITEMS.getDelegateOrThrow(Items.LAPIS_LAZULI)));
 
         // TODO: Remove when addAlias becomes proper API, as this should be done in the DR's above.
-        addAlias(ForgeRegistries.ATTRIBUTES, ResourceLocation.fromNamespaceAndPath("forge", "reach_distance"), ResourceLocation.fromNamespaceAndPath("forge", "block_reach"));
-        addAlias(ForgeRegistries.ATTRIBUTES, ResourceLocation.fromNamespaceAndPath("forge", "attack_range"), ResourceLocation.fromNamespaceAndPath("forge", "entity_reach"));
+        addAlias(ForgeRegistries.ATTRIBUTES, Identifier.fromNamespaceAndPath("forge", "reach_distance"), Identifier.fromNamespaceAndPath("forge", "block_reach"));
+        addAlias(ForgeRegistries.ATTRIBUTES, Identifier.fromNamespaceAndPath("forge", "attack_range"), Identifier.fromNamespaceAndPath("forge", "entity_reach"));
     }
 
     private static void preInit(FMLCommonSetupEvent evt) {
@@ -480,16 +480,16 @@ public class ForgeMod {
                 @Override
                 public void initializeClient(Consumer<IClientFluidTypeExtensions> consumer) {
                     consumer.accept(new IClientFluidTypeExtensions() {
-                        private static final ResourceLocation MILK_STILL = ResourceLocation.fromNamespaceAndPath("forge", "block/milk_still");
-                        private static final ResourceLocation MILK_FLOW = ResourceLocation.fromNamespaceAndPath("forge", "block/milk_flowing");
+                        private static final Identifier MILK_STILL = Identifier.fromNamespaceAndPath("forge", "block/milk_still");
+                        private static final Identifier MILK_FLOW = Identifier.fromNamespaceAndPath("forge", "block/milk_flowing");
 
                         @Override
-                        public ResourceLocation getStillTexture() {
+                        public Identifier getStillTexture() {
                             return MILK_STILL;
                         }
 
                         @Override
-                        public ResourceLocation getFlowingTexture() {
+                        public Identifier getFlowingTexture() {
                             return MILK_FLOW;
                         }
                     });
@@ -515,18 +515,18 @@ public class ForgeMod {
 
             Arrays.stream(ItemDisplayContext.values())
                 .filter(Predicate.not(ItemDisplayContext::isModded))
-                .forEach(ctx -> forgeRegistry.register(ctx.getId(), ResourceLocation.fromNamespaceAndPath("minecraft", ctx.getSerializedName()), ctx));
+                .forEach(ctx -> forgeRegistry.register(ctx.getId(), Identifier.fromNamespaceAndPath("minecraft", ctx.getSerializedName()), ctx));
         }
     }
 
     public static final PermissionNode<Boolean> USE_SELECTORS_PERMISSION = new PermissionNode<>("forge", "use_entity_selectors",
-            PermissionTypes.BOOLEAN, (player, uuid, contexts) -> player != null && player.hasPermissions(Commands.LEVEL_GAMEMASTERS));
+            PermissionTypes.BOOLEAN, (player, uuid, contexts) -> player != null && Commands.LEVEL_GAMEMASTERS.check(player.permissions()));
 
     /**
-     * TODO: Remove when {@link ForgeRegistry#addAlias(ResourceLocation, ResourceLocation)} is elevated to {@link IForgeRegistry}.
+     * TODO: Remove when {@link ForgeRegistry#addAlias(Identifier, Identifier)} is elevated to {@link IForgeRegistry}.
      */
     //@Deprecated(forRemoval = true, since = "1.20")
-    private static <T> void addAlias(IForgeRegistry<T> registry, ResourceLocation from, ResourceLocation to) {
+    private static <T> void addAlias(IForgeRegistry<T> registry, Identifier from, Identifier to) {
         ForgeRegistry<T> fReg = (ForgeRegistry<T>) registry;
         fReg.addAlias(from, to);
     }

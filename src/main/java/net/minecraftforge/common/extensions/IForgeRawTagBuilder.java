@@ -5,7 +5,7 @@
 
 package net.minecraftforge.common.extensions;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagEntry;
 
@@ -30,7 +30,7 @@ public interface IForgeRawTagBuilder {
      * @param source The source of the caller for logging purposes (generally a modid)
      * @return The builder for chaining purposes
      */
-    default TagBuilder removeElement(final ResourceLocation elementID, final String source) {
+    default TagBuilder removeElement(final Identifier elementID, final String source) {
         return this.remove(TagEntry.element(elementID), source);
     }
 
@@ -40,7 +40,7 @@ public interface IForgeRawTagBuilder {
      * @param source The source of the caller for logging purposes (generally a modid)
      * @return The builder for chaining purposes
      */
-    default TagBuilder removeTag(final ResourceLocation tagID, final String source) {
+    default TagBuilder removeTag(final Identifier tagID, final String source) {
         return this.remove(TagEntry.tag(tagID), source);
     }
 

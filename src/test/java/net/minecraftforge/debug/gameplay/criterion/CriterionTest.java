@@ -10,8 +10,8 @@ import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.AdvancementRequirements;
 import net.minecraft.advancements.AdvancementType;
 import net.minecraft.advancements.CriterionTrigger;
-import net.minecraft.advancements.critereon.BlockPredicate;
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.BlockPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -19,13 +19,12 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ForgeAdvancementProvider;
@@ -48,7 +47,7 @@ public final class CriterionTest extends BaseTestMod {
     private static final DeferredRegister<CriterionTrigger<?>> TRIGGERS = DeferredRegister.create(BuiltInRegistries.TRIGGER_TYPES.key(), MOD_ID);
     public static final RegistryObject<BreakWithItemCriterion> CRITERION = TRIGGERS.register("criterion", BreakWithItemCriterion::new);
     public static final String TEST_CRITERION_ID = "break_glass_with_fish";
-    public static final ResourceLocation TEST_ADVANCEMENT_ID = ResourceLocation.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
+    public static final Identifier TEST_ADVANCEMENT_ID = Identifier.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
 
     public CriterionTest(FMLJavaModLoadingContext context) {
         super(context, false, true);
@@ -102,7 +101,7 @@ public final class CriterionTest extends BaseTestMod {
     }
 
     private void gatherData(GatherDataEvent event) {
-        var tag = TagKey.create(Registries.ITEM, ResourceLocation.fromNamespaceAndPath(MOD_ID, "fish"));
+        var tag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "fish"));
 
         event.getGenerator().addProvider(true, new VanillaItemTagsProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), MOD_ID, event.getExistingFileHelper()) {
             @Override
@@ -118,7 +117,7 @@ public final class CriterionTest extends BaseTestMod {
             }
         });
 
-        var STORY_ROOT = new AdvancementHolder(ResourceLocation.fromNamespaceAndPath("minecraft", "story/root"), null);
+        var STORY_ROOT = new AdvancementHolder(Identifier.fromNamespaceAndPath("minecraft", "story/root"), null);
 
         event.getGenerator().addProvider(true,
             new ForgeAdvancementProvider(

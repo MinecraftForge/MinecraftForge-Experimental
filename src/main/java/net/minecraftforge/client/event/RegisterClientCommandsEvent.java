@@ -10,7 +10,7 @@ import com.mojang.brigadier.context.CommandContext;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.arguments.ObjectiveArgument;
-import net.minecraft.commands.arguments.ResourceLocationArgument;
+import net.minecraft.commands.arguments.IdentifierArgument;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -22,7 +22,7 @@ import org.jspecify.annotations.NullMarked;
  *
  * <p>Some command arguments behave differently for the client commands dispatcher:</p>
  * <ul>
- * <li>{@link ResourceLocationArgument#getId(CommandContext, String)} only returns advancements that are shown on
+ * <li>{@link IdentifierArgument#getId(CommandContext, String)} only returns advancements that are shown on
  * the advancements screen.
  * <li>{@link ObjectiveArgument#getObjective(com.mojang.brigadier.context.CommandContext, String)} only returns
  * objectives that are displayed to the player.

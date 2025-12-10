@@ -18,7 +18,7 @@ import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.client.resources.model.UnbakedGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.Fluids;
@@ -65,7 +65,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
     }
 
     @SuppressWarnings("deprecation")
-    private static Material getMaterial(ResourceLocation texture) {
+    private static Material getMaterial(Identifier texture) {
         return new Material(TextureAtlas.LOCATION_BLOCKS, texture);
     }
 
@@ -116,7 +116,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
         if (baseSprite != null) {
             // Base texture
             var unbaked = UnbakedGeometryHelper.createUnbakedItemElements(0, baseSprite.contents());
-            UnbakedGeometryHelper.bakeElements(unbaked, $ -> baseSprite, state, buf);
+            UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> baseSprite, state, buf);
         }
 
         if (fluidMaskLocation != null && fluidSprite != null) {
@@ -126,10 +126,11 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
                 var transformedState = new SimpleModelState(transformation.compose(FLUID_TRANSFORM));
                 var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(1, templateSprite.contents()); // Use template as mask
 
-                var emissive = applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
-                var transformer = emissive ? QuadTransformers.settingMaxEmissivity() : QuadTransformers.empty();
+                //var emissive = applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
+                //var transformer = emissive ? QuadTransformers.settingMaxEmissivity() : QuadTransformers.empty();
+                // TODO: [Forge][Rendering] Emissive fluid models
 
-                UnbakedGeometryHelper.bakeElements(unbaked, $ -> fluidSprite, transformedState, transformer, buf); // Bake with fluid texture
+                UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> fluidSprite, transformedState, buf); // Bake with fluid texture
             }
         }
 
@@ -139,7 +140,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
                 // Cover/overlay
                 var transformedState = new SimpleModelState(transformation.compose(COVER_TRANSFORM));
                 var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(2, coverSprite.contents()); // Use cover as mask
-                UnbakedGeometryHelper.bakeElements(unbaked, $ -> sprite, transformedState, buf); // Bake with selected texture
+                UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> sprite, transformedState, buf); // Bake with selected texture
             }
         }
 
@@ -154,7 +155,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
 
         @Override
         public UnbakedGeometry read(JsonObject jsonObject, JsonDeserializationContext deserializationContext) {
-            var fluidName = ResourceLocation.parse(GsonHelper.getAsString(jsonObject, "fluid"));
+            var fluidName = Identifier.parse(GsonHelper.getAsString(jsonObject, "fluid"));
 
             Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidName);
 

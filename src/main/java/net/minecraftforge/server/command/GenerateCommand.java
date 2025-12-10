@@ -20,7 +20,7 @@ import net.minecraftforge.common.WorldWorkerManager;
 class GenerateCommand {
     static ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal("generate")
-            .requires(cs->cs.hasPermission(4)) //permission
+            .requires(Commands.hasPermission(Commands.LEVEL_OWNERS))
             .then(Commands.argument("pos", BlockPosArgument.blockPos())
                 .then(Commands.argument("count", IntegerArgumentType.integer(1))
                     .then(Commands.argument("dim", DimensionArgument.dimension())

@@ -15,7 +15,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -93,7 +93,7 @@ public class FluidStack {
         if (fluidNameString.isEmpty())
             return EMPTY;
 
-        ResourceLocation fluidName = ResourceLocation.parse(fluidNameString.get());
+        Identifier fluidName = Identifier.parse(fluidNameString.get());
         Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidName);
         if (fluid == null)
             return EMPTY;
@@ -112,7 +112,7 @@ public class FluidStack {
         if (fluidNameString.isEmpty())
             return EMPTY;
 
-        ResourceLocation fluidName = ResourceLocation.parse(fluidNameString.get());
+        Identifier fluidName = Identifier.parse(fluidNameString.get());
         Fluid fluid = ForgeRegistries.FLUIDS.getValue(fluidName);
         if (fluid == null)
             return EMPTY;

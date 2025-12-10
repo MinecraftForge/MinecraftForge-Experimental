@@ -30,7 +30,7 @@ public record PlayStreamingSourceEvent(SoundEngine getEngine, SoundInstance getS
 
     @ApiStatus.Internal
     public PlayStreamingSourceEvent(SoundEngine engine, SoundInstance sound, Channel channel) {
-        this(engine, sound, channel, sound.getLocation().getPath());
+        this(engine, sound, channel, sound.getIdentifier().getPath());
     }
 
     @ApiStatus.Internal

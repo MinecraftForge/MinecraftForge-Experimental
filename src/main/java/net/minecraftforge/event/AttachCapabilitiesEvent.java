@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -39,8 +39,8 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public abstract class AttachCapabilitiesEvent extends MutableEvent implements InheritableEvent {
     private final Object obj;
-    private final Map<ResourceLocation, ICapabilityProvider> caps = new LinkedHashMap<>();
-    private final Map<ResourceLocation, ICapabilityProvider> view = Collections.unmodifiableMap(caps);
+    private final Map<Identifier, ICapabilityProvider> caps = new LinkedHashMap<>();
+    private final Map<Identifier, ICapabilityProvider> view = Collections.unmodifiableMap(caps);
     private final List<Runnable> listeners = new ArrayList<>();
     private final List<Runnable> listenersView = Collections.unmodifiableList(listeners);
 
@@ -128,7 +128,7 @@ public abstract class AttachCapabilitiesEvent extends MutableEvent implements In
      * @param key The name of owner of this capability provider.
      * @param cap The capability provider
      */
-    public void addCapability(ResourceLocation key, ICapabilityProvider cap) {
+    public void addCapability(Identifier key, ICapabilityProvider cap) {
         if (caps.containsKey(key))
             throw new IllegalStateException("Duplicate Capability Key: " + key  + " " + cap);
         this.caps.put(key, cap);
@@ -137,7 +137,7 @@ public abstract class AttachCapabilitiesEvent extends MutableEvent implements In
     /**
      * A unmodifiable view of the capabilities that will be attached to this object.
      */
-    public Map<ResourceLocation, ICapabilityProvider> getCapabilities() {
+    public Map<Identifier, ICapabilityProvider> getCapabilities() {
         return view;
     }
 

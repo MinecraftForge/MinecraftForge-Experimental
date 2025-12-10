@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/particle/ParticleEngine.java
 +++ b/net/minecraft/client/particle/ParticleEngine.java
-@@ -63,7 +_,7 @@
-     private <T extends ParticleOptions> Particle makeParticle(
+@@ -61,7 +_,7 @@
+     private <T extends ParticleOptions> @Nullable Particle makeParticle(
          T p_107396_, double p_107397_, double p_107398_, double p_107399_, double p_107400_, double p_107401_, double p_107402_
      ) {
 -        ParticleProvider<T> particleprovider = (ParticleProvider<T>)this.resourceManager.getProviders().get(BuiltInRegistries.PARTICLE_TYPE.getId(p_107396_.getType()));
@@ -9,7 +9,7 @@
          return particleprovider == null
              ? null
              : particleprovider.createParticle(p_107396_, this.level, p_107397_, p_107398_, p_107399_, p_107400_, p_107401_, p_107402_, this.random);
-@@ -113,6 +_,8 @@
+@@ -111,6 +_,8 @@
              return new ItemPickupParticleGroup(this);
          } else if (p_428647_ == ParticleRenderType.ELDER_GUARDIANS) {
              return new ElderGuardianParticleGroup(this);
@@ -18,7 +18,7 @@
          } else {
              return (ParticleGroup<?>)(p_428647_ == ParticleRenderType.NO_RENDER ? new NoRenderParticleGroup(this) : new QuadParticleGroup(this, p_428647_));
          }
-@@ -122,8 +_,20 @@
+@@ -120,8 +_,20 @@
          this.trackedParticleCounts.addTo(p_423291_, p_172283_);
      }
  

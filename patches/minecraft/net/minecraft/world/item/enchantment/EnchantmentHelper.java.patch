@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/enchantment/EnchantmentHelper.java
 +++ b/net/minecraft/world/item/enchantment/EnchantmentHelper.java
-@@ -572,7 +_,7 @@
+@@ -582,7 +_,7 @@
      public static List<EnchantmentInstance> getAvailableEnchantmentResults(int p_44818_, ItemStack p_44819_, Stream<Holder<Enchantment>> p_342857_) {
          List<EnchantmentInstance> list = Lists.newArrayList();
          boolean flag = p_44819_.is(Items.BOOK);

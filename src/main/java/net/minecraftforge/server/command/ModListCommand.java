@@ -18,7 +18,7 @@ class ModListCommand {
     static ArgumentBuilder<CommandSourceStack, ?> register()
     {
         return Commands.literal("mods")
-                .requires(cs->cs.hasPermission(0)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_ALL))
                 .executes(ctx -> {
                             ctx.getSource().sendSuccess(() -> Component.translatable("commands.forge.mods.list",
                                     ModList.get().applyForEachModFile(modFile ->

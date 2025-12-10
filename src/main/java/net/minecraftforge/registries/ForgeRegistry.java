@@ -49,7 +49,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Registry;
 import net.minecraftforge.common.util.TablePrinter;
 import org.apache.logging.log4j.LogManager;
@@ -70,11 +70,11 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     private static final Logger LOGGER = LogManager.getLogger();
     private final RegistryManager stage;
     private final BiMap<Integer, V> ids = HashBiMap.create();
-    private final BiMap<ResourceLocation, V> names = HashBiMap.create();
+    private final BiMap<Identifier, V> names = HashBiMap.create();
     private final BiMap<ResourceKey<V>, V> keys = HashBiMap.create();
-    private final Map<ResourceLocation, ResourceLocation> aliases = new HashMap<>();
+    private final Map<Identifier, Identifier> aliases = new HashMap<>();
     final Map<SlaveKey<?>, ?> slaves = new HashMap<>();
-    private final ResourceLocation defaultKey;
+    private final Identifier defaultKey;
     //private final ResourceKey<V> defaultResourceKey;
     private final CreateCallback<V> create;
     private final AddCallback<V> add;
@@ -84,8 +84,8 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     private final MissingFactory<V> missing;
     private final BitSet availabilityMap;
     private final IntSet blocked = new IntOpenHashSet();
-    private final Multimap<ResourceLocation, V> overrides = ArrayListMultimap.create();
-    private final Map<ResourceLocation, Holder.Reference<V>> delegatesByName = new HashMap<>();
+    private final Multimap<Identifier, V> overrides = ArrayListMultimap.create();
+    private final Map<Identifier, Holder.Reference<V>> delegatesByName = new HashMap<>();
     private final Map<V, Holder.Reference<V>> delegatesByValue = new HashMap<>();
     private final BiMap<OverrideOwner<V>, V> owners = HashBiMap.create();
     private final ForgeRegistryTagManager<V> tagManager;
@@ -98,13 +98,13 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     private V defaultValue = null;
     boolean isFrozen = false;
 
-    private final ResourceLocation name;
+    private final Identifier name;
     private final ResourceKey<Registry<V>> key;
     private final RegistryBuilder<V> builder;
 
     private final Codec<V> codec = new RegistryCodec();
 
-    ForgeRegistry(RegistryManager stage, ResourceLocation name, RegistryBuilder<V> builder) {
+    ForgeRegistry(RegistryManager stage, Identifier name, RegistryBuilder<V> builder) {
         this.name = name;
         this.key = ResourceKey.createRegistryKey(name);
         this.builder = builder;
@@ -134,7 +134,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public void register(ResourceLocation key, V value) {
+    public void register(Identifier key, V value) {
         add(-1, key, value);
     }
 
@@ -164,7 +164,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public ResourceLocation getRegistryName() {
+    public Identifier getRegistryName() {
         return this.name;
     }
 
@@ -179,7 +179,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public boolean containsKey(ResourceLocation key) {
+    public boolean containsKey(Identifier key) {
         while (key != null) {
             if (this.names.containsKey(key))
                 return true;
@@ -203,7 +203,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public V getValue(ResourceLocation key) {
+    public V getValue(Identifier key) {
         V ret = this.names.get(key);
         key = this.aliases.get(key);
         while (ret == null && key != null) {
@@ -214,8 +214,8 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public ResourceLocation getKey(V value) {
-        return getResourceKey(value).map(ResourceKey::location).orElse(this.defaultKey);
+    public Identifier getKey(V value) {
+        return getResourceKey(value).map(ResourceKey::identifier).orElse(this.defaultKey);
     }
 
     @NotNull
@@ -257,7 +257,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @NotNull
     @Override
-    public Optional<Holder<V>> getHolder(ResourceLocation location) {
+    public Optional<Holder<V>> getHolder(Identifier location) {
         return Optional.ofNullable(this.getWrapper()).flatMap(wrapper -> wrapper.get(location));
     }
 
@@ -275,7 +275,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @NotNull
     @Override
-    public Set<ResourceLocation> getKeys() {
+    public Set<Identifier> getKeys() {
         return Collections.unmodifiableSet(this.names.keySet());
     }
 
@@ -315,7 +315,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return ret == null ? -1 : ret.intValue();
     }
 
-    public int getID(ResourceLocation name) {
+    public int getID(Identifier name) {
         return getID(this.names.get(name));
     }
 
@@ -324,7 +324,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return ret == null ? -1 : ret.intValue();
     }
 
-    private int getIDRaw(ResourceLocation name) {
+    private int getIDRaw(Identifier name) {
         return getIDRaw(this.names.get(name));
     }
 
@@ -346,7 +346,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Nullable
-    public ResourceLocation getDefaultKey() {
+    public Identifier getDefaultKey() {
         return this.defaultKey;
     }
 
@@ -355,17 +355,17 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public void register(int id, ResourceLocation key, V value) {
+    public void register(int id, Identifier key, V value) {
         add(id, key, value, key.getNamespace());
     }
 
-    int add(int id, ResourceLocation key, V value) {
+    int add(int id, Identifier key, V value) {
         @SuppressWarnings("removal")
         final String owner = ModLoadingContext.get().getActiveNamespace();
         return add(id, key, value, owner);
     }
 
-    int add(int id, ResourceLocation key, V value, String owner) {
+    int add(int id, Identifier key, V value, String owner) {
         Preconditions.checkNotNull(key, "Can't use a null-name for the registry, object %s.", value);
         Preconditions.checkNotNull(value, "Can't add null-object to the registry, name %s.", key);
 
@@ -430,7 +430,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return idToUse;
     }
 
-    public V getRaw(ResourceLocation key) {
+    public V getRaw(Identifier key) {
         V ret = this.names.get(key);
         key = this.aliases.get(key);
         while (ret == null && key != null) {
@@ -448,7 +448,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
      *
      * TODO: Add as public API in IForgeRegistry and DeferredRegister.
      */
-    public void addAlias(ResourceLocation src, ResourceLocation dst) {
+    public void addAlias(Identifier src, Identifier dst) {
         if (this.isLocked())
             throw new IllegalStateException(String.format(Locale.ENGLISH, "Attempted to register the alias %s -> %s too late", src, dst));
 
@@ -464,7 +464,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     @NotNull
     @Override
     public Optional<Holder.Reference<V>> getDelegate(ResourceKey<V> rkey) {
-        return Optional.ofNullable(delegatesByName.get(rkey.location()));
+        return Optional.ofNullable(delegatesByName.get(rkey.identifier()));
     }
 
     @NotNull
@@ -475,13 +475,13 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     @NotNull
     @Override
-    public Optional<Holder.Reference<V>> getDelegate(ResourceLocation key) {
+    public Optional<Holder.Reference<V>> getDelegate(Identifier key) {
         return Optional.ofNullable(delegatesByName.get(key));
     }
 
     @NotNull
     @Override
-    public Holder.Reference<V> getDelegateOrThrow(ResourceLocation key) {
+    public Holder.Reference<V> getDelegateOrThrow(Identifier key) {
         return getDelegate(key).orElseThrow(() -> new IllegalArgumentException(String.format(Locale.ENGLISH, "No delegate exists for key %s", key)));
     }
 
@@ -498,7 +498,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     private Holder.Reference<V> bindDelegate(ResourceKey<V> rkey, V value) {
-        Holder.Reference<V> delegate = delegatesByName.computeIfAbsent(rkey.location(), k -> Holder.Reference.createStandAlone(this.getWrapperOrThrow(), rkey));
+        Holder.Reference<V> delegate = delegatesByName.computeIfAbsent(rkey.identifier(), k -> Holder.Reference.createStandAlone(this.getWrapperOrThrow(), rkey));
         delegate.bindKey(rkey);
         delegate.bindValue(value);
         delegatesByValue.put(value, delegate);
@@ -512,7 +512,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         for (Entry<ResourceKey<V>, V> entry : this.keys.entrySet())
             bindDelegate(entry.getKey(), entry.getValue());
 
-        for (Entry<ResourceLocation, V> entry : this.overrides.entries())
+        for (Entry<Identifier, V> entry : this.overrides.entries())
             bindDelegate(ResourceKey.create(this.key, entry.getKey()), entry.getValue());
     }
 
@@ -520,10 +520,10 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return this.defaultValue;
     }
 
-    void validateContent(ResourceLocation registryName) {
+    void validateContent(Identifier registryName) {
         for (V obj : this) {
             int id = getID(obj);
-            ResourceLocation name = getKey(obj);
+            Identifier name = getKey(obj);
 
             // name lookup failed -> obj is not in the obj<->name map
             if (name == null)
@@ -562,7 +562,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             this.bake.onBake(this, this.stage);
     }
 
-    void sync(ResourceLocation name, ForgeRegistry<V> from) {
+    void sync(Identifier name, ForgeRegistry<V> from) {
         LOGGER.debug(REGISTRIES,"Registry {} Sync: {} -> {}", this.name, this.stage.getName(), from.stage.getName());
         if (this == from)
             throw new IllegalArgumentException("WTF We are the same!?!?!");
@@ -593,7 +593,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
         boolean errored = false;
 
-        for (Entry<ResourceLocation, V> entry : from.names.entrySet()) {
+        for (Entry<Identifier, V> entry : from.names.entrySet()) {
             List<V> overrides = new ArrayList<>(from.overrides.get(entry.getKey()));
             int id = from.getID(entry.getKey());
             if (overrides.isEmpty()) {
@@ -646,7 +646,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     @Override
-    public V remove(ResourceLocation key) {
+    public V remove(Identifier key) {
         if (!this.isModifiable)
             throw new UnsupportedOperationException("Attempted to remove from a non-modifiable Forge Registry");
 
@@ -697,7 +697,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             wrapper.locked = false;
     }
 
-    void dump(ResourceLocation name) {
+    void dump(Identifier name) {
         // Building a good looking table is not cheap, so only do it if the debug logger is enabled.
         if (LOGGER.isDebugEnabled(REGISTRYDUMP)) {
             TablePrinter<DumpRow> tab = new TablePrinter<DumpRow>()
@@ -720,10 +720,10 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     private record DumpRow(String id, String key, String value) {}
 
-    public void loadIds(Object2IntMap<ResourceLocation> ids, Map<ResourceLocation, String> overrides, Object2IntMap<ResourceLocation> missing, Map<ResourceLocation, IdMappingEvent.IdRemapping> remapped, ForgeRegistry<V> old, ResourceLocation name) {
-        Map<ResourceLocation, String> ovs = new HashMap<>(overrides);
-        for (Object2IntMap.Entry<ResourceLocation> entry : ids.object2IntEntrySet()) {
-            ResourceLocation itemName = entry.getKey();
+    public void loadIds(Object2IntMap<Identifier> ids, Map<Identifier, String> overrides, Object2IntMap<Identifier> missing, Map<Identifier, IdMappingEvent.IdRemapping> remapped, ForgeRegistry<V> old, Identifier name) {
+        Map<Identifier, String> ovs = new HashMap<>(overrides);
+        for (Object2IntMap.Entry<Identifier> entry : ids.object2IntEntrySet()) {
+            Identifier itemName = entry.getKey();
 
             int newId = entry.getIntValue();
             int currId = old.getIDRaw(itemName);
@@ -772,8 +772,8 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             ovs.remove(itemName);
         }
 
-        for (Map.Entry<ResourceLocation, String> entry :  ovs.entrySet()) {
-            ResourceLocation itemName = entry.getKey();
+        for (Map.Entry<Identifier, String> entry :  ovs.entrySet()) {
+            Identifier itemName = entry.getKey();
             String owner = entry.getValue();
             String current = this.owners.inverse().get(this.getRaw(itemName)).owner;
             if (!owner.equals(current)) {
@@ -807,9 +807,9 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         return ret;
     }
 
-    Map<ResourceLocation, String> getOverrideOwners() {
-        Map<ResourceLocation, String> ret = new HashMap<>();
-        for (ResourceLocation key : this.overrides.keySet()) {
+    Map<Identifier, String> getOverrideOwners() {
+        Map<Identifier, String> ret = new HashMap<>();
+        for (Identifier key : this.overrides.keySet()) {
             V obj = this.names.get(key);
             OverrideOwner<V> owner = this.owners.inverse().get(obj);
             if (owner == null)
@@ -831,7 +831,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
                     return DataResult.success(val);
                 }).map(v -> Pair.of(v, ops.empty()));
             } else {
-                return ResourceLocation.CODEC.decode(ops, input).flatMap(keyValuePair -> !ForgeRegistry.this.containsKey(keyValuePair.getFirst())
+                return Identifier.CODEC.decode(ops, input).flatMap(keyValuePair -> !ForgeRegistry.this.containsKey(keyValuePair.getFirst())
                         ? DataResult.error(() -> "Unknown registry key in " + ForgeRegistry.this.key + ": " + keyValuePair.getFirst())
                         : DataResult.success(keyValuePair.mapFirst(ForgeRegistry.this::getValue)));
             }
@@ -839,7 +839,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
         @Override
         public <T> DataResult<T> encode(V input, DynamicOps<T> ops, T prefix) {
-            ResourceLocation key = getKey(input);
+            Identifier key = getKey(input);
             if (key == null)
                 return DataResult.error(() -> "Unknown registry element in " + ForgeRegistry.this.key + ": " + input);
             T toMerge = ops.compressMaps() ? ops.createInt(getID(input)) : ops.createString(key.toString());
@@ -848,11 +848,11 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
     }
 
     public static class Snapshot {
-        private static final Comparator<ResourceLocation> sorter = ResourceLocation::compareNamespaced;
-        public final Object2IntMap<ResourceLocation> ids = new Object2IntRBTreeMap<>(sorter);
-        public final Map<ResourceLocation, ResourceLocation> aliases = new TreeMap<>(sorter);
+        private static final Comparator<Identifier> sorter = Identifier::compareNamespaced;
+        public final Object2IntMap<Identifier> ids = new Object2IntRBTreeMap<>(sorter);
+        public final Map<Identifier, Identifier> aliases = new TreeMap<>(sorter);
         public final IntSet blocked = new IntRBTreeSet();
-        public final Map<ResourceLocation, String> overrides = new TreeMap<>(sorter);
+        public final Map<Identifier, String> overrides = new TreeMap<>(sorter);
         private FriendlyByteBuf binary = null;
 
         public CompoundTag write() {
@@ -897,15 +897,15 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
                 return ret;
 
             nbt.getListOrEmpty("ids").compoundStream().forEach(comp ->
-                ret.ids.put(ResourceLocation.parse(comp.getString("K").orElseThrow()), comp.getIntOr("V", 0))
+                ret.ids.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getIntOr("V", 0))
             );
 
             nbt.getListOrEmpty("aliases").compoundStream().forEach(comp ->
-                ret.aliases.put(ResourceLocation.parse(comp.getString("K").orElseThrow()), ResourceLocation.parse(comp.getString("V").orElseThrow()))
+                ret.aliases.put(Identifier.parse(comp.getString("K").orElseThrow()), Identifier.parse(comp.getString("V").orElseThrow()))
             );
 
             nbt.getListOrEmpty("overrides").compoundStream().forEach(comp ->
-                ret.overrides.put(ResourceLocation.parse(comp.getString("K").orElseThrow()), comp.getString("V").orElseThrow())
+                ret.overrides.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getString("V").orElseThrow())
             );
 
             nbt.getIntArray("blocked").ifPresent(blocked -> {
@@ -919,9 +919,9 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         public synchronized FriendlyByteBuf getPacketData() {
             if (binary == null) {
                 FriendlyByteBuf pkt = new FriendlyByteBuf(Unpooled.buffer());
-                pkt.writeMap(this.ids, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeVarInt);
-                pkt.writeMap(this.aliases, FriendlyByteBuf::writeResourceLocation, FriendlyByteBuf::writeResourceLocation);
-                pkt.writeMap(this.overrides, FriendlyByteBuf::writeResourceLocation, (b,v) -> b.writeUtf(v, 0x100));
+                pkt.writeMap(this.ids, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeVarInt);
+                pkt.writeMap(this.aliases, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeIdentifier);
+                pkt.writeMap(this.overrides, FriendlyByteBuf::writeIdentifier, (b,v) -> b.writeUtf(v, 0x100));
                 pkt.writeCollection(this.blocked, FriendlyByteBuf::writeVarInt);
                 this.binary = pkt;
             }
@@ -934,23 +934,23 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
                 return new Snapshot();
 
             var ret = new Snapshot();
-            ret.ids.putAll(buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readVarInt));
-            ret.aliases.putAll(buf.readMap(FriendlyByteBuf::readResourceLocation, FriendlyByteBuf::readResourceLocation));
-            ret.overrides.putAll(buf.readMap(FriendlyByteBuf::readResourceLocation, b -> b.readUtf(0x100)));
+            ret.ids.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readVarInt));
+            ret.aliases.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readIdentifier));
+            ret.overrides.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, b -> b.readUtf(0x100)));
             ret.blocked.addAll(buf.readList(FriendlyByteBuf::readVarInt));
             return ret;
         }
     }
 
     @SuppressWarnings("unchecked")
-    public MissingMappingsEvent getMissingEvent(ResourceLocation name, Object2IntMap<ResourceLocation> map) {
+    public MissingMappingsEvent getMissingEvent(Identifier name, Object2IntMap<Identifier> map) {
         List<MissingMappingsEvent.Mapping<V>> lst = new ArrayList<>();
         ForgeRegistry<V> pool = RegistryManager.ACTIVE.getRegistry(name);
         map.object2IntEntrySet().forEach(entry -> lst.add(new MissingMappingsEvent.Mapping<>(this, pool, entry.getKey(), entry.getIntValue())));
         return new MissingMappingsEvent(ResourceKey.createRegistryKey(name), this, (Collection<MissingMappingsEvent.Mapping<?>>) (Collection<?>) lst);
     }
 
-    void processMissingEvent(ResourceLocation name, ForgeRegistry<V> pool, List<MissingMappingsEvent.Mapping<V>> mappings, Object2IntMap<ResourceLocation> missing, Map<ResourceLocation, IdMappingEvent.IdRemapping> remaps, Collection<ResourceLocation> defaulted, Collection<ResourceLocation> failed, boolean injectNetworkDummies) {
+    void processMissingEvent(Identifier name, ForgeRegistry<V> pool, List<MissingMappingsEvent.Mapping<V>> mappings, Object2IntMap<Identifier> missing, Map<Identifier, IdMappingEvent.IdRemapping> remaps, Collection<Identifier> defaulted, Collection<Identifier> failed, boolean injectNetworkDummies) {
         LOGGER.debug(REGISTRIES,"Processing missing event for {}:", name);
         int ignored = 0;
 
@@ -960,7 +960,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
             if (action == MissingMappingsEvent.Action.REMAP) {
                 // entry re-mapped, finish the registration with the new name/object, but the old id
                 int currId = getID(remap.target);
-                ResourceLocation newName = pool.getKey(remap.target);
+                Identifier newName = pool.getKey(remap.target);
                 LOGGER.debug(REGISTRIES,"  Remapping {} -> {}.", remap.key, newName);
 
                 missing.removeInt(remap.key);

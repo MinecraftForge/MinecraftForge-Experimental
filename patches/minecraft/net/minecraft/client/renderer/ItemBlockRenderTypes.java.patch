@@ -5,26 +5,26 @@
  @OnlyIn(Dist.CLIENT)
  public class ItemBlockRenderTypes {
 +    @Deprecated
-     private static final Map<Block, ChunkSectionLayer> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_420870_ -> {
+     private static final Map<Block, ChunkSectionLayer> TYPE_BY_BLOCK = Util.make(Maps.newHashMap(), p_448152_ -> {
          ChunkSectionLayer chunksectionlayer = ChunkSectionLayer.TRIPWIRE;
-         p_420870_.put(Blocks.TRIPWIRE, chunksectionlayer);
-@@ -357,12 +_,15 @@
-         p_420870_.put(Blocks.BUBBLE_COLUMN, chunksectionlayer3);
-         p_420870_.put(Blocks.TINTED_GLASS, chunksectionlayer3);
+         p_448152_.put(Blocks.TRIPWIRE, chunksectionlayer);
+@@ -356,12 +_,15 @@
+         p_448152_.put(Blocks.BUBBLE_COLUMN, chunksectionlayer2);
+         p_448152_.put(Blocks.TINTED_GLASS, chunksectionlayer2);
      });
 +    @Deprecated
      private static final Map<Fluid, ChunkSectionLayer> LAYER_BY_FLUID = Util.make(Maps.newHashMap(), p_404902_ -> {
          p_404902_.put(Fluids.FLOWING_WATER, ChunkSectionLayer.TRANSLUCENT);
          p_404902_.put(Fluids.WATER, ChunkSectionLayer.TRANSLUCENT);
      });
-     private static boolean renderCutout;
+     private static boolean cutoutLeaves;
  
 +    /** @deprecated Forge: Use {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(BlockState, net.minecraft.util.RandomSource, net.minecraftforge.client.model.data.ModelData)}. */
 +    @Deprecated // Note: this method does NOT support model-based render types
      public static ChunkSectionLayer getChunkRenderType(BlockState p_109283_) {
          Block block = p_109283_.getBlock();
          if (block instanceof LeavesBlock) {
-@@ -373,6 +_,8 @@
+@@ -372,6 +_,8 @@
          }
      }
  
@@ -33,7 +33,7 @@
      public static RenderType getMovingBlockRenderType(BlockState p_109294_) {
          Block block = p_109294_.getBlock();
          if (block instanceof LeavesBlock) {
-@@ -393,11 +_,14 @@
+@@ -391,17 +_,78 @@
          }
      }
  
@@ -41,15 +41,7 @@
 +    @Deprecated // Note: this method does NOT support model-based render types
      public static RenderType getRenderType(BlockState p_364446_) {
          ChunkSectionLayer chunksectionlayer = getChunkRenderType(p_364446_);
-         return chunksectionlayer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentItemSheet() : Sheets.cutoutBlockSheet();
-     }
- 
-+    /* Forge: Use {@link net.minecraft.client.resources.model.BakedModel#getRenderPasses(ItemStack, boolean)} and {@link net.minecraft.client.resources.model.BakedModel#getRenderTypes(ItemStack, boolean)}. */
-     public static RenderType getRenderType(ItemStack p_363859_) {
-         if (p_363859_.getItem() instanceof BlockItem blockitem) {
-             Block block = blockitem.getBlock();
-@@ -407,12 +_,71 @@
-         }
+         return chunksectionlayer == ChunkSectionLayer.TRANSLUCENT ? Sheets.translucentBlockItemSheet() : Sheets.cutoutBlockSheet();
      }
  
 +    // Note: this method does NOT support model-based render types
@@ -59,16 +51,16 @@
          return chunksectionlayer != null ? chunksectionlayer : ChunkSectionLayer.SOLID;
      }
  
-     public static void setFancy(boolean p_109292_) {
-         renderCutout = p_109292_;
+     public static void setCutoutLeaves(boolean p_454762_) {
+         cutoutLeaves = p_454762_;
 +    }
 +
 +    /** Forge: Check if we are running in {@linkplain net.minecraft.client.Minecraft#useFancyGraphics() fancy graphics} to account for fast graphics render types */
 +    public static boolean isFancy() {
-+        return renderCutout;
++        return cutoutLeaves;
 +    }
 +
-+    private static final java.util.Collection<ChunkSectionLayer> CUTOUT_MIPPED = java.util.EnumSet.of(ChunkSectionLayer.CUTOUT_MIPPED);
++    private static final java.util.Collection<ChunkSectionLayer> CUTOUT_MIPPED = java.util.EnumSet.of(ChunkSectionLayer.CUTOUT);
 +    private static final java.util.Collection<ChunkSectionLayer> SOLID = java.util.EnumSet.of(ChunkSectionLayer.SOLID);
 +    private static final Map<net.minecraft.core.Holder.Reference<Block>, java.util.Collection<ChunkSectionLayer>> BLOCK_RENDER_TYPES = Util.make(new it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap<>(TYPE_BY_BLOCK.size(), 0.5F), map -> {
 +       map.defaultReturnValue(SOLID);
@@ -85,7 +77,7 @@
 +    public static java.util.Collection<ChunkSectionLayer> getRenderLayers(BlockState state) {
 +       Block block = state.getBlock();
 +       if (block instanceof LeavesBlock) {
-+          return renderCutout ? CUTOUT_MIPPED : SOLID;
++          return cutoutLeaves ? CUTOUT_MIPPED : SOLID;
 +       } else {
 +          return BLOCK_RENDER_TYPES.get(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(block));
 +       }

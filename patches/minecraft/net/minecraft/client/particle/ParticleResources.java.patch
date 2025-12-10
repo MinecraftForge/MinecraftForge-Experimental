@@ -2,13 +2,13 @@
 +++ b/net/minecraft/client/particle/ParticleResources.java
 @@ -45,6 +_,7 @@
      private static final FileToIdConverter PARTICLE_LISTER = FileToIdConverter.json("particles");
-     private final Map<ResourceLocation, ParticleResources.MutableSpriteSet> spriteSets = Maps.newHashMap();
+     private final Map<Identifier, ParticleResources.MutableSpriteSet> spriteSets = Maps.newHashMap();
      private final Int2ObjectMap<ParticleProvider<?>> providers = new Int2ObjectOpenHashMap<>();
-+    private final Map<ResourceLocation, ParticleProvider<?>> providersByName = new java.util.HashMap<>();
-     @Nullable
-     private Runnable onReload;
++    private final Map<Identifier, ParticleProvider<?>> providersByName = new java.util.HashMap<>();
+     private @Nullable Runnable onReload;
  
-@@ -174,14 +_,17 @@
+     public ParticleResources() {
+@@ -173,14 +_,17 @@
          this.register(ParticleTypes.FIREFLY, FireflyParticle.FireflyProvider::new);
      }
  
@@ -27,7 +27,7 @@
      }
  
      @Override
-@@ -274,8 +_,13 @@
+@@ -265,8 +_,13 @@
          }
      }
  

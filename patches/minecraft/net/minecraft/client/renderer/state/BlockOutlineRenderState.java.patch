@@ -6,7 +6,7 @@
      @Nullable VoxelShape occlusionShape,
 -    @Nullable VoxelShape interactionShape
 +    @Nullable VoxelShape interactionShape,
-+    @Nullable net.minecraftforge.client.event.RenderHighlightEvent.Callback customRenderer
++    net.minecraftforge.client.event.RenderHighlightEvent.@Nullable Callback customRenderer
  ) {
      public BlockOutlineRenderState(BlockPos p_425529_, boolean p_426298_, boolean p_426881_, VoxelShape p_424013_) {
          this(p_425529_, p_426298_, p_426881_, p_424013_, null, null, null);

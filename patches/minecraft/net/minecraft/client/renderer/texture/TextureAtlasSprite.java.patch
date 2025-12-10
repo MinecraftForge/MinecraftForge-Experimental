@@ -1,8 +1,8 @@
 --- a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
 +++ b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
-@@ -138,4 +_,13 @@
-         @Override
-         void close();
+@@ -129,4 +_,13 @@
+     public void close() {
+         this.contents.close();
      }
 +
 +    public int getPixelRGBA(int frameIndex, int x, int y) {

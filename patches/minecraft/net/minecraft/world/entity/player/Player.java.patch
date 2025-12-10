@@ -1,16 +1,16 @@
 --- a/net/minecraft/world/entity/player/Player.java
 +++ b/net/minecraft/world/entity/player/Player.java
-@@ -119,7 +_,7 @@
- import net.minecraft.world.scores.PlayerTeam;
+@@ -122,7 +_,7 @@
  import net.minecraft.world.scores.Team;
+ import org.jspecify.annotations.Nullable;
  
 -public abstract class Player extends Avatar implements ContainerUser {
 +public abstract class Player extends Avatar implements ContainerUser, net.minecraftforge.common.extensions.IForgePlayer {
      public static final int MAX_HEALTH = 20;
      public static final int SLEEP_DURATION = 100;
      public static final int WAKE_UP_DURATION = 10;
-@@ -175,6 +_,9 @@
-     public Entity currentExplosionCause;
+@@ -173,6 +_,9 @@
+     public @Nullable Entity currentExplosionCause;
      private boolean ignoreFallDamageFromCurrentImpulse = false;
      private int currentImpulseContextResetGraceTime = 0;
 +    private final java.util.Collection<MutableComponent> prefixes = new java.util.LinkedList<>();
@@ -19,7 +19,7 @@
  
      public Player(Level p_250508_, GameProfile p_252153_) {
          super(EntityType.PLAYER, p_250508_);
-@@ -183,6 +_,17 @@
+@@ -181,6 +_,17 @@
          this.inventory = new Inventory(this, this.equipment);
          this.inventoryMenu = new InventoryMenu(this.inventory, !p_250508_.isClientSide(), this);
          this.containerMenu = this.inventoryMenu;
@@ -37,7 +37,7 @@
      }
  
      @Override
-@@ -217,7 +_,8 @@
+@@ -215,7 +_,8 @@
              .add(Attributes.MINING_EFFICIENCY)
              .add(Attributes.SWEEPING_DAMAGE_RATIO)
              .add(Attributes.WAYPOINT_TRANSMIT_RANGE, 6.0E7)
@@ -47,7 +47,7 @@
      }
  
      @Override
-@@ -231,6 +_,7 @@
+@@ -229,6 +_,7 @@
  
      @Override
      public void tick() {
@@ -55,16 +55,16 @@
          this.noPhysics = this.isSpectator();
          if (this.isSpectator() || this.isPassenger()) {
              this.setOnGround(false);
-@@ -246,7 +_,7 @@
+@@ -244,7 +_,7 @@
                  this.sleepCounter = 100;
              }
  
--            if (!this.level().isClientSide() && this.level().isBrightOutside()) {
-+            if (!this.level().isClientSide() && !net.minecraftforge.event.ForgeEventFactory.onSleepingTimeCheck(this, getSleepingPos())) {
+-            if (!this.level().isClientSide() && !this.level().environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, this.position()).canSleep(this.level())) {
++            if (!this.level().isClientSide() && !net.minecraftforge.event.ForgeEventFactory.onSleepingTimeCheck(this, getSleepingPos(), this.level().environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, this.position()))) {
                  this.stopSleepInBed(false, true);
              }
          } else if (this.sleepCounter > 0) {
-@@ -284,6 +_,7 @@
+@@ -283,6 +_,7 @@
          if (this.currentImpulseContextResetGraceTime > 0) {
              this.currentImpulseContextResetGraceTime--;
          }
@@ -72,7 +72,7 @@
      }
  
      @Override
-@@ -343,6 +_,10 @@
+@@ -342,6 +_,10 @@
      }
  
      protected void updatePlayerPose() {
@@ -83,7 +83,7 @@
          if (this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.SWIMMING)) {
              Pose pose = this.getDesiredPose();
              Pose pose1;
-@@ -531,6 +_,7 @@
+@@ -526,6 +_,7 @@
  
      @Override
      public void die(DamageSource p_36152_) {
@@ -91,10 +91,10 @@
          super.die(p_36152_);
          this.reapplyPosition();
          if (!this.isSpectator() && this.level() instanceof ServerLevel serverlevel) {
-@@ -588,10 +_,15 @@
+@@ -582,10 +_,15 @@
+     }
  
-     @Nullable
-     public ItemEntity drop(ItemStack p_36177_, boolean p_36178_) {
+     public @Nullable ItemEntity drop(ItemStack p_36177_, boolean p_36178_) {
 -        return this.drop(p_36177_, false, p_36178_);
 +        return net.minecraftforge.common.ForgeHooks.onPlayerTossEvent(this, p_36177_, p_36178_);
      }
@@ -108,7 +108,7 @@
          float f = this.inventory.getSelectedItem().getDestroySpeed(p_36282_);
          if (f > 1.0F) {
              f += (float)this.getAttributeValue(Attributes.MINING_EFFICIENCY);
-@@ -620,11 +_,14 @@
+@@ -614,11 +_,14 @@
              f /= 5.0F;
          }
  
@@ -124,7 +124,7 @@
      }
  
      @Override
-@@ -691,6 +_,7 @@
+@@ -685,6 +_,7 @@
  
      @Override
      public boolean hurtServer(ServerLevel p_369360_, DamageSource p_364544_, float p_368576_) {
@@ -132,7 +132,7 @@
          if (this.isInvulnerableTo(p_369360_, p_364544_)) {
              return false;
          } else if (this.abilities.invulnerable && !p_364544_.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-@@ -759,10 +_,13 @@
+@@ -753,10 +_,13 @@
      @Override
      protected void actuallyHurt(ServerLevel p_365751_, DamageSource p_36312_, float p_36313_) {
          if (!this.isInvulnerableTo(p_365751_, p_36312_)) {
@@ -146,7 +146,7 @@
              float f = p_36313_ - f1;
              if (f > 0.0F && f < 3.4028235E37F) {
                  this.awardStat(Stats.DAMAGE_ABSORBED, Math.round(f * 10.0F));
-@@ -830,6 +_,10 @@
+@@ -827,6 +_,10 @@
  
              return InteractionResult.PASS;
          } else {
@@ -157,7 +157,7 @@
              ItemStack itemstack = this.getItemInHand(p_36159_);
              ItemStack itemstack1 = itemstack.copy();
              InteractionResult interactionresult = p_36158_.interact(this, p_36159_);
-@@ -838,6 +_,10 @@
+@@ -835,6 +_,10 @@
                      itemstack.setCount(itemstack1.getCount());
                  }
  
@@ -168,7 +168,7 @@
                  return interactionresult;
              } else {
                  if (!itemstack.isEmpty() && p_36158_ instanceof LivingEntity) {
-@@ -849,6 +_,7 @@
+@@ -846,6 +_,7 @@
                      if (interactionresult1.consumesAction()) {
                          this.level().gameEvent(GameEvent.ENTITY_INTERACT, p_36158_.position(), GameEvent.Context.of(this));
                          if (itemstack.isEmpty() && !this.hasInfiniteMaterials()) {
@@ -176,64 +176,64 @@
                              this.setItemInHand(p_36159_, ItemStack.EMPTY);
                          }
  
-@@ -948,6 +_,7 @@
+@@ -945,6 +_,7 @@
      }
  
      public void attack(Entity p_36347_) {
 +        if (!net.minecraftforge.common.ForgeHooks.onPlayerAttackTarget(this, p_36347_)) return;
-         if (p_36347_.isAttackable()) {
-             if (!p_36347_.skipAttackInteraction(this)) {
-                 float f = this.isAutoSpinAttack() ? this.autoSpinAttackDmg : (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
-@@ -983,8 +_,10 @@
-                             && !this.isPassenger()
-                             && p_36347_ instanceof LivingEntity
-                             && !this.isSprinting();
-+                        var hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(this, p_36347_, flag1, flag1 ? 1.5F : 1.0F);
-+                        flag1 = hitResult != null;
-                         if (flag1) {
--                            f *= 1.5F;
-+                            f *= hitResult.getDamageModifier();
-                         }
+         if (!this.cannotAttack(p_36347_)) {
+             float f = this.isAutoSpinAttack() ? this.autoSpinAttackDmg : (float)this.getAttributeValue(Attributes.ATTACK_DAMAGE);
+             ItemStack itemstack = this.getWeaponItem();
+@@ -966,8 +_,10 @@
  
-                         float f3 = f + f1;
-@@ -992,7 +_,7 @@
-                         if (flag3 && !flag1 && !flag && this.onGround()) {
-                             double d0 = this.getKnownMovement().horizontalDistanceSqr();
-                             double d1 = this.getSpeed() * 2.5;
--                            if (d0 < Mth.square(d1) && this.getItemInHand(InteractionHand.MAIN_HAND).is(ItemTags.SWORDS)) {
-+                            if (d0 < Mth.square(d1) && this.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(net.minecraftforge.common.ToolActions.SWORD_SWEEP)) {
-                                 flag2 = true;
-                             }
-                         }
-@@ -1028,7 +_,7 @@
-                             if (flag2) {
-                                 float f6 = 1.0F + (float)this.getAttributeValue(Attributes.SWEEPING_DAMAGE_RATIO) * f;
- 
--                                for (LivingEntity livingentity2 : this.level().getEntitiesOfClass(LivingEntity.class, p_36347_.getBoundingBox().inflate(1.0, 0.25, 1.0))) {
-+                                for (LivingEntity livingentity2 : this.level().getEntitiesOfClass(LivingEntity.class, this.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(this, p_36347_))) {
-                                     if (livingentity2 != this
-                                         && livingentity2 != p_36347_
-                                         && !this.isAlliedTo(livingentity2)
-@@ -1079,8 +_,8 @@
- 
-                             this.setLastHurtMob(p_36347_);
-                             Entity entity = p_36347_;
--                            if (p_36347_ instanceof EnderDragonPart) {
--                                entity = ((EnderDragonPart)p_36347_).parentMob;
-+                            if (p_36347_ instanceof net.minecraftforge.entity.PartEntity<?> pe) {
-+                                entity = pe.getParent();
-                             }
- 
-                             boolean flag5 = false;
-@@ -1124,6 +_,7 @@
-                         }
+                     f += itemstack.getItem().getAttackDamageBonus(p_36347_, f, damagesource);
+                     boolean flag2 = flag && this.canCriticalAttack(p_36347_);
++                    var hitResult = net.minecraftforge.common.ForgeHooks.getCriticalHit(this, p_36347_, flag2, flag2 ? 1.5F : 1.0F);
++                    flag2 = hitResult != null;
+                     if (flag2) {
+-                        f *= 1.5F;
++                        f *= hitResult.getDamageModifier();
                      }
+ 
+                     float f3 = f + f2;
+@@ -1039,7 +_,7 @@
+             double d0 = this.getKnownMovement().horizontalDistanceSqr();
+             double d1 = this.getSpeed() * 2.5;
+             if (d0 < Mth.square(d1)) {
+-                return this.getItemInHand(InteractionHand.MAIN_HAND).is(ItemTags.SWORDS);
++                return this.getItemInHand(InteractionHand.MAIN_HAND).canPerformAction(net.minecraftforge.common.ToolActions.SWORD_SWEEP);
+             }
+         }
+ 
+@@ -1075,8 +_,8 @@
+ 
+     private void itemAttackInteraction(Entity p_456980_, ItemStack p_453550_, DamageSource p_453296_, boolean p_457792_) {
+         Entity entity = p_456980_;
+-        if (p_456980_ instanceof EnderDragonPart) {
+-            entity = ((EnderDragonPart)p_456980_).parentMob;
++        if (p_456980_ instanceof net.minecraftforge.entity.PartEntity<?> pe) {
++            entity = pe.getParent();
+         }
+ 
+         boolean flag = false;
+@@ -1101,6 +_,7 @@
+                 } else {
+                     this.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY);
                  }
 +                this.resetAttackStrengthTicker(); // FORGE: Moved from beginning of attack() so that getAttackStrengthScale() returns an accurate value during all attack events
              }
          }
      }
-@@ -1230,6 +_,7 @@
+@@ -1141,7 +_,7 @@
+         if (this.level() instanceof ServerLevel serverlevel) {
+             float f = 1.0F + (float)this.getAttributeValue(Attributes.SWEEPING_DAMAGE_RATIO) * p_451630_;
+ 
+-            for (LivingEntity livingentity : this.level().getEntitiesOfClass(LivingEntity.class, p_451034_.getBoundingBox().inflate(1.0, 0.25, 1.0))) {
++            for (LivingEntity livingentity : this.level().getEntitiesOfClass(LivingEntity.class, this.getItemInHand(InteractionHand.MAIN_HAND).getSweepHitBox(this, p_451034_))) {
+                 if (livingentity != this
+                     && livingentity != p_451034_
+                     && !this.isAlliedTo(livingentity)
+@@ -1307,6 +_,7 @@
      }
  
      public void stopSleepInBed(boolean p_36226_, boolean p_36227_) {
@@ -241,7 +241,7 @@
          super.stopSleeping();
          if (this.level() instanceof ServerLevel && p_36227_) {
              ((ServerLevel)this.level()).updateSleepingPlayerList();
-@@ -1338,6 +_,7 @@
+@@ -1415,6 +_,7 @@
      @Override
      public boolean causeFallDamage(double p_391627_, float p_150093_, DamageSource p_150095_) {
          if (this.abilities.mayfly) {
@@ -249,7 +249,7 @@
              return false;
          } else {
              if (p_391627_ >= 2.0) {
-@@ -1392,13 +_,13 @@
+@@ -1469,13 +_,13 @@
      protected void playStepSound(BlockPos p_282121_, BlockState p_282194_) {
          if (this.isInWater()) {
              this.waterSwimSound();
@@ -265,7 +265,7 @@
                  } else {
                      super.playStepSound(blockpos, blockstate);
                  }
-@@ -1429,6 +_,12 @@
+@@ -1506,6 +_,12 @@
      }
  
      public void giveExperiencePoints(int p_36291_) {
@@ -278,7 +278,7 @@
          this.increaseScore(p_36291_);
          this.experienceProgress = this.experienceProgress + (float)p_36291_ / this.getXpNeededForNextLevel();
          this.totalExperience = Mth.clamp(this.totalExperience + p_36291_, 0, Integer.MAX_VALUE);
-@@ -1456,7 +_,7 @@
+@@ -1533,7 +_,7 @@
      }
  
      public void onEnchantmentPerformed(ItemStack p_36172_, int p_36173_) {
@@ -287,7 +287,7 @@
          if (this.experienceLevel < 0) {
              this.experienceLevel = 0;
              this.experienceProgress = 0.0F;
-@@ -1467,6 +_,12 @@
+@@ -1544,6 +_,12 @@
      }
  
      public void giveExperienceLevels(int p_36276_) {
@@ -300,7 +300,7 @@
          this.experienceLevel = IntMath.saturatedAdd(this.experienceLevel, p_36276_);
          if (this.experienceLevel < 0) {
              this.experienceLevel = 0;
-@@ -1602,7 +_,13 @@
+@@ -1689,7 +_,13 @@
  
      @Override
      public Component getDisplayName() {
@@ -315,7 +315,7 @@
          return this.decorateDisplayNameComponent(mutablecomponent);
      }
  
-@@ -1765,18 +_,19 @@
+@@ -1869,18 +_,19 @@
              Predicate<ItemStack> predicate = ((ProjectileWeaponItem)p_36349_.getItem()).getSupportedHeldProjectiles();
              ItemStack itemstack = ProjectileWeaponItem.getHeldProjectile(this, predicate);
              if (!itemstack.isEmpty()) {
@@ -338,7 +338,7 @@
              }
          }
      }
-@@ -1935,6 +_,54 @@
+@@ -2035,6 +_,54 @@
          this.currentImpulseImpactPos = null;
          this.ignoreFallDamageFromCurrentImpulse = false;
      }

@@ -5,7 +5,7 @@
 
 package net.minecraftforge.debug.gameplay.item;
 
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;

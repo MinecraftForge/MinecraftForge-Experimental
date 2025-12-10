@@ -1,9 +1,9 @@
 --- a/net/minecraft/server/packs/repository/PackDetector.java
 +++ b/net/minecraft/server/packs/repository/PackDetector.java
-@@ -20,6 +_,10 @@
+@@ -19,6 +_,10 @@
+     }
  
-     @Nullable
-     public T detectPackResources(Path p_298083_, List<ForbiddenSymlinkInfo> p_297322_) throws IOException {
+     public @Nullable T detectPackResources(Path p_298083_, List<ForbiddenSymlinkInfo> p_297322_) throws IOException {
 +        return detectPackResources(p_298083_, p_297322_, true);
 +    }
 +    @Nullable
@@ -11,7 +11,7 @@
          Path path = p_298083_;
  
          BasicFileAttributes basicfileattributes;
-@@ -44,10 +_,11 @@
+@@ -43,10 +_,11 @@
              if (!p_297322_.isEmpty()) {
                  return null;
              } else {

@@ -5,10 +5,10 @@
      }
  
 +    // Forge start
-+    java.util.Map<ResourceLocation, Object> ctx = new java.util.HashMap<>();
++    java.util.Map<Identifier, Object> ctx = new java.util.HashMap<>();
 +
 +    @SuppressWarnings("unchecked")
-+    public <R> R getContext(ResourceLocation rl) {
++    public <R> R getContext(Identifier rl) {
 +        var ret = (R)this.ctx.get(rl);
 +        if (ret == null && this.delegate instanceof DelegatingOps parent) {
 +            return (R)parent.getContext(rl);
@@ -17,7 +17,7 @@
 +    }
 +
 +    @SuppressWarnings("unchecked")
-+    public <R> R withContext(ResourceLocation key, Object ctx) {
++    public <R> R withContext(Identifier key, Object ctx) {
 +        this.ctx.put(key, ctx);
 +        return (R)this;
 +    }

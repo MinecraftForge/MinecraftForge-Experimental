@@ -1,9 +1,9 @@
 --- a/net/minecraft/world/item/crafting/ShapelessRecipe.java
 +++ b/net/minecraft/world/item/crafting/ShapelessRecipe.java
-@@ -24,12 +_,14 @@
+@@ -23,12 +_,14 @@
+     final ItemStack result;
      final List<Ingredient> ingredients;
-     @Nullable
-     private PlacementInfo placementInfo;
+     private @Nullable PlacementInfo placementInfo;
 +    private final boolean isSimple;
  
      public ShapelessRecipe(String p_249640_, CraftingBookCategory p_249390_, ItemStack p_252071_, List<Ingredient> p_365863_) {
@@ -15,7 +15,7 @@
      }
  
      @Override
-@@ -59,10 +_,12 @@
+@@ -58,10 +_,12 @@
      public boolean matches(CraftingInput p_345423_, Level p_44263_) {
          if (p_345423_.ingredientCount() != this.ingredients.size()) {
              return false;
@@ -31,7 +31,7 @@
          }
      }
  
-@@ -87,7 +_,7 @@
+@@ -86,7 +_,7 @@
                      Codec.STRING.optionalFieldOf("group", "").forGetter(p_299460_ -> p_299460_.group),
                      CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(p_297437_ -> p_297437_.category),
                      ItemStack.STRICT_CODEC.fieldOf("result").forGetter(p_300770_ -> p_300770_.result),

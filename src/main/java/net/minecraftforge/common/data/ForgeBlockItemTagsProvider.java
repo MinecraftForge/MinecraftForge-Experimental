@@ -10,7 +10,7 @@ import java.util.function.Consumer;
 
 import net.minecraft.data.tags.BlockItemTagsProvider;
 import net.minecraft.data.tags.TagAppender;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -658,17 +658,17 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
     }
 
     private static TagKey<Block> forgeTagKey(String path) {
-        return BlockTags.create(ResourceLocation.fromNamespaceAndPath("forge", path));
+        return BlockTags.create(Identifier.fromNamespaceAndPath("forge", path));
     }
 
     private static TagKey<Block> tagKey(String name) {
-        return BlockTags.create(ResourceLocation.withDefaultNamespace(name));
+        return BlockTags.create(Identifier.withDefaultNamespace(name));
     }
 
     private void addColored(Consumer<Block> consumer, TagKey<Block> group, String pattern) {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (DyeColor color  : DyeColor.values()) {
-            ResourceLocation key = ResourceLocation.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
+            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
             TagKey<Block> blockTag = getForgeTag(Tags.Blocks.class, prefix + color.getName());
             TagKey<Item> itemTag = getForgeTag(Tags.Items.class, prefix + color.getName());
             Block block = ForgeRegistries.BLOCKS.getValue(key);
@@ -689,8 +689,8 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
         }
     }
 
-    private static ResourceLocation forgeRl(String path) {
-        return ResourceLocation.fromNamespaceAndPath("forge", path);
+    private static Identifier forgeRl(String path) {
+        return Identifier.fromNamespaceAndPath("forge", path);
     }
 
     private TagAppender<Block, Block> tag(TagKey<Block> block, TagKey<Item> item, TagKey<Block> oldBlock, TagKey<Item> oldItem) {
@@ -738,7 +738,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             }
 
             @Override
-            public TagAppender<Block, Block> remove(ResourceLocation value) {
+            public TagAppender<Block, Block> remove(Identifier value) {
                 tag.remove(value);
                 old.remove(value);
                 return this;

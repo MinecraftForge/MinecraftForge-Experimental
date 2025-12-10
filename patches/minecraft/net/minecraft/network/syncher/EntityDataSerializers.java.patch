@@ -1,7 +1,7 @@
 --- a/net/minecraft/network/syncher/EntityDataSerializers.java
 +++ b/net/minecraft/network/syncher/EntityDataSerializers.java
-@@ -124,16 +_,18 @@
-     public static final EntityDataSerializer<ResolvableProfile> RESOLVABLE_PROFILE = EntityDataSerializer.forValueType(ResolvableProfile.STREAM_CODEC);
+@@ -128,15 +_,17 @@
+     public static final EntityDataSerializer<HumanoidArm> HUMANOID_ARM = EntityDataSerializer.forValueType(HumanoidArm.STREAM_CODEC);
  
      public static void registerSerializer(EntityDataSerializer<?> p_135051_) {
 +        int id =
@@ -9,8 +9,7 @@
 +        if (id >= 256) throw new RuntimeException("Vanilla DataSerializer ID limit exceeded");
      }
  
-     @Nullable
-     public static EntityDataSerializer<?> getSerializer(int p_135049_) {
+     public static @Nullable EntityDataSerializer<?> getSerializer(int p_135049_) {
 -        return SERIALIZERS.byId(p_135049_);
 +        return net.minecraftforge.common.ForgeHooks.getSerializer(p_135049_, SERIALIZERS);
      }

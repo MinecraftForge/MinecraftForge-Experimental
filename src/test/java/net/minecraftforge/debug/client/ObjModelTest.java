@@ -13,8 +13,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.model.ModelIdentifier;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.data.ModelData;
@@ -33,7 +33,7 @@ public class ObjModelTest {
 
     public static final String MODID = "obj_model_test";
     private static final PoseStack POSE_STACK = new PoseStack();
-    private static final ModelResourceLocation PYRAMID_MODEL_LOCATION = new ModelResourceLocation(ResourceLocation.fromNamespaceAndPath(MODID, "pyramid"), "");
+    private static final ModelIdentifier PYRAMID_MODEL_LOCATION = new ModelIdentifier(Identifier.fromNamespaceAndPath(MODID, "pyramid"), "");
     private static BakedModel pyramidModel;
 
     public ObjModelTest(FMLJavaModLoadingContext ctx) {

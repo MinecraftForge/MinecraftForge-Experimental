@@ -18,7 +18,7 @@ import net.minecraft.network.PacketListener;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.protocol.login.ClientboundCustomQueryPacket;
 import net.minecraft.network.protocol.login.ServerboundCustomQueryAnswerPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class NetworkProtocol<B extends FriendlyByteBuf> {
     public static final NetworkProtocol<RegistryFriendlyByteBuf> PLAY = new NetworkProtocol<>(ConnectionProtocol.PLAY);
@@ -45,7 +45,7 @@ public class NetworkProtocol<B extends FriendlyByteBuf> {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends PacketListener> Packet<T> buildPacket(PacketFlow direction, ResourceLocation name, Consumer<B> encoder) {
+    public <T extends PacketListener> Packet<T> buildPacket(PacketFlow direction, Identifier name, Consumer<B> encoder) {
         var payload = ForgePayload.create(name, (Consumer<FriendlyByteBuf>)encoder);
 
         switch (this.protocol) {

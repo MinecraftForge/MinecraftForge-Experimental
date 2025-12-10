@@ -6,7 +6,7 @@
 package net.minecraftforge.server.permission.events;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -37,17 +37,17 @@ public sealed class PermissionGatherEvent extends MutableEvent implements Inheri
     public static final class Handler extends PermissionGatherEvent {
         public static final EventBus<Handler> BUS = EventBus.create(Handler.class);
 
-        private final Map<ResourceLocation, IPermissionHandlerFactory> availableHandlers = new HashMap<>();
+        private final Map<Identifier, IPermissionHandlerFactory> availableHandlers = new HashMap<>();
 
         public Handler() {
             availableHandlers.put(DefaultPermissionHandler.IDENTIFIER, DefaultPermissionHandler::new);
         }
 
-        public Map<ResourceLocation, IPermissionHandlerFactory> getAvailablePermissionHandlerFactories() {
+        public Map<Identifier, IPermissionHandlerFactory> getAvailablePermissionHandlerFactories() {
             return Collections.unmodifiableMap(availableHandlers);
         }
 
-        public void addPermissionHandler(ResourceLocation identifier, IPermissionHandlerFactory handlerFactory) {
+        public void addPermissionHandler(Identifier identifier, IPermissionHandlerFactory handlerFactory) {
             Preconditions.checkNotNull(identifier, "Permission handler identifier cannot be null!");
             Preconditions.checkNotNull(handlerFactory, "Permission handler cannot be null!");
             if (this.availableHandlers.containsKey(identifier))

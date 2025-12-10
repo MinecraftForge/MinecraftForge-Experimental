@@ -1,0 +1,11 @@
+--- a/com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
++++ b/com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
+@@ -263,7 +_,7 @@
+             int k = this.getY();
+             p_282595_.blit(RenderPipelines.GUI_TEXTURED, this.image, j + 2, k + 2, 0.0F, 0.0F, 56, 56, 56, 56, 56, 56, i);
+             p_282595_.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_FRAME_SPRITE, j, k, 60, 60, i);
+-            int l = flag ? -6250336 : -1;
++            int l = getFGColor();
+             p_282595_.drawCenteredString(RealmsResetWorldScreen.this.font, this.getMessage(), j + 28, k - 14, l);
+         }
+     }

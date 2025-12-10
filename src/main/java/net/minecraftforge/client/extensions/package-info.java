@@ -15,12 +15,7 @@
  * methods are usually {@code default} with an implementation in the interface itself, but methods may be implemented
  * in the target class instead if it requires access to (patched-in or original) fields in the instance.</p>
  */
-@FieldsAreNonnullByDefault
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
+@NullMarked
 package net.minecraftforge.client.extensions;
 
-import net.minecraft.FieldsAreNonnullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
-
-import javax.annotation.ParametersAreNonnullByDefault;
+import org.jspecify.annotations.NullMarked;

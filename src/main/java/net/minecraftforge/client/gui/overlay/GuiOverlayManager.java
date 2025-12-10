@@ -8,7 +8,7 @@ package net.minecraftforge.client.gui.overlay;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.fml.ModLoader;
 import org.jetbrains.annotations.ApiStatus;
@@ -26,7 +26,7 @@ import java.util.function.Function;
 public final class GuiOverlayManager
 {
     private static ImmutableList<NamedGuiOverlay> OVERLAYS;
-    private static ImmutableMap<ResourceLocation, NamedGuiOverlay> OVERLAYS_BY_NAME;
+    private static ImmutableMap<Identifier, NamedGuiOverlay> OVERLAYS_BY_NAME;
 
     /**
      * Retrieves an ordered list of all registered overlays.
@@ -41,7 +41,7 @@ public final class GuiOverlayManager
      * Do not call this before {@link RegisterGuiOverlaysEvent} has finished firing.
      * /
     @Nullable
-    public static NamedGuiOverlay findOverlay(ResourceLocation id)
+    public static NamedGuiOverlay findOverlay(Identifier id)
     {
         return OVERLAYS_BY_NAME.get(id);
     }
@@ -49,8 +49,8 @@ public final class GuiOverlayManager
     @ApiStatus.Internal
     public static void init()
     {
-        var overlays = new HashMap<ResourceLocation, IGuiOverlay>();
-        var orderedOverlays = new ArrayList<ResourceLocation>();
+        var overlays = new HashMap<Identifier, IGuiOverlay>();
+        var orderedOverlays = new ArrayList<Identifier>();
         preRegisterVanillaOverlays(overlays, orderedOverlays);
         var event = new RegisterGuiOverlaysEvent(overlays, orderedOverlays);
         ModLoader.get().postEventWrapContainerInModOrder(event);
@@ -65,7 +65,7 @@ public final class GuiOverlayManager
     /**
      * Pre-registers vanilla overlays so they are available for ordering.
      * /
-    private static void preRegisterVanillaOverlays(HashMap<ResourceLocation, IGuiOverlay> overlays, ArrayList<ResourceLocation> orderedOverlays)
+    private static void preRegisterVanillaOverlays(HashMap<Identifier, IGuiOverlay> overlays, ArrayList<Identifier> orderedOverlays)
     {
         for (var entry : VanillaGuiOverlay.values())
         {

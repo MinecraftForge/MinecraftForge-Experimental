@@ -12,7 +12,7 @@ import com.google.gson.JsonParseException;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMaps;
 import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.model.ItemModelGenerator;
 import net.minecraft.client.renderer.block.model.SimpleUnbakedGeometry;
 import net.minecraft.client.renderer.block.model.TextureSlots;
@@ -24,7 +24,7 @@ import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.client.resources.model.UnbakedGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.ForgeRenderTypes;
 import net.minecraftforge.client.RenderTypeGroup;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
@@ -47,10 +47,10 @@ import org.jetbrains.annotations.Nullable;
 public class ItemLayerGeometry implements UnbakedGeometry {
     private static final ItemLayerGeometry INSTANCE = new ItemLayerGeometry(Int2ObjectMaps.emptyMap(), Int2ObjectMaps.emptyMap());
 
-    private final Int2ObjectMap<ResourceLocation> renderTypeNames;
-    private final Int2ObjectMap<ResourceLocation> renderTypeFastNames;
+    private final Int2ObjectMap<Identifier> renderTypeNames;
+    private final Int2ObjectMap<Identifier> renderTypeFastNames;
 
-    private ItemLayerGeometry(Int2ObjectMap<ResourceLocation> renderTypeNames, Int2ObjectMap<ResourceLocation> renderTypeFastNames) {
+    private ItemLayerGeometry(Int2ObjectMap<Identifier> renderTypeNames, Int2ObjectMap<Identifier> renderTypeFastNames) {
         this.renderTypeNames = renderTypeNames;
         this.renderTypeFastNames = renderTypeFastNames;
     }
@@ -69,7 +69,7 @@ public class ItemLayerGeometry implements UnbakedGeometry {
             elements.addAll(ItemModelGenerator.processFrames(i, layer, contents));
         }
 
-        return SimpleUnbakedGeometry.bake(elements, textures, baker.sprites(), state, name);
+        return SimpleUnbakedGeometry.bake(elements, textures, baker, state, name);
         /*
         Material particleMaterial = spriteGetter.getMaterial("particle");
         var particle = baker.sprites().get(particleMaterial  == null ? textures.get(0) : particleMaterial, name);
@@ -107,12 +107,12 @@ public class ItemLayerGeometry implements UnbakedGeometry {
             */
         }
 
-        private static Int2ObjectMap<ResourceLocation> readRenderTypeNames(JsonObject jsonObject, String key) {
-            var renderTypeNames = new Int2ObjectOpenHashMap<ResourceLocation>();
+        private static Int2ObjectMap<Identifier> readRenderTypeNames(JsonObject jsonObject, String key) {
+            var renderTypeNames = new Int2ObjectOpenHashMap<Identifier>();
             if (jsonObject.has(key)) {
                 var renderTypes = jsonObject.getAsJsonObject(key);
                 for (var entry : renderTypes.entrySet()) {
-                    var renderType = ResourceLocation.parse(entry.getKey());
+                    var renderType = Identifier.parse(entry.getKey());
                     for (var layer : entry.getValue().getAsJsonArray())
                         if (renderTypeNames.put(layer.getAsInt(), renderType) != null)
                             throw new JsonParseException("Registered duplicate " + key + " for layer " + layer);

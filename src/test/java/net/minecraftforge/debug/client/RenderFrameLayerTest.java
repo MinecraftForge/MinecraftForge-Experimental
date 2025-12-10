@@ -10,19 +10,19 @@ import net.minecraft.client.renderer.state.LevelRenderState;
 import net.minecraftforge.client.FramePassManager;
 import net.minecraftforge.client.event.AddFramePassEvent;
 import net.minecraftforge.common.extensions.IForgeGameTestHelper;
-import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.gametest.GameTest;
 import net.minecraftforge.gametest.GameTestNamespace;
 import net.minecraftforge.test.BaseTestMod;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.ShapeRenderer;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.gizmos.GizmoStyle;
+import net.minecraft.gizmos.Gizmos;
+import net.minecraft.util.ARGB;
+import net.minecraft.world.phys.AABB;
+
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.framegraph.FramePass;
-
 
 @GameTestNamespace("forge")
 @Mod(RenderFrameLayerTest.MODID)
@@ -61,11 +61,11 @@ public class RenderFrameLayerTest extends BaseTestMod {
                 passOne.set(true);
                 ps.translate(state.cameraRenderState.entityPos.multiply(-1,-1,-1));
                 ps.pushPose();
-                var buffSource = Minecraft.getInstance().renderBuffers().bufferSource();
-                var vc = buffSource.getBuffer(RenderType.lines());
-
-                ShapeRenderer.renderLineBox(ps.last(), vc, 0, -60, 0, 10, -50, 10, 1f, 1f, 1f, 1f);
-                buffSource.endBatch();
+                Gizmos.cuboid(
+                    new AABB(0, -60, 0, 10, -50, 10),
+                    GizmoStyle.stroke(ARGB.colorFromFloat(1.0F, 0.9F, 0.9F, 0.9F)),
+                    true
+                );
                 ps.popPose();
             }
         };
@@ -82,11 +82,11 @@ public class RenderFrameLayerTest extends BaseTestMod {
                 passTwo.set(true);
                 ps.translate(state.cameraRenderState.entityPos.multiply(-1,-1,-1));
                 ps.pushPose();
-                var buffSource = Minecraft.getInstance().renderBuffers().bufferSource();
-                var vc = buffSource.getBuffer(RenderType.lines());
-
-                ShapeRenderer.renderLineBox(ps.last(), vc, 1, -61, 1, 9, -49, 9, 1f, 1f, 1f, 1f);
-                buffSource.endBatch();
+                Gizmos.cuboid(
+                    new AABB(0, -60, 0, 10, -50, 10).contract(1, 1, 1),
+                    GizmoStyle.stroke(ARGB.colorFromFloat(1.0F, 0.9F, 0.9F, 0.9F)),
+                    true
+                );
                 ps.popPose();
             }
         };

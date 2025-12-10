@@ -1,0 +1,28 @@
+--- a/net/minecraft/world/entity/projectile/arrow/AbstractArrow.java
++++ b/net/minecraft/world/entity/projectile/arrow/AbstractArrow.java
+@@ -78,6 +_,7 @@
+     private @Nullable List<Entity> piercedAndKilledEntities;
+     private ItemStack pickupItemStack = this.getDefaultPickupItem();
+     private @Nullable ItemStack firedFromWeapon = null;
++    private final IntOpenHashSet ignoredEntities = new IntOpenHashSet();
+ 
+     protected AbstractArrow(EntityType<? extends AbstractArrow> p_450750_, Level p_450850_) {
+         super(p_450750_, p_450850_);
+@@ -191,7 +_,7 @@
+             this.shakeTime--;
+         }
+ 
+-        if (this.isInWaterOrRain()) {
++        if (this.isInWaterOrRain() || this.isInFluidType((fluidType, height) -> this.canFluidExtinguish(fluidType))) {
+             this.clearFire();
+         }
+ 
+@@ -587,7 +_,7 @@
+     protected boolean canHitEntity(Entity p_454713_) {
+         return p_454713_ instanceof Player && this.getOwner() instanceof Player player && !player.canHarmPlayer((Player)p_454713_)
+             ? false
+-            : super.canHitEntity(p_454713_) && (this.piercingIgnoreEntityIds == null || !this.piercingIgnoreEntityIds.contains(p_454713_.getId()));
++            : super.canHitEntity(p_454713_) && (this.piercingIgnoreEntityIds == null || !this.piercingIgnoreEntityIds.contains(p_454713_.getId())) && !this.ignoredEntities.contains(p_454713_.getId());
+     }
+ 
+     @Override

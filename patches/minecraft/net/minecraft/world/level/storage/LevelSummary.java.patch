@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/level/storage/LevelSummary.java
 +++ b/net/minecraft/world/level/storage/LevelSummary.java
 @@ -14,7 +_,7 @@
- import net.minecraft.world.level.LevelSettings;
  import org.apache.commons.lang3.StringUtils;
+ import org.jspecify.annotations.Nullable;
  
 -public class LevelSummary implements Comparable<LevelSummary> {
 +public class LevelSummary implements Comparable<LevelSummary>, net.minecraftforge.common.extensions.IForgeLevelSummary {
      public static final Component PLAY_WORLD = Component.translatable("selectWorld.select");
      private final LevelSettings settings;
      private final LevelVersion levelVersion;
-@@ -275,6 +_,12 @@
+@@ -274,6 +_,12 @@
          public boolean canRecreate() {
              return false;
          }

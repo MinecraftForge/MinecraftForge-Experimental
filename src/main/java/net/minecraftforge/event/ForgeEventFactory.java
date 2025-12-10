@@ -26,8 +26,8 @@ import net.minecraftforge.common.util.Result;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 
 import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
@@ -46,7 +46,7 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.ReloadableServerResources;
 import net.minecraft.server.level.ChunkHolder;
@@ -56,6 +56,7 @@ import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.server.players.NameAndId;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.sounds.SoundEvent;
@@ -66,17 +67,18 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.attribute.BedRule;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.projectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
@@ -90,7 +92,6 @@ import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Explosion;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelSimulatedReader;
@@ -103,6 +104,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraft.world.level.chunk.status.ChunkType;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.portal.PortalShape;
 import net.minecraft.world.level.storage.PlayerDataStorage;
@@ -214,7 +216,7 @@ public final class ForgeEventFactory {
         return EntityMultiPlaceEvent.BUS.post(new EntityMultiPlaceEvent(blockSnapshots, placedAgainst, entity));
     }
 
-    public static boolean onBlockPlace(@Nullable Entity entity, @NotNull BlockSnapshot blockSnapshot, @NotNull Direction direction) {
+    public static boolean onBlockPlace(@Nullable Entity entity, @NonNull BlockSnapshot blockSnapshot, @NonNull Direction direction) {
         var placedAgainst = blockSnapshot.getLevel().getBlockState(blockSnapshot.getPos().relative(direction.getOpposite()));
         return BlockEvent.EntityPlaceEvent.BUS.post(new BlockEvent.EntityPlaceEvent(blockSnapshot, placedAgainst, entity));
     }
@@ -232,11 +234,11 @@ public final class ForgeEventFactory {
         return PlayerEvent.BreakSpeed.BUS.post(event) ? -1 : event.getNewSpeed();
     }
 
-    public static void onPlayerDestroyItem(Player player, @NotNull ItemStack stack, @Nullable InteractionHand hand) {
+    public static void onPlayerDestroyItem(Player player, @NonNull ItemStack stack, @Nullable InteractionHand hand) {
         onPlayerDestroyItem(player, stack, hand.asEquipmentSlot());
     }
 
-    public static void onPlayerDestroyItem(Player player, @NotNull ItemStack stack, @Nullable EquipmentSlot slot) {
+    public static void onPlayerDestroyItem(Player player, @NonNull ItemStack stack, @Nullable EquipmentSlot slot) {
         PlayerDestroyItemEvent.BUS.post(new PlayerDestroyItemEvent(player, stack, slot));
     }
 
@@ -323,8 +325,7 @@ public final class ForgeEventFactory {
      * This overload is also the only way to pass through a {@link BaseSpawner} instance.
      * @see #onFinalizeSpawn
      */
-    @Nullable
-    public static MobSpawnEvent.FinalizeSpawn onFinalizeSpawnSpawner(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable SpawnGroupData spawnData, @Nullable ValueInput spawnTag, BaseSpawner spawner) {
+    public static MobSpawnEvent.@Nullable FinalizeSpawn onFinalizeSpawnSpawner(Mob mob, ServerLevelAccessor level, DifficultyInstance difficulty, @Nullable SpawnGroupData spawnData, @Nullable ValueInput spawnTag, BaseSpawner spawner) {
         var event = new MobSpawnEvent.FinalizeSpawn(mob, level, mob.getX(), mob.getY(), mob.getZ(), difficulty, EntitySpawnReason.SPAWNER, spawnData, spawnTag, spawner);
         return MobSpawnEvent.FinalizeSpawn.BUS.post(event) ? null : event;
     }
@@ -333,7 +334,7 @@ public final class ForgeEventFactory {
         return AllowDespawn.BUS.fire(new AllowDespawn(entity, level)).getResult();
     }
 
-    public static int getItemBurnTime(@NotNull ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
+    public static int getItemBurnTime(@NonNull ItemStack itemStack, int burnTime, @Nullable RecipeType<?> recipeType) {
         return FurnaceFuelBurnTimeEvent.BUS.fire(new FurnaceFuelBurnTimeEvent(itemStack, burnTime, recipeType)).getBurnTime();
     }
 
@@ -428,7 +429,7 @@ public final class ForgeEventFactory {
     }
 
     @Nullable
-    public static InteractionResult onBucketUse(@NotNull Player player, @NotNull Level level, @NotNull ItemStack stack, @Nullable HitResult target) {
+    public static InteractionResult onBucketUse(@NonNull Player player, @NonNull Level level, @NonNull ItemStack stack, @Nullable HitResult target) {
         var event = new FillBucketEvent(player, stack, level, target);
         if (FillBucketEvent.BUS.post(event))
             return InteractionResult.FAIL;
@@ -449,7 +450,7 @@ public final class ForgeEventFactory {
         return null;
     }
 
-    public static @Nullable PlayLevelSoundEvent.AtEntity onPlaySoundAtEntity(Level level, Entity entity, Holder<SoundEvent> name, SoundSource category, float volume, float pitch) {
+    public static PlayLevelSoundEvent.@Nullable AtEntity onPlaySoundAtEntity(Level level, Entity entity, Holder<SoundEvent> name, SoundSource category, float volume, float pitch) {
         var event = new PlayLevelSoundEvent.AtEntity(level, entity, name, category, volume, pitch);
         return PlayLevelSoundEvent.AtEntity.BUS.post(event) ? null : event;
     }
@@ -459,7 +460,7 @@ public final class ForgeEventFactory {
         return PlayLevelSoundEvent.AtPosition.BUS.post(event) ? null : event;
     }
 
-    public static int onItemExpire(ItemEntity entity, @NotNull ItemStack item) {
+    public static int onItemExpire(ItemEntity entity, @NonNull ItemStack item) {
         if (item.isEmpty()) return -1;
         var event = new ItemExpireEvent(entity, (item.isEmpty() ? 6000 : item.getItem().getEntityLifespan(item, entity.level())));
         if (!ItemExpireEvent.BUS.post(event)) return -1;
@@ -586,13 +587,13 @@ public final class ForgeEventFactory {
             return canContinueSleep == Result.ALLOW;
     }
 
-    public static boolean onSleepingTimeCheck(Player player, Optional<BlockPos> sleepingLocation) {
+    public static boolean onSleepingTimeCheck(Player player, Optional<BlockPos> sleepingLocation, BedRule rule) {
         var evt = new SleepingTimeCheckEvent(player, sleepingLocation);
         SleepingTimeCheckEvent.BUS.post(evt);
 
         var canContinueSleep = evt.getResult();
         if (canContinueSleep == Result.DEFAULT)
-            return !player.level().isBrightOutside();
+            return !rule.canSleep(player.level());
         else
             return canContinueSleep == Result.ALLOW;
     }
@@ -619,7 +620,7 @@ public final class ForgeEventFactory {
         return onProjectileImpactResult(projectile, ray) != ProjectileImpactEvent.ImpactResult.DEFAULT;
     }
 
-    public static @Nullable LootTable onLoadLootTable(ResourceLocation name, LootTable table) {
+    public static @Nullable LootTable onLoadLootTable(Identifier name, LootTable table) {
         var event = new LootTableLoadEvent(name, table);
         return LootTableLoadEvent.BUS.post(event) ? null : event.getTable();
     }
@@ -644,10 +645,10 @@ public final class ForgeEventFactory {
 
     public static boolean getMobGriefingEvent(ServerLevel level, @Nullable Entity entity) {
         if (entity == null)
-            return level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING);
+            return level.getGameRules().get(GameRules.MOB_GRIEFING);
 
         var result = EntityMobGriefingEvent.BUS.fire(new EntityMobGriefingEvent(entity)).getResult();
-        return result == Result.DEFAULT ? level.getGameRules().getBoolean(GameRules.RULE_MOBGRIEFING) : result == Result.ALLOW;
+        return result == Result.DEFAULT ? level.getGameRules().get(GameRules.MOB_GRIEFING) : result == Result.ALLOW;
     }
 
     @SuppressWarnings("removal")
@@ -700,22 +701,22 @@ public final class ForgeEventFactory {
         LivingConversionEvent.Post.BUS.post(new LivingConversionEvent.Post(entity, outcome));
     }
 
-    public static @Nullable EntityTeleportEvent.TeleportCommand onEntityTeleportCommand(Entity entity, double targetX, double targetY, double targetZ) {
+    public static EntityTeleportEvent.@Nullable TeleportCommand onEntityTeleportCommand(Entity entity, double targetX, double targetY, double targetZ) {
         var event = new EntityTeleportEvent.TeleportCommand(entity, targetX, targetY, targetZ);
         return EntityTeleportEvent.TeleportCommand.BUS.post(event) ? null : event;
     }
 
-    public static @Nullable EntityTeleportEvent.SpreadPlayersCommand onEntityTeleportSpreadPlayersCommand(Entity entity, double targetX, double targetY, double targetZ) {
+    public static EntityTeleportEvent.@Nullable SpreadPlayersCommand onEntityTeleportSpreadPlayersCommand(Entity entity, double targetX, double targetY, double targetZ) {
         var event = new EntityTeleportEvent.SpreadPlayersCommand(entity, targetX, targetY, targetZ);
         return EntityTeleportEvent.SpreadPlayersCommand.BUS.post(event) ? null : event;
     }
 
-    public static @Nullable EntityTeleportEvent.EnderEntity onEnderManTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
+    public static EntityTeleportEvent.@Nullable EnderEntity onEnderManTeleport(LivingEntity entity, double targetX, double targetY, double targetZ) {
         var event = new EntityTeleportEvent.EnderEntity(entity, targetX, targetY, targetZ);
         return EntityTeleportEvent.EnderEntity.BUS.post(event) ? null : event;
     }
 
-    public static @Nullable EntityTeleportEvent.EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
+    public static EntityTeleportEvent.@Nullable EnderPearl onEnderPearlLand(ServerPlayer entity, double targetX, double targetY, double targetZ, ThrownEnderpearl pearlEntity, float attackDamage, HitResult hitResult) {
         var event = new EntityTeleportEvent.EnderPearl(entity, targetX, targetY, targetZ, pearlEntity, attackDamage, hitResult);
         return EntityTeleportEvent.EnderPearl.BUS.post(event) ? null : event;
     }
@@ -724,7 +725,7 @@ public final class ForgeEventFactory {
         return EntityTeleportEvent.ChorusFruit.BUS.fire(new EntityTeleportEvent.ChorusFruit(entity, targetX, targetY, targetZ));
     }
 
-    public static boolean onPermissionChanged(NameAndId gameProfile, int newLevel, PlayerList playerList) {
+    public static boolean onPermissionChanged(NameAndId gameProfile, @Nullable LevelBasedPermissionSet newLevel, PlayerList playerList) {
         var oldLevel = playerList.getServer().getProfilePermissions(gameProfile);
         var player = playerList.getPlayer(gameProfile.id());
         if (newLevel != oldLevel && player != null)
@@ -868,11 +869,11 @@ public final class ForgeEventFactory {
         ConnectionStartEvent.BUS.post(new ConnectionStartEvent(connection));
     }
 
-    public static void onChannelRegistrationChange(Connection connection, ChannelRegistrationChangeEvent.Type changeType, HashSet<ResourceLocation> changed) {
+    public static void onChannelRegistrationChange(Connection connection, ChannelRegistrationChangeEvent.Type changeType, HashSet<Identifier> changed) {
         ChannelRegistrationChangeEvent.BUS.post(new ChannelRegistrationChangeEvent(connection, changeType, changed));
     }
 
-    public static @Nullable LivingSwapItemsEvent.Hands onLivingSwapHandItems(LivingEntity entity) {
+    public static LivingSwapItemsEvent.@Nullable Hands onLivingSwapHandItems(LivingEntity entity) {
         var event = new LivingSwapItemsEvent.Hands(entity);
         return LivingSwapItemsEvent.Hands.BUS.post(event) ? null : event;
     }
@@ -920,7 +921,7 @@ public final class ForgeEventFactory {
         PlayerInteractEvent.LeftClickEmpty.BUS.post(new PlayerInteractEvent.LeftClickEmpty(player));
     }
 
-    public static @Nullable PlayerInteractEvent.LeftClickBlock onLeftClickBlock(Player player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
+    public static PlayerInteractEvent.@Nullable LeftClickBlock onLeftClickBlock(Player player, BlockPos pos, Direction face, ServerboundPlayerActionPacket.Action action) {
         var event = new PlayerInteractEvent.LeftClickBlock(player, pos, face, PlayerInteractEvent.LeftClickBlock.Action.convert(action));
         return PlayerInteractEvent.LeftClickBlock.BUS.post(event) ? null : event;
     }
@@ -1007,18 +1008,18 @@ public final class ForgeEventFactory {
         return LivingChangeTargetEvent.BUS.post(event) ? null : event;
     }
 
-    public static @Nullable PlayerXpEvent.XpChange onPlayerXpChange(Player player, int xp) {
+    public static PlayerXpEvent.@Nullable XpChange onPlayerXpChange(Player player, int xp) {
         var event = new PlayerXpEvent.XpChange(player, xp);
         return PlayerXpEvent.XpChange.BUS.post(event) ? null : event;
     }
 
-    public static @Nullable PlayerXpEvent.LevelChange onPlayerLevelChange(Player player, int levels) {
+    public static PlayerXpEvent.@Nullable LevelChange onPlayerLevelChange(Player player, int levels) {
         var event = new PlayerXpEvent.LevelChange(player, levels);
         return PlayerXpEvent.LevelChange.BUS.post(event) ? null : event;
     }
 
 
-    public static @Nullable GrindstoneEvent.OnPlaceItem onGrindstoneChange(@NotNull ItemStack top, @NotNull ItemStack bottom, Container outputSlot, int xp) {
+    public static GrindstoneEvent.@Nullable OnPlaceItem onGrindstoneChange(@NonNull ItemStack top, @NonNull ItemStack bottom, Container outputSlot, int xp) {
         var event = new GrindstoneEvent.OnPlaceItem(top, bottom, xp);
         return GrindstoneEvent.OnPlaceItem.BUS.post(event) ? null : event;
     }
@@ -1031,12 +1032,12 @@ public final class ForgeEventFactory {
         return ItemStackedOnOtherEvent.BUS.post(new ItemStackedOnOtherEvent(carriedItem, stackedOnItem, slot, action, player, carriedSlotAccess));
     }
 
-    public static @Nullable NoteBlockEvent.Play onNotePlay(Level world, BlockPos pos, BlockState state, int note, NoteBlockInstrument instrument) {
+    public static NoteBlockEvent.@Nullable Play onNotePlay(Level world, BlockPos pos, BlockState state, int note, NoteBlockInstrument instrument) {
         var event = new NoteBlockEvent.Play(world, pos, state, note, instrument);
         return NoteBlockEvent.Play.BUS.post(event) ? null : event;
     }
 
-    public static AnvilRepairEvent onAnvilRepair(Player player, @NotNull ItemStack output, @NotNull ItemStack left, @NotNull ItemStack right) {
+    public static AnvilRepairEvent onAnvilRepair(Player player, @NonNull ItemStack output, @NonNull ItemStack left, @NonNull ItemStack right) {
         return AnvilRepairEvent.BUS.fire(new AnvilRepairEvent(player, left, right, output));
     }
 

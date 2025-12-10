@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/effect/MobEffect.java
 +++ b/net/minecraft/world/effect/MobEffect.java
 @@ -36,7 +_,8 @@
- import net.minecraft.world.flag.FeatureFlagSet;
  import net.minecraft.world.flag.FeatureFlags;
+ import org.jspecify.annotations.Nullable;
  
 -public class MobEffect implements FeatureElement {
 +
@@ -10,7 +10,7 @@
      public static final Codec<Holder<MobEffect>> CODEC = BuiltInRegistries.MOB_EFFECT.holderByNameCodec();
      public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MobEffect>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT);
      private static final int AMBIENT_ALPHA = Mth.floor(38.25F);
-@@ -59,12 +_,14 @@
+@@ -58,12 +_,14 @@
              int i = p_358853_.isAmbient() ? AMBIENT_ALPHA : 255;
              return ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, ARGB.color(i, p_19452_));
          };
@@ -25,7 +25,7 @@
      }
  
      public int getBlendInDurationTicks() {
-@@ -203,4 +_,28 @@
+@@ -202,4 +_,28 @@
              return new AttributeModifier(this.id, this.amount * (p_332230_ + 1), this.operation);
          }
      }

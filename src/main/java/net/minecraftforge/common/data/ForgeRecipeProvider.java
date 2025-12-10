@@ -20,7 +20,7 @@ import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -67,7 +67,7 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
     }
 
     private void exclude(String name) {
-        excludes.add(ResourceKey.create(Registries.RECIPE, ResourceLocation.parse(name)));
+        excludes.add(ResourceKey.create(Registries.RECIPE, Identifier.parse(name)));
     }
 
     private void replace(ItemLike item, TagKey<Item> tag) {
@@ -225,7 +225,7 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         }
 
         @Override
-        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, ResourceLocation advancementId, JsonElement advancement) {
+        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, Identifier advancementId, JsonElement advancement) {
             var modified = self.enhance(id, recipe);
             if (modified != null)
                 wrapped.accept(id, modified, null);

@@ -19,7 +19,7 @@
 +    static <T> TagAppender<ResourceKey<T>, T> forBuilder(final TagBuilder p_407840_, String source) {
          return new TagAppender<ResourceKey<T>, T>() {
              public TagAppender<ResourceKey<T>, T> add(ResourceKey<T> p_406023_) {
-                 p_407840_.addElement(p_406023_.location());
+                 p_407840_.addElement(p_406023_.identifier());
 @@ -54,6 +_,21 @@
                  p_407840_.addOptionalTag(p_407223_.location());
                  return this;
@@ -37,7 +37,7 @@
 +
 +            @Override
 +            public TagAppender<ResourceKey<T>, T> remove(ResourceKey<T> value) {
-+                return this.remove(value.location());
++                return this.remove(value.identifier());
 +            }
          };
      }

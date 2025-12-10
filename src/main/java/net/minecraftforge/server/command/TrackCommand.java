@@ -39,7 +39,7 @@ class TrackCommand {
     private static class StartTrackingCommand {
         static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("start")
-                .requires(cs->cs.hasPermission(2)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("te")
                     .then(Commands.argument("duration", IntegerArgumentType.integer(1))
                         .executes(ctx -> {
@@ -68,7 +68,7 @@ class TrackCommand {
     private static class ResetTrackingCommand {
         static ArgumentBuilder<CommandSourceStack, ?> register() {
             return Commands.literal("reset")
-                .requires(cs->cs.hasPermission(2)) //permission
+                .requires(Commands.hasPermission(Commands.LEVEL_GAMEMASTERS))
                 .then(Commands.literal("te")
                     .executes(ctx -> {
                         TimeTracker.BLOCK_ENTITY_UPDATE.reset();
@@ -127,7 +127,7 @@ class TrackCommand {
                 double averageTimings = data.getAverageTimings();
                 String tickTime = (averageTimings > 1000 ? TIME_FORMAT.format(averageTimings / 1000) : TIME_FORMAT.format(averageTimings)) + (averageTimings < 1000 ? "\u03bcs" : "ms");
 
-                return Component.translatable("commands.forge.tracking.timing_entry", ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()), entity.level().dimension().location().toString(), pos.getX(), pos.getY(), pos.getZ(), tickTime);
+                return Component.translatable("commands.forge.tracking.timing_entry", ForgeRegistries.ENTITY_TYPES.getKey(entity.getType()), entity.level().dimension().identifier().toString(), pos.getX(), pos.getY(), pos.getZ(), tickTime);
             }));
         }
     }
@@ -143,7 +143,7 @@ class TrackCommand {
 
                 double averageTimings = data.getAverageTimings();
                 String tickTime = (averageTimings > 1000 ? TIME_FORMAT.format(averageTimings / 1000) : TIME_FORMAT.format(averageTimings)) + (averageTimings < 1000 ? "\u03bcs" : "ms");
-                return Component.translatable("commands.forge.tracking.timing_entry", ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(be.getType()), be.getLevel().dimension().location().toString(), pos.getX(), pos.getY(), pos.getZ(), tickTime);
+                return Component.translatable("commands.forge.tracking.timing_entry", ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(be.getType()), be.getLevel().dimension().identifier().toString(), pos.getX(), pos.getY(), pos.getZ(), tickTime);
             }));
         }
     }

@@ -7,7 +7,7 @@ package net.minecraftforge.common.extensions;
 
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagBuilder;
 import net.minecraft.tags.TagKey;
 
@@ -62,7 +62,7 @@ public interface IForgeTagAppender<E, T> {
         return builder;
     }
 
-    default TagAppender<E, T> addOptional(ResourceLocation location) {
+    default TagAppender<E, T> addOptional(Identifier location) {
         self().getInternalBuilder().addOptionalElement(location);
         return self();
     }
@@ -89,7 +89,7 @@ public interface IForgeTagAppender<E, T> {
      * @param location The ID of the element to remove
      * @return The builder for chaining
      */
-    default TagAppender<E, T> remove(final ResourceLocation location) {
+    default TagAppender<E, T> remove(final Identifier location) {
         var builder = self();
         builder.getInternalBuilder().removeElement(location, builder.getSourceName());
         return builder;
@@ -100,7 +100,7 @@ public interface IForgeTagAppender<E, T> {
      * @param locations The IDs of the elements to remove
      * @return The builder for chaining
      */
-    default TagAppender<E, T> remove(final ResourceLocation first, final ResourceLocation... locations) {
+    default TagAppender<E, T> remove(final Identifier first, final Identifier... locations) {
         this.remove(first);
         for (var location : locations)
             this.remove(location);
@@ -114,7 +114,7 @@ public interface IForgeTagAppender<E, T> {
      * @return The appender for chaining
      */
     default TagAppender<E, T> remove(final ResourceKey<T> resourceKey) {
-        this.remove(resourceKey.location());
+        this.remove(resourceKey.identifier());
         return self();
     }
 

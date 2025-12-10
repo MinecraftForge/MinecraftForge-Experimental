@@ -12,7 +12,7 @@ import io.netty.channel.ChannelHandler;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundUpdateAttributesPacket;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.ConnectionType;
 import net.minecraftforge.network.NetworkContext;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -50,7 +50,7 @@ public class VanillaConnectionNetworkFilter extends VanillaPacketFilter {
         ClientboundUpdateAttributesPacket newPacket = new ClientboundUpdateAttributesPacket(msg.getEntityId(), Collections.emptyList());
         msg.getValues().stream()
                 .filter(snapshot -> {
-                    ResourceLocation key = ForgeRegistries.ATTRIBUTES.getKey(snapshot.attribute().get());
+                    Identifier key = ForgeRegistries.ATTRIBUTES.getKey(snapshot.attribute().get());
                     return key != null && key.getNamespace().equals("minecraft");
                 })
                 .forEach(snapshot -> newPacket.getValues().add(snapshot));
@@ -69,7 +69,7 @@ public class VanillaConnectionNetworkFilter extends VanillaPacketFilter {
         return new ClientboundUpdateTagsPacket(tags);
     }
 
-    private static boolean isVanillaRegistry(ResourceLocation location) {
+    private static boolean isVanillaRegistry(Identifier location) {
         // Checks if the registry name is contained within the static view of both BuiltInRegistries and VanillaRegistries
         return RegistryManager.getVanillaRegistryKeys().contains(location)
                 || VanillaRegistries.DATAPACK_REGISTRY_KEYS.stream().anyMatch(k -> k.location().equals(location));

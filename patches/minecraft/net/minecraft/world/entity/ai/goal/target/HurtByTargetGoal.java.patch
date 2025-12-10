@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
 +++ b/net/minecraft/world/entity/ai/goal/target/HurtByTargetGoal.java
-@@ -84,6 +_,10 @@
+@@ -83,6 +_,10 @@
                  }
  
                  mob = (Mob)iterator.next();

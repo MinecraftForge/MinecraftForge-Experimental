@@ -16,7 +16,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.datafixers.util.Either;
 import com.mojang.math.Transformation;
 
-import net.minecraft.FileUtil;
+import net.minecraft.util.FileUtil;
 import net.minecraft.client.Camera;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
@@ -51,6 +51,7 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
@@ -77,7 +78,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.PlayerChatMessage;
 import net.minecraft.network.protocol.status.ServerStatus;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraft.server.packs.resources.Resource;
@@ -183,7 +184,7 @@ public class ForgeHooksClient {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Marker CLIENTHOOKS = MarkerManager.getMarker("CLIENTHOOKS");
 
-    //private static final ResourceLocation ITEM_GLINT = new ResourceLocation("textures/misc/enchanted_item_glint.png");
+    //private static final Identifier ITEM_GLINT = new Identifier("textures/misc/enchanted_item_glint.png");
 
     /**
      * Contains the *extra* GUI layers.
@@ -192,7 +193,7 @@ public class ForgeHooksClient {
     private static final Stack<Screen> guiLayers = new Stack<>();
 
     public static void resizeGuiLayers(Minecraft minecraft, int width, int height) {
-        guiLayers.forEach(screen -> screen.resize(minecraft, width, height));
+        guiLayers.forEach(screen -> screen.resize(width, height));
     }
 
     public static void clearGuiLayers(Minecraft minecraft) {
@@ -210,7 +211,7 @@ public class ForgeHooksClient {
         if (minecraft.screen != null)
             guiLayers.push(minecraft.screen);
         minecraft.screen = Objects.requireNonNull(screen);
-        screen.init(minecraft, minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
+        screen.init(minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
         minecraft.getNarrator().saySystemNow(screen.getNarrationMessage());
     }
 
@@ -241,7 +242,7 @@ public class ForgeHooksClient {
     }
 
     /*
-    public static ResourceLocation getArmorTexture(Entity entity, ItemStack armor, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean inner) {
+    public static Identifier getArmorTexture(Entity entity, ItemStack armor, EquipmentSlot slot, ArmorMaterial.Layer layer, boolean inner) {
         var result = armor.getItem().getArmorTexture(armor, entity, slot, layer, inner);
         return result != null ? result : layer.texture(inner);
     }
@@ -337,9 +338,9 @@ public class ForgeHooksClient {
 
     public static Vector3f getFogColor(Camera camera, float partialTick, ClientLevel level, int renderDistance, float darkenWorldAmount, float fogRed, float fogGreen, float fogBlue) {
         // Modify fog color depending on the fluid
-        FluidState state = level.getFluidState(camera.getBlockPosition());
+        FluidState state = level.getFluidState(camera.blockPosition());
         Vector3f fluidFogColor = new Vector3f(fogRed, fogGreen, fogBlue);
-        if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(level, camera.getBlockPosition())))
+        if (camera.position().y < (double)((float)camera.blockPosition().getY() + state.getHeight(level, camera.blockPosition())))
             fluidFogColor = IClientFluidTypeExtensions.of(state).modifyFogColor(camera, partialTick, level, renderDistance, darkenWorldAmount, fluidFogColor);
 
         var event = ViewportEvent.ComputeFogColor.BUS.fire(new ViewportEvent.ComputeFogColor(camera, partialTick, fluidFogColor.x(), fluidFogColor.y(), fluidFogColor.z()));
@@ -350,8 +351,8 @@ public class ForgeHooksClient {
 
     public static Vector4f setupFog(FogType type, Camera camera, DeltaTracker delta, FogData data, Vector4f color) {
         // Modify fog rendering depending on the fluid
-        FluidState state = camera.getEntity().level().getFluidState(camera.getBlockPosition());
-        if (camera.getPosition().y < (double)((float)camera.getBlockPosition().getY() + state.getHeight(camera.getEntity().level(), camera.getBlockPosition())))
+        FluidState state = camera.entity().level().getFluidState(camera.blockPosition());
+        if (camera.position().y < (double)((float)camera.blockPosition().getY() + state.getHeight(camera.entity().level(), camera.blockPosition())))
             IClientFluidTypeExtensions.of(state).modifyFogRender(camera, type, delta.getRealtimeDeltaTicks(), data, color);
 
         ViewportEvent.RenderFog.BUS.post(new ViewportEvent.RenderFog(type, camera, delta.getRealtimeDeltaTicks(), data, color));
@@ -368,7 +369,7 @@ public class ForgeHooksClient {
 
     public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluidStateIn) {
         IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
-        ResourceLocation overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
+        Identifier overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
         var atlas = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS);
         return new TextureAtlasSprite[] {
             atlas.getSprite(props.getStillTexture(fluidStateIn, level, pos)),
@@ -400,14 +401,14 @@ public class ForgeHooksClient {
         return CustomizeGuiOverlayEvent.BossEventProgress.BUS.post(evt) ? null : evt;
     }
 
-    public static void onCustomizeChatEvent(GuiGraphics guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount) {
+    public static void onCustomizeChatEvent(GuiGraphics guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount, Font font) {
         var minecraft = Minecraft.getInstance();
         var evt = new CustomizeGuiOverlayEvent.Chat(window, guiGraphics, minecraft.getDeltaTracker().getRealtimeDeltaTicks(), 0, chat.getHeight() - 40);
         CustomizeGuiOverlayEvent.Chat.BUS.post(evt);
         guiGraphics.pose().pushMatrix();
         // We give the absolute Y position of the chat component in the event and account for the chat component's own offsetting here.
         guiGraphics.pose().translate(evt.getPosX(), (float) ((evt.getPosY() - chat.getHeight() + 40) / chat.getScale()));
-        chat.render(guiGraphics, tickCount, mouseX, mouseY, false);
+        chat.render(guiGraphics, font, tickCount, mouseX, mouseY, false, false);
         guiGraphics.pose().popMatrix();
     }
 
@@ -463,7 +464,7 @@ public class ForgeHooksClient {
         return IClientMobEffectExtensions.of(effectInstance).isVisibleInInventory(effectInstance);
     }
 
-    public static Set<MetadataSectionType<?>> getAtlastMetadataSections(ResourceLocation atlasId, Set<MetadataSectionType<?>> vanilla) {
+    public static Set<MetadataSectionType<?>> getAtlastMetadataSections(Identifier atlasId, Set<MetadataSectionType<?>> vanilla) {
         var ret = new HashSet<>(vanilla);
         ret.add(ForgeTextureMetadata.TYPE);
 
@@ -473,7 +474,7 @@ public class ForgeHooksClient {
     }
 
     @Nullable
-    public static SpriteContents loadSpriteContents(ResourceLocation name, Resource resource, FrameSize frameSize, NativeImage image, List<MetadataSectionType.WithValue<?>> metadata) {
+    public static SpriteContents loadSpriteContents(Identifier name, Resource resource, FrameSize frameSize, NativeImage image, List<MetadataSectionType.WithValue<?>> metadata) {
         for (var meta : metadata) {
             var forgeMeta = meta.unwrapToType(ForgeTextureMetadata.TYPE).orElse(null);
             if (forgeMeta != null && forgeMeta.loader() != null)
@@ -483,12 +484,12 @@ public class ForgeHooksClient {
     }
 
     @Nullable
-    public static TextureAtlasSprite loadTextureAtlasSprite(ResourceLocation atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int spriteX, int spriteY, int mipmapLevel) {
+    public static TextureAtlasSprite loadTextureAtlasSprite(Identifier atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int spriteX, int spriteY, int padding, int mipmapLevel) {
         var forgeMeta = contents.getAdditionalMetadata(ForgeTextureMetadata.TYPE).orElse(null);
         if (forgeMeta == null || forgeMeta.loader() == null)
             return null;
 
-        return forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, mipmapLevel);
+        return forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, padding, mipmapLevel);
     }
 
     private static final Map<ModelLayerLocation, Supplier<LayerDefinition>> layerDefinitions = new HashMap<>();
@@ -506,7 +507,7 @@ public class ForgeHooksClient {
     public static void processForgeListPingData(ServerStatus packet, ServerData target) {
         packet.forgeData().ifPresentOrElse(forgeData -> {
             final Map<String, String> mods = forgeData.getRemoteModData();
-            final Map<ResourceLocation, ServerStatusPing.ChannelData> remoteChannels = forgeData.getRemoteChannels();
+            final Map<Identifier, ServerStatusPing.ChannelData> remoteChannels = forgeData.getRemoteChannels();
             final int fmlver = forgeData.getFMLNetworkVersion();
 
             int wantedVer = NetworkInitialization.getVersion();
@@ -556,7 +557,7 @@ public class ForgeHooksClient {
         }, () -> target.forgeData = new ExtendedServerListData("VANILLA", NetworkRegistry.canConnectToVanillaServer(),0, null));
     }
 
-    private static final ResourceLocation ICON_SHEET = ResourceLocation.fromNamespaceAndPath(ForgeVersion.MOD_ID, "textures/gui/icons.png");
+    private static final Identifier ICON_SHEET = Identifier.fromNamespaceAndPath(ForgeVersion.MOD_ID, "textures/gui/icons.png");
     public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphics guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
         int idx;
         String tooltip;
@@ -658,7 +659,7 @@ public class ForgeHooksClient {
         return stackFont == null ? fallbackFont : stackFont;
     }
 
-    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable ResourceLocation background) {
+    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable Identifier background) {
         var preEvent = new RenderTooltipEvent.Pre(stack, graphics, x, y, screenWidth, screenHeight, getTooltipFont(stack, fallbackFont), components, positioner, background);
         return RenderTooltipEvent.Pre.BUS.post(preEvent) ? null : preEvent;
     }
@@ -769,8 +770,8 @@ public class ForgeHooksClient {
         );
     }
 
-    public static ResourceLocation getShaderImportLocation(String basePath, boolean isRelative, String importPath) {
-        final var loc = ResourceLocation.parse(importPath);
+    public static Identifier getShaderImportLocation(String basePath, boolean isRelative, String importPath) {
+        final var loc = Identifier.parse(importPath);
         final var normalised = FileUtil.normalizeResourcePath(
             (isRelative ? basePath : "shaders/include/") + loc.getPath());
         return loc.withPath(normalised);
@@ -793,7 +794,7 @@ public class ForgeHooksClient {
         EntitySpectatorShaderManager.init();
         ForgeHooksClient.onRegisterKeyMappings(mc.options);
         //GuiOverlayManager.init();
-        DimensionSpecialEffectsManager.init();
+        //DimensionSpecialEffectsManager.init();
         NamedRenderTypeManager.init();
         ColorResolverManager.init();
         ItemDecoratorHandler.init();
@@ -819,7 +820,7 @@ public class ForgeHooksClient {
         if (name == null)
             return null;
 
-        var loader = GeometryLoaderManager.get(ResourceLocation.parse(name));
+        var loader = GeometryLoaderManager.get(Identifier.parse(name));
         if (loader == null)
             throw new JsonParseException(String.format(Locale.ENGLISH, "Model loader '%s' not found. Registered loaders: %s", name, GeometryLoaderManager.getLoaderList()));
 
@@ -829,19 +830,19 @@ public class ForgeHooksClient {
 
     @Nullable
     public static ForgeBlockModelData deserializeBlockModel(JsonObject json, JsonDeserializationContext context) {
-        Optional<ResourceLocation> renderType = Optional.empty();
-        Optional<ResourceLocation> renderTypeFast = Optional.empty();
+        Optional<Identifier> renderType = Optional.empty();
+        Optional<Identifier> renderTypeFast = Optional.empty();
         Optional<Map<String, Boolean>> visibility = Optional.empty();
 
         var transform = Optional.ofNullable(GsonHelper.getAsObject(json, "transform", null, context, Transformation.class));
 
         var renderTypeName = GsonHelper.getAsString(json, "render_type", null);
         if (renderTypeName != null)
-            renderType = Optional.of(ResourceLocation.parse(renderTypeName));
+            renderType = Optional.of(Identifier.parse(renderTypeName));
 
         var renderTypeFastName = GsonHelper.getAsString(json, "render_type_fast", null);
         if (renderTypeFastName != null)
-            renderTypeFast = Optional.of(ResourceLocation.parse(renderTypeFastName));
+            renderTypeFast = Optional.of(Identifier.parse(renderTypeFastName));
 
         var visibilityJson = GsonHelper.getAsJsonObject(json, "visibility", null);
         if (visibilityJson != null) {
@@ -878,7 +879,7 @@ public class ForgeHooksClient {
             return group;
         }
 
-        @Override public ResolvedModel getModel(ResourceLocation p_397309_) {
+        @Override public ResolvedModel getModel(Identifier p_397309_) {
             return parent.getModel(p_397309_);
         }
 
@@ -891,9 +892,19 @@ public class ForgeHooksClient {
         public <T> T compute(SharedOperationKey<T> p_395456_) {
             return parent.compute(p_395456_);
         }
+
+        @Override
+        public BlockModelPart missingBlockModelPart() {
+            return parent.missingBlockModelPart();
+        }
+
+        @Override
+        public PartCache parts() {
+            return parent.parts();
+        }
     }
 
-    public static void addFramePass(ResourceLocation rl, FramePassManager.PassDefinition definition) {
+    public static void addFramePass(Identifier rl, FramePassManager.PassDefinition definition) {
         FramePassManager.addPass(rl, definition);
     }
 }

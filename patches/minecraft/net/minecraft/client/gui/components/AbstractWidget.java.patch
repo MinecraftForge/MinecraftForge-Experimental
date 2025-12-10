@@ -1,17 +1,16 @@
 --- a/net/minecraft/client/gui/components/AbstractWidget.java
 +++ b/net/minecraft/client/gui/components/AbstractWidget.java
-@@ -238,6 +_,25 @@
+@@ -221,6 +_,23 @@
          this.focused = p_93693_;
      }
  
-+    // Forge start
 +    public static final int UNSET_FG_COLOR = -1;
 +
 +    protected int packedFGColor = UNSET_FG_COLOR;
 +
 +    public int getFGColor() {
 +        if (packedFGColor != UNSET_FG_COLOR) return packedFGColor;
-+        return net.minecraft.util.ARGB.color(this.alpha, this.active ? -1 : -6250336); // White : Light Grey
++        return this.active ? net.minecraft.util.CommonColors.WHITE : net.minecraft.util.CommonColors.LIGHT_GRAY;
 +    }
 +
 +    public void setFGColor(int color) {
@@ -21,7 +20,6 @@
 +    public void clearFGColor() {
 +        this.packedFGColor = UNSET_FG_COLOR;
 +    }
-+    // Forge end
 +
      @Override
      public NarratableEntry.NarrationPriority narrationPriority() {

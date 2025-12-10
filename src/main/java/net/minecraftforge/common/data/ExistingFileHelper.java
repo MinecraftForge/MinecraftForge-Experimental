@@ -35,8 +35,7 @@ import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.PathPackResources.PathResourcesSupplier;
 import net.minecraft.server.packs.VanillaPackResources;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.client.model.generators.ModelBuilder;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModFileInfo;
@@ -83,7 +82,7 @@ public class ExistingFileHelper {
 
     private final MultiPackResourceManager clientResources, serverData;
     private final boolean enable;
-    private final Multimap<PackType, ResourceLocation> generated = HashMultimap.create();
+    private final Multimap<PackType, Identifier> generated = HashMultimap.create();
 
     /**
      * Create a new helper. This should probably <em>NOT</em> be used by mods, as
@@ -145,7 +144,7 @@ public class ExistingFileHelper {
         return packType == PackType.CLIENT_RESOURCES ? clientResources : serverData;
     }
 
-    private ResourceLocation getLocation(ResourceLocation base, String suffix, String prefix) {
+    private Identifier getLocation(Identifier base, String suffix, String prefix) {
         return base.withPath(p -> prefix + '/' + p + suffix);
     }
 
@@ -158,7 +157,7 @@ public class ExistingFileHelper {
      * @return {@code true} if the resource exists in any pack, {@code false}
      *         otherwise
      */
-    public boolean exists(ResourceLocation loc, PackType packType) {
+    public boolean exists(Identifier loc, PackType packType) {
         return generated.get(packType).contains(loc) || getManager(packType).getResource(loc).isPresent();
     }
 
@@ -175,7 +174,7 @@ public class ExistingFileHelper {
      * @return {@code true} if the resource exists in any pack, {@code false}
      *         otherwise
      */
-    public boolean exists(ResourceLocation loc, IResourceType type) {
+    public boolean exists(Identifier loc, IResourceType type) {
         return exists(getLocation(loc, type.getSuffix(), type.getPrefix()), type.getPackType());
     }
 
@@ -191,7 +190,7 @@ public class ExistingFileHelper {
      * @return {@code true} if the resource exists in any pack, {@code false}
      *         otherwise
      */
-    public boolean exists(ResourceLocation loc, PackType packType, String pathSuffix, String pathPrefix) {
+    public boolean exists(Identifier loc, PackType packType, String pathSuffix, String pathPrefix) {
         return exists(getLocation(loc, pathSuffix, pathPrefix), packType);
     }
 
@@ -214,7 +213,7 @@ public class ExistingFileHelper {
      * @param type a {@link IResourceType} describing how to form the path to the
      *             resource
      */
-    public void trackGenerated(ResourceLocation loc, IResourceType type) {
+    public void trackGenerated(Identifier loc, IResourceType type) {
         this.generated.put(type.getPackType(), getLocation(loc, type.getSuffix(), type.getPrefix()));
     }
 
@@ -237,22 +236,22 @@ public class ExistingFileHelper {
      * @param pathPrefix a string to append before the path, before a slash, e.g.
      *                   {@code "models"}
      */
-    public void trackGenerated(ResourceLocation loc, PackType packType, String pathSuffix, String pathPrefix) {
+    public void trackGenerated(Identifier loc, PackType packType, String pathSuffix, String pathPrefix) {
         this.generated.put(packType, getLocation(loc, pathSuffix, pathPrefix));
     }
 
     @VisibleForTesting
-    public Resource getResource(ResourceLocation loc, PackType packType, String pathSuffix, String pathPrefix) throws FileNotFoundException {
+    public Resource getResource(Identifier loc, PackType packType, String pathSuffix, String pathPrefix) throws FileNotFoundException {
         return getResource(getLocation(loc, pathSuffix, pathPrefix), packType);
     }
 
     @VisibleForTesting
-    public Resource getResource(ResourceLocation loc, PackType packType) throws FileNotFoundException {
+    public Resource getResource(Identifier loc, PackType packType) throws FileNotFoundException {
         return getManager(packType).getResourceOrThrow(loc);
     }
 
     @VisibleForTesting
-    public List<Resource> getResourceStack(ResourceLocation loc, PackType packType) {
+    public List<Resource> getResourceStack(Identifier loc, PackType packType) {
         return getManager(packType).getResourceStack(loc);
     }
 

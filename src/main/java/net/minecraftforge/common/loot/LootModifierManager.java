@@ -26,7 +26,7 @@ import net.minecraft.util.ExtraCodecs;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.FileToIdConverter;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 public class LootModifierManager extends SimpleJsonResourceReloadListener<JsonElement> {
     private static final Logger LOGGER = LogManager.getLogger();
@@ -34,7 +34,7 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener<JsonEl
     private static final String FOLDER = "loot_modifiers";
 
     private final HolderLookup.Provider registries;
-    private Map<ResourceLocation, IGlobalLootModifier> modifiers = ImmutableMap.of();
+    private Map<Identifier, IGlobalLootModifier> modifiers = ImmutableMap.of();
 
     public LootModifierManager(HolderLookup.Provider registries) {
         super(registries.createSerializationContext(JsonOps.INSTANCE), ExtraCodecs.JSON, FileToIdConverter.json(FOLDER));
@@ -42,10 +42,10 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener<JsonEl
     }
 
     @Override
-    protected Map<ResourceLocation, JsonElement> prepare(ResourceManager resources, ProfilerFiller profilerFiller) {
-        var path = ResourceLocation.fromNamespaceAndPath("forge", FOLDER + "/global_loot_modifiers.json");
+    protected Map<Identifier, JsonElement> prepare(ResourceManager resources, ProfilerFiller profilerFiller) {
+        var path = Identifier.fromNamespaceAndPath("forge", FOLDER + "/global_loot_modifiers.json");
 
-        List<ResourceLocation> toLoad = new ArrayList<>();
+        List<Identifier> toLoad = new ArrayList<>();
         //read in all data files from forge:loot_modifiers/global_loot_modifiers in order to do layering
         for (var resource : resources.getResourceStack(path)) {
             try (var reader = resource.openAsReader()) {
@@ -55,7 +55,7 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener<JsonEl
                     toLoad.clear();
 
                 for(var entry : GsonHelper.getAsJsonArray(json, "entries")) {
-                    ResourceLocation loc = ResourceLocation.parse(entry.getAsString());
+                    Identifier loc = Identifier.parse(entry.getAsString());
                     toLoad.remove(loc); //remove and re-add if needed, to update the ordering.
                     toLoad.add(loc);
                 }
@@ -71,8 +71,8 @@ public class LootModifierManager extends SimpleJsonResourceReloadListener<JsonEl
     }
 
     @Override
-    protected void apply(Map<ResourceLocation, JsonElement> resources, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
-        Builder<ResourceLocation, IGlobalLootModifier> builder = ImmutableMap.builder();
+    protected void apply(Map<Identifier, JsonElement> resources, ResourceManager resourceManagerIn, ProfilerFiller profilerIn) {
+        Builder<Identifier, IGlobalLootModifier> builder = ImmutableMap.builder();
         var ops = registries.createSerializationContext(JsonOps.INSTANCE);
         resources.forEach((location, json) -> {
             IGlobalLootModifier.DIRECT_CODEC.parse(ops, json)

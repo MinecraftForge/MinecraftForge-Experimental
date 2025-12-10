@@ -49,8 +49,7 @@ public interface IClientMobEffectExtensions {
     }
 
     /**
-     * Renders the icon of the specified effect in the player's inventory.
-     * This can be used to render icons from your own texture sheet.
+     * Renders the text and icon of the specified effect in the player's inventory.
      *
      * @param instance     The effect instance
      * @param effects       The effect-rendering screen
@@ -60,22 +59,7 @@ public interface IClientMobEffectExtensions {
      * @param blitOffset   The blit offset
      * @return true to prevent default rendering, false otherwise
      */
-    default boolean renderInventoryIcon(MobEffectInstance instance, EffectsInInventory effects, GuiGraphics guiGraphics, int x, int y, int blitOffset) {
-        return false;
-    }
-
-    /**
-     * Renders the text of the specified effect in the player's inventory.
-     *
-     * @param instance     The effect instance
-     * @param effects       The effect-rendering screen
-     * @param guiGraphics  The gui graphics
-     * @param x            The x coordinate
-     * @param y            The y coordinate
-     * @param blitOffset   The blit offset
-     * @return true to prevent default rendering, false otherwise
-     */
-    default boolean renderInventoryText(MobEffectInstance instance, EffectsInInventory effects, GuiGraphics guiGraphics, int x, int y, int blitOffset) {
+    default boolean renderInventory(MobEffectInstance instance, EffectsInInventory effects, GuiGraphics guiGraphics, int x, int y, int blitOffset) {
         return false;
     }
 

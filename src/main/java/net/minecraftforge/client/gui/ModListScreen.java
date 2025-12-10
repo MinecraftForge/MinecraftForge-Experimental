@@ -25,10 +25,10 @@ import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import org.apache.maven.artifact.versioning.ComparableVersion;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.ObjectSelectionList;
@@ -37,10 +37,9 @@ import net.minecraft.client.gui.components.StringWidget;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.util.ARGB;
 import net.minecraft.util.FormattedCharSequence;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.Util;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.Util;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Size2i;
 import net.minecraftforge.common.ForgeI18n;
@@ -52,14 +51,11 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.fml.loading.StringUtils;
 import net.minecraftforge.forgespi.language.IModInfo;
 
-import net.minecraft.locale.Language;
-import net.minecraft.network.chat.ClickEvent;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.Style;
 import org.slf4j.Logger;
 
 public class ModListScreen extends Screen {
-    private static final ResourceLocation LOGO = ResourceLocation.fromNamespaceAndPath("forge", "mod_logo");
+    private static final Identifier LOGO = Identifier.fromNamespaceAndPath("forge", "mod_logo");
     private static String stripControlCodes(String value) { return net.minecraft.util.StringUtil.stripColor(value); }
     private static final Logger LOGGER = LogUtils.getLogger();
     private enum SortType implements Comparator<IModInfo> {
@@ -112,7 +108,7 @@ public class ModListScreen extends Screen {
     }
 
     class InfoPanel extends ScrollPanel {
-        private ResourceLocation logoPath;
+        private Identifier logoPath;
         private Size2i logoDims = new Size2i(0, 0);
         private List<FormattedCharSequence> lines = Collections.emptyList();
 
@@ -120,7 +116,7 @@ public class ModListScreen extends Screen {
             super(mcIn, widthIn, heightIn, topIn, modList.getRight() + PADDING);
         }
 
-        void setInfo(List<String> lines, ResourceLocation logoPath, Size2i logoDims) {
+        void setInfo(List<String> lines, Identifier logoPath, Size2i logoDims) {
             this.logoPath = logoPath;
             this.logoDims = logoDims;
             this.lines = resizeContent(lines);
@@ -143,7 +139,7 @@ public class ModListScreen extends Screen {
                 Component chat = ForgeHooks.newChatWithLinks(line, false);
                 int maxTextLength = this.width - 12;
                 if (maxTextLength >= 0)
-                    ret.addAll(Language.getInstance().getVisualOrder(font.getSplitter().splitLines(chat, maxTextLength, Style.EMPTY)));
+                    ret.addAll(font.split(chat, maxTextLength));
             }
             return ret;
         }
@@ -172,45 +168,36 @@ public class ModListScreen extends Screen {
                 relativeY += headerHeight + PADDING;
             }
 
-            for (FormattedCharSequence line : lines) {
-                if (line != null)
-                    guiGraphics.drawString(ModListScreen.this.font, line, left + PADDING, relativeY, ARGB.white(1));
-                relativeY += font.lineHeight;
-            }
-
-            final Style component = findTextLine(mouseX, mouseY);
-            if (component!=null)
-                guiGraphics.renderComponentHoverEffect(ModListScreen.this.font, component, mouseX, mouseY);
+            visitText(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.TOOLTIP_AND_CURSOR), relativeY);
         }
 
-        private Style findTextLine(final int mouseX, final int mouseY) {
-            if (!isMouseOver(mouseX, mouseY))
-                return null;
+        private void visitText(ActiveTextCollector collector, int header) {
+            int x = left + PADDING;
+            int y = header;
 
-            double offset = (mouseY - top - PADDING - border) + scrollDistance;
-            if (logoPath != null)
-                offset -= 50;
-            if (offset <= 0)
-                return null;
-
-            int lineIdx = (int) (offset / font.lineHeight);
-            if (lineIdx >= lines.size() || lineIdx < 0)
-                return null;
-
-            FormattedCharSequence line = lines.get(lineIdx);
-            if (line != null)
-                return font.getSplitter().componentStyleAtWidth(line, mouseX - left - border);
-            return null;
+            for (int i = 0; i < this.lines.size(); i++) {
+                var line = this.lines.get(i);
+                if (line != null)
+                    collector.accept(x, y, line);
+                y += font.lineHeight;
+            }
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
-            final Style component = findTextLine((int)info.x(), (int)info.y());
-            if (component != null) {
-                ModListScreen.this.handleComponentClicked(component);
-                return true;
-            }
-            return super.mouseClicked(info, recent);
+        protected boolean clickPanel(double mouseX, double mouseY, int button) {
+            var finder = new ActiveTextCollector.ClickableStyleFinder(font, (int)mouseX + left, (int)mouseY);
+            visitText(finder, logoPath == null ? 0 : 50 + PADDING);
+            var style = finder.result();
+
+            if (style == null || style.getClickEvent() == null)
+                return false;
+
+            var event = style.getClickEvent();
+            if (this.client.player == null)
+                defaultHandleClickEvent(event, this.client, ModListScreen.this);
+            else
+                defaultHandleGameClickEvent(event, this.client, ModListScreen.this);
+            return true;
         }
 
         @Override
@@ -382,7 +369,7 @@ public class ModListScreen extends Screen {
         updateCache();
     }
 
-    record Logo(ResourceLocation texture, Size2i size) {}
+    record Logo(Identifier texture, Size2i size) {}
     private static final Logo NONE = new Logo(null, new Size2i(0, 0));
 
     private void updateCache() {
@@ -480,11 +467,11 @@ public class ModListScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft mc, int width, int height) {
+    public void resize(int width, int height) {
         String s = this.search.getValue();
         SortType sort = this.sortType;
         ModListWidget.ModEntry selected = this.selected;
-        this.init(mc, width, height);
+        this.init(width, height);
         this.search.setValue(s);
         this.selected = selected;
 
@@ -500,13 +487,5 @@ public class ModListScreen extends Screen {
     @Override
     public void onClose() {
         this.minecraft.setScreen(this.parentScreen);
-    }
-
-    @Override
-    protected void handleClickEvent(Minecraft mc, ClickEvent event) {
-        if (mc.player == null)
-            defaultHandleClickEvent(event, mc, this);
-        else
-            defaultHandleGameClickEvent(event, mc, this);
     }
 }

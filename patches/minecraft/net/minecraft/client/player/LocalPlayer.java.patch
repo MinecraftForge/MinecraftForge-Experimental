@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/player/LocalPlayer.java
 +++ b/net/minecraft/client/player/LocalPlayer.java
-@@ -295,6 +_,7 @@
+@@ -310,6 +_,7 @@
          ServerboundPlayerActionPacket.Action serverboundplayeractionpacket$action = p_108701_
              ? ServerboundPlayerActionPacket.Action.DROP_ALL_ITEMS
              : ServerboundPlayerActionPacket.Action.DROP_ITEM;
@@ -8,7 +8,7 @@
          ItemStack itemstack = this.getInventory().removeFromSelected(p_108701_);
          this.connection.send(new ServerboundPlayerActionPacket(serverboundplayeractionpacket$action, BlockPos.ZERO, Direction.DOWN));
          return !itemstack.isEmpty();
-@@ -482,7 +_,11 @@
+@@ -521,7 +_,11 @@
  
      @Override
      public void playSound(SoundEvent p_108651_, float p_108652_, float p_108653_) {
@@ -21,7 +21,7 @@
      }
  
      @Override
-@@ -720,6 +_,7 @@
+@@ -761,6 +_,7 @@
              && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING)
              && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
          this.input.tick();
@@ -29,7 +29,7 @@
          this.minecraft.getTutorial().onInput(this.input);
          boolean flag3 = false;
          if (this.autoJumpTime > 0) {
-@@ -792,8 +_,9 @@
+@@ -833,8 +_,9 @@
          }
  
          this.wasFallFlying = this.isFallFlying();
@@ -41,7 +41,7 @@
          }
  
          if (this.isEyeInFluid(FluidTags.WATER)) {
-@@ -859,7 +_,7 @@
+@@ -900,7 +_,7 @@
      }
  
      private boolean shouldStopSwimSprinting() {
@@ -50,7 +50,7 @@
      }
  
      public Portal.Transition getActivePortalLocalTransition() {
-@@ -902,6 +_,8 @@
+@@ -943,6 +_,8 @@
      @Override
      public void rideTick() {
          super.rideTick();
@@ -59,16 +59,16 @@
          this.handsBusy = false;
          if (this.getControlledVehicle() instanceof AbstractBoat abstractboat) {
              abstractboat.setInput(
-@@ -1079,7 +_,7 @@
+@@ -1120,7 +_,7 @@
              && this.isSprintingPossible(this.getAbilities().flying)
-             && !this.isUsingItem()
+             && !this.isSlowDueToUsingItem()
              && (!this.isFallFlying() || this.isUnderWater())
 -            && (!this.isMovingSlowly() || this.isUnderWater());
 +            && (!this.isMovingSlowly() || this.isUnderWater() || this.canStartSwimming());
      }
  
      private boolean vehicleCanSprint(Entity p_265184_) {
-@@ -1158,6 +_,17 @@
+@@ -1195,6 +_,17 @@
      @Override
      public float getVisualRotationYInDegrees() {
          return this.getYRot();

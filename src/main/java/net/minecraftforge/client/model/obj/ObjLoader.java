@@ -15,7 +15,7 @@ import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.ModelState;
 import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.client.resources.model.UnbakedGeometry;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
@@ -36,7 +36,7 @@ public class ObjLoader implements IGeometryLoader, ResourceManagerReloadListener
     public static ObjLoader INSTANCE = new ObjLoader();
 
     private final Map<ObjModel.ModelSettings, ObjModel> modelCache = Maps.newConcurrentMap();
-    private final Map<ResourceLocation, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
+    private final Map<Identifier, ObjMaterialLibrary> materialCache = Maps.newConcurrentMap();
 
     private ResourceManager manager = Minecraft.getInstance().getResourceManager();
 
@@ -49,7 +49,7 @@ public class ObjLoader implements IGeometryLoader, ResourceManagerReloadListener
 
     @Override
     public UnbakedGeometry read(JsonObject json, JsonDeserializationContext deserializationContext) {
-        var location = ResourceLocation.parse(GsonHelper.getAsString(json, "model"));
+        var location = Identifier.parse(GsonHelper.getAsString(json, "model"));
 
         boolean automaticCulling = GsonHelper.getAsBoolean(json, "automatic_culling", true);
         boolean shadeQuads = GsonHelper.getAsBoolean(json, "shade_quads", true);
@@ -74,7 +74,7 @@ public class ObjLoader implements IGeometryLoader, ResourceManagerReloadListener
         });
     }
 
-    public ObjMaterialLibrary loadMaterialLibrary(ResourceLocation materialLocation) {
+    public ObjMaterialLibrary loadMaterialLibrary(Identifier materialLocation) {
         return materialCache.computeIfAbsent(materialLocation, (location) -> {
             Resource resource = manager.getResource(location).orElseThrow();
             try (ObjTokenizer rdr = new ObjTokenizer(resource.open())) {

@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/opengl/GlStateManager.java
 +++ b/com/mojang/blaze3d/opengl/GlStateManager.java
-@@ -85,6 +_,11 @@
+@@ -86,6 +_,11 @@
          }
      }
  

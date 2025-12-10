@@ -9,7 +9,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
@@ -80,7 +80,7 @@ public class LanguageHook {
         for (var entry : byNamespace.entrySet()) {
             var languages = new ArrayList<IoSupplier<InputStream>>();
 
-            var path = ResourceLocation.fromNamespaceAndPath(entry.getKey(), langFile);
+            var path = Identifier.fromNamespaceAndPath(entry.getKey(), langFile);
             for (var pack : entry.getValue()) {
                 var io = pack.getResource(PackType.CLIENT_RESOURCES, path);
                 if (io != null)

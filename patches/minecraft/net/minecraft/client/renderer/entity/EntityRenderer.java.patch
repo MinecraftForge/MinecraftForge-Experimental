@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/entity/EntityRenderer.java
 +++ b/net/minecraft/client/renderer/entity/EntityRenderer.java
-@@ -131,9 +_,10 @@
+@@ -125,9 +_,10 @@
      }
  
      protected void submitNameTag(S p_429896_, PoseStack p_428845_, SubmitNodeCollector p_426439_, CameraRenderState p_428408_) {
@@ -13,7 +13,7 @@
              );
          }
      }
-@@ -184,7 +_,7 @@
+@@ -177,7 +_,7 @@
  
          if (this.entityRenderDispatcher.camera != null) {
              p_367427_.distanceToCameraSq = this.entityRenderDispatcher.distanceToSqr(p_367571_);
@@ -22,11 +22,3 @@
              if (flag1) {
                  p_367427_.nameTag = this.getNameTag(p_367571_);
                  p_367427_.nameTagAttachment = p_367571_.getAttachments().getNullable(EntityAttachment.NAME_TAG, 0, p_367571_.getYRot(p_363243_));
-@@ -408,6 +_,7 @@
-     }
- 
-     protected void extractAdditionalHitboxes(T p_392955_, Builder<HitboxRenderState> p_395671_, float p_395030_) {
-+        net.minecraft.client.renderer.entity.EnderDragonRenderer.extractAdditionalHitboxexGeneric(p_392955_, p_395671_, p_395030_); // Forge: Extract for our generic multi-part entity system
-     }
- 
-     @Nullable

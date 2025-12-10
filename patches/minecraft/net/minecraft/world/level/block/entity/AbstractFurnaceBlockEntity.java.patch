@@ -121,7 +121,7 @@
              }
  
              if (itemstack.is(Blocks.WET_SPONGE.asItem()) && !p_267073_.get(1).isEmpty() && p_267073_.get(1).is(Items.BUCKET)) {
-@@ -388,6 +_,35 @@
+@@ -385,6 +_,35 @@
          for (ItemStack itemstack : this.items) {
              p_363325_.accountStack(itemstack);
          }

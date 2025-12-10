@@ -7,7 +7,7 @@ package net.minecraftforge.registries;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.apache.commons.lang3.Validate;
@@ -94,12 +94,12 @@ public final class MissingMappingsEvent extends MutableEvent {
     public static class Mapping<T> implements Comparable<Mapping<T>> {
         private final IForgeRegistry<T> registry;
         private final IForgeRegistry<T> pool;
-        final ResourceLocation key;
+        final Identifier key;
         final int id;
         Action action = Action.DEFAULT;
         T target;
 
-        public Mapping(IForgeRegistry<T> registry, IForgeRegistry<T> pool, ResourceLocation key, int id) {
+        public Mapping(IForgeRegistry<T> registry, IForgeRegistry<T> pool, Identifier key, int id) {
             this.registry = registry;
             this.pool = pool;
             this.key = key;
@@ -147,7 +147,7 @@ public final class MissingMappingsEvent extends MutableEvent {
             return this.registry;
         }
 
-        public ResourceLocation getKey() {
+        public Identifier getKey() {
             return key;
         }
 

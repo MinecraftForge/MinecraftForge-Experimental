@@ -1,6 +1,6 @@
 --- a/net/minecraft/resources/RegistryDataLoader.java
 +++ b/net/minecraft/resources/RegistryDataLoader.java
-@@ -89,7 +_,7 @@
+@@ -91,7 +_,7 @@
          Lifecycle lifecycle = p_326161_.map(KnownPack::isVanilla).map(p_326166_ -> Lifecycle.stable()).orElse(Lifecycle.experimental());
          return new RegistrationInfo(p_326161_, lifecycle);
      });
@@ -9,7 +9,7 @@
          new RegistryDataLoader.RegistryData<>(Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.BIOME, Biome.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.CHAT_TYPE, ChatType.DIRECT_CODEC),
-@@ -130,7 +_,7 @@
+@@ -134,7 +_,7 @@
      public static final List<RegistryDataLoader.RegistryData<?>> DIMENSION_REGISTRIES = List.of(
          new RegistryDataLoader.RegistryData<>(Registries.LEVEL_STEM, LevelStem.CODEC)
      );
@@ -18,8 +18,8 @@
          new RegistryDataLoader.RegistryData<>(Registries.BIOME, Biome.NETWORK_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.CHAT_TYPE, ChatType.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.TRIM_PATTERN, TrimPattern.DIRECT_CODEC),
-@@ -154,6 +_,10 @@
-         new RegistryDataLoader.RegistryData<>(Registries.DIALOG, Dialog.DIRECT_CODEC)
+@@ -160,6 +_,10 @@
+         new RegistryDataLoader.RegistryData<>(Registries.TIMELINE, Timeline.NETWORK_CODEC)
      );
  
 +    public static java.util.stream.Stream<RegistryDataLoader.RegistryData<?>> getWorldGenAndDimensionStream() {
@@ -29,7 +29,7 @@
      public static RegistryAccess.Frozen load(
          ResourceManager p_252046_, List<HolderLookup.RegistryLookup<?>> p_250344_, List<RegistryDataLoader.RegistryData<?>> p_366741_
      ) {
-@@ -270,7 +_,7 @@
+@@ -276,7 +_,7 @@
  
      private static <E> void loadElementFromResource(
          WritableRegistry<E> p_330991_,
@@ -38,7 +38,7 @@
          RegistryOps<JsonElement> p_332135_,
          ResourceKey<E> p_332850_,
          Resource p_335244_,
-@@ -278,7 +_,23 @@
+@@ -284,7 +_,23 @@
      ) throws IOException {
          try (Reader reader = p_335244_.openAsReader()) {
              JsonElement jsonelement = StrictJsonParser.parse(reader);
@@ -63,15 +63,15 @@
              E e = dataresult.getOrThrow();
              p_330991_.register(p_332850_, e, p_332222_);
          }
-@@ -293,6 +_,7 @@
+@@ -299,6 +_,7 @@
      ) {
          FileToIdConverter filetoidconverter = FileToIdConverter.registry(p_331358_.key());
          RegistryOps<JsonElement> registryops = RegistryOps.create(JsonOps.INSTANCE, p_333035_);
 +        Decoder<Optional<E>> conditional = net.minecraftforge.common.crafting.conditions.ConditionCodec.wrap(p_329404_);
  
-         for (Entry<ResourceLocation, Resource> entry : filetoidconverter.listMatchingResources(p_335634_).entrySet()) {
-             ResourceLocation resourcelocation = entry.getKey();
-@@ -301,7 +_,7 @@
+         for (Entry<Identifier, Resource> entry : filetoidconverter.listMatchingResources(p_335634_).entrySet()) {
+             Identifier identifier = entry.getKey();
+@@ -307,7 +_,7 @@
              RegistrationInfo registrationinfo = REGISTRATION_INFO_CACHE.apply(resource.knownPackInfo());
  
              try {
@@ -80,7 +80,7 @@
              } catch (Exception exception) {
                  p_335074_.put(
                      resourcekey,
-@@ -324,7 +_,8 @@
+@@ -330,7 +_,8 @@
          RegistryDataLoader.NetworkedRegistryData registrydataloader$networkedregistrydata = p_331925_.get(p_332518_.key());
          if (registrydataloader$networkedregistrydata != null) {
              RegistryOps<Tag> registryops = RegistryOps.create(NbtOps.INSTANCE, p_329253_);
@@ -90,10 +90,10 @@
              FileToIdConverter filetoidconverter = FileToIdConverter.registry(p_332518_.key());
  
              for (RegistrySynchronization.PackedRegistryEntry registrysynchronization$packedregistryentry : registrydataloader$networkedregistrydata.elements) {
-@@ -346,7 +_,7 @@
+@@ -352,7 +_,7 @@
  
                      try {
-                         Resource resource = p_332010_.getResourceOrThrow(resourcelocation);
+                         Resource resource = p_332010_.getResourceOrThrow(identifier);
 -                        loadElementFromResource(p_332518_, p_328898_, registryops1, resourcekey, resource, NETWORK_REGISTRATION_INFO);
 +                        loadElementFromResource(p_332518_, conditional, registryops1, resourcekey, resource, NETWORK_REGISTRATION_INFO);
                      } catch (Exception exception1) {

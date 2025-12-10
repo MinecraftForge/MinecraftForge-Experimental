@@ -36,7 +36,7 @@ public final class PlaySoundEvent extends MutableEvent implements SoundEvent {
     public PlaySoundEvent(SoundEngine manager, SoundInstance sound) {
         this.manager = manager;
         this.originalSound = sound;
-        this.name = sound.getLocation().getPath();
+        this.name = sound.getIdentifier().getPath();
         this.setSound(sound);
     }
 

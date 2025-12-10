@@ -11,7 +11,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.MinecraftForge;
@@ -209,12 +209,12 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         private final int screenHeight;
         private final ClientTooltipPositioner positioner;
         @Nullable
-        private ResourceLocation background;
+        private Identifier background;
         @Nullable
-        private ResourceLocation originalBackground;
+        private Identifier originalBackground;
 
         @ApiStatus.Internal
-        public Pre(ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner, @Nullable ResourceLocation background) {
+        public Pre(ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner, @Nullable Identifier background) {
             super(stack, graphics, x, y, font, components);
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;
@@ -274,21 +274,21 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         /**
          * Sets the new prefix for the background texture
          */
-        public void setBackground(@Nullable ResourceLocation background) {
+        public void setBackground(@Nullable Identifier background) {
             this.background = background;
         }
 
         /**
          * @return the potentially modified background's prefix, can be null for default
          */
-        public @Nullable ResourceLocation getBackground() {
+        public @Nullable Identifier getBackground() {
             return this.background;
         }
 
         /**
          * @return the original tooltip background's prefix, can be null for default
          */
-        public @Nullable ResourceLocation getOriginalBackground() {
+        public @Nullable Identifier getOriginalBackground() {
             return originalBackground;
         }
     }

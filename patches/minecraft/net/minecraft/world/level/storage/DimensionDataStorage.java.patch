@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/storage/DimensionDataStorage.java
 +++ b/net/minecraft/world/level/storage/DimensionDataStorage.java
-@@ -119,6 +_,10 @@
+@@ -114,6 +_,10 @@
              }
  
              int i = NbtUtils.getDataVersion(compoundtag, 1343);

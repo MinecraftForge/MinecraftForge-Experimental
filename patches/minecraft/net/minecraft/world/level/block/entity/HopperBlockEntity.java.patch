@@ -17,7 +17,7 @@
          BlockPos blockpos = BlockPos.containing(p_155554_.getLevelX(), p_155554_.getLevelY() + 1.0, p_155554_.getLevelZ());
          BlockState blockstate = p_155553_.getBlockState(blockpos);
          Container container = getSourceContainer(p_155553_, p_155554_, blockpos, blockstate);
-@@ -452,5 +_,14 @@
+@@ -446,5 +_,14 @@
      @Override
      protected AbstractContainerMenu createMenu(int p_59312_, Inventory p_59313_) {
          return new HopperMenu(p_59312_, p_59313_, this);

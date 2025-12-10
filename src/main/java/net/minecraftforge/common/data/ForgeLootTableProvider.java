@@ -5,7 +5,7 @@
 
 package net.minecraftforge.common.data;
 
-import net.minecraft.advancements.critereon.ItemPredicate;
+import net.minecraft.advancements.criterion.ItemPredicate;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.data.PackOutput;
@@ -67,9 +67,9 @@ public final class ForgeLootTableProvider extends LootTableProvider {
     }
 
     private LootTableSubProvider replaceAndFilterChangesOnly(LootTableSubProvider subProvider) {
-        return (newConsumer) -> subProvider.generate((resourceLocation, builder) -> {
+        return (newConsumer) -> subProvider.generate((Identifier, builder) -> {
             if (findAndReplaceInLootTableBuilder(builder, Items.SHEARS, ToolActions.SHEARS_DIG)) {
-                newConsumer.accept(resourceLocation, builder);
+                newConsumer.accept(Identifier, builder);
             }
         });
     }

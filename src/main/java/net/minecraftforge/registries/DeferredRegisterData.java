@@ -10,7 +10,7 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder.RegistryBootstrap;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.common.extensions.IForgeRegistrySetBuilder;
 import org.jetbrains.annotations.NotNull;
@@ -177,7 +177,7 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
             throw new IllegalStateException("Cannot register new entries to DeferredRegister after it has been used. You should use this in a static context");
 
         requireNonNull("name", name);
-        var key = ResourceLocation.fromNamespaceAndPath(modid, name);
+        var key = Identifier.fromNamespaceAndPath(modid, name);
 
         RegistryObject<I> ret = new RegistryObject<>(key, this.registryKey, this.modid);
 
@@ -190,14 +190,14 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
 
     /**
      * Creates a ResourceKey based on the current modid and provided path as the location and the registry name linked to this DeferredRegister.
-     * To control the namespace, use {@link #key(ResourceLocation)}.
+     * To control the namespace, use {@link #key(Identifier)}.
      *
-     * @see #key(ResourceLocation)
+     * @see #key(Identifier)
      */
     @NotNull
     public ResourceKey<T> key(@NotNull String path) {
         requireNonNull("path", path);
-        return key(ResourceLocation.fromNamespaceAndPath(this.modid, path));
+        return key(Identifier.fromNamespaceAndPath(this.modid, path));
     }
 
     /**
@@ -207,22 +207,22 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
      * @see #key(String)
      */
     @NotNull
-    public ResourceKey<T> key(@NotNull ResourceLocation location) {
+    public ResourceKey<T> key(@NotNull Identifier location) {
         requireNonNull("location", location);
         return ResourceKey.create(getRegistryKey(), location);
     }
 
     /**
      * Creates a tag key based on the current modid and provided path as the location and the registry name linked to this DeferredRegister.
-     * To control the namespace, use {@link #createTagKey(ResourceLocation)}.
+     * To control the namespace, use {@link #createTagKey(Identifier)}.
      *
-     * @see #createTagKey(ResourceLocation)
+     * @see #createTagKey(Identifier)
      * @see #createOptionalTagKey(String, Set)
      */
     @NotNull
     public TagKey<T> createTagKey(@NotNull String path) {
         requireNonNull("path", path);
-        return createTagKey(ResourceLocation.fromNamespaceAndPath(this.modid, path));
+        return createTagKey(Identifier.fromNamespaceAndPath(this.modid, path));
     }
 
     /**
@@ -230,10 +230,10 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
      * To use the current modid as the namespace, use {@link #createTagKey(String)}.
      *
      * @see #createTagKey(String)
-     * @see #createOptionalTagKey(ResourceLocation, Set)
+     * @see #createOptionalTagKey(Identifier, Set)
      */
     @NotNull
-    public TagKey<T> createTagKey(@NotNull ResourceLocation location) {
+    public TagKey<T> createTagKey(@NotNull Identifier location) {
         requireNonNull("location", location);
         return TagKey.create(this.registryKey, location);
     }
@@ -263,8 +263,8 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
      * @return The registry name stored in this deferred register. Useful for creating new deferred registers based on an existing one.
      */
     @NotNull
-    public ResourceLocation getRegistryName() {
-        return this.registryKey.location();
+    public Identifier getRegistryName() {
+        return this.registryKey.identifier();
     }
 
     private static <T> T requireNonNull(String name, T value) {

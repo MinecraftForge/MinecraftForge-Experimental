@@ -14,20 +14,20 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.login.custom.CustomQueryAnswerPayload;
 import net.minecraft.network.protocol.login.custom.CustomQueryPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @ApiStatus.Internal
 public record ForgePayload (
-    ResourceLocation id,
+    Identifier id,
     @Nullable
     FriendlyByteBuf data,
     Consumer<FriendlyByteBuf> encoder
 ) implements CustomPacketPayload, CustomQueryPayload, CustomQueryAnswerPayload {
-    public static ForgePayload create(ResourceLocation id, FriendlyByteBuf data) {
+    public static ForgePayload create(Identifier id, FriendlyByteBuf data) {
         return new ForgePayload(id, data, buf -> buf.writeBytes(data.slice()));
     }
 
-    public static ForgePayload create(ResourceLocation id, Consumer<FriendlyByteBuf> encoder) {
+    public static ForgePayload create(Identifier id, Consumer<FriendlyByteBuf> encoder) {
         return new ForgePayload(id, null, encoder);
     }
 

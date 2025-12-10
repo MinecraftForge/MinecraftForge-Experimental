@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/GameRenderer.java
 +++ b/net/minecraft/client/renderer/GameRenderer.java
-@@ -233,6 +_,9 @@
+@@ -242,6 +_,9 @@
              case null:
              default:
                  this.clearPostEffect();
@@ -10,7 +10,7 @@
          }
      }
  
-@@ -244,7 +_,13 @@
+@@ -253,7 +_,13 @@
      public void processBlurEffect() {
          PostChain postchain = this.minecraft.getShaderManager().getPostChain(BLUR_POST_CHAIN_ID, LevelTargetBundle.MAIN_TARGETS);
          if (postchain != null) {
@@ -24,7 +24,7 @@
          }
      }
  
-@@ -406,7 +_,7 @@
+@@ -377,7 +_,7 @@
                  f *= Mth.lerp(f2, 1.0F, 0.85714287F);
              }
  
@@ -33,7 +33,7 @@
          }
      }
  
-@@ -557,7 +_,7 @@
+@@ -530,7 +_,7 @@
                  }
              } else if (flag && this.minecraft.screen != null) {
                  try {
@@ -42,7 +42,7 @@
                  } catch (Throwable throwable1) {
                      CrashReport crashreport1 = CrashReport.forThrowable(throwable1, "Rendering screen");
                      CrashReportCategory crashreportcategory1 = crashreport1.addCategory("Screen render details");
-@@ -672,6 +_,10 @@
+@@ -696,6 +_,10 @@
                          BlockInWorld blockinworld = new BlockInWorld(this.minecraft.level, blockpos, false);
                          Registry<Block> registry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
                          flag = !itemstack.isEmpty() && (itemstack.canBreakBlockInAdventureMode(blockinworld) || itemstack.canPlaceOnBlockInAdventureMode(blockinworld));
@@ -53,7 +53,7 @@
                      }
                  }
              }
-@@ -706,6 +_,9 @@
+@@ -736,6 +_,9 @@
          if (this.minecraft.options.bobView().get()) {
              this.bobView(posestack, this.mainCamera.getPartialTickTime());
          }
@@ -62,4 +62,4 @@
 +        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
  
          matrix4f.mul(posestack.last().pose());
-         float f3 = this.minecraft.options.screenEffectScale().get().floatValue();
+         float f2 = this.minecraft.options.screenEffectScale().get().floatValue();

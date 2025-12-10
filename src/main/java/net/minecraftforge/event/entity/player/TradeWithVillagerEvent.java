@@ -5,7 +5,7 @@
 
 package net.minecraftforge.event.entity.player;
 
-import net.minecraft.world.entity.npc.AbstractVillager;
+import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraftforge.eventbus.api.bus.EventBus;

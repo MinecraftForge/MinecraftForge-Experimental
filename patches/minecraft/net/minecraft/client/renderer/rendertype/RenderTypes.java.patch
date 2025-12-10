@@ -1,0 +1,44 @@
+--- a/net/minecraft/client/renderer/rendertype/RenderTypes.java
++++ b/net/minecraft/client/renderer/rendertype/RenderTypes.java
+@@ -542,7 +_,7 @@
+     }
+ 
+     public static RenderType text(Identifier p_456274_) {
+-        return TEXT.apply(p_456274_);
++        return net.minecraftforge.client.ForgeRenderTypes.getText(p_456274_);
+     }
+ 
+     public static RenderType textBackground() {
+@@ -550,19 +_,19 @@
+     }
+ 
+     public static RenderType textIntensity(Identifier p_460070_) {
+-        return TEXT_INTENSITY.apply(p_460070_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextIntensity(p_460070_);
+     }
+ 
+     public static RenderType textPolygonOffset(Identifier p_450888_) {
+-        return TEXT_POLYGON_OFFSET.apply(p_450888_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextPolygonOffset(p_450888_);
+     }
+ 
+     public static RenderType textIntensityPolygonOffset(Identifier p_457059_) {
+-        return TEXT_INTENSITY_POLYGON_OFFSET.apply(p_457059_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextIntensityPolygonOffset(p_457059_);
+     }
+ 
+     public static RenderType textSeeThrough(Identifier p_452096_) {
+-        return TEXT_SEE_THROUGH.apply(p_452096_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextSeeThrough(p_452096_);
+     }
+ 
+     public static RenderType textBackgroundSeeThrough() {
+@@ -570,7 +_,7 @@
+     }
+ 
+     public static RenderType textIntensitySeeThrough(Identifier p_453978_) {
+-        return TEXT_INTENSITY_SEE_THROUGH.apply(p_453978_);
++        return net.minecraftforge.client.ForgeRenderTypes.getTextIntensitySeeThrough(p_453978_);
+     }
+ 
+     public static RenderType lightning() {

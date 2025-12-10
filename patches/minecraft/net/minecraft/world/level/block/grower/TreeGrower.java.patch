@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/grower/TreeGrower.java
 +++ b/net/minecraft/world/level/block/grower/TreeGrower.java
-@@ -130,6 +_,9 @@
+@@ -128,6 +_,9 @@
          ResourceKey<ConfiguredFeature<?, ?>> resourcekey = this.getConfiguredMegaFeature(p_309951_);
          if (resourcekey != null) {
              Holder<ConfiguredFeature<?, ?>> holder = p_309830_.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).get(resourcekey).orElse(null);

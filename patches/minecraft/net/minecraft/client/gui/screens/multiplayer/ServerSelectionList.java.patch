@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
 +++ b/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
-@@ -363,6 +_,8 @@
+@@ -361,6 +_,8 @@
                  p_425273_.setTooltipForNextFrame(Lists.transform(this.onlinePlayersTooltip, Component::getVisualOrderText), p_424268_, p_430737_);
              }
  

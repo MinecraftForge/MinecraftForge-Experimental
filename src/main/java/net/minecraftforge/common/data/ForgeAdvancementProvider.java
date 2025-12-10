@@ -10,7 +10,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.advancements.AdvancementProvider;
 import net.minecraft.data.advancements.AdvancementSubProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +44,7 @@ public class ForgeAdvancementProvider extends AdvancementProvider {
     public interface AdvancementGenerator {
         /**
          * A method used to generate advancements for a mod. Advancements should be
-         * built via {@link net.minecraftforge.common.extensions.IForgeAdvancementBuilder#save(Consumer, ResourceLocation, ExistingFileHelper)}.
+         * built via {@link net.minecraftforge.common.extensions.IForgeAdvancementBuilder#save(Consumer, Identifier, ExistingFileHelper)}.
          *
          * @param registries a lookup for registries and their objects
          * @param saver a consumer used to write advancements to a file

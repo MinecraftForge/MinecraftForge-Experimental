@@ -4,7 +4,7 @@
                      file2 = new File(file1, p_92297_);
                  }
  
-+                var event = new net.minecraftforge.client.event.ScreenshotEvent(p_389141_, file2);
++                var event = new net.minecraftforge.client.event.ScreenshotEvent(p_447863_, file2);
 +                if (net.minecraftforge.client.event.ScreenshotEvent.BUS.post(event)) {
 +                    p_92301_.accept(event.getCancelMessage());
 +                    return;
@@ -15,12 +15,12 @@
                      .execute(
                          () -> {
 @@ -50,10 +_,13 @@
-                                 NativeImage $$4x = p_389141_;
+                                 NativeImage $$4x = p_447863_;
  
                                  try {
--                                    p_389141_.writeToFile(file2);
+-                                    p_447863_.writeToFile(file2);
 -                                    Component component = Component.literal(file2.getName())
-+                                    p_389141_.writeToFile(target);
++                                    p_447863_.writeToFile(target);
 +                                    Component component = Component.literal(target.getName())
                                          .withStyle(ChatFormatting.UNDERLINE)
                                          .withStyle(p_389149_ -> p_389149_.withClickEvent(new ClickEvent.OpenFile(file2.getAbsoluteFile())));
@@ -29,4 +29,4 @@
 +                                    else
                                      p_92301_.accept(Component.translatable("screenshot.success", component));
                                  } catch (Throwable throwable1) {
-                                     if (p_389141_ != null) {
+                                     if (p_447863_ != null) {

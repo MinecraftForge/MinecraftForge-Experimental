@@ -16,7 +16,7 @@
          public ServerLevel getLevel() {
              return this.level;
          }
-@@ -93,6 +_,10 @@
+@@ -92,6 +_,10 @@
          public LootParams create(ContextKeySet p_367827_) {
              ContextMap contextmap = this.params.create(p_367827_);
              return new LootParams(this.level, contextmap, this.dynamicDrops, this.luck);

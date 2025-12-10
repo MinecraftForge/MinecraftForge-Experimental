@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
-@@ -71,7 +_,7 @@
+@@ -72,7 +_,7 @@
  
          for (Entity entity : p_186526_) {
              if (!(entity instanceof Mob mob && (mob.isPersistenceRequired() || mob.requiresCustomPersistence()))) {
@@ -9,7 +9,7 @@
                  if (mobcategory != MobCategory.MISC) {
                      BlockPos blockpos = entity.blockPosition();
                      p_186527_.query(ChunkPos.asLong(blockpos), p_275163_ -> {
-@@ -202,7 +_,7 @@
+@@ -203,7 +_,7 @@
                                      l1++;
                                      p_47040_.addFreshEntityWithPassengers(mob);
                                      p_47044_.run(mob, p_47041_);
@@ -53,7 +53,7 @@
                                      spawngroupdata = mob.finalizeSpawn(
                                          p_220451_, p_220451_.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.CHUNK_GENERATION, spawngroupdata
                                      );
-@@ -501,7 +_,7 @@
+@@ -499,7 +_,7 @@
              }
  
              this.spawnPotential.addCharge(blockpos, d0);

@@ -12,16 +12,16 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import net.minecraftforge.client.gui.widget.ScrollPanel;
 import org.apache.commons.lang3.tuple.Pair;
 
 import net.minecraft.ChatFormatting;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
@@ -32,8 +32,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.HoverEvent;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraft.network.chat.TextColor;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.fml.ModList;
@@ -41,7 +40,8 @@ import net.minecraftforge.fml.loading.FMLPaths;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData;
 import net.minecraftforge.network.packets.ModVersions;
 
-//TODO: Oh god... Whoever wrote this was on something very very strong.
+//TODO: [Forge][Rendering] Rewrite entire ModMismatch screen
+//Oh god... Whoever wrote this was on something very very strong.
 public class ModMismatchDisconnectedScreen extends Screen {
     private final Component reason;
     private MultiLineLabel message = MultiLineLabel.EMPTY;
@@ -102,7 +102,8 @@ public class ModMismatchDisconnectedScreen extends Screen {
         this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
         int textYOffset = hasMismatches ? 18 : 0;
         guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset - 9 * 2, 0xAAAAAA);
-        this.message.render(guiGraphics, MultiLineLabel.Align.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, true, -1);
+        var lineCollector = guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.notClickable(false));
+        this.message.visitLines(TextAlignment.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, lineCollector);
         super.render(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
@@ -134,7 +135,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
                     )
                 ));
                 int i = 0;
-                for (ResourceLocation mod : data.missing()) {
+                for (Identifier mod : data.missing()) {
                     rawTable.add(Pair.of(
                         toModNameComponent(mod, data.mods().get(mod.getNamespace()).name(), i),
                         Pair.of(
@@ -223,7 +224,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
          * @param color Defines the color of the returned style information. An odd number will result in a yellow, an even one in a gold color. This color variation makes it easier for users to distinguish different mod entries.
          * @return A component with the mod name as the main text component, and an assigned style which will be used for the whole content row.
          */
-        private MutableComponent toModNameComponent(ResourceLocation id, String modName, int color) {
+        private MutableComponent toModNameComponent(Identifier id, String modName, int color) {
             String modId = id.getNamespace();
             String tooltipId = id.getPath().isEmpty() ? id.getNamespace() : id.toString();
             return Component.literal(modName).withStyle(color % 2 == 0 ? ChatFormatting.GOLD : ChatFormatting.YELLOW)
@@ -257,7 +258,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
                 FormattedCharSequence name = line.getLeft();
                 Pair<FormattedCharSequence, FormattedCharSequence> versions = line.getRight();
                 //Since font#draw does not respect the color of the given component, we have to read it out here and then use it as the last parameter
-                int color = Optional.ofNullable(font.getSplitter().componentStyleAtWidth(name, 0)).map(Style::getColor).map(TextColor::getValue).orElse(0xFFFFFF);
+                int color = 0xFFFFFF; //Optional.ofNullable(font.substrByWidth(name, 0)).map(Style::getColor).map(TextColor::getValue).orElse(0xFFFFFF);
                 //Only indent the given name if a version string is present. This makes it easier to distinguish table section headers and mod entries
                 int nameLeft = left + border + (versions == null ? 0 : nameIndent);
                 guiGraphics.drawString(font, name, nameLeft, relativeY + i * 12, color, false);
@@ -285,8 +286,8 @@ public class ModMismatchDisconnectedScreen extends Screen {
                 if (slotIndex < contentSize) {
                     //The relative x needs to take the potentially missing indent of the row into account. It does that by checking if the line has a version associated to it
                     double relativeX = x - left - border - (lineTable.get(slotIndex).getRight() == null ? 0 : nameIndent);
-                    if (relativeX >= 0)
-                        return font.getSplitter().componentStyleAtWidth(lineTable.get(slotIndex).getLeft(), (int)relativeX);
+                    //if (relativeX >= 0)
+                    //    return font.getSplitter().componentStyleAtWidth(lineTable.get(slotIndex).getLeft(), (int)relativeX);
                 }
             }
 
@@ -297,7 +298,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
         public boolean mouseClicked(MouseButtonEvent info, boolean recent) {
             Style style = getComponentStyleAt(info.x(), info.y());
             if (style != null) {
-                handleComponentClicked(style);
+                //handleComponentClicked(style);
                 return true;
             }
             return super.mouseClicked(info, recent);

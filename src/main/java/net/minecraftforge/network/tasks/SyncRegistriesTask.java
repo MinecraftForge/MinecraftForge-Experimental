@@ -16,7 +16,7 @@ import org.jetbrains.annotations.ApiStatus;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.network.ForgePacketHandler;
@@ -39,7 +39,7 @@ public class SyncRegistriesTask implements ConfigurationTask {
     public static final Type TYPE = new Type("forge:sync_registries");
 
     private ConfigurationTaskContext taskCtx;
-    private Map<ResourceLocation, Snapshot> snapshot;
+    private Map<Identifier, Snapshot> snapshot;
     private ForgePacketHandler handler;
     private int expectedToken;
 

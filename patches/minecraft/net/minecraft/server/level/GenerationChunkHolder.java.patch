@@ -1,7 +1,7 @@
 --- a/net/minecraft/server/level/GenerationChunkHolder.java
 +++ b/net/minecraft/server/level/GenerationChunkHolder.java
-@@ -34,6 +_,9 @@
-     private final AtomicReference<ChunkGenerationTask> task = new AtomicReference<>();
+@@ -33,6 +_,9 @@
+     private final AtomicReference<@Nullable ChunkGenerationTask> task = new AtomicReference<>();
      private final AtomicInteger generationRefCount = new AtomicInteger();
      private volatile CompletableFuture<Void> generationSaveSyncFuture = CompletableFuture.completedFuture(null);
 +    /** Forge: Used to bypass the future chain when loading chunks, because modders can do weird things that cause deadlocks, modders should never touch this **/

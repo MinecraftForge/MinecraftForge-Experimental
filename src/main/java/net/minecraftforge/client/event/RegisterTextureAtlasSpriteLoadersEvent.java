@@ -8,7 +8,7 @@ package net.minecraftforge.client.event;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.BiMap;
 
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.textures.ITextureAtlasSpriteLoader;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -32,20 +32,20 @@ public final class RegisterTextureAtlasSpriteLoadersEvent extends MutableEvent i
         return BUS;
     }
 
-    private final BiMap<ResourceLocation, ITextureAtlasSpriteLoader> loaders;
+    private final BiMap<Identifier, ITextureAtlasSpriteLoader> loaders;
 
     @ApiStatus.Internal
-    public RegisterTextureAtlasSpriteLoadersEvent(BiMap<ResourceLocation, ITextureAtlasSpriteLoader> loaders) {
+    public RegisterTextureAtlasSpriteLoadersEvent(BiMap<Identifier, ITextureAtlasSpriteLoader> loaders) {
         this.loaders = loaders;
     }
 
     /**
      * Registers a custom {@link ITextureAtlasSpriteLoader sprite loader}.
-     * @param resourceLocation The namespace should match your mod's namespace, such as your mod ID
+     * @param Identifier The namespace should match your mod's namespace, such as your mod ID
      */
-    public void register(ResourceLocation resourceLocation, ITextureAtlasSpriteLoader loader) {
-        Preconditions.checkArgument(!loaders.containsKey(resourceLocation), "Sprite loader already registered: " + resourceLocation);
+    public void register(Identifier Identifier, ITextureAtlasSpriteLoader loader) {
+        Preconditions.checkArgument(!loaders.containsKey(Identifier), "Sprite loader already registered: " + Identifier);
         Preconditions.checkArgument(!loaders.containsValue(loader), "Sprite loader already registered as " + loaders.inverse().get(loader));
-        loaders.put(resourceLocation, loader);
+        loaders.put(Identifier, loader);
     }
 }

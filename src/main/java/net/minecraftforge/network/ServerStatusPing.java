@@ -9,9 +9,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
-import net.minecraft.Util;
+import net.minecraft.util.Util;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
 
@@ -74,7 +74,7 @@ import java.util.stream.Collectors;
 
 // TODO: Rewrite to a simpler format And/Or remove when I rewrite DisplayTest
 public record ServerStatusPing(
-        Map<ResourceLocation, ChannelData> channels,
+        Map<Identifier, ChannelData> channels,
         Map<String, String> mods,
         int fmlNetworkVer,
         boolean truncated
@@ -125,13 +125,13 @@ public record ServerStatusPing(
         return Objects.hash(channels, mods, fmlNetworkVer);
     }
 
-    private List<Map.Entry<ResourceLocation, ChannelData>> getChannelsForMod(String modId) {
+    private List<Map.Entry<Identifier, ChannelData>> getChannelsForMod(String modId) {
         return channels.entrySet().stream()
                 .filter(c -> c.getKey().getNamespace().equals(modId))
                 .toList();
     }
 
-    private List<Map.Entry<ResourceLocation, ChannelData>> getNonModChannels() {
+    private List<Map.Entry<Identifier, ChannelData>> getNonModChannels() {
         return channels.entrySet().stream()
                 .filter(c -> !mods.containsKey(c.getKey().getNamespace()))
                 .toList();
@@ -140,7 +140,7 @@ public record ServerStatusPing(
     public ByteBuf toBuf() {
         // The following techniques are used to keep the size down:
         // 1. Try and group channels by ModID, this relies on the assumption that a mod "examplemod" uses a channel
-        //    like "examplemod:network". In that case only the "path" of the ResourceLocation is written
+        //    like "examplemod:network". In that case only the "path" of the Identifier is written
         // 2. Avoid sending IGNORESERVERONLY in plain text, instead use a flag (if set, no version string is sent)
         //
         // The size can be estimated as follows (assuming there are no non-mod network channels)
@@ -191,7 +191,7 @@ public record ServerStatusPing(
             buf.writeVarInt(nonModChannels.size());
             for (var entry : nonModChannels)
             {
-                buf.writeResourceLocation(entry.getKey());
+                buf.writeIdentifier(entry.getKey());
                 buf.writeVarInt(entry.getValue().version());
                 buf.writeBoolean(entry.getValue().required());
             }
@@ -209,7 +209,7 @@ public record ServerStatusPing(
     private static ServerStatusPing deserializeOptimized(int fmlNetworkVersion, ByteBuf bbuf) {
         var buf = new FriendlyByteBuf(bbuf);
         boolean truncated;
-        Map<ResourceLocation, ChannelData> channels;
+        Map<Identifier, ChannelData> channels;
         Map<String, String> mods;
 
         try {
@@ -227,7 +227,7 @@ public record ServerStatusPing(
                     var channelName = buf.readUtf();
                     var channelVersion = buf.readVarInt();
                     var requiredOnClient = buf.readBoolean();
-                    final ResourceLocation id = ResourceLocation.fromNamespaceAndPath(modId, channelName);
+                    final Identifier id = Identifier.fromNamespaceAndPath(modId, channelName);
                     channels.put(id, new ChannelData(id, channelVersion, requiredOnClient));
                 }
 
@@ -236,7 +236,7 @@ public record ServerStatusPing(
 
             var nonModChannelCount = buf.readVarInt();
             for (var i = 0; i < nonModChannelCount; i++) {
-                var channelName = buf.readResourceLocation();
+                var channelName = buf.readIdentifier();
                 var channelVersion = buf.readVarInt();
                 var requiredOnClient = buf.readBoolean();
                 channels.put(channelName, new ChannelData(channelName, channelVersion, requiredOnClient));
@@ -315,7 +315,7 @@ public record ServerStatusPing(
         return buf;
     }
 
-    public Map<ResourceLocation, ChannelData> getRemoteChannels() {
+    public Map<Identifier, ChannelData> getRemoteChannels() {
         return this.channels;
     }
 
@@ -338,9 +338,9 @@ public record ServerStatusPing(
         ).apply(in, ModInfo::new));
     }
 
-    public record ChannelData(ResourceLocation res, int version, boolean required) {
+    public record ChannelData(Identifier res, int version, boolean required) {
         public static final Codec<ChannelData> CODEC = RecordCodecBuilder.create(in -> in.group(
-            ResourceLocation.CODEC.fieldOf("res").forGetter(ChannelData::res),
+            Identifier.CODEC.fieldOf("res").forGetter(ChannelData::res),
             Codec.INT.fieldOf("version").forGetter(ChannelData::version),
             Codec.BOOL.fieldOf("required").forGetter(ChannelData::required)
         ).apply(in, ChannelData::new));

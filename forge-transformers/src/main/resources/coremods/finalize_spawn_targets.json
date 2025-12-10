@@ -1,5 +1,11 @@
 [
     {
+        "class": "net/minecraft/gametest/framework/GameTestHelper",
+        "methods": [
+            "spawn(Lnet/minecraft/world/entity/EntityType;Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/entity/EntitySpawnReason;)Lnet/minecraft/world/entity/Entity;"
+        ]
+    },
+    {
         "class": "net/minecraft/server/commands/RaidCommand",
         "methods": [
             "spawnLeader(Lnet/minecraft/commands/CommandSourceStack;)I"
@@ -24,28 +30,22 @@
         ]
     },
     {
+        "class": "net/minecraft/world/entity/animal/equine/SkeletonTrapGoal",
+        "methods": [
+            "createHorse(Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/equine/AbstractHorse;",
+            "createSkeleton(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/animal/equine/AbstractHorse;)Lnet/minecraft/world/entity/monster/skeleton/Skeleton;"
+        ]
+    },
+    {
+        "class": "net/minecraft/world/entity/animal/equine/ZombieHorse",
+        "methods": [
+            "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
+        ]
+    },
+    {
         "class": "net/minecraft/world/entity/animal/frog/Tadpole",
         "methods": [
             
-        ]
-    },
-    {
-        "class": "net/minecraft/world/entity/animal/horse/SkeletonTrapGoal",
-        "methods": [
-            "createHorse(Lnet/minecraft/world/DifficultyInstance;)Lnet/minecraft/world/entity/animal/horse/AbstractHorse;",
-            "createSkeleton(Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/animal/horse/AbstractHorse;)Lnet/minecraft/world/entity/monster/Skeleton;"
-        ]
-    },
-    {
-        "class": "net/minecraft/world/entity/monster/Evoker$EvokerSummonSpellGoal",
-        "methods": [
-            "performSpellCasting()V"
-        ]
-    },
-    {
-        "class": "net/minecraft/world/entity/monster/Spider",
-        "methods": [
-            "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
         ]
     },
     {
@@ -55,14 +55,38 @@
         ]
     },
     {
-        "class": "net/minecraft/world/entity/monster/Zombie",
+        "class": "net/minecraft/world/entity/monster/illager/Evoker$EvokerSummonSpellGoal",
+        "methods": [
+            "performSpellCasting()V"
+        ]
+    },
+    {
+        "class": "net/minecraft/world/entity/monster/spider/Spider",
+        "methods": [
+            "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
+        ]
+    },
+    {
+        "class": "net/minecraft/world/entity/monster/zombie/Drowned",
+        "methods": [
+            "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
+        ]
+    },
+    {
+        "class": "net/minecraft/world/entity/monster/zombie/Husk",
+        "methods": [
+            "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
+        ]
+    },
+    {
+        "class": "net/minecraft/world/entity/monster/zombie/Zombie",
         "methods": [
             "hurtServer(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/damagesource/DamageSource;F)Z",
             "finalizeSpawn(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
         ]
     },
     {
-        "class": "net/minecraft/world/entity/monster/ZombieVillager",
+        "class": "net/minecraft/world/entity/monster/zombie/ZombieVillager",
         "methods": [
             
         ]
@@ -74,9 +98,9 @@
         ]
     },
     {
-        "class": "net/minecraft/world/entity/npc/Villager",
+        "class": "net/minecraft/world/entity/npc/villager/Villager",
         "methods": [
-            "getBreedOffspring(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/AgeableMob;)Lnet/minecraft/world/entity/npc/Villager;"
+            "getBreedOffspring(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/AgeableMob;)Lnet/minecraft/world/entity/npc/villager/Villager;"
         ]
     },
     {

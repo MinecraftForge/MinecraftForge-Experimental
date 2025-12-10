@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/renderer/block/model/BlockElementFace.java
 +++ b/net/minecraft/client/renderer/block/model/BlockElementFace.java
 @@ -15,9 +_,18 @@
- import net.minecraftforge.api.distmarker.OnlyIn;
+ import org.jspecify.annotations.Nullable;
  
  @OnlyIn(Dist.CLIENT)
--public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, @Nullable BlockElementFace.UVs uvs, Quadrant rotation) {
-+public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, @Nullable BlockElementFace.UVs uvs, Quadrant rotation, @Nullable net.minecraftforge.client.model.ForgeFaceData data) {
+-public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation) {
++public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation, net.minecraftforge.client.model.@Nullable ForgeFaceData data) {
      public static final int NO_TINT = -1;
  
-+    public BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, @Nullable BlockElementFace.UVs uvs, Quadrant rotation) {
++    public BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation) {
 +        this(cullForDirection, tintIndex, texture, uvs, rotation, null);
 +    }
 +

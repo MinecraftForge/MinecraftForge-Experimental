@@ -80,7 +80,7 @@ public class LootEventsTest extends BaseTestMod {
 
     private class ForgeEvents {
         public static void onLootTableLoad(LootTableLoadEvent event) {
-            if (event.getName().equals(TEST_BLOCK.get().getLootTable().orElse(null).location())) {
+            if (event.getName().equals(TEST_BLOCK.get().getLootTable().orElse(null).identifier())) {
                 event.getTable().removePool(0);
                 event.getTable().addPool(
                     LootPool.lootPool()

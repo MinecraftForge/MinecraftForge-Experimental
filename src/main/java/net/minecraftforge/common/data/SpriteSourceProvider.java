@@ -9,7 +9,7 @@ import com.mojang.serialization.JsonOps;
 import net.minecraft.client.renderer.texture.atlas.SpriteSource;
 import net.minecraft.client.renderer.texture.atlas.SpriteSources;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.PackType;
 
 import java.util.ArrayList;
@@ -27,18 +27,18 @@ import java.util.function.BiConsumer;
  */
 public abstract class SpriteSourceProvider extends JsonCodecProvider<List<SpriteSource>>
 {
-    protected static final ResourceLocation BLOCKS_ATLAS = ResourceLocation.withDefaultNamespace("blocks");
-    protected static final ResourceLocation BANNER_PATTERNS_ATLAS = ResourceLocation.withDefaultNamespace("banner_patterns");
-    protected static final ResourceLocation BEDS_ATLAS = ResourceLocation.withDefaultNamespace("beds");
-    protected static final ResourceLocation CHESTS_ATLAS = ResourceLocation.withDefaultNamespace("chests");
-    protected static final ResourceLocation SHIELD_PATTERNS_ATLAS = ResourceLocation.withDefaultNamespace("shield_patterns");
-    protected static final ResourceLocation SHULKER_BOXES_ATLAS = ResourceLocation.withDefaultNamespace("shulker_boxes");
-    protected static final ResourceLocation SIGNS_ATLAS = ResourceLocation.withDefaultNamespace("signs");
-    protected static final ResourceLocation MOB_EFFECTS_ATLAS = ResourceLocation.withDefaultNamespace("mob_effects");
-    protected static final ResourceLocation PAINTINGS_ATLAS = ResourceLocation.withDefaultNamespace("paintings");
-    protected static final ResourceLocation PARTICLES_ATLAS = ResourceLocation.withDefaultNamespace("particles");
+    protected static final Identifier BLOCKS_ATLAS = Identifier.withDefaultNamespace("blocks");
+    protected static final Identifier BANNER_PATTERNS_ATLAS = Identifier.withDefaultNamespace("banner_patterns");
+    protected static final Identifier BEDS_ATLAS = Identifier.withDefaultNamespace("beds");
+    protected static final Identifier CHESTS_ATLAS = Identifier.withDefaultNamespace("chests");
+    protected static final Identifier SHIELD_PATTERNS_ATLAS = Identifier.withDefaultNamespace("shield_patterns");
+    protected static final Identifier SHULKER_BOXES_ATLAS = Identifier.withDefaultNamespace("shulker_boxes");
+    protected static final Identifier SIGNS_ATLAS = Identifier.withDefaultNamespace("signs");
+    protected static final Identifier MOB_EFFECTS_ATLAS = Identifier.withDefaultNamespace("mob_effects");
+    protected static final Identifier PAINTINGS_ATLAS = Identifier.withDefaultNamespace("paintings");
+    protected static final Identifier PARTICLES_ATLAS = Identifier.withDefaultNamespace("particles");
 
-    private final Map<ResourceLocation, SourceList> atlases = new HashMap<>();
+    private final Map<Identifier, SourceList> atlases = new HashMap<>();
 
     public SpriteSourceProvider(PackOutput output, ExistingFileHelper fileHelper, String modid)
     {
@@ -46,11 +46,11 @@ public abstract class SpriteSourceProvider extends JsonCodecProvider<List<Sprite
     }
 
     @Override
-    protected final void gather(BiConsumer<ResourceLocation, List<SpriteSource>> consumer)
+    protected final void gather(BiConsumer<Identifier, List<SpriteSource>> consumer)
     {
         addSources();
         for (var entry : atlases.entrySet()) {
-            ResourceLocation atlas = entry.getKey();
+            Identifier atlas = entry.getKey();
             SourceList srcList = entry.getValue();
             consumer.accept(atlas, srcList.sources);
         }
@@ -64,7 +64,7 @@ public abstract class SpriteSourceProvider extends JsonCodecProvider<List<Sprite
      *              and the vanilla atlases
      * @return an existing {@code SourceList} for the given atlas or a new one if not present yet
      */
-    protected final SourceList atlas(ResourceLocation atlas)
+    protected final SourceList atlas(Identifier atlas)
     {
         return atlases.computeIfAbsent(atlas, $ -> new SourceList());
     }

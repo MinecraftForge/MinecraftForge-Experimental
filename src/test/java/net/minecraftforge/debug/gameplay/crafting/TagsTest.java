@@ -6,7 +6,7 @@
 package net.minecraftforge.debug.gameplay.crafting;
 
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -28,7 +28,7 @@ public class TagsTest extends BaseTestMod {
     @GameTest
     public static void cobble_in_legacy(GameTestHelper helper) throws ReflectiveOperationException {
         var cobble = new ItemStack(Items.COBBLESTONE);
-        var forgeCobbleTag = ItemTags.create(ResourceLocation.fromNamespaceAndPath("forge", "cobblestone"));
+        var forgeCobbleTag = ItemTags.create(Identifier.fromNamespaceAndPath("forge", "cobblestone"));
         boolean isCobble = cobble.is(forgeCobbleTag);
         helper.assertTrue(isCobble, forgeCobbleTag + " is missing " + Items.COBBLESTONE);
         helper.succeed();

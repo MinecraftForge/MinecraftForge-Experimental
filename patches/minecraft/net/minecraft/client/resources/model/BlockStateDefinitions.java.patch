@@ -2,10 +2,10 @@
 +++ b/net/minecraft/client/resources/model/BlockStateDefinitions.java
 @@ -33,6 +_,8 @@
  
-     static Function<ResourceLocation, StateDefinition<Block, BlockState>> definitionLocationToBlockStateMapper() {
-         Map<ResourceLocation, StateDefinition<Block, BlockState>> map = new HashMap<>(STATIC_DEFINITIONS);
+     static Function<Identifier, StateDefinition<Block, BlockState>> definitionLocationToBlockStateMapper() {
+         Map<Identifier, StateDefinition<Block, BlockState>> map = new HashMap<>(STATIC_DEFINITIONS);
 +        var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onRegisterModeStateDefinitions();
 +        map.putAll(event.getStates());
  
          for (Block block : BuiltInRegistries.BLOCK) {
-             map.put(block.builtInRegistryHolder().key().location(), block.getStateDefinition());
+             map.put(block.builtInRegistryHolder().key().identifier(), block.getStateDefinition());

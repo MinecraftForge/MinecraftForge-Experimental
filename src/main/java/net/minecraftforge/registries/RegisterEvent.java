@@ -7,7 +7,7 @@ package net.minecraftforge.registries;
 
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -24,7 +24,7 @@ import java.util.function.Supplier;
  * <p>
  * Fired on the {@linkplain FMLJavaModLoadingContext#getModBusGroup() mod BusGroup}.
  *
- * @see #register(ResourceKey, ResourceLocation, Supplier)
+ * @see #register(ResourceKey, Identifier, Supplier)
  * @see #register(ResourceKey, Consumer)
  */
 public class RegisterEvent implements IModBusEvent {
@@ -55,7 +55,7 @@ public class RegisterEvent implements IModBusEvent {
      * @see #register(ResourceKey, Consumer) a register variant making registration of multiple objects less redundant
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public <T> void register(ResourceKey<? extends Registry<T>> registryKey, ResourceLocation name, Supplier<T> valueSupplier) {
+    public <T> void register(ResourceKey<? extends Registry<T>> registryKey, Identifier name, Supplier<T> valueSupplier) {
         if (this.registryKey.equals(registryKey)) {
             if (this.forgeRegistry != null)
                 ((IForgeRegistry) this.forgeRegistry).register(name, valueSupplier.get());
@@ -69,7 +69,7 @@ public class RegisterEvent implements IModBusEvent {
      *
      * @param registryKey the key of the registry to register objects to
      * @param <T> the type of the registry
-     * @see #register(ResourceKey, ResourceLocation, Supplier) a register variant targeted towards registering one or two objects
+     * @see #register(ResourceKey, Identifier, Supplier) a register variant targeted towards registering one or two objects
      */
     public <T> void register(ResourceKey<? extends Registry<T>> registryKey, Consumer<RegisterHelper<T>> consumer) {
         if (this.registryKey.equals(registryKey))
@@ -112,14 +112,14 @@ public class RegisterEvent implements IModBusEvent {
         /**
          * Registers the given value with the given name to the registry.
          * The namespace is inferred based on the active mod container.
-         * If you wish to specify a namespace, use {@link #register(ResourceLocation, Object)} instead.
+         * If you wish to specify a namespace, use {@link #register(Identifier, Object)} instead.
          *
          * @param name the name of the object to register as its key with the namespaced inferred from the active mod container
          * @param value the object value
          */
         @SuppressWarnings("removal")
         default void register(String name, T value) {
-            register(ResourceLocation.fromNamespaceAndPath(ModLoadingContext.get().getActiveNamespace(), name), value);
+            register(Identifier.fromNamespaceAndPath(ModLoadingContext.get().getActiveNamespace(), name), value);
         }
 
         /**
@@ -129,7 +129,7 @@ public class RegisterEvent implements IModBusEvent {
          * @param value the object value
          */
         default void register(ResourceKey<T> key, T value) {
-            register(key.location(), value);
+            register(key.identifier(), value);
         }
 
         /**
@@ -138,6 +138,6 @@ public class RegisterEvent implements IModBusEvent {
          * @param name the name of the object to register as its key
          * @param value the object value
          */
-        void register(ResourceLocation name, T value);
+        void register(Identifier name, T value);
     }
 }

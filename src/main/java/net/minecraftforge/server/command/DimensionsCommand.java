@@ -9,7 +9,7 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.core.Registry;
 import net.minecraft.world.level.dimension.DimensionType;
 import net.minecraft.server.level.ServerLevel;
@@ -25,18 +25,18 @@ import com.mojang.brigadier.builder.ArgumentBuilder;
 class DimensionsCommand {
     static ArgumentBuilder<CommandSourceStack, ?> register() {
         return Commands.literal("dimensions")
-            .requires(cs->cs.hasPermission(0)) //permission
+            .requires(Commands.hasPermission(Commands.LEVEL_ALL)) //permission
             .executes(ctx -> {
                 ctx.getSource().sendSuccess(() -> Component.translatable("commands.forge.dimensions.list"), true);
                 final Registry<DimensionType> reg = ctx.getSource().registryAccess().lookupOrThrow(Registries.DIMENSION_TYPE);
 
-                Map<ResourceLocation, List<ResourceLocation>> types = new HashMap<>();
+                Map<Identifier, List<Identifier>> types = new HashMap<>();
                 for (ServerLevel dim : ctx.getSource().getServer().getAllLevels()) {
-                    types.computeIfAbsent(reg.getKey(dim.dimensionType()), k -> new ArrayList<>()).add(dim.dimension().location());
+                    types.computeIfAbsent(reg.getKey(dim.dimensionType()), k -> new ArrayList<>()).add(dim.dimension().identifier());
                 }
 
                 types.keySet().stream().sorted().forEach(key -> {
-                    ctx.getSource().sendSuccess(() -> Component.literal(key + ": " + types.get(key).stream().map(ResourceLocation::toString).sorted().collect(Collectors.joining(", "))), false);
+                    ctx.getSource().sendSuccess(() -> Component.literal(key + ": " + types.get(key).stream().map(Identifier::toString).sorted().collect(Collectors.joining(", "))), false);
                 });
                 return 0;
             });

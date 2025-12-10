@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.ModelDiscovery.ModelWrapper;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.ForgeBlockModelData;
 
 @ApiStatus.Internal
@@ -76,7 +76,7 @@ public record ModelContext(
     }
 
     @Override
-    public @Nullable ResourceLocation getRenderTypeHint() {
+    public @Nullable Identifier getRenderTypeHint() {
         return data == null ? null : data.renderType().orElse(null);
     }
 

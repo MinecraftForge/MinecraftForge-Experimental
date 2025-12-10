@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/BucketPickup.java
 +++ b/net/minecraft/world/level/block/BucketPickup.java
 @@ -9,8 +_,10 @@
- import net.minecraft.world.level.LevelAccessor;
  import net.minecraft.world.level.block.state.BlockState;
+ import org.jspecify.annotations.Nullable;
  
 -public interface BucketPickup {
 +public interface BucketPickup extends net.minecraftforge.common.extensions.IForgeBucketPickup {

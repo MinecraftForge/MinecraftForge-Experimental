@@ -48,7 +48,7 @@ public final class RegisterPresetEditorsEvent implements SelfDestructing, IModBu
     public void register(ResourceKey<WorldPreset> key, PresetEditor editor) {
         PresetEditor old = this.editors.put(key, editor);
         if (old != null) {
-            LOGGER.debug("PresetEditor {} overridden by mod {}", key.location(), ModLoadingContext.get().getActiveNamespace());
+            LOGGER.debug("PresetEditor {} overridden by mod {}", key.identifier(), ModLoadingContext.get().getActiveNamespace());
         }
     }
 }

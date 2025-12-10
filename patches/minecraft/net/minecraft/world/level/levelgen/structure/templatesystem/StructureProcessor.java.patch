@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessor.java
 +++ b/net/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessor.java
 @@ -7,6 +_,11 @@
- import net.minecraft.world.level.ServerLevelAccessor;
+ import org.jspecify.annotations.Nullable;
  
  public abstract class StructureProcessor {
 +
@@ -9,10 +9,10 @@
 +     * @deprecated Forge: Use {@link #process(LevelReader, BlockPos, BlockPos, StructureTemplate.StructureBlockInfo, StructureTemplate.StructureBlockInfo, StructurePlaceSettings, StructureTemplate)} instead.
 +     */
 +    @Deprecated
-     @Nullable
-     public StructureTemplate.StructureBlockInfo processBlock(
+     public StructureTemplate.@Nullable StructureBlockInfo processBlock(
          LevelReader p_74416_,
-@@ -30,5 +_,22 @@
+         BlockPos p_74417_,
+@@ -29,5 +_,21 @@
          StructurePlaceSettings p_277497_
      ) {
          return p_278053_;
@@ -30,8 +30,7 @@
 +       return entityInfo;
 +    }
 +
-+    @Nullable
-+    public StructureTemplate.StructureBlockInfo process(LevelReader level, BlockPos seed, BlockPos offset, StructureTemplate.StructureBlockInfo rawBlock, StructureTemplate.StructureBlockInfo block, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
++    public StructureTemplate.@Nullable StructureBlockInfo process(LevelReader level, BlockPos seed, BlockPos offset, StructureTemplate.StructureBlockInfo rawBlock, StructureTemplate.StructureBlockInfo block, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
 +       return processBlock(level, seed, offset, rawBlock, block, settings);
      }
  }

@@ -5,8 +5,8 @@
 
 package net.minecraftforge.server.permission;
 
-import net.minecraft.ResourceLocationException;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.IdentifierException;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.common.ForgeConfig;
 import net.minecraftforge.common.MinecraftForge;
@@ -45,7 +45,7 @@ public final class PermissionAPI
      * @return the Identifier of the currently active permission handler
      */
     @Nullable
-    public static ResourceLocation getActivePermissionHandler()
+    public static Identifier getActivePermissionHandler()
     {
         return activeHandler == null ? null : activeHandler.getIdentifier();
     }
@@ -105,11 +105,11 @@ public final class PermissionAPI
         PermissionAPI.activeHandler = null;
 
         var handlerEvent = PermissionGatherEvent.Handler.BUS.fire(new PermissionGatherEvent.Handler());
-        Map<ResourceLocation, IPermissionHandlerFactory> availableHandlers = handlerEvent.getAvailablePermissionHandlerFactories();
+        Map<Identifier, IPermissionHandlerFactory> availableHandlers = handlerEvent.getAvailablePermissionHandlerFactories();
 
         try
         {
-            ResourceLocation selectedPermissionHandler = ResourceLocation.parse(ForgeConfig.SERVER.permissionHandler.get());
+            Identifier selectedPermissionHandler = Identifier.parse(ForgeConfig.SERVER.permissionHandler.get());
             if (!availableHandlers.containsKey(selectedPermissionHandler))
             {
                 LOGGER.error("Unable to find configured permission handler {}, will use {}", selectedPermissionHandler, DefaultPermissionHandler.IDENTIFIER);
@@ -127,7 +127,7 @@ public final class PermissionAPI
 
             LOGGER.info("Successfully initialized permission handler {}", PermissionAPI.activeHandler.getIdentifier());
         }
-        catch (ResourceLocationException e)
+        catch (IdentifierException e)
         {
             LOGGER.error("Error parsing config value 'permissionHandler'", e);
         }

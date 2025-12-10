@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Camera.java
 +++ b/net/minecraft/client/Camera.java
-@@ -132,9 +_,13 @@
+@@ -136,9 +_,13 @@
      }
  
      protected void setRotation(float p_90573_, float p_90574_) {
@@ -15,10 +15,10 @@
          FORWARDS.rotate(this.rotation, this.forwards);
          UP.rotate(this.rotation, this.up);
          LEFT.rotate(this.rotation, this.left);
-@@ -250,6 +_,13 @@
+@@ -168,6 +_,13 @@
  
-     public float getPartialTickTime() {
-         return this.partialTickTime;
+     public float yRot() {
+         return this.yRot;
 +    }
 +
 +    public net.minecraft.world.level.block.state.BlockState getBlockAtCamera() {
