@@ -1115,13 +1115,6 @@ public final class ForgeHooks {
 
     @ApiStatus.Internal
     public static boolean onCustomPayload(CustomPayloadEvent event) {
-        var connection = event.getSource().getConnection();
-        var expectedSide = connection.getReceiving() == PacketFlow.CLIENTBOUND ? LogicalSide.CLIENT : LogicalSide.SERVER;
-        if (expectedSide != EffectiveSide.get()) {
-            connection.disconnect(Component.literal("Illegal packet received " + event.getChannel() + " on wrong side " + EffectiveSide.get().name() + ", terminating connection"));
-            return false;
-        }
-
         var channel = NetworkRegistry.findTarget(event.getChannel());
         if (channel != null && channel.dispatch(event))
             return true;

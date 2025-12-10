@@ -6,7 +6,7 @@
      TextureSlots.Data textureSlots,
 -    @Nullable Identifier parent
 +    @Nullable Identifier parent,
-+    @Nullable net.minecraftforge.client.model.ForgeBlockModelData forgeData
++    net.minecraftforge.client.model.@Nullable ForgeBlockModelData forgeData
  ) implements UnbakedModel {
 +    public BlockModel(
 +        @Nullable UnbakedGeometry geometry,

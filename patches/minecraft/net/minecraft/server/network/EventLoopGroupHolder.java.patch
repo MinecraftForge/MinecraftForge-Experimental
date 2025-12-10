@@ -1,35 +1,50 @@
 --- a/net/minecraft/server/network/EventLoopGroupHolder.java
 +++ b/net/minecraft/server/network/EventLoopGroupHolder.java
-@@ -48,6 +_,12 @@
-             return LocalIoHandler.newFactory();
-         }
-     };
-+    private static final EventLoopGroupHolder LOCAL_CLIENT = new EventLoopGroupHolder("Local Client", LocalChannel.class, LocalServerChannel.class) {
-+        @Override
-+        protected IoHandlerFactory ioHandlerFactory() {
-+            return LocalIoHandler.newFactory();
-+        }
-+    };
-     private final String type;
+@@ -52,6 +_,7 @@
      private final Class<? extends Channel> channelCls;
      private final Class<? extends ServerChannel> serverChannelCls;
-@@ -71,6 +_,10 @@
-         return LOCAL;
+     private volatile @Nullable EventLoopGroup group;
++    private volatile @Nullable EventLoopGroup groupClient;
+ 
+     public static EventLoopGroupHolder remote(boolean p_453425_) {
+         if (p_453425_) {
+@@ -77,24 +_,31 @@
+         this.serverChannelCls = p_455144_;
      }
  
-+    public static EventLoopGroupHolder localClient() {
-+        return LOCAL_CLIENT;
-+    }
-+
-     EventLoopGroupHolder(String p_451976_, Class<? extends Channel> p_460581_, Class<? extends ServerChannel> p_455144_) {
-         this.type = p_451976_;
-         this.channelCls = p_460581_;
-@@ -78,7 +_,7 @@
-     }
- 
-     private ThreadFactory createThreadFactory() {
+-    private ThreadFactory createThreadFactory() {
 -        return new ThreadFactoryBuilder().setNameFormat("Netty " + this.type + " IO #%d").setDaemon(true).build();
-+        return new ThreadFactoryBuilder().setNameFormat("Netty " + this.type + " IO #%d").setDaemon(true).setThreadFactory(net.minecraftforge.fml.util.thread.SidedThreadGroups.get(this == LOCAL_CLIENT)).build();
++    private ThreadFactory createThreadFactory(boolean client) {
++        return new ThreadFactoryBuilder().setNameFormat("Netty " + this.type + (client ? " Client" : " Server") + " IO #%d").setDaemon(true).setThreadFactory(net.minecraftforge.fml.util.thread.SidedThreadGroups.get(client)).build();
      }
  
      protected abstract IoHandlerFactory ioHandlerFactory();
+ 
+-    private EventLoopGroup createEventLoopGroup() {
+-        return new MultiThreadIoEventLoopGroup(this.createThreadFactory(), this.ioHandlerFactory());
++    private EventLoopGroup createEventLoopGroup(boolean client) {
++        return new MultiThreadIoEventLoopGroup(this.createThreadFactory(client), this.ioHandlerFactory());
+     }
+ 
+     public EventLoopGroup eventLoopGroup() {
+-        EventLoopGroup eventloopgroup = this.group;
++        return eventLoopGroup(false);
++    }
++
++    public EventLoopGroup eventLoopGroup(boolean client) {
++        EventLoopGroup eventloopgroup = client ? this.groupClient : this.group;
+         if (eventloopgroup == null) {
+             synchronized (this) {
+-                eventloopgroup = this.group;
++                eventloopgroup = client ? this.groupClient : this.group;
+                 if (eventloopgroup == null) {
+-                    eventloopgroup = this.createEventLoopGroup();
+-                    this.group = eventloopgroup;
++                    eventloopgroup = this.createEventLoopGroup(client);
++                    if (client)
++                        this.groupClient = eventloopgroup;
++                    else
++                        this.group = eventloopgroup;
+                 }
+             }
+         }

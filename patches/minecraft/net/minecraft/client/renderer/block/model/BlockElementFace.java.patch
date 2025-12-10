@@ -5,7 +5,7 @@
  
  @OnlyIn(Dist.CLIENT)
 -public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation) {
-+public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation, @Nullable net.minecraftforge.client.model.ForgeFaceData data) {
++public record BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation, net.minecraftforge.client.model.@Nullable ForgeFaceData data) {
      public static final int NO_TINT = -1;
  
 +    public BlockElementFace(@Nullable Direction cullForDirection, int tintIndex, String texture, BlockElementFace.@Nullable UVs uvs, Quadrant rotation) {
