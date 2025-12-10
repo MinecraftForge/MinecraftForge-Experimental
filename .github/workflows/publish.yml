@@ -2,7 +2,7 @@ name: Publish
 
 on:
   push:
-    branches: [ '1.21.x' ]
+    branches: [ '1.21.11' ]
 
 permissions:
   contents: read
