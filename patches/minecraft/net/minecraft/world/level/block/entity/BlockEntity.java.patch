@@ -43,7 +43,7 @@
      }
  
      protected void saveAdditional(ValueOutput p_407573_) {
-+        if (getCapabilities() != null) p_407573_.storeNullable("ForgeCaps", CompoundTag.CODEC, serializeCaps(this.level.registryAccess()));
++        if (getCapabilities() != null && this.level != null) p_407573_.storeNullable("ForgeCaps", CompoundTag.CODEC, serializeCaps(this.level.registryAccess()));
      }
  
      public final CompoundTag saveWithFullMetadata(HolderLookup.Provider p_331193_) {
