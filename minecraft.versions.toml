@@ -1,7 +1,7 @@
 [versions]
 java = "21"
-minecraft = "1.21.10"
+minecraft = "1.21.11"
 minecraft-next = "1.22"
-mcp = "20251007.101210"
+mcp = "20251209.095502"
 mappings-channel = "official"
-mappings-version = "1.21.10"
+mappings-version = "1.21.11"

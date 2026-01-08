@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 pluginManagement {
-    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.30'
+    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.32'
 
     if (new File('forgedev/settings.gradle').exists()) {
         includeBuild 'forgedev'
@@ -90,7 +90,7 @@ dependencyResolutionManagement.versionCatalogs {
         library 'binarypatcher',  'net.minecraftforge', 'binarypatcher'         version '1.2.0'
         library 'installertools', 'net.minecraftforge', 'installertools'        version '1.4.3'
         library 'fart',           'net.minecraftforge', 'ForgeAutoRenamingTool' version '1.0.6'
-        library 'srg2source',     'net.minecraftforge', 'Srg2Source'            version '8.1.1'
+        library 'srg2source',     'net.minecraftforge', 'Srg2Source'            version '8.2.0'
     }
 
     //@formatter:off
