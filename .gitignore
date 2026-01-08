@@ -1,3 +1,6 @@
+#forgedev dev if the folder exists in here
+forgedev
+
 #eclipse
 **/bin
 **/.settings
