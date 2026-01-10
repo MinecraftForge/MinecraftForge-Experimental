@@ -68,7 +68,6 @@ public class FMLServiceProvider implements ITransformationService {
     @SuppressWarnings("rawtypes")
     @Override
     public @NotNull List<ITransformer> transformers() {
-        LOGGER.debug(CORE, "Loading coremod transformers");
-        return new ArrayList<>(FMLLoader.getCoreModProvider().getCoreModTransformers());
+        return List.of();
     }
 }

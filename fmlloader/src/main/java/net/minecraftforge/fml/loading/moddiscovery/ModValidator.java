@@ -125,7 +125,6 @@ public class ModValidator {
         allErrors.addAll(this.discoveryErrorData);
 
         loadingModList = ModSorter.sort(candidateMods, allErrors);
-        loadingModList.addCoreMods();
         loadingModList.addAccessTransformers();
         loadingModList.setBrokenFiles(brokenFiles);
         BackgroundScanHandler backgroundScanHandler = new BackgroundScanHandler(candidateMods);

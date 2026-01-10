@@ -156,7 +156,6 @@ abstract class CommonDevLaunchHandler extends CommonLaunchHandler {
         return new String[] {
             "net/minecraftforge/",
             "META-INF/services/",
-            "META-INF/coremods.json",
             "META-INF/mods.toml"
         };
     }

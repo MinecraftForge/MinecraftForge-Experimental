@@ -10,14 +10,15 @@ import com.google.gson.annotations.SerializedName;
 import cpw.mods.modlauncher.api.ITransformer;
 import cpw.mods.modlauncher.api.ITransformerVotingContext;
 import cpw.mods.modlauncher.api.TransformerVoteResult;
-import net.minecraftforge.coremod.api.ASMAPI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.objectweb.asm.Opcodes;
 import org.objectweb.asm.tree.AbstractInsnNode;
 import org.objectweb.asm.tree.ClassNode;
 import org.objectweb.asm.tree.MethodInsnNode;
+import org.objectweb.asm.tree.MethodNode;
 
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -36,15 +37,16 @@ record MethodRedirector() implements ITransformer<ClassNode> {
     private static final Replacement[] REPLACEMENTS = {
         new Replacement(
             // finalizeSpawn redirection to ForgeEventFactory.onFinalizeSpawn
-            ASMAPI.MethodType.VIRTUAL,
+            Opcodes.INVOKEVIRTUAL,
             "finalizeSpawn",
             "(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;",
             GSON.fromJson(new InputStreamReader(sneak(() -> MethodRedirector.class.getModule().getResourceAsStream("coremods/finalize_spawn_targets.json"))), Target[].class),
-            insn -> ASMAPI.buildMethodCall(
-                ASMAPI.MethodType.STATIC,
+            insn -> new MethodInsnNode(
+                Opcodes.INVOKESTATIC,
                 "net/minecraftforge/event/ForgeEventFactory",
                 "onFinalizeSpawn",
-                "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;"
+                "(Lnet/minecraft/world/entity/Mob;Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;",
+                false
             )
         )
     };
@@ -58,7 +60,7 @@ record MethodRedirector() implements ITransformer<ClassNode> {
     }
 
     record Replacement(
-        ASMAPI.MethodType type,
+        int opcode,
         String name,
         String desc,
         Target[] targets,
@@ -94,7 +96,7 @@ record MethodRedirector() implements ITransformer<ClassNode> {
                 var splitPos = methodString.indexOf('(');
                 var methodName = methodString.substring(0, splitPos);
                 var methodDesc = methodString.substring(splitPos);
-                var method = ASMAPI.findMethodNode(clazz, methodName, methodDesc);
+                var method = findMethodNode(clazz, methodName, methodDesc);
 
                 if (method == null) {
                     LOGGER.error("Failed to redirect method call for {}! Method {} not found in class {}! This is a Forge bug, and is likely due to a Minecraft update changing something.", replacement.name, methodString, clazz.name);
@@ -107,7 +109,7 @@ record MethodRedirector() implements ITransformer<ClassNode> {
                     var methodInsn = (MethodInsnNode) insn;
                     var redirection = replacement.factory.apply(methodInsn);
                     LOGGER.debug("Redirecting method call {}{} to {}{} inside of {}.{}", methodInsn.name, methodInsn.desc, redirection.name, redirection.desc, clazz.name, method.name);
-                    ASMAPI.insertInsn(method, methodInsn, redirection, ASMAPI.InsertMode.REMOVE_ORIGINAL);
+                    method.instructions.set(insn, redirection);
                 }
             }
         }
@@ -115,8 +117,16 @@ record MethodRedirector() implements ITransformer<ClassNode> {
         return clazz;
     }
 
+    private static @Nullable MethodNode findMethodNode(ClassNode clazz, String name, String desc) {
+        for (var method : clazz.methods) {
+            if (name.equals(method.name) && desc.equals(method.desc))
+                return method;
+        }
+        return null;
+    }
+
     private static boolean shouldReplace(AbstractInsnNode insn, Replacement replacement) {
-        return insn.getOpcode() == replacement.type.toOpcode()
+        return insn.getOpcode() == replacement.opcode
             && replacement.name.equals(((MethodInsnNode) insn).name)
             && replacement.desc.equals(((MethodInsnNode) insn).desc);
     }

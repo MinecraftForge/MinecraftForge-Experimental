@@ -56,14 +56,6 @@ public class LoadingModList {
         return INSTANCE;
     }
 
-    public void addCoreMods() {
-        modFiles.stream()
-                .map(ModFileInfo::getFile)
-                .map(ModFile::getCoreMods)
-                .flatMap(List::stream)
-                .forEach(FMLLoader.getCoreModProvider()::addCoreMod);
-    }
-
     public void addAccessTransformers() {
         for (ModFileInfo modFile : modFiles) {
             ModFile mod = modFile.getFile();

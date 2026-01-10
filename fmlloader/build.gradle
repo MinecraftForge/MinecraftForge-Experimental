@@ -26,7 +26,6 @@ dependencies {
     api(libs.apache.commons)
     api(libs.bundles.night.config)
     api(libs.modlauncher)
-    api(libs.coremods)
     api(libs.mojang.logging)
     api(libs.jarjar.selector)
     api(libs.jarjar.meta)
