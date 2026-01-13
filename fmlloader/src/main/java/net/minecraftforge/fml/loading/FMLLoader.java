@@ -16,7 +16,6 @@ import net.minecraftforge.accesstransformer.service.AccessTransformerService;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.targets.CommonLaunchHandler;
 import net.minecraftforge.forgespi.Environment;
-import net.minecraftforge.forgespi.coremod.ICoreModProvider;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;

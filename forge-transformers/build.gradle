@@ -19,6 +19,7 @@ dependencies {
     implementation(libs.log4j.api)
     implementation(libs.gson)
     implementation(libs.modlauncher)
+    implementation(libs.coremods.api)
 
     testCompileOnly(libs.jetbrains.annotations)
 }

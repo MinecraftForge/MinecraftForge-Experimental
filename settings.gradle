@@ -30,6 +30,7 @@ dependencyResolutionManagement {
             library('securemodules', 'net.minecraftforge:securemodules:2.2.23') // Needs unsafe
             library('unsafe', 'net.minecraftforge:unsafe:0.9.2')
             library('accesstransformers', 'net.minecraftforge:accesstransformers:8.2.2')
+            library('coremods-api', 'net.minecraftforge:coremods-api:5.3.0')
             library('eventbus', 'net.minecraftforge:eventbus:7.0-beta.12')
             library('eventbus-validator', 'net.minecraftforge:eventbus-validator:7.0-beta.12')
             library('mergetool-api', 'net.minecraftforge:mergetool-api:1.0')

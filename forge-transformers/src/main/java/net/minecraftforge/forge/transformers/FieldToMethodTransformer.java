@@ -120,7 +120,7 @@ record FieldToMethodTransformer(String className, Map<String, String> fields) im
      * @apiNote This method was written as a special use case for Forge. It is not recommended to use this method
      *     unless you know what you are doing.
      */
-    public static void redirectFieldToMethod(final ClassNode classNode, final String fieldName, final String methodName) {
+    private static void redirectFieldToMethod(final ClassNode classNode, final String fieldName, final String methodName) {
         var foundField = findField(classNode, fieldName);
         if (foundField == null)
             throw new IllegalStateException("No field with name " + fieldName + " found");
