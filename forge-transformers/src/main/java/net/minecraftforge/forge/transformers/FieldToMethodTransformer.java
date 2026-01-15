@@ -27,7 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 record FieldToMethodTransformer(String className, Map<String, String> fields) implements ITransformer<ClassNode> {
-    private static Logger LOGGER = LogManager.getLogger();
+    private static final Logger LOGGER = LogManager.getLogger();
 
     // TODO [Forge][Transformer] Make this properly data driven or configurable.
     //      It was hard-coded like this before when using JS CoreMods, though.
