@@ -127,8 +127,7 @@ dependencies {
     installer(libs.eventbus)
     installer(libs.jspecify) // Dep of EventBus
     installer(libs.forgespi)
-    installer(libs.coremods)
-    installer(libs.nashorn) // Dep of Coremods
+    installer(libs.coremods.api)
     installer(libs.modlauncher)
     installer(libs.mergetool.api)
     installer(libs.bundles.night.config)

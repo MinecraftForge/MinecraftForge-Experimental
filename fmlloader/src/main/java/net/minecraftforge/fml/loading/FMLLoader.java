@@ -16,7 +16,6 @@ import net.minecraftforge.accesstransformer.service.AccessTransformerService;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.targets.CommonLaunchHandler;
 import net.minecraftforge.forgespi.Environment;
-import net.minecraftforge.forgespi.coremod.ICoreModProvider;
 import org.slf4j.Logger;
 
 import java.nio.file.Path;
@@ -34,7 +33,6 @@ import static net.minecraftforge.fml.loading.LogMarkers.SCAN;
 public class FMLLoader {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static AccessTransformerService accessTransformer;
-    private static ICoreModProvider coreModProvider;
     private static LanguageLoadingProvider languageLoadingProvider;
     private static Dist dist;
     private static String naming;
@@ -57,8 +55,6 @@ public class FMLLoader {
         checkPackage(ITransformationService.class, "4.0", "ModLauncher");
         accessTransformer  = getPlugin(env, "accesstransformer",  "1.0", "AccessTransformer");
         runtimeDistCleaner = getPlugin(env, "runtimedistcleaner", "1.0", "RuntimeDistCleaner");
-        coreModProvider = getSingleService(ICoreModProvider.class, "CoreMod");
-        LOGGER.debug(CORE, "FML found CoreMod version : {}", JarVersionLookupHandler.getInfo(coreModProvider.getClass()).impl().version().orElse("MISSING"));
         checkPackage(Environment.class, "2.0", "ForgeSPI");
 
         try {
@@ -96,6 +92,7 @@ public class FMLLoader {
         }
     }
 
+    @SuppressWarnings("unused")
     private static <T> T getSingleService(Class<T> clazz, String name) throws IncompatibleEnvironmentException {
           var providers = new ArrayList<T>();
           for (var itr = ServiceLoader.load(FMLLoader.class.getModule().getLayer(), clazz).iterator(); itr.hasNext(); ) {
@@ -158,10 +155,6 @@ public class FMLLoader {
         backgroundScanHandler = modValidator.stage2Validation();
         loadingModList = backgroundScanHandler.getLoadingModList();
         return List.of(modValidator.getModResources());
-    }
-
-    public static ICoreModProvider getCoreModProvider() {
-        return coreModProvider;
     }
 
     public static LanguageLoadingProvider getLanguageLoadingProvider() {

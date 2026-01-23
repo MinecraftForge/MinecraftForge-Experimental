@@ -37,7 +37,7 @@
                      return CompletableFuture.allOf(
                          p_358460_.listElements()
 +                            .filter(holder -> shouldDump(holder.key()))
-                             .map(
+                             .<CompletableFuture<?>>map(
                                  p_448721_ -> dumpValue(
                                      packoutput$pathprovider.json(p_448721_.key().identifier()),
 @@ -65,6 +_,10 @@

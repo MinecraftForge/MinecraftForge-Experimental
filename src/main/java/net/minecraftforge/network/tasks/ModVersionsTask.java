@@ -15,13 +15,11 @@ import net.minecraftforge.network.config.ConfigurationTaskContext;
 import net.minecraftforge.network.packets.ModVersions;
 
 /**
- * Sends the list of known channels to the client using the
- * <a href="https://web.archive.org/web/20220711204310/https://dinnerbone.com/blog/2012/01/13/minecraft-plugin-channels-messaging/">Plugin Channel</a>
- * register messages.
+ * Sends a list of mods and their versions, this is easily spoofed so should not be relied on for anti-cheats.
  */
 @ApiStatus.Internal
 public class ModVersionsTask implements ConfigurationTask {
-    public static final Type TYPE = new Type("forge:channel_list");
+    public static final Type TYPE = new Type("forge:mod_versions");
 
     @Override
     public void start(ConfigurationTaskContext ctx) {

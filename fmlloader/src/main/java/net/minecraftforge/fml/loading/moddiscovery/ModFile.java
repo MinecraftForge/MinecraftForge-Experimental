@@ -48,7 +48,6 @@ public class ModFile implements IModFile {
     private final IModFileInfo modFileInfo;
     private ModFileScanData fileModFileScanData;
     private CompletableFuture<ModFileScanData> futureScanResult;
-    private List<CoreModFile> coreMods;
     private Path accessTransformer;
 
     static final Attributes.Name TYPE = new Attributes.Name("FMLModType");
@@ -99,17 +98,8 @@ public class ModFile implements IModFile {
     public boolean identifyMods() {
         if (this.modFileInfo == null) return this.getType() != Type.MOD;
         LOGGER.debug(LogMarkers.LOADING,"Loading mod file {} with languages {}", this.getFileName(), this.modFileInfo.requiredLanguageLoaders());
-        this.coreMods = ModFileParser.getCoreMods(this);
-        if (!this.coreMods.isEmpty())
-            LOGGER.warn("Mod file {} contains javascript coremods! JS CoreMods are deprecated and will be removed in a future release. Consider using Mixin or ModLauncher transformers.", this.getFileName());
-        for (var mi : this.coreMods)
-            LOGGER.debug(LogMarkers.LOADING, "Found coremod {}", mi.getPath());
         this.accessTransformer = findResource("META-INF", "accesstransformer.cfg");
         return true;
-    }
-
-    public List<CoreModFile> getCoreMods() {
-        return coreMods;
     }
 
     /**
