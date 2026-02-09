@@ -11,6 +11,7 @@ assignees: ''
 
 <!-- For support with crashes and issues, please create a post on the forum instead: -->
 <!-- https://www.minecraftforge.net/forum/forum/18-support-bug-reports/ -->
+<!-- You can also use the discord for support, https://discord.minecraftforge.net/ -->
 
 **Minecraft Version:** {Minecraft version}
 
