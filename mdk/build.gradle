@@ -1,5 +1,6 @@
-// This is a minimal setup to that works on all IDEs and environments.
-// For complex examples, see https://github.com/MinecraftForge/MDKExamples
+// This is a minimal setup that works on all IDEs and environments without compromise.
+// For complex examples (including AccessTransformers, Jar-in-Jar, and Mixin), see our examples repository.
+// https://github.com/MinecraftForge/MDKExamples
 
 plugins {
     id 'java'

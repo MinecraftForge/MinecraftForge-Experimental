@@ -19,7 +19,7 @@ authors="YourNameHere, OtherNameHere" #optional
 #displayTest="MATCH_VERSION" #optional, default=MATCH_VERSION when not clientSideOnly, else IGNORE_ALL_VERSION
 
 description='''Example mod description.
-Newline characters can be used and will be replaced properly.'''
+Newline characters can be used like this, and rendered on the mods screen properly.'''
 
 [[dependencies.examplemod]] #recommended
     modId="forge"
