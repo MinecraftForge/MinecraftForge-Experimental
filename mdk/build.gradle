@@ -54,5 +54,5 @@ repositories {
 
 dependencies {
     minecraft 'net.minecraftforge:forge:@MC_VERSION@-@FORGE_VERSION@'
-    annotationProcessor 'net.minecraftforge:eventbus-validator:7.0-beta.12'
+    annotationProcessor 'net.minecraftforge:eventbus-validator:@EVENTBUS_VERSION@'
 }
