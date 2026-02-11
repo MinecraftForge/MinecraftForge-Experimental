@@ -56,3 +56,9 @@ dependencies {
     implementation minecraft.dependency('net.minecraftforge:forge:@MC_VERSION@-@FORGE_VERSION@')
     annotationProcessor 'net.minecraftforge:eventbus-validator:@EVENTBUS_VERSION@'
 }
+
+tasks.withType(JavaCompile).configureEach {
+    // Use the UTF-8 charset for Java compilation
+    // This is done by default in Java 18+, but this ensures it no matter the Java or Gradle version
+    options.encoding = 'UTF-8'
+}
