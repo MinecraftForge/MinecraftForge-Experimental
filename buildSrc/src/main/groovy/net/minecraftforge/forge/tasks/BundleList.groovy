@@ -62,6 +62,10 @@ abstract class BundleList extends DefaultTask {
                 def (group, name, other) = artifact.split(':', 3)
                 //println("Group: $group Name: $name")
                 def key = "$group:$name"
+                if (other.indexOf(':') != -1){
+                    key += ':' + other.split(':', 2)[1]
+                    //println("\tKey: $key")
+                }
                 if (!entries.containsKey(key))
                     entries.put(key, line)
             }

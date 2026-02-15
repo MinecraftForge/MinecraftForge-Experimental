@@ -89,8 +89,8 @@ dependencyResolutionManagement {
             // These are libraries shipped by the MC launcher, try and keep them in sync with the manifest
             // but honestly if we don't it just means we ship them as normal libraries by adding them to the installer config in the forge project
             library('gson', 'com.google.code.gson:gson:2.11.0')
-            library('guava', 'com.google.guava:guava:33.3.1-jre')
-            library('failureaccess', 'com.google.guava:failureaccess:1.0.2')
+            library('guava', 'com.google.guava:guava:33.5.0-jre')
+            library('failureaccess', 'com.google.guava:failureaccess:1.0.3')
 
             version('log4j', '2.24.3')
             library('log4j-api',  'org.apache.logging.log4j', 'log4j-api' ).versionRef('log4j')
