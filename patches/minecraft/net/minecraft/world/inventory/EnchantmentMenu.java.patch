@@ -9,7 +9,7 @@
              }
  
              @Override
-@@ -90,23 +_,25 @@
+@@ -90,23 +_,24 @@
              if (!itemstack.isEmpty() && itemstack.isEnchantable()) {
                  this.access.execute((p_449765_, p_449766_) -> {
                      IdMap<Holder<Enchantment>> idmap = p_449765_.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
@@ -18,7 +18,7 @@
  
                      for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
                          if (EnchantingTableBlock.isValidBookShelf(p_449765_, p_449766_, blockpos)) {
-                             j++;
+-                            j++;
 +                            j += p_449765_.getBlockState(p_449766_.offset(blockpos)).getEnchantPowerBonus(p_449765_, p_449766_.offset(blockpos));
                          }
                      }
