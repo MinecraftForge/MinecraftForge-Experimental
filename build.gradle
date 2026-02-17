@@ -159,8 +159,7 @@ dependencies {
     installer libs.eventbus
     installer libs.jspecify // Dep of EventBus
     installer libs.forgespi
-    installer libs.coremods
-    installer libs.nashorn // Dep of Coremods
+    installer libs.coremods.api
     installer libs.modlauncher
     installer libs.mergetool.api
     installer libs.bundles.night.config
@@ -194,7 +193,6 @@ testing.suites.named('test', JvmTestSuite) {
 }
 
 final List<File> EXTRA_TXTS = [
-    file('CREDITS.txt'),
     file('LICENSE.txt'),
     tasks.named('createChangelog', GenerateChangelog).flatMap(GenerateChangelog.&getOutputFile)
 ]
@@ -821,20 +819,27 @@ tasks.register('installerJar', InstallerJar) {
     jarSigner.sign(it)
 }
 
+final mdkGradleWrapper = tasks.register('mdkGradleWrapper', Wrapper) {
+    gradleVersion = '9.3.1'
+}
+
 tasks.register('mdkZip', Zip) {
+    dependsOn mdkGradleWrapper
+
     archiveBaseName = project.name
     archiveClassifier = 'mdk'
     archiveVersion = project.version
     destinationDirectory = file('build/libs')
 
-    from rootProject.file('gradlew')
-    from rootProject.file('gradlew.bat')
+    from mdkGradleWrapper.map(Wrapper.&getScriptFile)
+    from mdkGradleWrapper.map(Wrapper.&getBatchScript)
     from(EXTRA_TXTS)
-    from(rootProject.file('gradle/')){
-        into('gradle/')
+    into('gradle/wrapper/') {
+        from mdkGradleWrapper.map(Wrapper.&getJarFile)
+        from mdkGradleWrapper.map(Wrapper.&getPropertiesFile)
     }
     from(rootProject.file('mdk/')){
-        rootProject.file('mdk/gitignore.txt').eachLine{
+        rootProject.file('mdk/gitignore.txt').eachLine {
             if (!it.trim().isEmpty() && !it.trim().startsWith('#'))
                 exclude it
         }
@@ -846,7 +851,8 @@ tasks.register('mdkZip', Zip) {
             MAPPING_CHANNEL: mappingsChannel,
             MAPPING_VERSION: mappingsVersion,
             FORGE_SPEC_VERSION: gitversion.info.tag.split("\\.")[0],
-            MC_NEXT_VERSION: minecraftNextVersion
+            MC_NEXT_VERSION: minecraftNextVersion,
+            EVENTBUS_VERSION: libs.versions.eventbus.get()
         ])
         rename 'gitignore\\.txt', '.gitignore'
         rename 'gitattributes\\.txt', '.gitattributes'
