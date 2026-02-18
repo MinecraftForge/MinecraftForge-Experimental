@@ -40,7 +40,7 @@ tasks.named('jar', Jar) {
     manifest {
         attributes([
             'Automatic-Module-Name': 'net.minecraftforge.forge.transformers',
-            'FMLModType'           : 'boot'
+            'Forge-Module-Layer'   : 'boot'
         ])
         attributes([
             'Specification-Title'   : gradleutils.displayName.get(),
@@ -49,7 +49,7 @@ tasks.named('jar', Jar) {
             'Implementation-Title'  : gradleutils.displayName.get(),
             'Implementation-Vendor' : vendor,
             'Implementation-Version': forgeVersion
-        ], 'net/minecraftforge/fml/javafmlmod/')
+        ], 'net/minecraftforge/forge/transformers/')
     }
 }
 

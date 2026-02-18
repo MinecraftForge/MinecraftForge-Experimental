@@ -15,12 +15,6 @@ import net.minecraftforge.forgedev.legacy.tasks.checks.CheckSAS
 import net.minecraftforge.forgedev.legacy.tasks.checks.CheckTask
 import net.minecraftforge.forgedev.legacy.values.MavenInfo
 import de.undercouch.gradle.tasks.download.Download
-import net.minecraftforge.forgedev.tasks.installertools.DownloadMappings
-import net.minecraftforge.forgedev.tasks.installertools.ExtractInheritance
-import net.minecraftforge.forgedev.tasks.obfuscation.LegacyRenameJar
-import net.minecraftforge.forgedev.tasks.obfuscation.LegacyReobfuscateJar
-import net.minecraftforge.forgedev.tasks.patching.binary.ApplyBinPatches
-import net.minecraftforge.forgedev.tasks.patching.binary.CreateBinPatches
 import net.minecraftforge.forgedev.tasks.srg2source.ApplyRangeMap
 import net.minecraftforge.forgedev.tasks.srg2source.ExtractRangeMap
 import org.gradle.api.plugins.jvm.JvmTestSuite
@@ -72,6 +66,25 @@ tasks.register('setup') {
 java.toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
 
 jarSigner.autoDetect('forge')
+
+// We have to tell ForgeDev to use the exact versions of tools we ship in the installer
+fdtools {
+    configure('srg2source') {
+        version = buildLibs.srg2source.get().version
+    }
+    configure('binpatcher') {
+        version = buildLibs.binarypatcher.get().version
+    }
+    configure('installertools') {
+        version = buildLibs.installertools.get().version
+    }
+    configure('renamer') {
+        version = buildLibs.renamer.get().version
+    }
+    configure('jarcompatibilitychecker') {
+        javaLauncher = javaToolchains.launcherFor(java.toolchain)
+    }
+}
 
 sourceSets {
     named('main') {
@@ -413,47 +426,6 @@ tasks.register('findFinalizeSpawnTargets', BytecodePredicateFinder) {
 
 ValidateDeprecations.register(tasks, tasks.named('jar', Jar), minecraftVersion)
 
-// TODO [ForgeDev][Jonathing] Streamline all of this in ForgeBuildPlugin
-tasks.named('reobfJar', LegacyReobfuscateJar) {
-    using(buildLibs.fart) { classifier 'all' }
-}
-tasks.named('downloadClientMappings', DownloadMappings) {
-    using(buildLibs.installertools) { classifier 'fatjar' }
-}
-tasks.named('downloadServerMappings', DownloadMappings) {
-    using(buildLibs.installertools) { classifier 'fatjar' }
-}
-tasks.named('extractInheritance', ExtractInheritance) {
-    using(buildLibs.installertools) { classifier 'fatjar' }
-}
-tasks.named('createClientOfficial', LegacyRenameJar) {
-    using(buildLibs.fart) { classifier 'all' }
-}
-tasks.named('createServerOfficial', LegacyRenameJar) {
-    using(buildLibs.fart) { classifier 'all' }
-}
-tasks.named('genClientBinPatches', CreateBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('genServerBinPatches', CreateBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('genJoinedBinPatches', CreateBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('applyClientBinPatches', ApplyBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('applyServerBinPatches', ApplyBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('applyJoinedBinPatches', ApplyBinPatches) {
-    using(buildLibs.binarypatcher) { classifier 'fatjar' }
-}
-tasks.named('extractRangeMap', ExtractRangeMap) {
-    usingDirectly('https://maven.minecraftforge.net/net/minecraftforge/Srg2Source/8.1.1/Srg2Source-8.1.1-fatjar.jar')
-}
-
 DownloadDependency.register(project, 'downloadInstaller', dependencies.variantOf(libs.installer) { classifier 'fatjar' })
 DownloadDependency.register(project, 'downloadServerShim', libs.bootstrap.shim)
 
@@ -521,7 +493,9 @@ tasks.named('genPatches', GeneratePatches) {
 }
 
 CheckForgeJarCompatibility.register(project, minecraftVersion) {
-    commonLibraries.from(project.configurations.named('installer'))
+    // I don't know why this needs an 'it.' but it does
+    it.commonLibraries.from(forgedev.minecraftConfiguration)
+    it.commonLibraries.from(project.configurations.named('installer'))
 }
 
 if (!providers.environmentVariable('MAVEN_USER').orElse(providers.environmentVariable('MAVEN_PASSWORD')).present
@@ -572,23 +546,24 @@ tasks.register('installerJson', InstallerJson) {
     )
 
     var installertools = asArtifactString(buildLibs.installertools)
-    var fart = asArtifactString(buildLibs.fart)
+    var renamer = asArtifactString(buildLibs.renamer)
     var binarypatcher = asArtifactString(buildLibs.binarypatcher)
+    var profileName = project.name
+    var projectArtifact = "${project.group}:${project.name}:${project.version}"
 
     doFirst {
         var libs = libraries
 
         var installerToolsClasspath = getClasspath(project, libs, installertools)
-        var fartClasspath = getClasspath(project, libs, fart)
+        var renamerClasspath = getClasspath(project, libs, renamer)
         var binarypatcherClasspath = getClasspath(project, libs, binarypatcher)
-
         getClasspath(project, libs, mcpArtifactString) //Tell it to download mcp_config
 
         json.putAll([
             _comment: launcherJson.json._comment,
             hideExtract: true,
             spec: 1,
-            profile: project.name,
+            profile: profileName,
             version: launcherJson.json.id,
             path: Util.getMavenInfoFromTask(tasks.serverShimJar).name,
             minecraft: minecraftVersion,
@@ -623,8 +598,8 @@ tasks.register('installerJson', InstallerJson) {
                     server: '/data/server.lzma'
                 ],
                 PATCHED: [
-                    client: "[${project.group}:${project.name}:${project.version}:client]",
-                    server: "[${project.group}:${project.name}:${project.version}:server]"
+                    client: "[$projectArtifact:client]",
+                    server: "[$projectArtifact:server]"
                 ],
                 PATCHED_SHA: [
                     client: "'${applyClientBinPatches.output.get().asFile.sha1}'",
@@ -698,8 +673,8 @@ tasks.register('installerJson', InstallerJson) {
                     ]
                 ], [
                     sides: ['server'],
-                    jar: fart,
-                    classpath: fartClasspath,
+                    jar: renamer,
+                    classpath: renamerClasspath,
                     args: [
                         '--input', '{MC_UNPACKED}',
                         '--output', '{MC_OFF}',
@@ -711,8 +686,8 @@ tasks.register('installerJson', InstallerJson) {
                     ]
                 ], [
                     sides: ['client'],
-                    jar: fart,
-                    classpath: fartClasspath,
+                    jar: renamer,
+                    classpath: renamerClasspath,
                     args: [
                         '--input', '{MINECRAFT_JAR}',
                         '--output', '{MC_OFF}',
