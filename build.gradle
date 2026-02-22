@@ -382,16 +382,16 @@ tasks.named('userdevConfig', net.minecraftforge.forgedev.tasks.generation.Genera
             environment 'MCP_MAPPINGS', '{mcp_mappings}'
         }
 
-        client {
-            property 'forge.enableGameTest', 'true'
-            args '--launchTarget', "forge_userdev_client"
-            args '--version', 'MOD_DEV'
+        clientData {
+            args '--launchTarget', "forge_userdev_client_data"
             args '--assetIndex', '{asset_index}'
             args '--assetsDir', '{assets_root}'
         }
 
-        clientData {
-            args '--launchTarget', "forge_userdev_client_data"
+        client {
+            property 'forge.enableGameTest', 'true'
+            args '--launchTarget', "forge_userdev_client"
+            args '--version', 'MOD_DEV'
             args '--assetIndex', '{asset_index}'
             args '--assetsDir', '{assets_root}'
         }
@@ -498,13 +498,6 @@ CheckForgeJarCompatibility.register(project, minecraftVersion) {
     it.commonLibraries.from(project.configurations.named('installer'))
 }
 
-if (!providers.environmentVariable('MAVEN_USER').orElse(providers.environmentVariable('MAVEN_PASSWORD')).present
-    && providers.gradleProperty('net.minecraftforge.forge.build.check.compatibility').map(Boolean.&parseBoolean).getOrElse(false)) {
-    tasks.named('check') {
-        dependsOn checkJarCompatibility
-    }
-}
-
 tasks.register('downloadCrowdin', Download) {
     group = 'Forge downloads'
     description = 'Downloads the Forge translations from Crowdin.'
@@ -516,202 +509,157 @@ tasks.register('downloadCrowdin', Download) {
     quiet true
 }
 
-// TODO [ForgeDev] Rework to be friendly with Gradle 10 + configuration cache
-tasks.register('launcherJson', LauncherJson).configure {
-    json.putAll([
-        mainClass: 'net.minecraftforge.bootstrap.ForgeBootstrap',
-        arguments: [
-            game: [
-                '--launchTarget', 'forge_client'
-            ],
-            jvm: [
-                '-Djava.net.preferIPv6Addresses=system'
-            ]
+forgedev.installer {
+    dev = !forgedev.ci
+    offline = false
+
+    // Add extra libraries
+    pack tasks.named('serverShimJar', Jar) // The Server executable jar IS needed to be packed, as the installer would need a spec bump in order to download it
+    pack tasks.named('universalJar', Jar) // I don't think this is strictly needed to be packed anymore, will need to double check later
+    // This isn't actually needed, but its here for some reason, probably wasn't deleted when then installer process was cleaned up
+    library mcpArtifactString
+
+    launcherLibrary tasks.named('universalJar', Jar)
+    // We configure the launcher here to keep the order for easier diff, after publishing, move this to the LauncherJson configuration below
+    launcherJson {
+        // We create this during install, so it's not downloadable
+        generated(tasks.named('applyClientBinPatches'), 'client')
+    }
+
+    launcherLibraries configurations.installerextra
+    launcherLibraries configurations.installer
+
+    var launcherId = "${minecraftVersion}-${project.name}-${forgeVersion}"
+    var installertools = tool(buildLibs.installertools)
+    var renamer = tool(buildLibs.renamer)
+    var binarypatcher = tool(buildLibs.binarypatcher)
+
+    jar {
+        from(EXTRA_TXTS)
+        from(rootProject.file('/forge_installer_logo.png')) {
+            rename { 'big_logo.png' }
+        }
+        from(genClientBinPatches.output) {
+            rename { 'data/client.lzma' }
+        }
+        from(genServerBinPatches.output) {
+            rename { 'data/server.lzma' }
+        }
+
+        final var argsFile = rootProject.file('server_files/args.txt')
+        final Map<String, Map<String, String>> tokens = [tokens: [
+            SHIM_JAR_FILE: serverShimJar.archiveFileName.get(),
+            MAVEN_PATH: mavenPath
+        ]]
+        from(argsFile) {
+            filter(tokens, ReplaceTokens)
+            into 'data'
+            rename { 'unix_args.txt' }
+        }
+        from(argsFile) {
+            filter(tokens, ReplaceTokens)
+            into 'data'
+            rename { 'win_args.txt' }
+        }
+
+        from(rootProject.file('server_files')) {
+            filter(tokens, ReplaceTokens)
+            into 'data'
+            exclude 'args.txt'
+        }
+
+        jarSigner.sign(it)
+    }
+    json {
+        icon = rootProject.file('icon.ico')
+        executable tasks.named('serverShimJar', Jar)
+        minecraft = minecraftVersion
+        profileVersion = launcherId
+
+        var projectArtifact = "${project.group}:${project.name}:${project.version}"
+
+        data 'MOJMAPS', "[net.minecraft:client:${minecraftVersion}:mappings@tsrg]", "[net.minecraft:server:${minecraftVersion}:mappings@tsrg]"
+        data 'MOJMAPS_SHA', downloadClientMappings.output, downloadServerMappings.output
+
+        data 'MC_UNPACKED', "[net.minecraft:client:${minecraftVersion}]", "[net.minecraft:server:${minecraftVersion}:unpacked]"
+        data 'MC_UNPACKED_SHA', setupMCP.clientRaw, setupMCP.serverExtracted
+
+        data 'MC_OFF', "[net.minecraft:client:${minecraftVersion}:official]", "[net.minecraft:server:${minecraftVersion}:official]"
+        data 'MC_OFF_SHA', createClientOfficial.output, createServerOfficial.output
+
+        data 'BINPATCH', '/data/client.lzma', '/data/server.lzma'
+        data 'PATCHED', "[$projectArtifact:client]", "[$projectArtifact:server]"
+        data 'PATCHED_SHA', applyClientBinPatches.output, applyServerBinPatches.output
+
+        def rename = (side, input) -> {
+            step(renamer) {
+                sides = [side]
+                args = [
+                    '--input', input,
+                    '--output', '{MC_OFF}',
+                    '--names', '{MOJMAPS}',
+                    '--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse'
+                ]
+                cache '{MC_OFF}', '{MC_OFF_SHA}'
+            }
+        }
+
+        steps = [
+            extract(installertools) {
+                side = 'server'
+                archive '{INSTALLER}'
+                extract 'data/README.txt', '{ROOT}/README.txt'
+                extract 'data/run.sh', '{ROOT}/run.sh'
+                executable '{ROOT}/run.sh'
+                extract 'data/run.bat', '{ROOT}/run.bat'
+                optional 'data/user_jvm_args.txt', '{ROOT}/user_jvm_args.txt'
+                extract 'data/unix_args.txt', "{ROOT}/libraries/${mavenPath}/unix_args.txt"
+                extract 'data/win_args.txt', "{ROOT}/libraries/${mavenPath}/win_args.txt"
+            },
+            extractBundle(installertools) {
+                side = 'server'
+                libraries()
+            },
+            extractBundle(installertools) {
+                side = 'server'
+                jar '{MINECRAFT_JAR}', '{MC_UNPACKED}'
+                cache '{MC_UNPACKED}', '{MC_UNPACKED_SHA}'
+            },
+            step(installertools) {
+                args = [
+                    '--task', 'DOWNLOAD_MOJMAPS',
+                    '--sanitize',
+                    '--version', minecraftVersion,
+                    '--side', '{SIDE}',
+                    '--output', '{MOJMAPS}'
+                ]
+                cache '{MOJMAPS}', '{MOJMAPS_SHA}'
+            },
+            rename.call('server', '{MC_UNPACKED}'),
+            rename.call('client', '{MINECRAFT_JAR}'),
+            step(binarypatcher) {
+                args = [
+                    '--clean', '{MC_OFF}',
+                    '--output', '{PATCHED}',
+                    '--apply', '{BINPATCH}',
+                    '--data', '--unpatched'
+                ]
+                cache '{PATCHED}', '{PATCHED_SHA}'
+            }
         ]
-    ] as LinkedHashMap)
-}
+    }
 
-// TODO [ForgeDev] Rework to be friendly with Gradle 10 + configuration cache
-tasks.register('installerJson', InstallerJson) {
-    icon = rootProject.file('icon.ico')
+    launcherJson {
+        // These are flags to preserve glitchy old behavior to make diffing easier, removing when migrating to production is recommended
+        sortLibraries = false // Don't sort, makes things non-deterministic, but easier to diff old versions
+        duplicateLibraries = true // Our 'bootstrap' layer go added twice
+        librariesLast = false // Makes libraries be added before args
 
-    // Json to install into the client's launcher
-    dependsOn(launcherJson)
-    input.from(launcherJson.output)
-
-    dependsOn(setupMCP)
-    input.from(
-        downloadClientMappings.output, setupMCP.clientRaw, createClientOfficial, applyClientBinPatches,
-        downloadServerMappings.output, setupMCP.serverExtracted, createServerOfficial, applyServerBinPatches
-    )
-
-    var installertools = asArtifactString(buildLibs.installertools)
-    var renamer = asArtifactString(buildLibs.renamer)
-    var binarypatcher = asArtifactString(buildLibs.binarypatcher)
-    var profileName = project.name
-    var projectArtifact = "${project.group}:${project.name}:${project.version}"
-
-    doFirst {
-        var libs = libraries
-
-        var installerToolsClasspath = getClasspath(project, libs, installertools)
-        var renamerClasspath = getClasspath(project, libs, renamer)
-        var binarypatcherClasspath = getClasspath(project, libs, binarypatcher)
-        getClasspath(project, libs, mcpArtifactString) //Tell it to download mcp_config
-
-        json.putAll([
-            _comment: launcherJson.json._comment,
-            hideExtract: true,
-            spec: 1,
-            profile: profileName,
-            version: launcherJson.json.id,
-            path: Util.getMavenInfoFromTask(tasks.serverShimJar).name,
-            minecraft: minecraftVersion,
-            serverJarPath: '{LIBRARY_DIR}/net/minecraft/server/{MINECRAFT_VERSION}/server-{MINECRAFT_VERSION}-bundled.jar',
-            data: [
-                MOJMAPS: [
-                    client: "[net.minecraft:client:${minecraftVersion}:mappings@tsrg]",
-                    server: "[net.minecraft:server:${minecraftVersion}:mappings@tsrg]"
-                ],
-                MOJMAPS_SHA: [
-                    client: "'${downloadClientMappings.output.asFile.get().sha1}'",
-                    server: "'${downloadServerMappings.output.asFile.get().sha1}'"
-                ],
-                MC_UNPACKED: [
-                    client: "[net.minecraft:client:${minecraftVersion}]",
-                    server: "[net.minecraft:server:${minecraftVersion}:unpacked]"
-                ],
-                MC_UNPACKED_SHA: [
-                    client: "'${setupMCP.clientRaw.asFile.get().sha1}'",
-                    server: "'${setupMCP.serverExtracted.asFile.get().sha1}'"
-                ],
-                MC_OFF: [
-                    client: "[net.minecraft:client:${minecraftVersion}:official]",
-                    server: "[net.minecraft:server:${minecraftVersion}:official]"
-                ],
-                MC_OFF_SHA: [
-                    client: "'${createClientOfficial.output.get().asFile.sha1}'",
-                    server: "'${createServerOfficial.output.get().asFile.sha1}'"
-                ],
-                BINPATCH: [
-                    client: '/data/client.lzma',
-                    server: '/data/server.lzma'
-                ],
-                PATCHED: [
-                    client: "[$projectArtifact:client]",
-                    server: "[$projectArtifact:server]"
-                ],
-                PATCHED_SHA: [
-                    client: "'${applyClientBinPatches.output.get().asFile.sha1}'",
-                    server: "'${applyServerBinPatches.output.get().asFile.sha1}'"
-                ]
-            ],
-            processors: [
-                [
-                    sides: ['server'],
-                    jar: installertools,
-                    classpath: installerToolsClasspath,
-                    args: [
-                        '--task', 'EXTRACT_FILES',
-                        '--archive', '{INSTALLER}',
-
-                        '--from', 'data/README.txt',
-                        '--to', '{ROOT}/README.txt',
-
-                        '--from', 'data/run.sh',
-                        '--to', '{ROOT}/run.sh',
-                        '--exec', '{ROOT}/run.sh',
-
-                        '--from', 'data/run.bat',
-                        '--to', '{ROOT}/run.bat',
-
-                        '--from', 'data/user_jvm_args.txt',
-                        '--to', '{ROOT}/user_jvm_args.txt',
-                        '--optional', '{ROOT}/user_jvm_args.txt',
-
-                        '--from', 'data/unix_args.txt',
-                        '--to', "{ROOT}/libraries/${mavenPath}/unix_args.txt",
-
-                        '--from', 'data/win_args.txt',
-                        '--to', "{ROOT}/libraries/${mavenPath}/win_args.txt"
-                    ]
-                ], [
-                    sides: ['server'],
-                    jar: installertools,
-                    classpath: installerToolsClasspath,
-                    args: [
-                        '--task', 'BUNDLER_EXTRACT',
-                        '--input', '{MINECRAFT_JAR}',
-                        '--output', '{ROOT}/libraries/',
-                        '--libraries'
-                    ]
-                ], [
-                    sides: ['server'],
-                    jar: installertools,
-                    classpath: installerToolsClasspath,
-                    args: [
-                        '--task', 'BUNDLER_EXTRACT',
-                        '--input', '{MINECRAFT_JAR}',
-                        '--output', '{MC_UNPACKED}',
-                        '--jar-only'
-                    ],
-                    outputs: [
-                        '{MC_UNPACKED}': '{MC_UNPACKED_SHA}'
-                    ]
-                ], [
-                    jar: installertools,
-                    classpath: installerToolsClasspath,
-                    args: [
-                        '--task', 'DOWNLOAD_MOJMAPS',
-                        '--sanitize',
-                        '--version', minecraftVersion,
-                        '--side', '{SIDE}',
-                        '--output', '{MOJMAPS}'
-                    ],
-                    outputs: [
-                        '{MOJMAPS}': '{MOJMAPS_SHA}'
-                    ]
-                ], [
-                    sides: ['server'],
-                    jar: renamer,
-                    classpath: renamerClasspath,
-                    args: [
-                        '--input', '{MC_UNPACKED}',
-                        '--output', '{MC_OFF}',
-                        '--names', '{MOJMAPS}',
-                        '--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse'
-                    ],
-                    outputs: [
-                        '{MC_OFF}': '{MC_OFF_SHA}'
-                    ]
-                ], [
-                    sides: ['client'],
-                    jar: renamer,
-                    classpath: renamerClasspath,
-                    args: [
-                        '--input', '{MINECRAFT_JAR}',
-                        '--output', '{MC_OFF}',
-                        '--names', '{MOJMAPS}',
-                        '--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse'
-                    ],
-                    outputs: [
-                        '{MC_OFF}': '{MC_OFF_SHA}'
-                    ]
-                ], [
-                    jar: binarypatcher,
-                    classpath: binarypatcherClasspath,
-                    args: [
-                        '--clean', '{MC_OFF}',
-                        '--output', '{PATCHED}',
-                        '--apply', '{BINPATCH}',
-                        '--data', '--unpatched'
-                    ],
-                    outputs: [
-                        '{PATCHED}': '{PATCHED_SHA}'
-                    ]
-                ]
-            ]
-        ] as LinkedHashMap)
+        id = launcherId
+        inheritsFrom = minecraftVersion
+        mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
+        gameArgs = [ '--launchTarget', 'forge_client' ]
+        jvmArgs = [ '-Djava.net.preferIPv6Addresses=system' ]
     }
 }
 
@@ -751,46 +699,6 @@ tasks.named('universalJar', Jar) {
 }
 
 tasks.named('universalJarSrg', Jar) {
-    jarSigner.sign(it)
-}
-
-// TODO [ForgeDev] Rework to be friendly with Gradle 10 + configuration cache
-tasks.register('installerJar', InstallerJar) {
-    //fat = true // default = !System.getEnv('CI')
-    //offline = true // default = false
-    from(EXTRA_TXTS)
-    from(rootProject.file('/forge_installer_logo.png')) {
-        rename { 'big_logo.png' }
-    }
-    from(genClientBinPatches.output) {
-        rename { 'data/client.lzma' }
-    }
-    from(genServerBinPatches.output) {
-        rename { 'data/server.lzma' }
-    }
-
-    final var argsFile = rootProject.file('server_files/args.txt')
-    final Map<String, Map<String, String>> tokens = [tokens: [
-        SHIM_JAR_FILE: serverShimJar.archiveFileName.get(),
-        MAVEN_PATH: mavenPath
-    ]]
-    from(argsFile) {
-        filter(tokens, ReplaceTokens)
-        into 'data'
-        rename { 'unix_args.txt' }
-    }
-    from(argsFile) {
-        filter(tokens, ReplaceTokens)
-        into 'data'
-        rename { 'win_args.txt' }
-    }
-
-    from(rootProject.file('server_files')) {
-        filter(tokens, ReplaceTokens)
-        into 'data'
-        exclude 'args.txt'
-    }
-
     jarSigner.sign(it)
 }
 

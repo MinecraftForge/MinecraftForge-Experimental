@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 pluginManagement {
-    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.38'
+    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.41'
 
     if (new File('forgedev/settings.gradle').exists()) {
         includeBuild 'forgedev'
