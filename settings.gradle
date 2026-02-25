@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 pluginManagement {
-    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.41'
+    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.44'
 
     if (new File('forgedev/settings.gradle').exists()) {
         includeBuild 'forgedev'
@@ -103,7 +103,7 @@ dependencyResolutionManagement.versionCatalogs {
         plugin 'gitversion',  'net.minecraftforge.gitversion'      version '3.1.7'
         plugin 'changelog',   'net.minecraftforge.changelog'       version '3.2.1'
         plugin 'download',    'de.undercouch.download'             version '5.6.0'
-        plugin 'jarsigner',   'net.minecraftforge.gradlejarsigner' version '1.2.0'
+        plugin 'jarsigner',   'net.minecraftforge.gradlejarsigner' version '1.2.1'
         plugin 'apt',         'com.diffplug.eclipse.apt'           version '4.4.1'
 
         // TODO [Forge][Buildscript We should not be needing to manually add transitive dependencies

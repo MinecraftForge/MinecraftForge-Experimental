@@ -7,28 +7,16 @@
  * - This buildscript contains mostly configuration on top of those tasks.
  */
 
-import groovy.transform.Field
-import net.minecraftforge.forgedev.legacy.tasks.checks.CheckATs
-import net.minecraftforge.forgedev.legacy.tasks.checks.CheckExcs
-import net.minecraftforge.forgedev.legacy.tasks.checks.CheckPatches
-import net.minecraftforge.forgedev.legacy.tasks.checks.CheckSAS
-import net.minecraftforge.forgedev.legacy.tasks.checks.CheckTask
 import net.minecraftforge.forgedev.legacy.values.MavenInfo
 import de.undercouch.gradle.tasks.download.Download
 import net.minecraftforge.forgedev.tasks.srg2source.ApplyRangeMap
 import net.minecraftforge.forgedev.tasks.srg2source.ExtractRangeMap
 import org.gradle.api.plugins.jvm.JvmTestSuite
-import org.objectweb.asm.tree.AbstractInsnNode
-import org.objectweb.asm.tree.ClassNode
-import org.objectweb.asm.tree.MethodInsnNode
-import org.objectweb.asm.tree.MethodNode
 
 import net.minecraftforge.forgedev.legacy.tasks.*
-import static net.minecraftforge.forgedev.legacy.tasks.Util.*
 
 import net.minecraftforge.forgedev.tasks.patching.diff.GeneratePatches
 import org.apache.tools.ant.filters.ReplaceTokens
-import org.objectweb.asm.Opcodes
 
 import net.minecraftforge.gitversion.gradle.changelog.GenerateChangelog
 import net.minecraftforge.forgedev.tasks.patching.diff.ApplyPatches
@@ -44,7 +32,7 @@ plugins {
     alias libs.plugins.gradleutils
     alias libs.plugins.gitversion
     alias libs.plugins.changelog
-    id 'net.minecraftforge.gradlejarsigner' version '1.2.0'
+    id 'net.minecraftforge.gradlejarsigner' version '1.2.1'
     id 'de.undercouch.download' version '5.6.0'
     id 'net.minecraftforge.forgedev'
     id 'net.minecraftforge.forge.build.convention'
@@ -145,14 +133,6 @@ mcp {
     pipeline = 'joined'
 }
 
-// The new versioning sceme is <MCVersion>-<ForgeMC>.<RB>.<CommitsSinceRB>
-// ForgeMC is a unique identifier for every MC version we have supported.
-// Essentially, the same as the old, except dropping the first number, and the builds are no longer unique.
-final String mcpArtifactString = mcp.config.get()
-final String mcpSrg2OffString = mcpArtifactString.split('(:|@)').with {
-    "${it[0]}:${it[1]}:${it[2]}:srg2off"
-}
-
 dependencies {
     // These need to actually be on the classpath at the start. This is only used for the server shim jar.
     // And this is only needed because custom file systems are REQUIRED to be on the boot classloader.
@@ -191,7 +171,7 @@ dependencies {
     installer projects.mclanguage
     installer projects.forgeTransformers
 
-    installerextra mcpSrg2OffString
+    installerextra mcp.getArtifact('srg2off')
 
     runtimeOnly libs.bootstrap
     runtimeOnly libs.bootstrap.dev
@@ -205,7 +185,7 @@ testing.suites.named('test', JvmTestSuite) {
     }
 }
 
-final List<File> EXTRA_TXTS = [
+var EXTRA_TXTS = [
     file('LICENSE.txt'),
     tasks.named('createChangelog', GenerateChangelog).flatMap(GenerateChangelog.&getOutputFile)
 ]
@@ -226,16 +206,16 @@ def asArtifactString = {
 }
 
 patcher {
-    excs.from file("$rootDir/src/main/resources/forge.exc")
+    excs.from file('src/main/resources/forge.exc')
     //parent = project(':mcp')
     mcVersion = minecraftVersion
     mappingChannel = mappingsChannel
     mappingVersion = mappingsVersion
-    patches = rootProject.file('patches/minecraft')
-    patchedSrc = rootProject.file('src/minecraft/java')
+    patches = file('patches/minecraft')
+    patchedSrc = file('src/minecraft/java')
     srgPatches = false
-    accessTransformers.from rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
-    sideAnnotationStrippers.from rootProject.file('src/main/resources/forge.sas')
+    accessTransformers.from file('src/main/resources/META-INF/accesstransformer.cfg')
+    sideAnnotationStrippers.from file('src/main/resources/forge.sas')
 
     runs {
         configureEach {
@@ -279,7 +259,6 @@ patcher {
         register('data') {
             args '--launchTarget', 'forge_dev_data',
                 '--all',
-                '--validate',
                 '--existing', sourceSets.main.resources.srcDirs[0],
                 '--assetsDir', '{assets_root}',
                 '--assetIndex', '{asset_index}'
@@ -298,7 +277,6 @@ patcher {
 
         register('clientData') {
             args '--all',
-                '--validate',
                 '--existing', sourceSets.main.resources.srcDirs[0],
                 '--assetsDir', '{assets_root}',
                 '--assetIndex', '{asset_index}'
@@ -320,6 +298,10 @@ patcher {
             }
         }
     }
+}
+
+tasks.register('genAllData') {
+    dependsOn 'runData', 'runClientData', 'runTestData', 'runTestClientData'
 }
 
 tasks.named('applyPatches', ApplyPatches) {
@@ -413,81 +395,59 @@ tasks.named('userdevConfig', net.minecraftforge.forgedev.tasks.generation.Genera
     }
 }
 
-tasks.register('findFinalizeSpawnTargets', BytecodePredicateFinder) {
+forgedev.shim {
+    config {
+        mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
+        args = ['--launchTarget', 'forge_server']
+    }
+    classpath {
+        libraries configurations.installer
+        libraries configurations.installerextra
+        library tasks.named('universalJar', Jar)
+        library tasks.named('applyServerBinPatches'), 'server'
+        serverBundle = mcp.files.server
+    }
+    jar {
+        manifest {
+            attributes('Class-Path': configurations.bootstrap.incoming.artifacts.collect { "libraries/${MavenInfo.from(project, it).path()}" }.join(' '))
+        }
+        jarSigner.sign(it)
+    }
+}
+
+forgedev.methodCallFinder('findFinalizeSpawnTargets') {
+    allowEmpty = true // Old implementation bug, remove when moved to production
     jar = createClientOfficial.output
     output = rootProject.file('forge-transformers/src/main/resources/coremods/finalize_spawn_targets.json')
-    predicate = { ClassNode parent, MethodNode node, AbstractInsnNode insn ->
-            return 'net/minecraft/world/level/BaseSpawner' != parent.name // Ignore this class as we special case it.
-            && insn.opcode === Opcodes.INVOKEVIRTUAL
-            && (insn as MethodInsnNode).name == 'finalizeSpawn'
-            && (insn as MethodInsnNode).desc == '(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;';
+    blacklist 'net/minecraft/world/level/BaseSpawner' // Ignore this class as we special case it.
+    invokeVirtual('finalizeSpawn', '(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;')
+}
+
+forgedev.validateDeprecations(tasks.named('jar', Jar))
+forgedev.checks() {
+    ats {
+        mappings = createSrg2Mcp.output
     }
-}
+    sas {}
+    // This is not needed anymore as we're not generating SRG patches in repo.
+    //execs { }
 
-ValidateDeprecations.register(tasks, tasks.named('jar', Jar), minecraftVersion)
-
-DownloadDependency.register(project, 'downloadInstaller', dependencies.variantOf(libs.installer) { classifier 'fatjar' })
-DownloadDependency.register(project, 'downloadServerShim', libs.bootstrap.shim)
-
-tasks.register('createServerShimConfig', BootstrapShimConfig) {
-    mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
-    args = ['--launchTarget', 'forge_server']
-}
-
-tasks.register('serverShimJar', Jar) {
-    dependsOn(createServerShimConfig)
-    from (createServerShimConfig.output)
-    from (createServerShimClasspath.output) {
-        rename { 'bootstrap-shim.list' }
-    }
-    from (zipTree(downloadServerShim.output))
-    manifest {
-        from {
-            zipTree(downloadServerShim.output).find { it.name == 'MANIFEST.MF' }
-        }
-
-        attributes('Class-Path': configurations.bootstrap.incoming.artifacts.collect { "libraries/${MavenInfo.from(project, it).path()}" }.join(' '))
-    }
-    archiveClassifier = 'shim'
-    jarSigner.sign(it)
-}
-
-tasks.register('checkAndFix') {
-    dependsOn findFinalizeSpawnTargets
-
-    group = LifecycleBasePlugin.VERIFICATION_GROUP
-}
-
-CheckTask.register(tasks, 'ATs', CheckATs) {
-    dependsOn extractInheritance, createSrg2Mcp
-    ats.from patcher.accessTransformers
-    inheritance = extractInheritance.output
-    mappings = createSrg2Mcp.output
-}
-
-CheckTask.register(tasks, 'SAS', CheckSAS) {
-    dependsOn extractInheritance
-    sass.from patcher.sideAnnotationStrippers
-    inheritance = extractInheritance.output
-}
-
-CheckTask.register(tasks, 'Excs', CheckExcs) {
-    dependsOn jar
-    binary = jar.archiveFile
-    excs.from patcher.excs
-}
-
-CheckTask.register(tasks, 'Patches', CheckPatches) {
-    dependsOn genPatches
-    patchDir = file("$rootDir/patches")
-    patchesWithS2SArtifact = [
+    patches {
+        dependsOn genPatches
+        patchDir = file("$rootDir/patches")
+        patchesWithS2SArtifact = [
             'minecraft/net/minecraft/client/renderer/ViewArea.java.patch',
             'minecraft/net/minecraft/data/models/blockstates/Variant.java.patch',
-    ]
+        ]
+    }
+
+    fix {
+        dependsOn findFinalizeSpawnTargets
+    }
 }
 
 tasks.named('genPatches', GeneratePatches) {
-    finalizedBy checkAndFixPatches
+    finalizedBy forgedev.checks.patches.fix
     autoHeader = true
     lineEndings = '\n'
 }
@@ -495,7 +455,7 @@ tasks.named('genPatches', GeneratePatches) {
 CheckForgeJarCompatibility.register(project, minecraftVersion) {
     // I don't know why this needs an 'it.' but it does
     it.commonLibraries.from(forgedev.minecraftConfiguration)
-    it.commonLibraries.from(project.configurations.named('installer'))
+    it.commonLibraries.from(project.configurations.installer)
 }
 
 tasks.register('downloadCrowdin', Download) {
@@ -517,7 +477,7 @@ forgedev.installer {
     pack tasks.named('serverShimJar', Jar) // The Server executable jar IS needed to be packed, as the installer would need a spec bump in order to download it
     pack tasks.named('universalJar', Jar) // I don't think this is strictly needed to be packed anymore, will need to double check later
     // This isn't actually needed, but its here for some reason, probably wasn't deleted when then installer process was cleaned up
-    library mcpArtifactString
+    library mcp.artifact
 
     launcherLibrary tasks.named('universalJar', Jar)
     // We configure the launcher here to keep the order for easier diff, after publishing, move this to the LauncherJson configuration below
@@ -704,6 +664,8 @@ tasks.named('universalJarSrg', Jar) {
 
 final mdkGradleWrapper = tasks.register('mdkGradleWrapper', Wrapper) {
     gradleVersion = '9.3.1'
+    scriptFile = layout.buildDirectory.dir("wrapper/" + gradleVersion + "/gradlew")
+    jarFile = layout.buildDirectory.dir("wrapper/" + gradleVersion + "/gradle/wrapper/gradle-wrapper.jar")
 }
 
 tasks.register('mdkZip', Zip) {
@@ -713,10 +675,10 @@ tasks.register('mdkZip', Zip) {
     archiveClassifier = 'mdk'
     archiveVersion = project.version
     destinationDirectory = file('build/libs')
+    from(EXTRA_TXTS)
 
     from mdkGradleWrapper.map(Wrapper.&getScriptFile)
     from mdkGradleWrapper.map(Wrapper.&getBatchScript)
-    from(EXTRA_TXTS)
     into('gradle/wrapper/') {
         from mdkGradleWrapper.map(Wrapper.&getJarFile)
         from mdkGradleWrapper.map(Wrapper.&getPropertiesFile)
@@ -747,10 +709,6 @@ tasks.register('mdkZip', Zip) {
         into('src/main/resources/')
         exclude '**/.cache/'
     }
-}
-
-tasks.register('genAllData') {
-    dependsOn 'forge_data', 'forge_test_data'
 }
 
 if (project.hasProperty('UPDATE_MAPPINGS')) {
@@ -867,3 +825,22 @@ publishing {
         }
     }
 }
+
+def all = tasks.register('all') {}
+afterEvaluate {
+    if (gradle.startParameter.taskNames.contains('all')) {
+	    tasks.forEach { task -> // This forces everything to be realized, which is why we hve the startParameter check
+	        if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
+            if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init']) return
+            if (task.name.startsWith('clean')) return
+            if (task.name == 'checkJarCompatibility') return // This doesn't work in FG6 dev, I think it's cuz we check vs srg names. Will need to look at later
+        	all.configure { dependsOn(task) }
+	    }
+    }
+}
+// We dont have any unit tests, so disable this error
+tasks.withType(AbstractTestTask).configureEach {
+    failOnNoDiscoveredTests = false
+}
+tasks.named('genPatches').configure { mustRunAfter tasks.named('applyPatches') }
+
