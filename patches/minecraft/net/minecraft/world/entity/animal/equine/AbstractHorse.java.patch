@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/equine/AbstractHorse.java
 +++ b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
-@@ -140,6 +_,7 @@
+@@ -144,6 +_,7 @@
          }
  
          this.addBehaviourGoals();
@@ -8,42 +8,42 @@
      }
  
      protected void addBehaviourGoals() {
-@@ -274,6 +_,11 @@
+@@ -279,6 +_,11 @@
  
      @Override
-     public boolean causeFallDamage(double p_454114_, float p_458836_, DamageSource p_450439_) {
-+        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, p_454114_, p_458836_);
+     public boolean causeFallDamage(final double fallDistance, final float damageModifier, final DamageSource damageSource) {
++        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, fallDistance, damageModifier);
 +        if (event == null) return false;
-+        p_454114_ = event.getDistance();
-+        p_458836_ = event.getDamageMultiplier();
++        fallDistance = event.getDistance();
++        damageModifier = event.getDamageMultiplier();
 +
-         if (p_454114_ > 1.0) {
-             this.playSound(SoundEvents.HORSE_LAND, 0.4F, 1.0F);
+         if (fallDistance > 1.0) {
+             this.playSound(this.isBaby() ? SoundEvents.HORSE_LAND_BABY : SoundEvents.HORSE_LAND, 0.4F, 1.0F);
          }
-@@ -339,9 +_,9 @@
-     protected void playStepSound(BlockPos p_457686_, BlockState p_459257_) {
-         if (!p_459257_.liquid()) {
-             BlockState blockstate = this.level().getBlockState(p_457686_.above());
--            SoundType soundtype = p_459257_.getSoundType();
-+            SoundType soundtype = p_459257_.getSoundType(level(), p_457686_, this);
+@@ -344,9 +_,9 @@
+     protected void playStepSound(final BlockPos pos, final BlockState blockState) {
+         if (!blockState.liquid()) {
+             BlockState blockstate = this.level().getBlockState(pos.above());
+-            SoundType soundtype = blockState.getSoundType();
++            SoundType soundtype = blockState.getSoundType(level(), pos, this);
              if (blockstate.is(Blocks.SNOW)) {
 -                soundtype = blockstate.getSoundType();
-+                soundtype = blockstate.getSoundType(level(), p_457686_.above(), this);
++                soundtype = blockstate.getSoundType(level(), pos.above(), this);
              }
  
              if (this.isVehicle() && this.canGallop) {
-@@ -773,6 +_,7 @@
+@@ -778,6 +_,7 @@
              float f1 = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
-             this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * f * p_452386_, 0.0, 0.4F * f1 * p_452386_));
+             this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * f * amount, 0.0, 0.4F * f1 * amount));
          }
 +        net.minecraftforge.common.ForgeHooks.onLivingJump(this);
      }
  
      protected void playJumpSound() {
-@@ -1013,6 +_,26 @@
+@@ -1028,6 +_,26 @@
  
-     public boolean hasInventoryChanged(Container p_457588_) {
-         return this.inventory != p_457588_;
+     public boolean hasInventoryChanged(final Container oldInventory) {
+         return this.inventory != oldInventory;
 +    }
 +
 +    private net.minecraftforge.common.util.LazyOptional<?> itemHandler = null;

@@ -12,10 +12,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
@@ -171,76 +173,18 @@ public interface IClientFluidTypeExtensions {
     /* Level-Based Accessors */
 
     /**
-     * Returns the reference of the texture to apply to a source fluid.
+     * Returns the location dependent FluidModel.
      *
-     * <p>This should return a reference to the texture and not the actual
-     * texture itself (e.g. {@code minecraft:block/water_still} will point to
-     * {@code assets/minecraft/textures/block/water_still.png}).
-     *
-     * <p>Important: This method should only return {@code null} for {@link Fluids#EMPTY}.
-     * All other implementations must define this property.
-     *
-     * @param state  the state of the fluid
-     * @param getter the getter the fluid can be obtained from
-     * @param pos    the position of the fluid
-     * @return the reference of the texture to apply to a source fluid
-     */
-    default Identifier getStillTexture(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-        return this.getStillTexture();
-    }
-
-    /**
-     * Returns the reference of the texture to apply to a flowing fluid.
-     *
-     * <p>This should return a reference to the texture and not the actual
-     * texture itself (e.g. {@code minecraft:block/water_flow} will point to
-     * {@code assets/minecraft/textures/block/water_flow.png}).
-     *
-     * <p>Important: This method should only return {@code null} for {@link Fluids#EMPTY}.
-     * All other implementations must define this property.
-     *
-     * @param state  the state of the fluid
-     * @param getter the getter the fluid can be obtained from
-     * @param pos    the position of the fluid
-     * @return the reference of the texture to apply to a flowing fluid
-     */
-    default Identifier getFlowingTexture(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-        return this.getFlowingTexture();
-    }
-
-    /**
-     * Returns the reference of the texture to apply to a fluid directly touching
-     * a non-opaque block other than air. If no reference is specified, either
-     * {@code #getStillTexture} or {@code #getFlowingTexture} will be applied
-     * instead.
-     *
-     * <p>This should return a reference to the texture and not the actual
-     * texture itself (e.g. {@code minecraft:block/water_overlay} will point to
-     * {@code assets/minecraft/textures/block/water_overlay.png}).
-     *
-     * @param state  the state of the fluid
-     * @param getter the getter the fluid can be obtained from
-     * @param pos    the position of the fluid
-     * @return the reference of the texture to apply to a fluid directly touching
-     *         a non-opaque block
-     */
-    default Identifier getOverlayTexture(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-        return this.getOverlayTexture();
-    }
-
-    /**
-     * Returns the tint applied to the fluid's textures.
-     *
-     * <p>The result represents a 32-bit integer where each 8-bits represent
-     * the alpha, red, green, and blue channel respectively.
+     * <p>The result will be queried for its textures and tinting.
+     * See {@link FluidRenderer#tesselate(BlockAndTintGetter,BlockPos,net.minecraft.client.renderer.block.FluidRenderer.Output,net.minecraft.world.level.block.state.BlockState,FluidState) FluidRenderer.tesselate}
      *
      * @param state  the state of the fluid
      * @param getter the getter the fluid can be obtained from
      * @param pos    the position of the fluid
      * @return the tint applied to the fluid's textures in ARGB format
      */
-    default int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-        return this.getTintColor();
+    default FluidModel getModel(FluidState state, BlockAndTintGetter getter, BlockPos pos, FluidModel vanilla) {
+        return vanilla;
     }
 
     /* Stack-Based Accessors */

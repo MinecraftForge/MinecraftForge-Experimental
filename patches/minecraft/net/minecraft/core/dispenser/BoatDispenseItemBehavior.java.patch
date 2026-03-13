@@ -3,10 +3,10 @@
 @@ -29,18 +_,22 @@
          double d2 = vec3.y() + direction.getStepY() * 1.125F;
          double d3 = vec3.z() + direction.getStepZ() * d0;
-         BlockPos blockpos = p_123375_.pos().relative(direction);
+         BlockPos blockpos = source.pos().relative(direction);
 +        AbstractBoat abstractboat = this.type.create(serverlevel, EntitySpawnReason.DISPENSER);
 +        if (abstractboat == null) {
-+            return this.defaultDispenseItemBehavior.dispense(p_123375_, p_123376_);
++            return this.defaultDispenseItemBehavior.dispense(source, dispensed);
 +        }
 +        abstractboat.setYRot(direction.toYRot());
          double d4;
@@ -16,7 +16,7 @@
          } else {
 -            if (!serverlevel.getBlockState(blockpos).isAir() || !serverlevel.getFluidState(blockpos.below()).is(FluidTags.WATER)) {
 +            if (!serverlevel.getBlockState(blockpos).isAir() || !abstractboat.canBoatInFluid(serverlevel.getFluidState(blockpos.below()))) {
-                 return this.defaultDispenseItemBehavior.dispense(p_123375_, p_123376_);
+                 return this.defaultDispenseItemBehavior.dispense(source, dispensed);
              }
  
              d4 = 0.0;
@@ -25,4 +25,4 @@
 -        AbstractBoat abstractboat = this.type.create(serverlevel, EntitySpawnReason.DISPENSER);
          if (abstractboat != null) {
              abstractboat.setInitialPos(d1, d2 + d4, d3);
-             EntityType.<AbstractBoat>createDefaultStackConfig(serverlevel, p_123376_, null).accept(abstractboat);
+             EntityType.<AbstractBoat>createDefaultStackConfig(serverlevel, dispensed, null).accept(abstractboat);

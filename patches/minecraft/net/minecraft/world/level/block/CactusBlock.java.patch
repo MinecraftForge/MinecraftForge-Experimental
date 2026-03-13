@@ -12,39 +12,39 @@
 @@ -45,6 +_,7 @@
  
      @Override
-     protected void tick(BlockState p_220908_, ServerLevel p_220909_, BlockPos p_220910_, RandomSource p_220911_) {
-+        if (!p_220909_.isAreaLoaded(p_220910_, 1)) return; // Forge: prevent growing cactus from loading unloaded chunks with block update
-         if (!p_220908_.canSurvive(p_220909_, p_220910_)) {
-             p_220909_.destroyBlock(p_220910_, true);
+     protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
++        if (!level.isAreaLoaded(pos, 1)) return; // Forge: prevent growing cactus from loading unloaded chunks with block update
+         if (!state.canSurvive(level, pos)) {
+             level.destroyBlock(pos, true);
          }
 @@ -63,6 +_,7 @@
                  }
              }
  
-+            if (!net.minecraftforge.common.ForgeHooks.onCropsGrowPre(p_220914_, blockpos, p_220913_, true)) return;
-             if (j == 8 && this.canSurvive(this.defaultBlockState(), p_220914_, p_220915_.above())) {
++            if (!net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, true)) return;
+             if (j == 8 && this.canSurvive(this.defaultBlockState(), level, pos.above())) {
                  double d0 = i >= 3 ? 0.25 : 0.1;
-                 if (p_220916_.nextDouble() <= d0) {
+                 if (random.nextDouble() <= d0) {
 @@ -78,6 +_,7 @@
              if (j < 15) {
-                 p_220914_.setBlock(p_220915_, p_220913_.setValue(AGE, j + 1), 260);
+                 level.setBlock(pos, state.setValue(AGE, j + 1), 260);
              }
-+            net.minecraftforge.common.ForgeHooks.onCropsGrowPost(p_220914_, p_220915_, p_220913_);
++            net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
          }
      }
  
 @@ -119,7 +_,7 @@
          }
  
-         BlockState blockstate1 = p_51154_.getBlockState(p_51155_.below());
--        return (blockstate1.is(Blocks.CACTUS) || blockstate1.is(BlockTags.SAND)) && !p_51154_.getBlockState(p_51155_.above()).liquid();
-+        return blockstate1.canSustainPlant(p_51154_, p_51155_, Direction.UP, this) && !p_51154_.getBlockState(p_51155_.above()).liquid();
+         BlockState blockstate1 = level.getBlockState(pos.below());
+-        return (blockstate1.is(this) || blockstate1.is(BlockTags.SUPPORTS_CACTUS)) && !level.getBlockState(pos.above()).liquid();
++        return blockstate1.canSustainPlant(level, pos, Direction.UP, this) && !level.getBlockState(pos.above()).liquid();
      }
  
      @Override
-@@ -135,5 +_,15 @@
+@@ -142,5 +_,15 @@
      @Override
-     protected boolean isPathfindable(BlockState p_51143_, PathComputationType p_51146_) {
+     protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
          return false;
 +    }
 +

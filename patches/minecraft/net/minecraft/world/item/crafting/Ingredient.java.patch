@@ -1,39 +1,39 @@
 --- a/net/minecraft/world/item/crafting/Ingredient.java
 +++ b/net/minecraft/world/item/crafting/Ingredient.java
-@@ -23,18 +_,26 @@
+@@ -24,18 +_,26 @@
  import net.minecraft.world.level.ItemLike;
  
- public class Ingredient implements StackedContents.IngredientInfo<Holder<Item>>, Predicate<ItemStack> {
+ public class Ingredient implements Predicate<ItemStack>, StackedContents.IngredientInfo<Holder<Item>> {
 -    public static final StreamCodec<RegistryFriendlyByteBuf, Ingredient> CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
 +    private static final StreamCodec<RegistryFriendlyByteBuf, Ingredient> VANILLA_CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
-         .map(Ingredient::new, p_359816_ -> p_359816_.values);
+         .map(Ingredient::new, i -> i.values);
 -    public static final StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> OPTIONAL_CONTENTS_STREAM_CODEC = ByteBufCodecs.holderSet(Registries.ITEM)
 +    public static final StreamCodec<RegistryFriendlyByteBuf, Ingredient> CONTENTS_STREAM_CODEC = net.minecraftforge.common.ForgeHooks.ingredientStreamCodec();
 +    public static final StreamCodec<RegistryFriendlyByteBuf, Optional<Ingredient>> OPTIONAL_CONTENTS_STREAM_CODEC = CONTENTS_STREAM_CODEC
          .map(
--            p_359814_ -> p_359814_.size() == 0 ? Optional.empty() : Optional.of(new Ingredient((HolderSet<Item>)p_359814_)),
--            p_359815_ -> p_359815_.<HolderSet<Item>>map(p_359810_ -> p_359810_.values).orElse(HolderSet.direct())
+-            ingredient -> ingredient.size() == 0 ? Optional.empty() : Optional.of(new Ingredient((HolderSet<Item>)ingredient)),
+-            ingredient -> ingredient.<HolderSet<Item>>map(i -> i.values).orElse(HolderSet.empty())
 +            ingredient -> ingredient.items().count() == 0 ? Optional.empty() : Optional.of(ingredient),
 +            ingredient -> ingredient.orElseGet(() -> Ingredient.of())
          );
      public static final Codec<HolderSet<Item>> NON_AIR_HOLDER_SET_CODEC = HolderSetCodec.create(Registries.ITEM, Item.CODEC, false);
--    public static final Codec<Ingredient> CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC).xmap(Ingredient::new, p_359811_ -> p_359811_.values);
+-    public static final Codec<Ingredient> CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC).xmap(Ingredient::new, i -> i.values);
 -    private final HolderSet<Item> values;
-+    private static final Codec<Ingredient> VANILLA_CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC).xmap(Ingredient::new, p_359811_ -> p_359811_.values);
++    private static final Codec<Ingredient> VANILLA_CODEC = ExtraCodecs.nonEmptyHolderSet(NON_AIR_HOLDER_SET_CODEC).xmap(Ingredient::new, i -> i.values);
 +    private static final com.mojang.serialization.MapCodec<Ingredient> VANILLA_MAP_CODEC = VANILLA_CODEC.fieldOf("value");
 +    public static final Codec<Ingredient> CODEC = net.minecraftforge.common.ForgeHooks.ingredientBaseCodec(VANILLA_CODEC);
 +    protected final HolderSet<Item> values;
  
-     protected Ingredient(HolderSet<Item> p_368516_) {
-+        this(p_368516_, true);
+     protected Ingredient(final HolderSet<Item> values) {
++        this(values, true);
 +    }
 +
-+    protected Ingredient(HolderSet<Item> p_368516_, boolean validate) {
++    protected Ingredient(HolderSet<Item> values, boolean validate) {
 +        if (validate)
-         p_368516_.unwrap().ifRight(p_359817_ -> {
-             if (p_359817_.isEmpty()) {
+         values.unwrap().ifRight(directValues -> {
+             if (directValues.isEmpty()) {
                  throw new UnsupportedOperationException("Ingredients can't be empty");
-@@ -106,5 +_,50 @@
+@@ -107,5 +_,50 @@
          } else {
              return slotdisplay;
          }

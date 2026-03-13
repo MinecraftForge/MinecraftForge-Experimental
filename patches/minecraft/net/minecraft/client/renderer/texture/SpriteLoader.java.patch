@@ -4,36 +4,27 @@
              int j1 = Math.min(j, k);
              int k1 = Mth.log2(j1);
              int l1;
--            if (k1 < p_261919_) {
-+            if (k1 < p_261919_ && net.minecraftforge.common.ForgeConfig.CLIENT.allowMipmapLowering()) { // Forge: Do not lower the mipmap level
-                 LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", this.location, p_261919_, k1, j1);
+-            if (k1 < maxMipmapLevels) {
++            if (k1 < maxMipmapLevels && net.minecraftforge.common.ForgeConfig.CLIENT.allowMipmapLowering()) { // Forge: Do not lower the mipmap level
+                 LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", this.location, maxMipmapLevels, k1, j1);
                  l1 = k1;
              } else {
-@@ -126,7 +_,8 @@
-     public CompletableFuture<SpriteLoader.Preparations> loadAndStitch(
-         ResourceManager p_262108_, Identifier p_459205_, int p_262104_, Executor p_261687_, Set<MetadataSectionType<?>> p_430900_
+@@ -130,7 +_,8 @@
+         final Executor taskExecutor,
+         final Set<MetadataSectionType<?>> additionalMetadata
      ) {
--        SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(p_430900_);
-+        var sections = net.minecraftforge.client.ForgeHooksClient.getAtlastMetadataSections(p_459205_, p_430900_);
+-        SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(additionalMetadata);
++        var sections = net.minecraftforge.client.ForgeHooksClient.getAtlastMetadataSections(atlasInfoLocation, additionalMetadata);
 +        SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(sections);
-         return CompletableFuture.<List<SpriteSource.Loader>>supplyAsync(() -> SpriteSourceList.load(p_262108_, p_459205_).list(p_262108_), p_261687_)
-             .thenCompose(p_296297_ -> runSpriteSuppliers(spriteresourceloader, (List<SpriteSource.Loader>)p_296297_, p_261687_))
-             .thenApply(p_261393_ -> this.stitch((List<SpriteContents>)p_261393_, p_262104_, p_261687_));
-@@ -135,9 +_,14 @@
-     private Map<Identifier, TextureAtlasSprite> getStitchedSprites(Stitcher<SpriteContents> p_276117_, int p_276111_, int p_276112_) {
+         return CompletableFuture.<List<SpriteSource.Loader>>supplyAsync(() -> SpriteSourceList.load(manager, atlasInfoLocation).list(manager), taskExecutor)
+             .thenCompose(sprites -> runSpriteSuppliers(spriteresourceloader, (List<SpriteSource.Loader>)sprites, taskExecutor))
+             .thenApply(resources -> this.stitch((List<SpriteContents>)resources, maxMipmapLevels, taskExecutor));
+@@ -139,7 +_,7 @@
+     private Map<Identifier, TextureAtlasSprite> getStitchedSprites(final Stitcher<SpriteContents> stitcher, final int atlasWidth, final int atlasHeight) {
          Map<Identifier, TextureAtlasSprite> map = new HashMap<>();
-         p_276117_.gatherSprites(
--            (p_448383_, p_448384_, p_448385_, p_448386_) -> map.put(
--                p_448383_.name(), new TextureAtlasSprite(this.location, p_448383_, p_276111_, p_276112_, p_448384_, p_448385_, p_448386_)
--            )
-+            (p_448383_, p_448384_, p_448385_, p_448386_) -> {
-+                TextureAtlasSprite sprite = net.minecraftforge.client.ForgeHooksClient.loadTextureAtlasSprite(this.location, p_448383_, p_276111_, p_276112_, p_448384_, p_448385_, p_448386_, p_448383_.byMipLevel.length - 1);
-+                if (sprite != null) {
-+                    map.put(p_448383_.name(), sprite);
-+                    return;
-+                }
-+                map.put(p_448383_.name(), new TextureAtlasSprite(this.location, p_448383_, p_276111_, p_276112_, p_448384_, p_448385_, p_448386_));
-+            }
+         stitcher.gatherSprites(
+-            (contents, x, y, padding) -> map.put(contents.name(), new TextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
++            (contents, x, y, padding) -> map.put(contents.name(), net.minecraftforge.client.ForgeHooksClient.loadTextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
          );
          return map;
      }

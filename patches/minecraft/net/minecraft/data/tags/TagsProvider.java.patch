@@ -1,6 +1,6 @@
 --- a/net/minecraft/data/tags/TagsProvider.java
 +++ b/net/minecraft/data/tags/TagsProvider.java
-@@ -32,26 +_,57 @@
+@@ -32,28 +_,53 @@
      private final CompletableFuture<TagsProvider.TagLookup<T>> parentProvider;
      protected final ResourceKey<? extends Registry<T>> registryKey;
      protected final Map<Identifier, TagBuilder> builders = Maps.newLinkedHashMap();
@@ -10,42 +10,38 @@
 +    private final net.minecraftforge.common.data.ExistingFileHelper.IResourceType resourceType;
 +    private final net.minecraftforge.common.data.ExistingFileHelper.IResourceType elementResourceType; // FORGE: Resource type for validating required references to datapack registry elements.
  
-+    /**
-+     * @deprecated Forge: Use the {@linkplain #TagsProvider(PackOutput, ResourceKey, CompletableFuture, String, net.minecraftforge.common.data.ExistingFileHelper) mod id variant}
-+     */
-     protected TagsProvider(PackOutput p_256596_, ResourceKey<? extends Registry<T>> p_255886_, CompletableFuture<HolderLookup.Provider> p_256513_) {
--        this(p_256596_, p_255886_, p_256513_, CompletableFuture.completedFuture(TagsProvider.TagLookup.empty()));
-+        this(p_256596_, p_255886_, p_256513_, "vanilla", null);
+     protected TagsProvider(
+         final PackOutput output, final ResourceKey<? extends Registry<T>> registryKey, final CompletableFuture<HolderLookup.Provider> lookupProvider
+     ) {
+-        this(output, registryKey, lookupProvider, CompletableFuture.completedFuture(TagsProvider.TagLookup.empty()));
++        this(output, registryKey, lookupProvider, "vanilla", null);
 +    }
 +
-+    protected TagsProvider(PackOutput p_256596_, ResourceKey<? extends Registry<T>> p_255886_, CompletableFuture<HolderLookup.Provider> p_256513_, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
-+       this(p_256596_, p_255886_, p_256513_, CompletableFuture.completedFuture(TagsProvider.TagLookup.empty()), modId, existingFileHelper);
++    protected TagsProvider(final PackOutput output, final ResourceKey<? extends Registry<T>> registryKey, final CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
++       this(output, registryKey, lookupProvider, CompletableFuture.completedFuture(TagsProvider.TagLookup.empty()), modId, existingFileHelper);
 +    }
 +
-+    /**
-+     * @deprecated Forge: Use the {@linkplain #TagsProvider(PackOutput, ResourceKey, CompletableFuture, CompletableFuture, String, net.minecraftforge.common.data.ExistingFileHelper) mod id variant}
-+     */
-+    protected TagsProvider(PackOutput p_275432_, ResourceKey<? extends Registry<T>> p_275476_, CompletableFuture<HolderLookup.Provider> p_275222_, CompletableFuture<TagsProvider.TagLookup<T>> p_275565_) {
-+        this(p_275432_, p_275476_, p_275222_, p_275565_, "vanilla", null);
++    protected TagsProvider(PackOutput output, ResourceKey<? extends Registry<T>> registryKey, CompletableFuture<HolderLookup.Provider> lookupProvider, CompletableFuture<TagsProvider.TagLookup<T>> parentProvider) {
++        this(output, registryKey, lookupProvider, parentProvider, "vanilla", null);
      }
  
      protected TagsProvider(
-         PackOutput p_275432_,
-         ResourceKey<? extends Registry<T>> p_275476_,
-         CompletableFuture<HolderLookup.Provider> p_275222_,
--        CompletableFuture<TagsProvider.TagLookup<T>> p_275565_
-+        CompletableFuture<TagsProvider.TagLookup<T>> p_275565_,
-+        String modId,
-+        @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper
+         final PackOutput output,
+         final ResourceKey<? extends Registry<T>> registryKey,
+         final CompletableFuture<HolderLookup.Provider> lookupProvider,
+-        final CompletableFuture<TagsProvider.TagLookup<T>> parentProvider
++        final CompletableFuture<TagsProvider.TagLookup<T>> parentProvider,
++        final String modId,
++        final @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper
      ) {
-         this.pathProvider = p_275432_.createRegistryTagsPathProvider(p_275476_);
-         this.registryKey = p_275476_;
-         this.parentProvider = p_275565_;
-         this.lookupProvider = p_275222_;
+         this.pathProvider = output.createRegistryTagsPathProvider(registryKey);
+         this.registryKey = registryKey;
+         this.parentProvider = parentProvider;
+         this.lookupProvider = lookupProvider;
 +        this.modId = modId;
 +        this.existingFileHelper = existingFileHelper;
-+        this.resourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", net.minecraft.core.registries.Registries.tagsDirPath(p_275476_));
-+        this.elementResourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", net.minecraft.core.registries.Registries.elementsDirPath(p_275476_));
++        this.resourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", net.minecraft.core.registries.Registries.tagsDirPath(registryKey));
++        this.elementResourceType = new net.minecraftforge.common.data.ExistingFileHelper.ResourceType(net.minecraft.server.packs.PackType.SERVER_DATA, ".json", net.minecraft.core.registries.Registries.elementsDirPath(registryKey));
 +    }
 +
 +    // Forge: Allow customizing the path for a given tag or returning null
@@ -60,62 +56,62 @@
 +        return "Tags for " + this.registryKey.identifier() + " mod id " + this.modId;
      }
  
-     protected abstract void addTags(HolderLookup.Provider p_256380_);
-@@ -69,7 +_,13 @@
-             .thenCombineAsync(this.parentProvider, (p_274778_, p_274779_) -> new CombinedData<>(p_274778_, (TagsProvider.TagLookup<T>)p_274779_), Util.backgroundExecutor())
+     protected abstract void addTags(HolderLookup.Provider registries);
+@@ -71,7 +_,13 @@
+             .thenCombineAsync(this.parentProvider, (x$0, x$1) -> new CombinedData<>(x$0, (TagsProvider.TagLookup<T>)x$1), Util.backgroundExecutor())
              .thenCompose(
-                 p_325926_ -> {
--                    HolderLookup.RegistryLookup<T> registrylookup = p_325926_.contents.lookupOrThrow(this.registryKey);
-+                    HolderLookup.RegistryLookup<T> registrylookup = p_325926_.contents.lookup(this.registryKey).orElseThrow(() -> {
+                 c -> {
+-                    HolderLookup.RegistryLookup<T> registrylookup = c.contents.lookupOrThrow(this.registryKey);
++                    HolderLookup.RegistryLookup<T> registrylookup = c.contents.lookup(this.registryKey).orElseThrow(() -> {
 +                       // FORGE: Throw a more descriptive error message if this is a Forge registry without tags enabled
 +                       if (net.minecraftforge.registries.RegistryManager.ACTIVE.getRegistry(this.registryKey) != null) {
 +                          return new IllegalStateException("Forge registry " + this.registryKey.identifier() + " does not have support for tags");
 +                       }
 +                       return new IllegalStateException("Registry " + this.registryKey.identifier() + " not found");
 +                    });
-                     Predicate<Identifier> predicate = p_448741_ -> registrylookup.get(ResourceKey.create(this.registryKey, p_448741_)).isPresent();
-                     Predicate<Identifier> predicate1 = p_448739_ -> this.builders.containsKey(p_448739_)
-                         || p_325926_.parent.contains(TagKey.create(this.registryKey, p_448739_));
-@@ -82,7 +_,7 @@
-                                     Identifier identifier = p_325931_.getKey();
-                                     TagBuilder tagbuilder = p_325931_.getValue();
+                     Predicate<Identifier> predicate = id -> registrylookup.get(ResourceKey.create(this.registryKey, id)).isPresent();
+                     Predicate<Identifier> predicate1 = id -> this.builders.containsKey(id) || c.parent.contains(TagKey.create(this.registryKey, id));
+                     return CompletableFuture.allOf(
+@@ -83,7 +_,7 @@
+                                     Identifier identifier = entry.getKey();
+                                     TagBuilder tagbuilder = entry.getValue();
                                      List<TagEntry> list = tagbuilder.build();
--                                    List<TagEntry> list1 = list.stream().filter(p_274771_ -> !p_274771_.verifyIfPresent(predicate, predicate1)).toList();
-+                                    List<TagEntry> list1 = java.util.stream.Stream.concat(list.stream(), tagbuilder.getRemoveEntries()).filter(p_274771_ -> !p_274771_.verifyIfPresent(predicate, predicate1)).filter(this::missing).toList();
+-                                    List<TagEntry> list1 = list.stream().filter(e -> !e.verifyIfPresent(predicate, predicate1)).toList();
++                                    List<TagEntry> list1 = java.util.stream.Stream.concat(list.stream(), tagbuilder.getRemoveEntries()).filter(e -> !e.verifyIfPresent(predicate, predicate1)).filter(this::missing).toList();
                                      if (!list1.isEmpty()) {
                                          throw new IllegalArgumentException(
                                              String.format(
-@@ -93,8 +_,11 @@
+@@ -94,8 +_,11 @@
                                              )
                                          );
                                      } else {
 -                                        Path path = this.pathProvider.json(identifier);
--                                        return DataProvider.saveStable(p_253684_, p_325926_.contents, TagFile.CODEC, new TagFile(list, false), path);
+-                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(list, tagbuilder.shouldReplace()), path);
 +                                        Path path = this.getPath(identifier);
 +                                        if (path == null) {
 +                                            return CompletableFuture.completedFuture(null); // Forge: Allow running this data provider without writing it. Recipe provider needs valid tags.
 +                                        }
-+                                        return DataProvider.saveStable(p_253684_, p_325926_.contents, TagFile.CODEC, new TagFile(list, tagbuilder.isReplace(), tagbuilder.getRemoveEntries().toList()), path);
++                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(list, tagbuilder.shouldReplace(), tagbuilder.getRemoveEntries().toList()), path);
                                      }
                                  }
                              )
-@@ -105,7 +_,12 @@
+@@ -106,7 +_,12 @@
      }
  
-     protected TagBuilder getOrCreateRawBuilder(TagKey<T> p_236452_) {
--        return this.builders.computeIfAbsent(p_236452_.location(), p_460082_ -> TagBuilder.create());
-+        return this.builders.computeIfAbsent(p_236452_.location(), p_460082_ -> {
+     protected TagBuilder getOrCreateRawBuilder(final TagKey<T> tag) {
+-        return this.builders.computeIfAbsent(tag.location(), k -> TagBuilder.create());
++        return this.builders.computeIfAbsent(tag.location(), k -> {
 +            if (existingFileHelper != null) {
-+                existingFileHelper.trackGenerated(p_460082_, resourceType);
++                existingFileHelper.trackGenerated(k, resourceType);
 +            }
 +            return TagBuilder.create();
 +        });
      }
  
      public CompletableFuture<TagsProvider.TagLookup<T>> contentsGetter() {
-@@ -118,6 +_,15 @@
-             this.addTags(p_274768_);
-             return (HolderLookup.Provider)p_274768_;
+@@ -119,6 +_,15 @@
+             this.addTags(registries);
+             return (HolderLookup.Provider)registries;
          });
 +    }
 +

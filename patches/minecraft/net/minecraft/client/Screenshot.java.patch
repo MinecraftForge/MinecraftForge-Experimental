@@ -1,32 +1,32 @@
 --- a/net/minecraft/client/Screenshot.java
 +++ b/net/minecraft/client/Screenshot.java
-@@ -43,6 +_,13 @@
-                     file2 = new File(file1, p_92297_);
+@@ -45,6 +_,13 @@
+                     file2 = new File(file1, forceName);
                  }
  
-+                var event = new net.minecraftforge.client.event.ScreenshotEvent(p_447863_, file2);
++                var event = new net.minecraftforge.client.event.ScreenshotEvent(image, file2);
 +                if (net.minecraftforge.client.event.ScreenshotEvent.BUS.post(event)) {
-+                    p_92301_.accept(event.getCancelMessage());
++                    callback.accept(event.getCancelMessage());
 +                    return;
 +                }
-+                final File target = event.getScreenshotFile();
++                final File outputFile = event.getScreenshotFile();
 +
                  Util.ioPool()
                      .execute(
                          () -> {
-@@ -50,10 +_,13 @@
-                                 NativeImage $$4x = p_447863_;
+@@ -52,10 +_,13 @@
+                                 NativeImage nativeimage = image;
  
                                  try {
--                                    p_447863_.writeToFile(file2);
+-                                    image.writeToFile(file2);
 -                                    Component component = Component.literal(file2.getName())
-+                                    p_447863_.writeToFile(target);
-+                                    Component component = Component.literal(target.getName())
++                                    image.writeToFile(outputFile);
++                                    Component component = Component.literal(outputFile.getName())
                                          .withStyle(ChatFormatting.UNDERLINE)
-                                         .withStyle(p_389149_ -> p_389149_.withClickEvent(new ClickEvent.OpenFile(file2.getAbsoluteFile())));
+                                         .withStyle(s -> s.withClickEvent(new ClickEvent.OpenFile(file2.getAbsoluteFile())));
 +                                    if (event.getResultMessage() != null)
-+                                        p_92301_.accept(event.getResultMessage());
++                                        callback.accept(event.getResultMessage());
 +                                    else
-                                     p_92301_.accept(Component.translatable("screenshot.success", component));
+                                     callback.accept(Component.translatable("screenshot.success", component));
                                  } catch (Throwable throwable1) {
-                                     if (p_447863_ != null) {
+                                     if (image != null) {

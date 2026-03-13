@@ -1,62 +1,67 @@
 --- a/net/minecraft/world/level/storage/loot/LootTable.java
 +++ b/net/minecraft/world/level/storage/loot/LootTable.java
-@@ -41,7 +_,7 @@
-             p_450068_ -> p_450068_.group(
-                     LootContextParamSets.CODEC.lenientOptionalFieldOf("type", DEFAULT_PARAM_SET).forGetter(p_297013_ -> p_297013_.paramSet),
-                     Identifier.CODEC.optionalFieldOf("random_sequence").forGetter(p_297014_ -> p_297014_.randomSequence),
--                    LootPool.CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(p_297012_ -> p_297012_.pools),
-+                    LootPool.CONDITIONAL_CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(p_297012_ -> p_297012_.pools),
-                     LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(p_297010_ -> p_297010_.functions)
+@@ -40,7 +_,7 @@
+             i -> i.group(
+                     LootContextParamSets.CODEC.lenientOptionalFieldOf("type", DEFAULT_PARAM_SET).forGetter(t -> t.paramSet),
+                     Identifier.CODEC.optionalFieldOf("random_sequence").forGetter(t -> t.randomSequence),
+-                    LootPool.CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(t -> t.pools),
++                    LootPool.CONDITIONAL_CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(t -> t.pools),
+                     LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(t -> t.functions)
                  )
-                 .apply(p_450068_, LootTable::new)
-@@ -58,7 +_,7 @@
-     LootTable(ContextKeySet p_365565_, Optional<Identifier> p_298628_, List<LootPool> p_298771_, List<LootItemFunction> p_301234_) {
-         this.paramSet = p_365565_;
-         this.randomSequence = p_298628_;
--        this.pools = p_298771_;
-+        this.pools = Lists.newArrayList(p_298771_);
-         this.functions = p_301234_;
-         this.compositeFunction = LootItemFunctions.compose(p_301234_);
+                 .apply(i, LootTable::new)
+@@ -59,7 +_,7 @@
+     ) {
+         this.paramSet = paramSet;
+         this.randomSequence = randomSequence;
+-        this.pools = pools;
++        this.pools = Lists.newArrayList(pools);
+         this.functions = functions;
+         this.compositeFunction = LootItemFunctions.compose(functions);
      }
-@@ -81,10 +_,12 @@
+@@ -82,10 +_,12 @@
          };
      }
  
 +    @Deprecated // Use a non-'Raw' version of 'getRandomItems', so that the Forge Global Loot Modifiers will be applied
-     public void getRandomItemsRaw(LootParams p_287669_, Consumer<ItemStack> p_287781_) {
-         this.getRandomItemsRaw(new LootContext.Builder(p_287669_).create(this.randomSequence), p_287781_);
+     public void getRandomItemsRaw(final LootParams params, final Consumer<ItemStack> output) {
+         this.getRandomItemsRaw(new LootContext.Builder(params).create(this.randomSequence), output);
      }
  
 +    @Deprecated // Use a non-'Raw' version of 'getRandomItems', so that the Forge Global Loot Modifiers will be applied
-     public void getRandomItemsRaw(LootContext p_79132_, Consumer<ItemStack> p_79133_) {
+     public void getRandomItemsRaw(final LootContext context, final Consumer<ItemStack> output) {
          LootContext.VisitedEntry<?> visitedentry = LootContext.createVisitedEntry(this);
-         if (p_79132_.pushVisitedElement(visitedentry)) {
-@@ -101,15 +_,15 @@
+         if (context.pushVisitedElement(visitedentry)) {
+@@ -102,18 +_,19 @@
      }
  
-     public void getRandomItems(LootParams p_287748_, long p_287729_, Consumer<ItemStack> p_287583_) {
--        this.getRandomItemsRaw(new LootContext.Builder(p_287748_).withOptionalRandomSeed(p_287729_).create(this.randomSequence), createStackSplitter(p_287748_.getLevel(), p_287583_));
-+        this.getRandomItems(new LootContext.Builder(p_287748_).withOptionalRandomSeed(p_287729_).create(this.randomSequence)).forEach(p_287583_);
+     public void getRandomItems(final LootParams params, final long optionalLootTableSeed, final Consumer<ItemStack> output) {
+-        this.getRandomItemsRaw(
+-            new LootContext.Builder(params).withOptionalRandomSeed(optionalLootTableSeed).create(this.randomSequence),
++        this.getRandomItems(
++            new LootContext.Builder(params).withOptionalRandomSeed(optionalLootTableSeed).create(this.randomSequence)
++        ).forEach(
+             createStackSplitter(params.getLevel(), output)
+         );
      }
  
-     public void getRandomItems(LootParams p_287704_, Consumer<ItemStack> p_287617_) {
--        this.getRandomItemsRaw(p_287704_, createStackSplitter(p_287704_.getLevel(), p_287617_));
-+        this.getRandomItems(p_287704_).forEach(p_287617_);
+     public void getRandomItems(final LootParams params, final Consumer<ItemStack> output) {
+-        this.getRandomItemsRaw(params, createStackSplitter(params.getLevel(), output));
++        this.getRandomItems(params).forEach(createStackSplitter(params.getLevel(), output));
      }
  
-     public void getRandomItems(LootContext p_79149_, Consumer<ItemStack> p_79150_) {
--        this.getRandomItemsRaw(p_79149_, createStackSplitter(p_79149_.getLevel(), p_79150_));
-+        this.getRandomItems(p_79149_).forEach(p_79150_);
+     public void getRandomItems(final LootContext context, final Consumer<ItemStack> output) {
+-        this.getRandomItemsRaw(context, createStackSplitter(context.getLevel(), output));
++        this.getRandomItems(context).forEach(createStackSplitter(context.getLevel(), output));
      }
  
-     public ObjectArrayList<ItemStack> getRandomItems(LootParams p_345012_, RandomSource p_344559_) {
-@@ -126,7 +_,8 @@
+     public ObjectArrayList<ItemStack> getRandomItems(final LootParams params, final RandomSource randomSource) {
+@@ -130,7 +_,8 @@
  
-     private ObjectArrayList<ItemStack> getRandomItems(LootContext p_230923_) {
+     private ObjectArrayList<ItemStack> getRandomItems(final LootContext context) {
          ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
--        this.getRandomItems(p_230923_, objectarraylist::add);
-+        this.getRandomItemsRaw(p_230923_, createStackSplitter(p_230923_.getLevel(), objectarraylist::add));
-+        objectarraylist = net.minecraftforge.common.ForgeHooks.modifyLoot(this, objectarraylist, p_230923_);
+-        this.getRandomItems(context, objectarraylist::add);
++        this.getRandomItemsRaw(context, createStackSplitter(context.getLevel(), objectarraylist::add));
++        objectarraylist = net.minecraftforge.common.ForgeHooks.modifyLoot(this, objectarraylist, context);
          return objectarraylist;
      }
  

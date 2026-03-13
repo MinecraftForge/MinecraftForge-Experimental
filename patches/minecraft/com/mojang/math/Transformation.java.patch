@@ -1,17 +1,17 @@
 --- a/com/mojang/math/Transformation.java
 +++ b/com/mojang/math/Transformation.java
-@@ -16,7 +_,7 @@
+@@ -17,7 +_,7 @@
  import org.joml.Vector3fc;
  import org.jspecify.annotations.Nullable;
  
 -public final class Transformation {
 +public final class Transformation implements net.minecraftforge.common.extensions.IForgeTransformation {
-     private final Matrix4fc matrix;
-     public static final Codec<Transformation> CODEC = RecordCodecBuilder.create(
-         p_269604_ -> p_269604_.group(
-@@ -168,5 +_,19 @@
-             this.getScale().lerp(p_175938_.getScale(), p_175939_, new Vector3f()),
-             this.getRightRotation().slerp(p_175938_.getRightRotation(), p_175939_, new Quaternionf())
+     private static final Vector3fc ZERO_TRANSLATION = new Vector3f();
+     private static final Vector3fc UNIT_SCALE = new Vector3f(1.0F, 1.0F, 1.0F);
+     private static final Quaternionfc ZERO_ROTATION = new Quaternionf();
+@@ -172,6 +_,20 @@
+             this.scale().lerp(that.scale(), progress, new Vector3f()),
+             this.rightRotation().slerp(that.rightRotation(), progress, new Quaternionf())
          );
 +    }
 +
@@ -28,4 +28,5 @@
 +            normalTransform.transpose();
 +        }
      }
- }
+ 
+     public static Matrix4fc compose(final Matrix4fc parent, final Optional<Transformation> transform) {

@@ -1,8 +1,8 @@
 --- a/net/minecraft/client/resources/model/ModelBaker.java
 +++ b/net/minecraft/client/resources/model/ModelBaker.java
-@@ -33,4 +_,16 @@
+@@ -32,4 +_,16 @@
      public interface SharedOperationKey<T> {
-         T compute(ModelBaker p_393089_);
+         T compute(ModelBaker modelBakery);
      }
 +
 +    /** Forge: Return the render type to use when baking this model, its a dirty hack to pass down this value to parents */

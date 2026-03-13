@@ -6,10 +6,10 @@
      private volatile @Nullable EventLoopGroup group;
 +    private volatile @Nullable EventLoopGroup groupClient;
  
-     public static EventLoopGroupHolder remote(boolean p_453425_) {
-         if (p_453425_) {
+     public static EventLoopGroupHolder remote(final boolean allowNativeTransport) {
+         if (allowNativeTransport) {
 @@ -77,24 +_,31 @@
-         this.serverChannelCls = p_455144_;
+         this.serverChannelCls = serverChannelCls;
      }
  
 -    private ThreadFactory createThreadFactory() {

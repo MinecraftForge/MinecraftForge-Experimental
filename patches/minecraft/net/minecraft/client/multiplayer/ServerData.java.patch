@@ -6,5 +6,5 @@
      private ServerData.State state = ServerData.State.INITIAL;
 +    public net.minecraftforge.client.ExtendedServerListData forgeData = null;
  
-     public ServerData(String p_105375_, String p_105376_, ServerData.Type p_297678_) {
-         this.name = p_105375_;
+     public ServerData(final String name, final String ip, final ServerData.Type type) {
+         this.name = name;

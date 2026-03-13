@@ -6,7 +6,7 @@
 package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.CharacterEvent;
@@ -154,7 +154,7 @@ public sealed interface ScreenEvent {
         /**
          * {@return the gui graphics used for rendering}
          */
-        GuiGraphics getGuiGraphics();
+        GuiGraphicsExtractor getGuiGraphics();
 
         /**
          * {@return the X coordinate of the mouse pointer}
@@ -180,7 +180,7 @@ public sealed interface ScreenEvent {
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
-        record Pre(Screen getScreen, GuiGraphics getGuiGraphics, int getMouseX, int getMouseY, float getPartialTick)
+        record Pre(Screen getScreen, GuiGraphicsExtractor getGuiGraphics, int getMouseX, int getMouseY, float getPartialTick)
                 implements Cancellable, Render, RecordEvent {
             public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
 
@@ -194,7 +194,7 @@ public sealed interface ScreenEvent {
          * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
          * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
-        record Post(Screen getScreen, GuiGraphics getGuiGraphics, int getMouseX, int getMouseY, float getPartialTick)
+        record Post(Screen getScreen, GuiGraphicsExtractor getGuiGraphics, int getMouseX, int getMouseY, float getPartialTick)
                 implements Render, RecordEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
 
@@ -212,7 +212,7 @@ public sealed interface ScreenEvent {
      *
      * @param getGuiGraphics the gui graphics used for rendering
      */
-    record BackgroundRendered(Screen getScreen, GuiGraphics getGuiGraphics) implements RecordEvent, ScreenEvent {
+    record BackgroundRendered(Screen getScreen, GuiGraphicsExtractor getGuiGraphics) implements RecordEvent, ScreenEvent {
         public static final EventBus<BackgroundRendered> BUS = EventBus.create(BackgroundRendered.class);
 
         @ApiStatus.Internal

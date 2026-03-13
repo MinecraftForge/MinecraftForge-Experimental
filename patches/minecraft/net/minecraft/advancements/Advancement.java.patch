@@ -1,15 +1,15 @@
 --- a/net/minecraft/advancements/Advancement.java
 +++ b/net/minecraft/advancements/Advancement.java
-@@ -231,7 +_,11 @@
+@@ -227,7 +_,11 @@
          }
  
-         public AdvancementHolder save(Consumer<AdvancementHolder> p_138390_, String p_138391_) {
--            AdvancementHolder advancementholder = this.build(Identifier.parse(p_138391_));
-+            return save(p_138390_, Identifier.parse(p_138391_));
+         public AdvancementHolder save(final Consumer<AdvancementHolder> output, final String name) {
+-            AdvancementHolder advancementholder = this.build(Identifier.parse(name));
++            return save(output, Identifier.parse(name));
 +        }
 +
-+        public AdvancementHolder save(Consumer<AdvancementHolder> p_138390_, Identifier id) {
++        public AdvancementHolder save(Consumer<AdvancementHolder> output, Identifier id) {
 +            AdvancementHolder advancementholder = this.build(id);
-             p_138390_.accept(advancementholder);
+             output.accept(advancementholder);
              return advancementholder;
          }

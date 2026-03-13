@@ -1,8 +1,8 @@
 --- a/net/minecraft/tags/WorldPresetTags.java
 +++ b/net/minecraft/tags/WorldPresetTags.java
 @@ -14,4 +_,12 @@
-     private static TagKey<WorldPreset> create(String p_216058_) {
-         return TagKey.create(Registries.WORLD_PRESET, Identifier.withDefaultNamespace(p_216058_));
+     private static TagKey<WorldPreset> create(final String name) {
+         return TagKey.create(Registries.WORLD_PRESET, Identifier.withDefaultNamespace(name));
      }
 +
 +    public static TagKey<WorldPreset> create(String namepsace, String path) {

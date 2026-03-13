@@ -6,22 +6,22 @@
  
 +    /** @deprecated FORGE: use SpawnPlacementRegisterEvent to register and modify spawn placements */
      private static <T extends Mob> void register(
-         EntityType<T> p_21755_, SpawnPlacementType p_331557_, Heightmap.Types p_21757_, SpawnPlacements.SpawnPredicate<T> p_21758_
+         final EntityType<T> type,
+         final SpawnPlacementType placementType,
+@@ -78,7 +_,8 @@
+         final EntityType<T> type, final ServerLevelAccessor level, final EntitySpawnReason spawnReason, final BlockPos pos, final RandomSource random
      ) {
-@@ -75,7 +_,8 @@
-         EntityType<T> p_217075_, ServerLevelAccessor p_217076_, EntitySpawnReason p_369208_, BlockPos p_217078_, RandomSource p_217079_
-     ) {
-         SpawnPlacements.Data spawnplacements$data = DATA_BY_TYPE.get(p_217075_);
--        return spawnplacements$data == null || spawnplacements$data.predicate.test((EntityType)p_217075_, p_217076_, p_369208_, p_217078_, p_217079_);
-+        boolean vanillaResult = spawnplacements$data == null || spawnplacements$data.predicate.test((EntityType)p_217075_, p_217076_, p_369208_, p_217078_, p_217079_);
-+        return net.minecraftforge.event.ForgeEventFactory.checkSpawnPlacements(p_217075_, p_217076_, p_369208_, p_217078_, p_217079_, vanillaResult);
+         SpawnPlacements.Data spawnplacements$data = DATA_BY_TYPE.get(type);
+-        return spawnplacements$data == null || spawnplacements$data.predicate.test((EntityType)type, level, spawnReason, pos, random);
++        boolean vanillaResult = spawnplacements$data == null || spawnplacements$data.predicate.test((EntityType)type, level, spawnReason, pos, random);
++        return net.minecraftforge.event.ForgeEventFactory.checkSpawnPlacements(type, level, spawnReason, pos, random, vanillaResult);
      }
  
      static {
-@@ -169,5 +_,13 @@
+@@ -191,5 +_,13 @@
      @FunctionalInterface
      public interface SpawnPredicate<T extends Entity> {
-         boolean test(EntityType<T> p_217081_, ServerLevelAccessor p_217082_, EntitySpawnReason p_365908_, BlockPos p_217084_, RandomSource p_217085_);
+         boolean test(EntityType<T> type, ServerLevelAccessor level, EntitySpawnReason spawnReason, BlockPos pos, RandomSource random);
 +    }
 +
 +    // ******* FORGE START. INTERNAL USE ONLY! ****** //

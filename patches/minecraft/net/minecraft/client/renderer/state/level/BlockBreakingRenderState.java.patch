@@ -1,0 +1,12 @@
+--- a/net/minecraft/client/renderer/state/level/BlockBreakingRenderState.java
++++ b/net/minecraft/client/renderer/state/level/BlockBreakingRenderState.java
+@@ -6,5 +_,8 @@
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+ @OnlyIn(Dist.CLIENT)
+-public record BlockBreakingRenderState(BlockPos blockPos, BlockState blockState, int progress) {
++public record BlockBreakingRenderState(BlockPos blockPos, BlockState blockState, int progress, net.minecraftforge.client.model.data.ModelData data) {
++    public BlockBreakingRenderState(BlockPos blockPos, BlockState blockState, int progress) {
++        this(blockPos, blockState, progress, net.minecraftforge.client.model.data.ModelData.EMPTY);
++    }
+ }

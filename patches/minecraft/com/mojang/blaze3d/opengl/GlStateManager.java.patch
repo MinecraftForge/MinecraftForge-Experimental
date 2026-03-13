@@ -12,7 +12,7 @@
      public static void _disableBlend() {
          RenderSystem.assertOnRenderThread();
          BLEND.mode.disable();
-@@ -371,9 +_,17 @@
+@@ -380,9 +_,17 @@
          }
      }
  
@@ -20,13 +20,13 @@
 +    public static float lastBrightnessX = 0.0f;
 +    public static float lastBrightnessY = 0.0f;
 +
-     public static void _texParameter(int p_393876_, int p_397998_, int p_396741_) {
+     public static void _texParameter(final int target, final int name, final int value) {
          RenderSystem.assertOnRenderThread();
-         GL11.glTexParameteri(p_393876_, p_397998_, p_396741_);
-+        if (p_393876_ == GL13.GL_TEXTURE1) {
-+            lastBrightnessX = p_397998_;
-+            lastBrightnessY = p_396741_;
+         GL11.glTexParameteri(target, name, value);
++        if (target == GL13.GL_TEXTURE1) {
++            lastBrightnessX = name;
++            lastBrightnessY = value;
 +        }
      }
  
-     public static int _getTexLevelParameter(int p_393352_, int p_397204_, int p_396319_) {
+     public static int _getTexLevelParameter(final int target, final int level, final int name) {

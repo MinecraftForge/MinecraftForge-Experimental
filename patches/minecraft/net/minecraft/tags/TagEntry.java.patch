@@ -1,6 +1,6 @@
 --- a/net/minecraft/tags/TagEntry.java
 +++ b/net/minecraft/tags/TagEntry.java
-@@ -111,6 +_,18 @@
+@@ -108,6 +_,18 @@
          return stringbuilder.toString();
      }
  
@@ -17,5 +17,5 @@
 +    }
 +
      public interface Lookup<T> {
-         @Nullable T element(Identifier p_459727_, boolean p_362986_);
+         @Nullable T element(Identifier key, boolean required);
  

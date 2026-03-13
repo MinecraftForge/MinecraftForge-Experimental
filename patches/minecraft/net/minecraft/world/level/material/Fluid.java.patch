@@ -12,13 +12,13 @@
 @@ -64,6 +_,8 @@
      }
  
-     protected void entityInside(Level p_394813_, BlockPos p_394655_, Entity p_396881_, InsideBlockEffectApplier p_395108_) {
-+        if (p_396881_.canFluidExtinguish(getFluidType()))
-+            p_395108_.apply(net.minecraft.world.entity.InsideBlockEffectType.EXTINGUISH);
+     protected void entityInside(final Level level, final BlockPos pos, final Entity entity, final InsideBlockEffectApplier effectApplier) {
++        if (entity.canFluidExtinguish(getFluidType()))
++            effectApplier.apply(net.minecraft.world.entity.InsideBlockEffectType.EXTINGUISH);
      }
  
      protected @Nullable ParticleOptions getDripParticle() {
-@@ -130,5 +_,12 @@
+@@ -123,5 +_,12 @@
      @Deprecated
      public Holder.Reference<Fluid> builtInRegistryHolder() {
          return this.builtInRegistryHolder;

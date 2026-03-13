@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/entity/npc/villager/VillagerType.java
 +++ b/net/minecraft/world/entity/npc/villager/VillagerType.java
 @@ -80,4 +_,9 @@
-     public static ResourceKey<VillagerType> byBiome(Holder<Biome> p_452045_) {
-         return p_452045_.unwrapKey().map(BY_BIOME::get).orElse(PLAINS);
+     public static ResourceKey<VillagerType> byBiome(final Holder<Biome> biome) {
+         return biome.unwrapKey().map(BY_BIOME::get).orElse(PLAINS);
      }
 +
 +    /** FORGE: Registers the VillagerType that will spawn in the given biome. This method should be called during FMLCommonSetupEvent using event.enqueueWork() */

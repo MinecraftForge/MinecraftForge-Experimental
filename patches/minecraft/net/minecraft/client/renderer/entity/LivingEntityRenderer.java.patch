@@ -3,24 +3,25 @@
 @@ -72,6 +_,7 @@
      }
  
-     public void submit(S p_427824_, PoseStack p_423787_, SubmitNodeCollector p_424901_, CameraRenderState p_422963_) {
-+        if (net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPre(p_427824_, this, p_423787_, p_424901_, p_422963_)) return;
-         p_423787_.pushPose();
-         if (p_427824_.hasPose(Pose.SLEEPING)) {
-             Direction direction = p_427824_.bedOrientation;
+     public void submit(final S state, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final CameraRenderState camera) {
++        if (net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPre(state, this, poseStack, submitNodeCollector, camera)) return;
+         poseStack.pushPose();
+         if (state.hasPose(Pose.SLEEPING)) {
+             Direction direction = state.bedOrientation;
 @@ -107,6 +_,7 @@
  
-         p_423787_.popPose();
-         super.submit(p_427824_, p_423787_, p_424901_, p_422963_);
-+        net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPost(p_427824_, this, p_423787_, p_424901_, p_422963_);
+         poseStack.popPose();
+         super.submit(state, poseStack, submitNodeCollector, camera);
++        net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderLivingPost(state, this, poseStack, submitNodeCollector, camera);
      }
  
-     protected boolean shouldRenderLayers(S p_360804_) {
-@@ -284,6 +_,7 @@
-         p_363057_.isFullyFrozen = p_368665_.isFullyFrozen();
-         p_363057_.isBaby = p_368665_.isBaby();
-         p_363057_.isInWater = p_368665_.isInWater();
-+        p_363057_.isInWater = p_368665_.isInWaterOrSwimmable();
-         p_363057_.isAutoSpinAttack = p_368665_.isAutoSpinAttack();
-         p_363057_.ticksSinceKineticHitFeedback = p_368665_.getTicksSinceLastKineticHitFeedback(p_364497_);
-         p_363057_.hasRedOverlay = p_368665_.hurtTime > 0 || p_368665_.deathTime > 0;
+     protected boolean shouldRenderLayers(final S state) {
+@@ -283,7 +_,7 @@
+ 
+         state.isFullyFrozen = entity.isFullyFrozen();
+         state.isBaby = entity.isBaby();
+-        state.isInWater = entity.isInWater();
++        state.isInWater = entity.isInWaterOrSwimmable();
+         state.isAutoSpinAttack = entity.isAutoSpinAttack();
+         state.ticksSinceKineticHitFeedback = entity.getTicksSinceLastKineticHitFeedback(partialTicks);
+         state.hasRedOverlay = entity.hurtTime > 0 || entity.deathTime > 0;

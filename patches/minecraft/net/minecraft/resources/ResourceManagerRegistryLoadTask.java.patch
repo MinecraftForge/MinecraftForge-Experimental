@@ -1,0 +1,38 @@
+--- a/net/minecraft/resources/ResourceManagerRegistryLoadTask.java
++++ b/net/minecraft/resources/ResourceManagerRegistryLoadTask.java
+@@ -21,6 +_,7 @@
+ import net.minecraft.util.thread.ParallelMapTransform;
+ 
+ public class ResourceManagerRegistryLoadTask<T> extends RegistryLoadTask<T> {
++    private static final org.slf4j.Logger LOGGER = com.mojang.logging.LogUtils.getLogger();
+     private static final Function<Optional<KnownPack>, RegistrationInfo> REGISTRATION_INFO_CACHE = Util.memoize(knownPack -> {
+         Lifecycle lifecycle = knownPack.map(KnownPack::isVanilla).map(info -> Lifecycle.stable()).orElse(Lifecycle.experimental());
+         return new RegistrationInfo(knownPack, lifecycle);
+@@ -40,6 +_,7 @@
+     @Override
+     public CompletableFuture<?> load(final RegistryOps.RegistryInfoLookup context, final Executor executor) {
+         FileToIdConverter filetoidconverter = FileToIdConverter.registry(this.registryKey());
++        var optionalCodec = net.minecraftforge.common.crafting.conditions.ConditionCodec.wrap(this.data.elementCodec());
+         return CompletableFuture.<Map<Identifier, Resource>>supplyAsync(() -> filetoidconverter.listMatchingResources(this.resourceManager), executor)
+             .thenCompose(
+                 registryResources -> {
+@@ -49,9 +_,18 @@
+                         (resourceId, thunk) -> {
+                             ResourceKey<T> resourcekey = ResourceKey.create(this.registryKey(), filetoidconverter.fileToId(resourceId));
+                             RegistrationInfo registrationinfo = REGISTRATION_INFO_CACHE.apply(thunk.knownPackInfo());
++                            // braking types here for smaller patch, its just used for error messages so its fine
++                            var result = RegistryLoadTask.PendingRegistration.loadFromResource(optionalCodec, registryops, (ResourceKey<Optional<T>>)resourcekey, thunk);
++                            if (!result.right().isPresent()) { // Wasn't an error so check if present
++                                var value = result.left().get();
++                                if (value.isEmpty()) {
++                                    LOGGER.debug("Skipping {} conditions not met", resourcekey);
++                                    return null;
++                                }
++                            }
+                             return new RegistryLoadTask.PendingRegistration<>(
+                                 resourcekey,
+-                                RegistryLoadTask.PendingRegistration.loadFromResource(this.data.elementCodec(), registryops, resourcekey, thunk),
++                                result.mapLeft(Optional::get),
+                                 registrationinfo
+                             );
+                         },

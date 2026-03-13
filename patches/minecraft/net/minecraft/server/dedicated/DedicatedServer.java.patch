@@ -1,22 +1,22 @@
 --- a/net/minecraft/server/dedicated/DedicatedServer.java
 +++ b/net/minecraft/server/dedicated/DedicatedServer.java
-@@ -93,6 +_,7 @@
+@@ -97,6 +_,7 @@
      private final Map<String, String> codeOfConductTexts;
      private @Nullable ManagementServer jsonRpcServer;
      private long lastHeartbeat;
 +    private net.minecraft.client.server.@Nullable LanServerPinger dediLanPinger;
  
      public DedicatedServer(
-         Thread p_214789_,
-@@ -189,6 +_,7 @@
-         Thread thread1 = new Thread("Server console handler") {
+         final Thread serverThread,
+@@ -211,6 +_,7 @@
+ 
              @Override
              public void run() {
 +                if (net.minecraftforge.server.console.TerminalHandler.handleCommands(DedicatedServer.this)) return;
                  BufferedReader bufferedreader = new BufferedReader(new InputStreamReader(System.in, StandardCharsets.UTF_8));
  
                  String s4;
-@@ -262,11 +_,13 @@
+@@ -284,11 +_,13 @@
              this.tickTimeLogger = new RemoteSampleLogger(TpsDebugDimensions.values().length, this.debugSubscribers(), RemoteDebugSampleType.TICK_TIME);
              long j = Util.getNanos();
              this.services.nameToIdCache().resolveOfflineUsers(!this.usesAuthentication());
@@ -28,11 +28,11 @@
              LOGGER.info("Done ({})! For help, type \"help\"", s3);
 +            this.nextTickTimeNanos = Util.getNanos(); //Forge: Update server time to prevent watchdog/spaming during long load.
              if (dedicatedserverproperties.announcePlayerAchievements != null) {
-                 this.worldData.getGameRules().set(GameRules.SHOW_ADVANCEMENT_MESSAGES, dedicatedserverproperties.announcePlayerAchievements, this);
+                 this.getGameRules().set(GameRules.SHOW_ADVANCEMENT_MESSAGES, dedicatedserverproperties.announcePlayerAchievements, this);
              }
-@@ -295,7 +_,12 @@
-             }
+@@ -318,7 +_,12 @@
  
+             this.saveEverything(false, true, true);
              this.notificationManager().serverStarted();
 -            return true;
 +            if (net.minecraftforge.common.ForgeConfig.SERVER.advertiseDedicatedServerToLan.get()) {
@@ -44,7 +44,7 @@
          }
      }
  
-@@ -436,6 +_,13 @@
+@@ -470,6 +_,13 @@
                  LOGGER.error("Interrupted while stopping the management server", (Throwable)interruptedexception);
              }
          }
@@ -58,10 +58,10 @@
      }
  
      @Override
-@@ -717,8 +_,13 @@
+@@ -751,8 +_,13 @@
  
      @Override
-     public void stopServer() {
+     protected void stopServer() {
 +        net.minecraftforge.event.GameShuttingDownEvent.BUS.post(new net.minecraftforge.event.GameShuttingDownEvent());
          this.notificationManager().serverShuttingDown();
          super.stopServer();

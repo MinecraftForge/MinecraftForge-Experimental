@@ -1,46 +1,46 @@
 --- a/net/minecraft/world/item/AxeItem.java
 +++ b/net/minecraft/world/item/AxeItem.java
 @@ -64,7 +_,7 @@
-         if (playerHasBlockingItemUseIntent(p_40529_)) {
+         if (playerHasBlockingItemUseIntent(context)) {
              return InteractionResult.PASS;
          } else {
 -            Optional<BlockState> optional = this.evaluateNewBlockState(level, blockpos, player, level.getBlockState(blockpos));
-+            Optional<BlockState> optional = this.evaluateNewBlockState(level, blockpos, player, level.getBlockState(blockpos), p_40529_);
++            Optional<BlockState> optional = this.evaluateNewBlockState(level, blockpos, player, level.getBlockState(blockpos), context);
              if (optional.isEmpty()) {
                  return InteractionResult.PASS;
              } else {
-@@ -90,17 +_,24 @@
+@@ -92,17 +_,24 @@
      }
  
-     private Optional<BlockState> evaluateNewBlockState(Level p_312809_, BlockPos p_313114_, @Nullable Player p_312029_, BlockState p_311198_) {
--        Optional<BlockState> optional = this.getStripped(p_311198_);
-+        return this.evaluateNewBlockState(p_312809_, p_313114_, p_312029_, p_311198_, null);
+     private Optional<BlockState> evaluateNewBlockState(final Level level, final BlockPos pos, final @Nullable Player player, final BlockState oldState) {
+-        Optional<BlockState> optional = this.getStripped(oldState);
++        return this.evaluateNewBlockState(level, pos, player, oldState, null);
 +    }
 +
-+    private Optional<BlockState> evaluateNewBlockState(Level p_312809_, BlockPos p_313114_, @Nullable Player p_312029_, BlockState p_311198_, @Nullable UseOnContext ctx) {
-+        var strip = ctx == null ? null : p_311198_.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
-+        Optional<BlockState> optional = strip != null ? Optional.of(strip) : this.getStripped(p_311198_);
++    private Optional<BlockState> evaluateNewBlockState(final Level level, final BlockPos pos, final @Nullable Player player, final BlockState oldState, final @Nullable UseOnContext ctx) {
++        var strip = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
++        Optional<BlockState> optional = strip != null ? Optional.of(strip) : this.getStripped(oldState);
          if (optional.isPresent()) {
-             p_312809_.playSound(p_312029_, p_313114_, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
+             level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
              return optional;
          } else {
--            Optional<BlockState> optional1 = WeatheringCopper.getPrevious(p_311198_);
-+            var scrape = ctx == null ? null : p_311198_.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
-+            Optional<BlockState> optional1 = scrape != null ? Optional.of(scrape) : WeatheringCopper.getPrevious(p_311198_);
+-            Optional<BlockState> optional1 = WeatheringCopper.getPrevious(oldState);
++            var scrape = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
++            Optional<BlockState> optional1 = scrape != null ? Optional.of(scrape) : WeatheringCopper.getPrevious(oldState);
              if (optional1.isPresent()) {
-                 spawnSoundAndParticle(p_312809_, p_313114_, p_312029_, p_311198_, SoundEvents.AXE_SCRAPE, 3005);
+                 spawnSoundAndParticle(level, pos, player, oldState, SoundEvents.AXE_SCRAPE, 3005);
                  return optional1;
              } else {
--                Optional<BlockState> optional2 = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(p_311198_.getBlock()))
-+                var waxOff = ctx == null ? null : p_311198_.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_WAX_OFF, false);
-+                Optional<BlockState> optional2 = waxOff != null ? Optional.of(waxOff) : Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(p_311198_.getBlock()))
-                     .map(p_150694_ -> p_150694_.withPropertiesOf(p_311198_));
+-                Optional<BlockState> optional2 = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
++                var waxOff = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_WAX_OFF, false);
++                Optional<BlockState> optional2 = waxOff != null ? Optional.of(waxOff) : Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
+                     .map(b -> b.withPropertiesOf(oldState));
                  if (optional2.isPresent()) {
-                     spawnSoundAndParticle(p_312809_, p_313114_, p_312029_, p_311198_, SoundEvents.AXE_WAX_OFF, 3004);
-@@ -125,5 +_,21 @@
-     private Optional<BlockState> getStripped(BlockState p_150691_) {
-         return Optional.ofNullable(STRIPPABLES.get(p_150691_.getBlock()))
-             .map(p_359378_ -> p_359378_.defaultBlockState().setValue(RotatedPillarBlock.AXIS, p_150691_.getValue(RotatedPillarBlock.AXIS)));
+                     spawnSoundAndParticle(level, pos, player, oldState, SoundEvents.AXE_WAX_OFF, 3004);
+@@ -129,5 +_,21 @@
+     private Optional<BlockState> getStripped(final BlockState state) {
+         return Optional.ofNullable(STRIPPABLES.get(state.getBlock()))
+             .map(block -> block.defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)));
 +    }
 +
 +    @Override

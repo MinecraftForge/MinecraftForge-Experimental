@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/level/block/PumpkinBlock.java
 +++ b/net/minecraft/world/level/block/PumpkinBlock.java
-@@ -36,7 +_,7 @@
-     protected InteractionResult useItemOn(
-         ItemStack p_330568_, BlockState p_330263_, Level p_327756_, BlockPos p_328675_, Player p_334049_, InteractionHand p_331851_, BlockHitResult p_329008_
+@@ -43,7 +_,7 @@
+         final InteractionHand hand,
+         final BlockHitResult hitResult
      ) {
--        if (!p_330568_.is(Items.SHEARS)) {
-+        if (p_330568_.canPerformAction(net.minecraftforge.common.ToolActions.SHEARS_CARVE)) {
-             return super.useItemOn(p_330568_, p_330263_, p_327756_, p_328675_, p_334049_, p_331851_, p_329008_);
-         } else if (p_327756_ instanceof ServerLevel serverlevel) {
-             Direction direction = p_329008_.getDirection();
+-        if (!itemStack.is(Items.SHEARS)) {
++        if (!itemStack.canPerformAction(net.minecraftforge.common.ToolActions.SHEARS_CARVE)) {
+             return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
+         } else if (level instanceof ServerLevel serverlevel) {
+             Direction direction = hitResult.getDirection();

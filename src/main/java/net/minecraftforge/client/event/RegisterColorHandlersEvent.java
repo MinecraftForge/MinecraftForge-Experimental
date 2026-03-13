@@ -5,21 +5,20 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.client.color.block.BlockColor;
 import net.minecraft.client.color.block.BlockColors;
+import net.minecraft.client.color.block.BlockTintSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ColorResolver;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Fired for registering block and item color handlers at the appropriate time.
@@ -39,12 +38,6 @@ public sealed interface RegisterColorHandlersEvent {
     record Block(BlockColors getBlockColors) implements RecordEvent, RegisterColorHandlersEvent {
         public static final EventBus<Block> BUS = EventBus.create(Block.class);
 
-        /** @deprecated {@link RegisterColorHandlersEvent.Block} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<Block> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
-
         @ApiStatus.Internal
         public Block {}
 
@@ -58,14 +51,14 @@ public sealed interface RegisterColorHandlersEvent {
         }
 
         /**
-         * Registers a {@link BlockColor} instance for a set of blocks.
+         * Registers {@link BlockTintSource} instances for a set of blocks.
          *
-         * @param blockColor The color provider
-         * @param blocks     The blocks
+         * @param sources The tint sources
+         * @param blocks  The blocks
          */
         @SuppressWarnings("deprecation")
-        public void register(BlockColor blockColor, net.minecraft.world.level.block.Block... blocks) {
-            getBlockColors.register(blockColor, blocks);
+        public void register(List<BlockTintSource> sources, net.minecraft.world.level.block.Block... blocks) {
+            getBlockColors.register(sources, blocks);
         }
     }
 
@@ -76,12 +69,6 @@ public sealed interface RegisterColorHandlersEvent {
     @NullMarked
     final class ColorResolvers extends MutableEvent implements SelfDestructing, RegisterColorHandlersEvent {
         public static final EventBus<ColorResolvers> BUS = EventBus.create(ColorResolvers.class);
-
-        /** @deprecated {@link RegisterColorHandlersEvent.ColorResolvers} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<ColorResolvers> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
 
         private final ArrayList<ColorResolver> builder;
 

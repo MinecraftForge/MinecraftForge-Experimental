@@ -1,16 +1,16 @@
 --- a/net/minecraft/client/renderer/GameRenderer.java
 +++ b/net/minecraft/client/renderer/GameRenderer.java
-@@ -242,6 +_,9 @@
+@@ -235,6 +_,9 @@
              case null:
              default:
                  this.clearPostEffect();
-+                var rl = p_109107_ == null ? null : net.minecraftforge.client.EntitySpectatorShaderManager.get(p_109107_.getType());
++                var rl = cameraEntity == null ? null : net.minecraftforge.client.EntitySpectatorShaderManager.get(cameraEntity.getType());
 +                if (rl != null)
 +                    this.setPostEffect(rl);
          }
      }
  
-@@ -253,7 +_,13 @@
+@@ -246,7 +_,13 @@
      public void processBlurEffect() {
          PostChain postchain = this.minecraft.getShaderManager().getPostChain(BLUR_POST_CHAIN_ID, LevelTargetBundle.MAIN_TARGETS);
          if (postchain != null) {
@@ -24,28 +24,19 @@
          }
      }
  
-@@ -377,7 +_,7 @@
-                 f *= Mth.lerp(f2, 1.0F, 0.85714287F);
-             }
+@@ -507,7 +_,7 @@
+             profilerfiller.push("screen");
  
--            return f;
-+            return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this, p_109142_, p_109143_, f, p_109144_).getFOV();
-         }
-     }
- 
-@@ -530,7 +_,7 @@
-                 }
-             } else if (flag && this.minecraft.screen != null) {
-                 try {
--                    this.minecraft.screen.renderWithTooltipAndSubtitles(guigraphics, i, j, p_343467_.getGameTimeDeltaTicks());
-+                    net.minecraftforge.client.ForgeHooksClient.drawScreen(this.minecraft.screen, guigraphics, i, j, p_343467_.getRealtimeDeltaTicks());
-                 } catch (Throwable throwable1) {
-                     CrashReport crashreport1 = CrashReport.forThrowable(throwable1, "Rendering screen");
-                     CrashReportCategory crashreportcategory1 = crashreport1.addCategory("Screen render details");
-@@ -696,6 +_,10 @@
-                         BlockInWorld blockinworld = new BlockInWorld(this.minecraft.level, blockpos, false);
+             try {
+-                this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(guigraphicsextractor, i, j, deltaTracker.getGameTimeDeltaTicks());
++                net.minecraftforge.client.ForgeHooksClient.drawScreen(this.minecraft.screen, guigraphicsextractor, i, j, deltaTracker.getRealtimeDeltaTicks());
+             } catch (Throwable throwable) {
+                 CrashReport crashreport1 = CrashReport.forThrowable(throwable, "Rendering screen");
+                 CrashReportCategory crashreportcategory1 = crashreport1.addCategory("Screen render details");
+@@ -672,6 +_,10 @@
                          Registry<Block> registry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
-                         flag = !itemstack.isEmpty() && (itemstack.canBreakBlockInAdventureMode(blockinworld) || itemstack.canPlaceOnBlockInAdventureMode(blockinworld));
+                         flag = !itemstack.isEmpty()
+                             && (itemstack.canBreakBlockInAdventureMode(blockinworld) || itemstack.canPlaceOnBlockInAdventureMode(blockinworld));
 +                        if (!flag && blockstate.hasBlockEntity()) {
 +                            var blockEntity = this.minecraft.level.getBlockEntity(blockpos);
 +                            flag = blockEntity != null && blockEntity.hasCustomOutlineRendering();
@@ -53,13 +44,13 @@
                      }
                  }
              }
-@@ -736,6 +_,9 @@
-         if (this.minecraft.options.bobView().get()) {
-             this.bobView(posestack, this.mainCamera.getPartialTickTime());
+@@ -696,6 +_,9 @@
+         if (optionsrenderstate.bobView) {
+             this.bobView(camerarenderstate, posestack);
          }
 +
 +        var cameraSetup = net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeCameraAngles(this, this.mainCamera, f);
 +        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
  
          matrix4f.mul(posestack.last().pose());
-         float f2 = this.minecraft.options.screenEffectScale().get().floatValue();
+         float f2 = optionsrenderstate.screenEffectScale;

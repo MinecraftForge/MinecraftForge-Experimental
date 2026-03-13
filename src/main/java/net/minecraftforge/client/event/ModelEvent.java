@@ -6,19 +6,21 @@
 package net.minecraftforge.client.event;
 
 import com.google.common.base.Preconditions;
+
+import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.sprite.MaterialBaker;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.client.model.geometry.IGeometryLoader;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -50,12 +52,6 @@ public sealed interface ModelEvent {
             implements RecordEvent, ModelEvent {
         public static final EventBus<ModifyBakingResult> BUS = EventBus.create(ModifyBakingResult.class);
 
-        /** @deprecated {@link ModelEvent.ModifyBakingResult} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<ModifyBakingResult> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
-
         @ApiStatus.Internal
         public ModifyBakingResult {}
     }
@@ -75,12 +71,6 @@ public sealed interface ModelEvent {
             implements RecordEvent, ModelEvent {
         public static final EventBus<BakingCompleted> BUS = EventBus.create(BakingCompleted.class);
 
-        /** @deprecated {@link ModelEvent.BakingCompleted} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<BakingCompleted> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
-
         @ApiStatus.Internal
         public BakingCompleted {}
     }
@@ -95,12 +85,6 @@ public sealed interface ModelEvent {
      */
     final class RegisterModelStateDefinitions extends MutableEvent implements ModelEvent {
         public static final EventBus<RegisterModelStateDefinitions> BUS = EventBus.create(RegisterModelStateDefinitions.class);
-
-        /** @deprecated {@link ModelEvent.RegisterModelStateDefinitions} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<RegisterModelStateDefinitions> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
 
         private final Map<Identifier, StateDefinition<Block, BlockState>> states = new HashMap<>();
         private final Map<Identifier, StateDefinition<Block, BlockState>> view = Collections.unmodifiableMap(states);
@@ -132,12 +116,6 @@ public sealed interface ModelEvent {
     final class RegisterGeometryLoaders extends MutableEvent implements ModelEvent {
         public static final EventBus<RegisterGeometryLoaders> BUS = EventBus.create(RegisterGeometryLoaders.class);
 
-        /** @deprecated {@link ModelEvent.RegisterGeometryLoaders} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<RegisterGeometryLoaders> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
-
         private final Map<Identifier, IGeometryLoader> loaders;
 
         @ApiStatus.Internal
@@ -152,6 +130,39 @@ public sealed interface ModelEvent {
         public void register(Identifier Identifier, IGeometryLoader loader) {
             Preconditions.checkArgument(!loaders.containsKey(Identifier), "Geometry loader already registered: " + Identifier);
             loaders.put(Identifier, loader);
+        }
+    }
+
+    /**
+     * Allows users to register their own {@link FluidModel fluid models}.
+     *
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     */
+    @NullMarked
+    final class BakeFluidModels extends MutableEvent implements ModelEvent {
+        public static final EventBus<BakeFluidModels> BUS = EventBus.create(BakeFluidModels.class);
+
+        private final ModelBakery bakery;
+        private final MaterialBaker materials;
+        private final Map<Fluid, FluidModel> models;
+
+        @ApiStatus.Internal
+        public BakeFluidModels(ModelBakery bakery, MaterialBaker materials, Map<Fluid, FluidModel> models) {
+            this.bakery = bakery;
+            this.materials = materials;
+            this.models = models;
+        }
+
+        public ModelBakery bakery() {
+            return this.bakery;
+        }
+
+        public MaterialBaker materials() {
+            return this.materials;
+        }
+
+        public void register(Fluid fluid, FluidModel model) {
+            models.put(fluid, model);
         }
     }
 }

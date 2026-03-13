@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/Mob.java
 +++ b/net/minecraft/world/entity/Mob.java
-@@ -137,6 +_,9 @@
+@@ -139,6 +_,9 @@
      private Leashable.@Nullable LeashData leashData;
      private BlockPos homePosition = BlockPos.ZERO;
      private int homeRadius = -1;
@@ -8,37 +8,37 @@
 +    private EntitySpawnReason spawnReason;
 +    private boolean spawnCancelled = false;
  
-     protected Mob(EntityType<? extends Mob> p_21368_, Level p_21369_) {
-         super(p_21368_, p_21369_);
-@@ -230,7 +_,10 @@
+     protected Mob(final EntityType<? extends Mob> type, final Level level) {
+         super(type, level);
+@@ -244,7 +_,10 @@
      }
  
-     public void setTarget(@Nullable LivingEntity p_21544_) {
--        this.target = p_21544_;
-+        var event = net.minecraftforge.event.ForgeEventFactory.onLivingChangeTargetMob(this, p_21544_);
+     public void setTarget(final @Nullable LivingEntity target) {
+-        this.target = this.asValidTarget(target);
++        var event = net.minecraftforge.event.ForgeEventFactory.onLivingChangeTargetMob(this, target);
 +        if (event != null) {
 +            this.target = event.getNewTarget();
 +        }
      }
  
      @Override
-@@ -369,6 +_,10 @@
+@@ -383,6 +_,10 @@
          if (this.isNoAi()) {
-             p_409238_.putBoolean("NoAI", this.isNoAi());
+             output.putBoolean("NoAI", this.isNoAi());
          }
 +
 +        if (this.spawnReason != null) {
-+            p_409238_.putString("forge:spawn_type", this.spawnReason.name());
++            output.putString("forge:spawn_type", this.spawnReason.name());
 +        }
      }
  
      @Override
-@@ -387,6 +_,13 @@
-         this.lootTable = p_408489_.read("DeathLootTable", LootTable.KEY_CODEC);
-         this.lootTableSeed = p_408489_.getLongOr("DeathLootTableSeed", 0L);
-         this.setNoAi(p_408489_.getBooleanOr("NoAI", false));
+@@ -401,6 +_,13 @@
+         this.lootTable = input.read("DeathLootTable", LootTable.KEY_CODEC);
+         this.lootTableSeed = input.getLongOr("DeathLootTableSeed", 0L);
+         this.setNoAi(input.getBooleanOr("NoAI", false));
 +
-+        p_408489_.getString("forge:spawn_type").ifPresent(type -> {
++        input.getString("forge:spawn_type").ifPresent(type -> {
 +            try {
 +                this.spawnReason = EntitySpawnReason.valueOf(type);
 +            } catch (Exception ex) {
@@ -47,7 +47,7 @@
      }
  
      @Override
-@@ -445,7 +_,7 @@
+@@ -459,7 +_,7 @@
              && this.canPickUpLoot()
              && this.isAlive()
              && !this.dead
@@ -56,7 +56,7 @@
              Vec3i vec3i = this.getPickupReach();
  
              for (ItemEntity itementity : this.level()
-@@ -641,6 +_,14 @@
+@@ -658,6 +_,14 @@
              this.discard();
          } else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence()) {
              Entity entity = this.level().getNearestPlayer(this, -1.0);
@@ -71,7 +71,7 @@
              if (entity != null) {
                  double d0 = entity.distanceToSqr(this);
                  int i = this.getType().getCategory().getDespawnDistance();
-@@ -1032,6 +_,16 @@
+@@ -1059,6 +_,16 @@
          }
      }
  
@@ -86,29 +86,29 @@
 +    @Deprecated
 +    @org.jetbrains.annotations.ApiStatus.OverrideOnly
      public @Nullable SpawnGroupData finalizeSpawn(
-         ServerLevelAccessor p_21434_, DifficultyInstance p_21435_, EntitySpawnReason p_369316_, @Nullable SpawnGroupData p_21437_
+         final ServerLevelAccessor level, final DifficultyInstance difficulty, final EntitySpawnReason spawnReason, final @Nullable SpawnGroupData groupData
      ) {
-@@ -1044,6 +_,7 @@
+@@ -1071,6 +_,7 @@
          }
  
          this.setLeftHanded(randomsource.nextFloat() < 0.05F);
-+        this.spawnReason = p_369316_;
-         return p_21437_;
++        this.spawnReason = spawnReason;
+         return groupData;
      }
  
-@@ -1350,15 +_,25 @@
+@@ -1386,15 +_,25 @@
          return flag;
      }
  
 +    @Deprecated // FORGE: use jumpInFluid instead
      @Override
-     protected void jumpInLiquid(TagKey<Fluid> p_204045_) {
-+        this.jumpInLiquidInternal(() -> super.jumpInLiquid(p_204045_));
+     protected void jumpInLiquid(final TagKey<Fluid> type) {
++        this.jumpInLiquidInternal(() -> super.jumpInLiquid(type));
 +    }
 +
 +    private void jumpInLiquidInternal(Runnable onSuper) {
          if (this.getNavigation().canFloat()) {
--            super.jumpInLiquid(p_204045_);
+-            super.jumpInLiquid(type);
 +            onSuper.run();
          } else {
              this.setDeltaMovement(this.getDeltaMovement().add(0.0, 0.3, 0.0));
@@ -122,11 +122,11 @@
 +
      @VisibleForTesting
      public void removeFreeWill() {
-         this.removeAllGoals(p_341273_ -> true);
-@@ -1385,6 +_,41 @@
+         this.removeAllGoals(goal -> true);
+@@ -1420,6 +_,41 @@
+     @Override
      public @Nullable ItemStack getPickResult() {
-         SpawnEggItem spawneggitem = SpawnEggItem.byId(this.getType());
-         return spawneggitem == null ? null : new ItemStack(spawneggitem);
+         return SpawnEggItem.byId(this.getType()).map(ItemStack::new).orElse(null);
 +    }
 +
 +    /**
@@ -153,12 +153,12 @@
 +
 +    /**
 +     * Marks this mob as being disallowed to spawn during {@link Level#addFreshEntity(Entity)}.<p>
-+     * @throws UnsupportedOperationException if this entity has already been {@link Entity#isAddedToWorld() added to the world}.
++     * @throws UnsupportedOperationException if this entity has already been {@link Entity#isAddedToLevel() added to the world}.
 +     * @apiNote Not public-facing API.
 +     */
 +    @org.jetbrains.annotations.ApiStatus.Internal
 +    public final void setSpawnCancelled(boolean cancel) {
-+        if (this.isAddedToWorld()) {
++        if (this.isAddedToLevel()) {
 +            throw new UnsupportedOperationException("Late invocations of Mob#setSpawnCancelled are not permitted.");
 +        }
 +        this.spawnCancelled = cancel;

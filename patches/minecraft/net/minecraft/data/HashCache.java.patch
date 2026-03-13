@@ -6,7 +6,7 @@
      private final Map<String, HashCache.ProviderCache> caches;
 +    private final Map<String, HashCache.ProviderCache> originalCaches;
      private final Set<String> cachesToWrite = new HashSet<>();
-     final Set<Path> cachePaths = new HashSet<>();
+     private final Set<Path> cachePaths = new HashSet<>();
      private final int initialCount;
 @@ -65,6 +_,7 @@
          }
@@ -17,16 +17,16 @@
      }
  
 @@ -106,6 +_,8 @@
-         this.caches.forEach((p_448628_, p_448629_) -> {
-             if (this.cachesToWrite.contains(p_448628_)) {
-                 Path path = this.getProviderCachePath(p_448628_);
+         this.caches.forEach((providerId, cache) -> {
+             if (this.cachesToWrite.contains(providerId)) {
+                 Path path = this.getProviderCachePath(providerId);
 +                // Forge: Only rewrite the cache file if it changed or is missing
-+                if (!p_448629_.equals(this.originalCaches.get(p_448628_)) || !Files.exists(path))
-                 p_448629_.save(this.rootDir, path, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "\t" + p_448628_);
++                if (!cache.equals(this.originalCaches.get(providerId)) || !Files.exists(path))
+                 cache.save(this.rootDir, path, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "\t" + providerId);
              }
  
-@@ -221,10 +_,11 @@
-                 bufferedwriter.write(p_236145_);
+@@ -224,10 +_,11 @@
+                 bufferedwriter.write(extraHeaderInfo);
                  bufferedwriter.newLine();
  
 -                for (Entry<Path, HashCode> entry : this.data.entrySet()) {
@@ -34,8 +34,8 @@
 +                for (Entry<Path, HashCode> entry : this.data.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
                      bufferedwriter.write(entry.getValue().toString());
                      bufferedwriter.write(32);
--                    bufferedwriter.write(p_236143_.relativize(entry.getKey()).toString());
-+                    bufferedwriter.write(p_236143_.relativize(entry.getKey()).toString().replace("\\", "/")); // Forge: Standardize file paths.
+-                    bufferedwriter.write(rootDir.relativize(entry.getKey()).toString());
++                    bufferedwriter.write(rootDir.relativize(entry.getKey()).toString().replace("\\", "/")); // Forge: Standardize file paths.
                      bufferedwriter.newLine();
                  }
              } catch (IOException ioexception) {

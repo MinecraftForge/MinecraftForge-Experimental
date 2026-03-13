@@ -6,65 +6,65 @@
      private int sendAllPlayerInfoIn;
 +    private final List<ServerPlayer> playersView = java.util.Collections.unmodifiableList(players);
  
-     public PlayerList(MinecraftServer p_203842_, LayeredRegistryAccess<RegistryLayer> p_251844_, PlayerDataStorage p_203844_, NotificationService p_425184_) {
-         this.server = p_203842_;
-@@ -185,6 +_,7 @@
-         servergamepacketlistenerimpl.send(new ClientboundPlayerAbilitiesPacket(p_11263_.getAbilities()));
-         servergamepacketlistenerimpl.send(new ClientboundSetHeldSlotPacket(p_11263_.getInventory().getSelectedSlot()));
+     public PlayerList(
+         final MinecraftServer server,
+@@ -184,6 +_,7 @@
+         servergamepacketlistenerimpl.send(new ClientboundPlayerAbilitiesPacket(player.getAbilities()));
+         servergamepacketlistenerimpl.send(new ClientboundSetHeldSlotPacket(player.getInventory().getSelectedSlot()));
          RecipeManager recipemanager = this.server.getRecipeManager();
-+        net.minecraftforge.event.OnDatapackSyncEvent.BUS.post(new net.minecraftforge.event.OnDatapackSyncEvent(this, p_11263_));
-         servergamepacketlistenerimpl.send(new ClientboundUpdateRecipesPacket(recipemanager.getSynchronizedItemProperties(), recipemanager.getSynchronizedStonecutterRecipes()));
-         this.sendPlayerPermissionLevel(p_11263_);
-         p_11263_.getStats().markAllDirty();
-@@ -216,6 +_,7 @@
-         p_11263_.initInventoryMenu();
-         this.server.notificationManager().playerJoined(p_11263_);
++        net.minecraftforge.event.OnDatapackSyncEvent.BUS.post(new net.minecraftforge.event.OnDatapackSyncEvent(this, player));
+         servergamepacketlistenerimpl.send(
+             new ClientboundUpdateRecipesPacket(recipemanager.getSynchronizedItemProperties(), recipemanager.getSynchronizedStonecutterRecipes())
+         );
+@@ -217,6 +_,7 @@
+         player.initInventoryMenu();
+         this.server.notificationManager().playerJoined(player);
          servergamepacketlistenerimpl.resumeFlushing();
-+        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedIn(p_11263_);
++        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedIn(player);
      }
  
-     protected void updateEntireScoreboard(ServerScoreboard p_11274_, ServerPlayer p_11275_) {
-@@ -285,6 +_,7 @@
+     protected void updateEntireScoreboard(final ServerScoreboard scoreboard, final ServerPlayer player) {
+@@ -290,6 +_,7 @@
      }
  
-     protected void save(ServerPlayer p_11277_) {
-+        if (p_11277_.connection == null) return; // Not sure if still needed -Paint_Ninja
-         this.playerIo.save(p_11277_);
-         ServerStatsCounter serverstatscounter = this.stats.get(p_11277_.getUUID());
+     protected void save(final ServerPlayer player) {
++        if (player.connection == null) return; // Not sure if still needed -Paint_Ninja
+         this.playerIo.save(player);
+         ServerStatsCounter serverstatscounter = this.stats.get(player.getUUID());
          if (serverstatscounter != null) {
-@@ -298,6 +_,7 @@
+@@ -303,6 +_,7 @@
      }
  
-     public void remove(ServerPlayer p_11287_) {
-+        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedOut(p_11287_);
-         ServerLevel serverlevel = p_11287_.level();
-         p_11287_.awardStat(Stats.LEAVE_GAME);
-         this.save(p_11287_);
-@@ -418,6 +_,7 @@
+     public void remove(final ServerPlayer player) {
++        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedOut(player);
+         ServerLevel serverlevel = player.level();
+         player.awardStat(Stats.LEAVE_GAME);
+         this.save(player);
+@@ -429,6 +_,7 @@
          this.playersByUUID.put(serverplayer.getUUID(), serverplayer);
          serverplayer.initInventoryMenu();
          serverplayer.setHealth(serverplayer.getHealth());
-+        net.minecraftforge.event.ForgeEventFactory.firePlayerRespawnEvent(serverplayer, p_11238_);
++        net.minecraftforge.event.ForgeEventFactory.firePlayerRespawnEvent(serverplayer, keepAllPlayerData);
          ServerPlayer.RespawnConfig serverplayer$respawnconfig = serverplayer.getRespawnConfig();
-         if (!p_11238_ && serverplayer$respawnconfig != null) {
+         if (!keepAllPlayerData && serverplayer$respawnconfig != null) {
              LevelData.RespawnData leveldata$respawndata = serverplayer$respawnconfig.respawnData();
-@@ -531,6 +_,7 @@
+@@ -542,6 +_,7 @@
      }
  
-     public void op(NameAndId p_425211_, Optional<LevelBasedPermissionSet> p_427477_, Optional<Boolean> p_426308_) {
-+        if (net.minecraftforge.event.ForgeEventFactory.onPermissionChanged(p_425211_, p_427477_.orElse(this.server.operatorUserPermissions()), this)) return;
+     public void op(final NameAndId nameAndId, final Optional<LevelBasedPermissionSet> permissions, final Optional<Boolean> canBypassPlayerLimit) {
++        if (net.minecraftforge.event.ForgeEventFactory.onPermissionChanged(nameAndId, permissions.orElse(this.server.operatorUserPermissions()), this)) return;
          this.ops
-             .add(new ServerOpListEntry(p_425211_, p_427477_.orElse(this.server.operatorUserPermissions()), p_426308_.orElse(this.ops.canBypassPlayerLimit(p_425211_))));
-         ServerPlayer serverplayer = this.getPlayer(p_425211_.id());
-@@ -540,6 +_,7 @@
+             .add(
+                 new ServerOpListEntry(
+@@ -555,6 +_,7 @@
      }
  
-     public void deop(NameAndId p_428113_) {
-+        if (net.minecraftforge.event.ForgeEventFactory.onPermissionChanged(p_428113_, null, this)) return;
-         if (this.ops.remove(p_428113_)) {
-             ServerPlayer serverplayer = this.getPlayer(p_428113_.id());
+     public void deop(final NameAndId nameAndId) {
++        if (net.minecraftforge.event.ForgeEventFactory.onPermissionChanged(nameAndId, null, this)) return;
+         if (this.ops.remove(nameAndId)) {
+             ServerPlayer serverplayer = this.getPlayer(nameAndId.id());
              if (serverplayer != null) {
-@@ -804,7 +_,7 @@
+@@ -824,7 +_,7 @@
      }
  
      public List<ServerPlayer> getPlayers() {
@@ -72,16 +72,16 @@
 +        return this.playersView; //Unmodifiable view, we don't want people removing things without us knowing.
      }
  
-     public @Nullable ServerPlayer getPlayer(UUID p_11260_) {
-@@ -830,6 +_,7 @@
+     public @Nullable ServerPlayer getPlayer(final UUID uuid) {
+@@ -850,6 +_,7 @@
              playeradvancements.reload(this.server.getAdvancements());
          }
  
 +        net.minecraftforge.event.OnDatapackSyncEvent.BUS.post(new net.minecraftforge.event.OnDatapackSyncEvent(this, null));
          this.broadcastAll(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(this.registries)));
          RecipeManager recipemanager = this.server.getRecipeManager();
-         ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(recipemanager.getSynchronizedItemProperties(), recipemanager.getSynchronizedStonecutterRecipes());
-@@ -842,5 +_,9 @@
+         ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(
+@@ -864,5 +_,9 @@
  
      public boolean isAllowCommandsForAllPlayers() {
          return this.allowCommandsForAllPlayers;

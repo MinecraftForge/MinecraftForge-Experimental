@@ -9,10 +9,10 @@
      private static final ConcurrentMap<ResourceKey.InternKey, ResourceKey<?>> VALUES = new MapMaker().weakValues().makeMap();
      private final Identifier registryName;
      private final Identifier identifier;
-@@ -67,5 +_,18 @@
+@@ -65,5 +_,18 @@
      }
  
-     record InternKey(Identifier registry, Identifier identifier) {
+     private record InternKey(Identifier registry, Identifier identifier) {
 +    }
 +
 +    @Override

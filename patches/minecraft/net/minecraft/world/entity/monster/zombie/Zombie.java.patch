@@ -1,48 +1,53 @@
 --- a/net/minecraft/world/entity/monster/zombie/Zombie.java
 +++ b/net/minecraft/world/entity/monster/zombie/Zombie.java
-@@ -237,19 +_,26 @@
+@@ -245,17 +_,21 @@
      }
  
-     protected void convertToZombieType(ServerLevel p_455508_, EntityType<? extends Zombie> p_460671_) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, p_460671_, timer -> this.conversionTime = timer)) return;
+     protected void convertToZombieType(final ServerLevel level, final EntityType<? extends Zombie> zombieType) {
++        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, zombieType, timer -> this.conversionTime = timer)) return;
          this.convertTo(
--            p_460671_, ConversionParams.single(this, true, true), p_451761_ -> p_451761_.handleAttributes(p_455508_.getCurrentDifficultyAt(p_451761_.blockPosition()).getSpecialMultiplier())
-+            p_460671_, ConversionParams.single(this, true, true), p_451761_ -> {
-+                p_451761_.handleAttributes(p_455508_.getCurrentDifficultyAt(p_451761_.blockPosition()).getSpecialMultiplier());
-+                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_451761_);
+             zombieType,
+             ConversionParams.single(this, true, true),
+-            newZombie -> newZombie.handleAttributes(
+-                level.getCurrentDifficultyAt(newZombie.blockPosition()).getSpecialMultiplier(), EntitySpawnReason.CONVERSION
+-            )
++            newZombie -> {
++                newZombie.handleAttributes(level.getCurrentDifficultyAt(newZombie.blockPosition()).getSpecialMultiplier(), EntitySpawnReason.CONVERSION);
++                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, newZombie);
 +            }
          );
      }
  
      @VisibleForTesting
-     public boolean convertVillagerToZombieVillager(ServerLevel p_454968_, Villager p_452932_) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(p_452932_, EntityType.ZOMBIE_VILLAGER, (timer) -> {}))
+     public boolean convertVillagerToZombieVillager(final ServerLevel level, final Villager villager) {
++        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(villager, EntityType.ZOMBIE_VILLAGER, (timer) -> {}))
 +            return false;
-         ZombieVillager zombievillager = p_452932_.convertTo(EntityType.ZOMBIE_VILLAGER, ConversionParams.single(p_452932_, true, true), p_458247_ -> {
-             p_458247_.finalizeSpawn(p_454968_, p_454968_.getCurrentDifficultyAt(p_458247_.blockPosition()), EntitySpawnReason.CONVERSION, new Zombie.ZombieGroupData(false, true));
-             p_458247_.setVillagerData(p_452932_.getVillagerData());
-             p_458247_.setGossips(p_452932_.getGossips().copy());
-             p_458247_.setTradeOffers(p_452932_.getOffers().copy());
-             p_458247_.setVillagerXp(p_452932_.getVillagerXp());
-+            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(p_452932_, p_458247_);
-             if (!this.isSilent()) {
-                 p_454968_.levelEvent(null, 1026, this.blockPosition(), 0);
-             }
-@@ -271,19 +_,26 @@
-                 livingentity = (LivingEntity)p_458181_.getEntity();
+         ZombieVillager zombievillager = villager.convertTo(
+             EntityType.ZOMBIE_VILLAGER,
+             ConversionParams.single(villager, true, true),
+@@ -267,6 +_,7 @@
+                 zombie.setGossips(villager.getGossips().copy());
+                 zombie.setTradeOffers(villager.getOffers().copy());
+                 zombie.setVillagerXp(villager.getVillagerXp());
++                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(villager, zombie);
+                 if (!this.isSilent()) {
+                     level.levelEvent(null, 1026, this.blockPosition(), 0);
+                 }
+@@ -289,19 +_,26 @@
+                 livingentity = (LivingEntity)source.getEntity();
              }
  
 -            if (livingentity != null
 +            var vanilla = (livingentity != null
-                 && p_452619_.getDifficulty() == Difficulty.HARD
+                 && level.getDifficulty() == Difficulty.HARD
                  && this.random.nextFloat() < this.getAttributeValue(Attributes.SPAWN_REINFORCEMENTS_CHANCE)
--                && p_452619_.isSpawningMonsters()) {
-+                && p_452619_.isSpawningMonsters());
+-                && level.isSpawningMonsters()) {
++                && level.isSpawningMonsters());
                  int i = Mth.floor(this.getX());
                  int j = Mth.floor(this.getY());
                  int k = Mth.floor(this.getZ());
                  EntityType<? extends Zombie> entitytype = this.getType();
--                Zombie zombie = entitytype.create(p_452619_, EntitySpawnReason.REINFORCEMENT);
+-                Zombie zombie = entitytype.create(level, EntitySpawnReason.REINFORCEMENT);
 -                if (zombie == null) {
 -                    return true;
 -                }

@@ -23,11 +23,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -51,11 +50,14 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -64,8 +66,6 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.SpriteGetter;
-import net.minecraft.client.resources.model.UnbakedGeometry;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.core.BlockPos;
@@ -94,7 +94,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -319,7 +318,7 @@ public class ForgeHooksClient {
         return PlaySoundEvent.BUS.fire(new PlaySoundEvent(manager, sound)).getSound();
     }
 
-    public static void drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public static void drawScreen(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.pose().pushMatrix();
         for (Screen layer : guiLayers) {
             // Prevent the background layers from thinking the mouse is over their controls and showing them as highlighted.
@@ -330,9 +329,9 @@ public class ForgeHooksClient {
         guiGraphics.pose().popMatrix();
     }
 
-    private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    private static void drawScreenInternal(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!ScreenEvent.Render.Pre.BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
-            screen.renderWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
+            screen.extractRenderStateWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
         ScreenEvent.Render.Post.BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
@@ -395,13 +394,13 @@ public class ForgeHooksClient {
         return from.getItem().shouldCauseReequipAnimation(from, to, changed);
     }
 
-    public static @Nullable CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphics guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
+    public static @Nullable CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphicsExtractor guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
         var evt = new CustomizeGuiOverlayEvent.BossEventProgress(window, guiGraphics,
                 Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false), bossInfo, x, y, increment);
         return CustomizeGuiOverlayEvent.BossEventProgress.BUS.post(evt) ? null : evt;
     }
 
-    public static void onCustomizeChatEvent(GuiGraphics guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount, Font font) {
+    public static void onCustomizeChatEvent(GuiGraphicsExtractor guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount, Font font) {
         var minecraft = Minecraft.getInstance();
         var evt = new CustomizeGuiOverlayEvent.Chat(window, guiGraphics, minecraft.getDeltaTracker().getRealtimeDeltaTicks(), 0, chat.getHeight() - 40);
         CustomizeGuiOverlayEvent.Chat.BUS.post(evt);
@@ -412,7 +411,7 @@ public class ForgeHooksClient {
         guiGraphics.pose().popMatrix();
     }
 
-    public static void onCustomizeDebugEvent(GuiGraphics guiGraphics, Window window, float partialTick, List<String> text, boolean isLeft) {
+    public static void onCustomizeDebugEvent(GuiGraphicsExtractor guiGraphics, Window window, float partialTick, List<String> text, boolean isLeft) {
         var evt = new CustomizeGuiOverlayEvent.DebugText(window, guiGraphics, partialTick, text,
                 isLeft ? CustomizeGuiOverlayEvent.DebugText.Side.Left : CustomizeGuiOverlayEvent.DebugText.Side.Right);
         CustomizeGuiOverlayEvent.DebugText.BUS.post(evt);
@@ -483,13 +482,12 @@ public class ForgeHooksClient {
         return null;
     }
 
-    @Nullable
-    public static TextureAtlasSprite loadTextureAtlasSprite(Identifier atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int spriteX, int spriteY, int padding, int mipmapLevel) {
+    public static TextureAtlasSprite loadTextureAtlasSprite(Identifier atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int x, int y, int padding) {
+        TextureAtlasSprite ret = null;
         var forgeMeta = contents.getAdditionalMetadata(ForgeTextureMetadata.TYPE).orElse(null);
-        if (forgeMeta == null || forgeMeta.loader() == null)
-            return null;
-
-        return forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, padding, mipmapLevel);
+        if (forgeMeta != null && forgeMeta.loader() != null)
+            ret = forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, x, y, padding, contents.getMipLevel());
+        return ret != null ? ret : new TextureAtlasSprite(atlasName, contents, atlasWidth, atlasHeight, x, y, padding);
     }
 
     private static final Map<ModelLayerLocation, Supplier<LayerDefinition>> layerDefinitions = new HashMap<>();
@@ -558,7 +556,7 @@ public class ForgeHooksClient {
     }
 
     private static final Identifier ICON_SHEET = Identifier.fromNamespaceAndPath(ForgeVersion.MOD_ID, "textures/gui/icons.png");
-    public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphics guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
+    public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphicsExtractor guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
         int idx;
         String tooltip;
         if (target.forgeData == null)
@@ -659,7 +657,7 @@ public class ForgeHooksClient {
         return stackFont == null ? fallbackFont : stackFont;
     }
 
-    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable Identifier background) {
+    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphicsExtractor graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable Identifier background) {
         var preEvent = new RenderTooltipEvent.Pre(stack, graphics, x, y, screenWidth, screenHeight, getTooltipFont(stack, fallbackFont), components, positioner, background);
         return RenderTooltipEvent.Pre.BUS.post(preEvent) ? null : preEvent;
     }

@@ -6,6 +6,10 @@
 package net.minecraftforge.client.loading;
 
 import com.mojang.blaze3d.platform.Monitor;
+import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.BackendCreationException;
+import com.mojang.blaze3d.systems.GpuBackend;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.server.packs.resources.ReloadInstance;
@@ -13,7 +17,6 @@ import net.minecraft.server.packs.resources.ReloadInstance;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
@@ -21,8 +24,20 @@ import org.lwjgl.glfw.GLFW;
 
 public final class NoVizFallback {
     private static long WINDOW;
-    public static LongSupplier windowHandoff(IntSupplier width, IntSupplier height, Supplier<String> title, LongSupplier monitor) {
-        return () -> WINDOW = GLFW.glfwCreateWindow(width.getAsInt(), height.getAsInt(), title.get(), monitor.getAsLong(), 0L);
+    public static LongSupplier windowHandoff(int width, int height, String title, long monitor, Supplier<Object> backend) {
+        return () -> {
+            try {
+                return WINDOW = Window.createGlfwWindow(width, height, title, monitor, (GpuBackend)backend.get());
+            } catch (BackendCreationException e) {
+                return sneak(e);
+            }
+        };
+    }
+
+
+    @SuppressWarnings("unchecked")
+    private static <R, E extends Throwable> R sneak(Throwable t) throws E {
+        throw (E)t;
     }
 
     public static Supplier<LoadingOverlay> loadingOverlay(Supplier<Minecraft> mc, Supplier<ReloadInstance> ri, Consumer<Optional<Throwable>> ex, boolean fadein) {

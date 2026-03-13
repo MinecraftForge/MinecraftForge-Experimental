@@ -1,7 +1,7 @@
 --- a/net/minecraft/client/gui/components/Button.java
 +++ b/net/minecraft/client/gui/components/Button.java
-@@ -33,6 +_,12 @@
-         this.createNarration = p_259552_;
+@@ -39,6 +_,12 @@
+         this.createNarration = createNarration;
      }
  
 +    // Forge (GH-9238)
@@ -11,9 +11,9 @@
 +    }
 +
      @Override
-     public void onPress(InputWithModifiers p_424878_) {
+     public void onPress(final InputWithModifiers input) {
          this.onPress.onPress(this);
-@@ -96,9 +_,12 @@
+@@ -102,9 +_,12 @@
          }
  
          public Button build() {
@@ -29,10 +29,10 @@
          }
      }
  
-@@ -118,6 +_,10 @@
-             int p_455297_, int p_455388_, int p_459653_, int p_452847_, Component p_459347_, Button.OnPress p_453378_, Button.CreateNarration p_456163_
+@@ -130,6 +_,10 @@
+             final Button.CreateNarration createNarration
          ) {
-             super(p_455297_, p_455388_, p_459653_, p_452847_, p_459347_, p_453378_, p_456163_);
+             super(x, y, width, height, message, onPress, createNarration);
 +        }
 +
 +        protected Plain(Builder builder) {

@@ -5,12 +5,12 @@
  
  public class PoiTypeTagsProvider extends KeyTagProvider<PoiType> {
 +    /** @deprecated Forge: Use the {@linkplain #PoiTypeTagsProvider(PackOutput, CompletableFuture, String, net.minecraftforge.common.data.ExistingFileHelper) mod id variant} */
-     public PoiTypeTagsProvider(PackOutput p_256012_, CompletableFuture<HolderLookup.Provider> p_256617_) {
-         super(p_256012_, Registries.POINT_OF_INTEREST_TYPE, p_256617_);
+     public PoiTypeTagsProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider) {
+         super(output, Registries.POINT_OF_INTEREST_TYPE, lookupProvider);
 +    }
 +
-+    public PoiTypeTagsProvider(PackOutput p_256012_, CompletableFuture<HolderLookup.Provider> p_256617_, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
-+        super(p_256012_, Registries.POINT_OF_INTEREST_TYPE, p_256617_, modId, existingFileHelper);
++    public PoiTypeTagsProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
++        super(output, Registries.POINT_OF_INTEREST_TYPE, lookupProvider, modId, existingFileHelper);
      }
  
      @Override

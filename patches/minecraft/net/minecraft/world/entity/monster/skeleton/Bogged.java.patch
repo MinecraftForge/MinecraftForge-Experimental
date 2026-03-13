@@ -2,13 +2,13 @@
 +++ b/net/minecraft/world/entity/monster/skeleton/Bogged.java
 @@ -70,7 +_,7 @@
      @Override
-     protected InteractionResult mobInteract(Player p_453508_, InteractionHand p_459904_) {
-         ItemStack itemstack = p_453508_.getItemInHand(p_459904_);
+     protected InteractionResult mobInteract(final Player player, final InteractionHand hand) {
+         ItemStack itemstack = player.getItemInHand(hand);
 -        if (itemstack.is(Items.SHEARS) && this.readyForShearing()) {
 +        if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) { // Forge: move to onSheared
              if (this.level() instanceof ServerLevel serverlevel) {
                  this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
-                 this.gameEvent(GameEvent.SHEAR, p_453508_);
+                 this.gameEvent(GameEvent.SHEAR, player);
 @@ -137,5 +_,17 @@
      @Override
      public boolean readyForShearing() {

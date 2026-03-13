@@ -1,35 +1,35 @@
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -395,6 +_,7 @@
+@@ -402,6 +_,7 @@
                  this.modified = true;
              }
  
-+            net.minecraftforge.event.ForgeEventFactory.fireChunkTicketLevelUpdated(this.level, p_140177_, p_140180_, p_140178_, p_140179_);
-             return p_140179_;
++            net.minecraftforge.event.ForgeEventFactory.fireChunkTicketLevelUpdated(this.level, node, oldLevel, level, chunk);
+             return chunk;
          }
      }
-@@ -521,6 +_,7 @@
-                 if (this.pendingUnloads.remove(p_140182_, p_140183_) && chunkaccess != null) {
+@@ -533,6 +_,7 @@
+                 if (this.pendingUnloads.remove(pos, chunkHolder) && chunkaccess != null) {
                      if (chunkaccess instanceof LevelChunk levelchunk) {
                          levelchunk.setLoaded(false);
 +                        net.minecraftforge.event.ForgeEventFactory.onChunkUnload(chunkaccess);
                      }
  
                      this.save(chunkaccess);
-@@ -765,6 +_,7 @@
+@@ -772,6 +_,7 @@
                  this.activeChunkWrites.incrementAndGet();
-                 SerializableChunkData serializablechunkdata = SerializableChunkData.copyOf(this.level, p_140259_);
+                 SerializableChunkData serializablechunkdata = SerializableChunkData.copyOf(this.level, chunk);
                  CompletableFuture<CompoundTag> completablefuture = CompletableFuture.supplyAsync(serializablechunkdata::write, Util.backgroundExecutor());
-+                net.minecraftforge.event.ForgeEventFactory.onChunkDataSave(p_140259_, p_140259_.getWorldForge() != null ? p_140259_.getWorldForge() : this.level, serializablechunkdata);
-                 this.write(chunkpos, completablefuture::join).handle((p_449138_, p_449139_) -> {
-                     if (p_449139_ != null) {
-                         this.level.getServer().reportChunkSaveFailure(p_449139_, this.storageInfo(), chunkpos);
-@@ -1143,7 +_,7 @@
++                net.minecraftforge.event.ForgeEventFactory.onChunkDataSave(chunk, chunk.getWorldForge() != null ? chunk.getWorldForge() : this.level, serializablechunkdata);
+                 this.write(chunkpos, completablefuture::join).handle((ignored, throwable) -> {
+                     if (throwable != null) {
+                         this.level.getServer().reportChunkSaveFailure(throwable, this.storageInfo(), chunkpos);
+@@ -1150,7 +_,7 @@
      }
  
-     protected void addEntity(Entity p_140200_) {
--        if (!(p_140200_ instanceof EnderDragonPart)) {
-+        if (!(p_140200_ instanceof net.minecraftforge.entity.PartEntity)) {
-             EntityType<?> entitytype = p_140200_.getType();
+     protected void addEntity(final Entity entity) {
+-        if (!(entity instanceof EnderDragonPart)) {
++        if (!(entity instanceof net.minecraftforge.entity.PartEntity)) {
+             EntityType<?> entitytype = entity.getType();
              int i = entitytype.clientTrackingRange() * 16;
              if (i != 0) {

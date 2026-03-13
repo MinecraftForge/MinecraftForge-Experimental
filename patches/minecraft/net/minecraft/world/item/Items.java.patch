@@ -1,16 +1,16 @@
 --- a/net/minecraft/world/item/Items.java
 +++ b/net/minecraft/world/item/Items.java
-@@ -2320,7 +_,25 @@
+@@ -2359,7 +_,25 @@
      }
  
-     public static Item registerBlock(Block p_252092_, Block... p_248886_) {
--        Item item = registerBlock(p_252092_);
-+        Item item = registerBlock(p_252092_, (block_, prop_) -> {
+     private static Item registerBlock(final Block block, final Block... alternatives) {
+-        Item item = registerBlock(block);
++        Item item = registerBlock(block, (block_, prop_) -> {
 +            return new BlockItem(block_, prop_) {
 +                @Override
 +                public void registerBlocks(java.util.Map<Block, Item> map, Item self) {
 +                    super.registerBlocks(map, self);
-+                    for (var b : p_248886_) {
++                    for (var b : alternatives) {
 +                        map.put(b, self);
 +                    }
 +                }
@@ -18,23 +18,23 @@
 +                @Override
 +                public void removeFromBlockToItemMap(java.util.Map<Block, Item> map, Item self) {
 +                    super.removeFromBlockToItemMap(map, self);
-+                    for (var b : p_248886_) {
++                    for (var b : alternatives) {
 +                        map.remove(b);
 +                    }
 +                }
 +            };
 +        });
  
-         for (Block block : p_248886_) {
-             Item.BY_BLOCK.put(block, item);
-@@ -2359,10 +_,6 @@
+         for (Block blockx : alternatives) {
+             Item.BY_BLOCK.put(blockx, item);
+@@ -2398,10 +_,6 @@
  
-     public static Item registerItem(ResourceKey<Item> p_364577_, Function<Item.Properties, Item> p_366144_, Item.Properties p_369845_) {
-         Item item = p_366144_.apply(p_369845_.setId(p_364577_));
+     private static Item registerItem(final ResourceKey<Item> key, final Function<Item.Properties, Item> itemFactory, final Item.Properties properties) {
+         Item item = itemFactory.apply(properties.setId(key));
 -        if (item instanceof BlockItem blockitem) {
 -            blockitem.registerBlocks(Item.BY_BLOCK, item);
 -        }
 -
-         return Registry.register(BuiltInRegistries.ITEM, p_364577_, item);
+         return Registry.register(BuiltInRegistries.ITEM, key, item);
      }
  }

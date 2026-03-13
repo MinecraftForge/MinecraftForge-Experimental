@@ -1,22 +1,22 @@
 --- a/net/minecraft/core/dispenser/DispenseItemBehavior.java
 +++ b/net/minecraft/core/dispenser/DispenseItemBehavior.java
-@@ -179,7 +_,7 @@
-                 DispensibleContainerItem dispensiblecontaineritem = (DispensibleContainerItem)p_334276_.getItem();
-                 BlockPos blockpos = p_334868_.pos().relative(p_334868_.state().getValue(DispenserBlock.FACING));
-                 Level level = p_334868_.level();
+@@ -148,7 +_,7 @@
+                 DispensibleContainerItem dispensiblecontaineritem = (DispensibleContainerItem)dispensed.getItem();
+                 BlockPos blockpos = source.pos().relative(source.state().getValue(DispenserBlock.FACING));
+                 Level level = source.level();
 -                if (dispensiblecontaineritem.emptyContents(null, level, blockpos, null)) {
-+                if (dispensiblecontaineritem.emptyContents(null, level, blockpos, null, p_334276_)) {
-                     dispensiblecontaineritem.checkExtraContent(null, level, p_334276_, blockpos);
-                     return this.consumeWithRemainder(p_334868_, p_334276_, new ItemStack(Items.BUCKET));
++                if (dispensiblecontaineritem.emptyContents(null, level, blockpos, null, dispensed)) {
+                     dispensiblecontaineritem.checkExtraContent(null, level, dispensed, blockpos);
+                     return this.consumeWithRemainder(source, dispensed, new ItemStack(Items.BUCKET));
                  } else {
-@@ -230,8 +_,9 @@
+@@ -199,8 +_,9 @@
                  } else if (CampfireBlock.canLight(blockstate) || CandleBlock.canLight(blockstate) || CandleCakeBlock.canLight(blockstate)) {
                      serverlevel.setBlockAndUpdate(blockpos, blockstate.setValue(BlockStateProperties.LIT, true));
                      serverlevel.gameEvent(null, GameEvent.BLOCK_CHANGE, blockpos);
 -                } else if (blockstate.getBlock() instanceof TntBlock) {
 -                    if (TntBlock.prime(serverlevel, blockpos)) {
-+                } else if (blockstate.isFlammable(serverlevel, blockpos, p_333645_.state().getValue(DispenserBlock.FACING).getOpposite())) {
-+                    if (blockstate.onCaughtFire(serverlevel, blockpos, p_333645_.state().getValue(DispenserBlock.FACING).getOpposite(), null)) {
++                } else if (blockstate.isFlammable(serverlevel, blockpos, source.state().getValue(DispenserBlock.FACING).getOpposite())) {
++                    if (blockstate.onCaughtFire(serverlevel, blockpos, source.state().getValue(DispenserBlock.FACING).getOpposite(), null)) {
 +                        if (blockstate.getBlock() instanceof TntBlock)
                          serverlevel.removeBlock(blockpos, false);
                      } else {

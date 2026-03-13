@@ -9,7 +9,7 @@
 +    Optional<net.minecraftforge.network.ServerStatusPing> forgeData
  ) {
      public static final Codec<ServerStatus> CODEC = RecordCodecBuilder.create(
-         p_326135_ -> p_326135_.group(
+         i -> i.group(
 @@ -28,7 +_,8 @@
                  ServerStatus.Players.CODEC.lenientOptionalFieldOf("players").forGetter(ServerStatus::players),
                  ServerStatus.Version.CODEC.lenientOptionalFieldOf("version").forGetter(ServerStatus::version),
@@ -18,5 +18,5 @@
 +                Codec.BOOL.lenientOptionalFieldOf("enforcesSecureChat", false).forGetter(ServerStatus::enforcesSecureChat),
 +                net.minecraftforge.network.ServerStatusPing.CODEC.optionalFieldOf("forgeData").forGetter(ServerStatus::forgeData)
              )
-             .apply(p_326135_, ServerStatus::new)
+             .apply(i, ServerStatus::new)
      );

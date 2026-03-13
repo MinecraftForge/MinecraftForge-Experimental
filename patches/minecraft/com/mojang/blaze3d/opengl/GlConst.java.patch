@@ -1,0 +1,35 @@
+--- a/com/mojang/blaze3d/opengl/GlConst.java
++++ b/com/mojang/blaze3d/opengl/GlConst.java
+@@ -249,6 +_,10 @@
+     }
+ 
+     public static int toGlInternalId(final TextureFormat textureFormat) {
++        return toGlInternalId(textureFormat, false);
++    }
++    public static int toGlInternalId(final TextureFormat textureFormat, final boolean stencil) {
++        if (stencil && textureFormat.hasDepthAspect()) return org.lwjgl.opengl.GL30.GL_DEPTH32F_STENCIL8;
+         return switch (textureFormat) {
+             case RGBA8 -> 32856;
+             case RED8 -> 33321;
+@@ -258,6 +_,10 @@
+     }
+ 
+     public static int toGlExternalId(final TextureFormat textureFormat) {
++        return toGlExternalId(textureFormat, false);
++    }
++    public static int toGlExternalId(final TextureFormat textureFormat, final boolean stencil) {
++        if (stencil && textureFormat.hasDepthAspect()) return org.lwjgl.opengl.GL30.GL_DEPTH_STENCIL;
+         return switch (textureFormat) {
+             case RGBA8 -> 6408;
+             case RED8 -> 6403;
+@@ -267,6 +_,10 @@
+     }
+ 
+     public static int toGlType(final TextureFormat textureFormat) {
++        return toGlType(textureFormat, false);
++    }
++    public static int toGlType(final TextureFormat textureFormat, boolean stencil) {
++        if (stencil && textureFormat.hasDepthAspect()) return org.lwjgl.opengl.GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV;
+         return switch (textureFormat) {
+             case RGBA8 -> 5121;
+             case RED8 -> 5121;

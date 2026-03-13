@@ -1,6 +1,6 @@
 --- a/net/minecraft/core/MappedRegistry.java
 +++ b/net/minecraft/core/MappedRegistry.java
-@@ -30,6 +_,8 @@
+@@ -31,6 +_,8 @@
  import org.jspecify.annotations.Nullable;
  
  public class MappedRegistry<T> implements WritableRegistry<T> {
@@ -8,33 +8,33 @@
 +    private static final org.apache.logging.log4j.Marker MARKER = net.minecraftforge.registries.ForgeRegistry.REGISTRIES;
      private final ResourceKey<? extends Registry<T>> key;
      private final ObjectList<Holder.Reference<T>> byId = new ObjectArrayList<>(256);
-     private final Reference2IntMap<T> toId = Util.make(new Reference2IntOpenHashMap<>(), p_308420_ -> p_308420_.defaultReturnValue(-1));
-@@ -84,6 +_,7 @@
+     private final Reference2IntMap<T> toId = Util.make(new Reference2IntOpenHashMap<>(), t -> t.defaultReturnValue(-1));
+@@ -86,6 +_,7 @@
  
      @Override
-     public Holder.Reference<T> register(ResourceKey<T> p_256252_, T p_256591_, RegistrationInfo p_329661_) {
+     public Holder.Reference<T> register(final ResourceKey<T> key, final T value, final RegistrationInfo registrationInfo) {
 +        markKnown();
-         this.validateWrite(p_256252_);
-         Objects.requireNonNull(p_256252_);
-         Objects.requireNonNull(p_256591_);
-@@ -102,6 +_,8 @@
-                 reference.bindKey(p_256252_);
+         this.validateWrite(key);
+         Objects.requireNonNull(key);
+         Objects.requireNonNull(value);
+@@ -104,6 +_,8 @@
+                 reference.bindKey(key);
              } else {
-                 reference = this.byKey.computeIfAbsent(p_256252_, p_358082_ -> Holder.Reference.createStandAlone(this, (ResourceKey<T>)p_358082_));
+                 reference = this.byKey.computeIfAbsent(key, k -> Holder.Reference.createStandAlone(this, (ResourceKey<T>)k));
 +                // Forge: Bind the value immediately so it can be queried while the registry is not frozen
-+                reference.bindValue(p_256591_);
++                reference.bindValue(value);
              }
  
-             this.byKey.put(p_256252_, reference);
-@@ -268,7 +_,6 @@
+             this.byKey.put(key, reference);
+@@ -275,7 +_,6 @@
              return this;
          } else {
              this.frozen = true;
--            this.byValue.forEach((p_247989_, p_247990_) -> p_247990_.bindValue((T)p_247989_));
-             List<Identifier> list = this.byKey
-                 .entrySet()
-                 .stream()
-@@ -284,7 +_,8 @@
+-            this.byValue.forEach((value, holder) -> holder.bindValue((T)value));
+             List<Identifier> list = this.byKey.entrySet().stream().filter(e -> !e.getValue().isBound()).map(e -> e.getKey().identifier()).sorted().toList();
+             if (!list.isEmpty()) {
+                 throw new IllegalStateException("Unbound values in registry " + this.key() + ": " + list);
+@@ -285,7 +_,8 @@
                          throw new IllegalStateException("Some intrusive holders were not registered: " + this.unregisteredIntrusiveHolders.values());
                      }
  
@@ -44,7 +44,7 @@
                  }
  
                  if (this.allTags.isBound()) {
-@@ -298,8 +_,9 @@
+@@ -299,8 +_,9 @@
                          .sorted()
                          .toList();
                      if (!list1.isEmpty()) {
@@ -53,10 +53,10 @@
 +                        LOGGER.debug(MARKER, "Unbound tags in registry " + this.key() + ": " + list1);
 +                        bindAllUnboundTagsToEmpty();
 +                    } /* else */ {
+                         this.componentLookup = new DataComponentLookup<>(this.byId);
                          this.allTags = MappedRegistry.TagSet.fromMap(this.frozenTags);
                          this.refreshTagsInHolders();
-                         return this;
-@@ -309,6 +_,13 @@
+@@ -311,6 +_,13 @@
          }
      }
  
@@ -68,9 +68,9 @@
 +    }
 +
      @Override
-     public Holder.Reference<T> createIntrusiveHolder(T p_205915_) {
+     public Holder.Reference<T> createIntrusiveHolder(final T value) {
          if (this.unregisteredIntrusiveHolders == null) {
-@@ -383,6 +_,31 @@
+@@ -389,6 +_,31 @@
          };
      }
  
@@ -100,9 +100,9 @@
 +    }
 +
      @Override
-     public Registry.PendingTags<T> prepareTagReload(TagLoader.LoadResult<T> p_368827_) {
+     public Registry.PendingTags<T> prepareTagReload(final TagLoader.LoadResult<T> tags) {
          if (!this.frozen) {
-@@ -430,6 +_,11 @@
+@@ -444,6 +_,11 @@
                  @Override
                  public HolderLookup.RegistryLookup<T> lookup() {
                      return registrylookup;

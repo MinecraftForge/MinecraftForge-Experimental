@@ -34,7 +34,7 @@
          }
      }
  
-@@ -207,7 +_,9 @@
+@@ -202,7 +_,9 @@
                  if (this.minecraft.screen != null) {
                      double d3 = this.getScaledXPos(this.minecraft.getWindow());
                      double d4 = this.getScaledYPos(this.minecraft.getWindow());
@@ -45,7 +45,7 @@
                      this.minecraft.screen.afterMouseAction();
                  } else if (this.minecraft.player != null) {
                      Vector2i vector2i = this.scrollWheelHandler.onMouseScroll(d1, d2);
-@@ -216,6 +_,7 @@
+@@ -211,6 +_,7 @@
                      }
  
                      int i = vector2i.y == 0 ? -vector2i.x : vector2i.y;
@@ -53,7 +53,7 @@
                      if (this.minecraft.player.isSpectator()) {
                          if (this.minecraft.gui.getSpectatorGui().isMenuActive()) {
                              this.minecraft.gui.getSpectatorGui().onMouseScrolled(-i);
-@@ -324,7 +_,7 @@
+@@ -315,7 +_,7 @@
                      double d5 = getScaledYPos(window, this.accumulatedDY);
  
                      try {
@@ -62,7 +62,7 @@
                      } catch (Throwable throwable) {
                          CrashReport crashreport1 = CrashReport.forThrowable(throwable, "mouseDragged event handler");
                          screen.fillCrashDetails(crashreport1);
-@@ -411,6 +_,14 @@
+@@ -400,6 +_,14 @@
  
      public double ypos() {
          return this.ypos;

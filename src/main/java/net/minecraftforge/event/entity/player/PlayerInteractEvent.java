@@ -102,34 +102,6 @@ public sealed abstract class PlayerInteractEvent implements PlayerEvent, Inherit
     }
 
     /**
-     * This event is fired on both sides when the player right clicks an entity.
-     * It is responsible for all general entity interactions.
-     *
-     * This event is fired only if the result of the above {@link EntityInteractSpecific} is not {@link InteractionResult#SUCCESS}.
-     * This event's state affects whether {@link Entity#interact(Player, InteractionHand)} and
-     * {@link Item#interactLivingEntity(ItemStack, Player, LivingEntity, InteractionHand)} are called.
-     *
-     * Let result be {@link InteractionResult#SUCCESS} if {@link Entity#interact(Player, InteractionHand)} or
-     * {@link Item#interactLivingEntity(ItemStack, Player, LivingEntity, InteractionHand)} return true,
-     * or {@link #cancellationResult} if the event is cancelled.
-     * If we are on the client and result is not {@link InteractionResult#SUCCESS}, the client will then try {@link RightClickItem}.
-     */
-    public static final class EntityInteract extends PlayerInteractEvent implements Cancellable {
-        public static final CancellableEventBus<EntityInteract> BUS = CancellableEventBus.create(EntityInteract.class);
-
-        private final Entity target;
-
-        public EntityInteract(Player player, InteractionHand hand, Entity target) {
-            super(player, hand, target.blockPosition(), null);
-            this.target = target;
-        }
-
-        public Entity getTarget() {
-            return target;
-        }
-    }
-
-    /**
      * This event is fired on both sides whenever the player right clicks while targeting a block. <br>
      * This event controls which of {@link Item#onItemUseFirst}, {@link Block#use(BlockState, Level, BlockPos, Player, InteractionHand, BlockHitResult)},
      * and {@link Item#useOn(UseOnContext)} will be called. <br>

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -85,7 +_,7 @@
+@@ -90,7 +_,7 @@
  import org.apache.commons.lang3.mutable.MutableBoolean;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      public static final Codec<ResourceKey<Level>> RESOURCE_KEY_CODEC = ResourceKey.codec(Registries.DIMENSION);
      public static final ResourceKey<Level> OVERWORLD = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("overworld"));
      public static final ResourceKey<Level> NETHER = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("the_nether"));
-@@ -125,6 +_,11 @@
+@@ -130,6 +_,11 @@
      private final DamageSources damageSources;
      private final PalettedContainerFactory palettedContainerFactory;
      private long subTickCount;
@@ -20,35 +20,36 @@
 +    private final java.util.ArrayList<BlockEntity> pendingFreshBlockEntities = new java.util.ArrayList<>();
  
      protected Level(
-         WritableLevelData p_270739_,
-@@ -136,6 +_,7 @@
-         long p_270248_,
-         int p_270466_
-     ) {
-+        super();
-         this.levelData = p_270739_;
-         this.dimensionTypeRegistration = p_270240_;
-         this.dimension = p_270683_;
-@@ -217,11 +_,35 @@
+         final WritableLevelData levelData,
+@@ -214,7 +_,7 @@
+     }
+ 
+     @Override
+-    public boolean setBlock(final BlockPos pos, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
++    public boolean setBlock(BlockPos pos, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
+         if (!this.isInValidBounds(pos)) {
+             return false;
+         } else if (!this.isClientSide() && this.isDebug()) {
+@@ -222,11 +_,35 @@
          } else {
-             LevelChunk levelchunk = this.getChunkAt(p_46605_);
-             Block block = p_46606_.getBlock();
+             LevelChunk levelchunk = this.getChunkAt(pos);
+             Block block = blockState.getBlock();
 +
-+            p_46605_ = p_46605_.immutable(); // Forge - prevent mutable BlockPos leaks
++            pos = pos.immutable(); // Forge - prevent mutable BlockPos leaks
 +            net.minecraftforge.common.util.BlockSnapshot blockSnapshot = null;
 +            if (this.captureBlockSnapshots && !this.isClientSide) {
-+                blockSnapshot = net.minecraftforge.common.util.BlockSnapshot.create(this.dimension, this, p_46605_, p_46607_);
++                blockSnapshot = net.minecraftforge.common.util.BlockSnapshot.create(this.dimension, this, pos, updateFlags);
 +                this.capturedBlockSnapshots.add(blockSnapshot);
 +            }
 +
-             BlockState blockstate = levelchunk.setBlockState(p_46605_, p_46606_, p_46607_);
+             BlockState blockstate = levelchunk.setBlockState(pos, blockState, updateFlags);
              if (blockstate == null) {
 +                if (blockSnapshot != null) this.capturedBlockSnapshots.remove(blockSnapshot);
                  return false;
              } else {
-                 BlockState blockstate1 = this.getBlockState(p_46605_);
+                 BlockState blockstate1 = this.getBlockState(pos);
 +                if (blockSnapshot == null) { // Don't notify clients or update physics while capturing blockstates
-+                    this.markAndNotifyBlock(p_46605_, levelchunk, blockstate, p_46606_, p_46607_, p_46608_);
++                    this.markAndNotifyBlock(pos, levelchunk, blockstate, blockState, updateFlags, updateLimit);
 +                }
 +
 +                return true;
@@ -57,27 +58,27 @@
 +    }
 +
 +    // Split off from original setBlockState(BlockPos, BlockState, int, int) method in order to directly send client and physic updates
-+    public void markAndNotifyBlock(BlockPos p_46605_, @Nullable LevelChunk levelchunk, BlockState blockstate, BlockState p_46606_, int p_46607_, int p_46608_) {
-+        Block block = p_46606_.getBlock();
-+        BlockState blockstate1 = getBlockState(p_46605_);
++    public void markAndNotifyBlock(final BlockPos pos, final @Nullable LevelChunk levelchunk, final BlockState blockstate, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
++        Block block = blockState.getBlock();
++        BlockState blockstate1 = getBlockState(pos);
 +        {
 +            {
-                 if (blockstate1 == p_46606_) {
+                 if (blockstate1 == blockState) {
                      if (blockstate != blockstate1) {
-                         this.setBlocksDirty(p_46605_, blockstate, blockstate1);
-@@ -248,9 +_,8 @@
+                         this.setBlocksDirty(pos, blockstate, blockstate1);
+@@ -253,9 +_,8 @@
                      }
  
-                     this.updatePOIOnBlockStateChange(p_46605_, blockstate, blockstate1);
-+                    p_46606_.onBlockStateChange(this, p_46605_, blockstate);
+                     this.updatePOIOnBlockStateChange(pos, blockstate, blockstate1);
++                    blockState.onBlockStateChange(this, pos, blockstate);
                  }
 -
 -                return true;
              }
          }
      }
-@@ -484,8 +_,28 @@
-         (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers).add(p_151526_);
+@@ -524,8 +_,27 @@
+         (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers).add(ticker);
      }
  
 +    public void addFreshBlockEntities(java.util.Collection<BlockEntity> beList) {
@@ -89,7 +90,6 @@
 +    }
 +
      public void tickBlockEntities() {
-+
 +        if (!this.pendingFreshBlockEntities.isEmpty()) {
 +            this.freshBlockEntities.addAll(this.pendingFreshBlockEntities);
 +            this.pendingFreshBlockEntities.clear();
@@ -105,84 +105,84 @@
          if (!this.pendingBlockEntityTickers.isEmpty()) {
              this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
              this.pendingBlockEntityTickers.clear();
-@@ -508,12 +_,19 @@
+@@ -548,12 +_,19 @@
  
-     public <T extends Entity> void guardEntityTick(Consumer<T> p_46654_, T p_46655_) {
+     public <T extends Entity> void guardEntityTick(final Consumer<T> tick, final T entity) {
          try {
-+            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackStart(p_46655_);
-             p_46654_.accept(p_46655_);
++            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackStart(entity);
+             tick.accept(entity);
          } catch (Throwable throwable) {
              CrashReport crashreport = CrashReport.forThrowable(throwable, "Ticking entity");
              CrashReportCategory crashreportcategory = crashreport.addCategory("Entity being ticked");
-             p_46655_.fillCrashReportCategory(crashreportcategory);
+             entity.fillCrashReportCategory(crashreportcategory);
 +            if (net.minecraftforge.common.ForgeConfig.SERVER.removeErroringEntities.get()) {
 +                com.mojang.logging.LogUtils.getLogger().error("{}", crashreport.getFriendlyReport(net.minecraft.ReportType.CRASH));
-+                p_46655_.discard();
++                entity.discard();
 +            } else
              throw new ReportedException(crashreport);
 +        } finally {
-+            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackEnd(p_46655_);
++            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackEnd(entity);
          }
      }
  
-@@ -669,6 +_,7 @@
-         if (this.isInValidBounds(p_46748_)) {
-             this.getChunkAt(p_46748_).removeBlockEntity(p_46748_);
+@@ -709,6 +_,7 @@
+         if (this.isInValidBounds(pos)) {
+             this.getChunkAt(pos).removeBlockEntity(pos);
          }
-+        this.updateNeighbourForOutputSignal(p_46748_, getBlockState(p_46748_).getBlock()); //Notify neighbors of changes
++        this.updateNeighbourForOutputSignal(pos, getBlockState(pos).getBlock()); //Notify neighbors of changes
      }
  
-     public boolean isLoaded(BlockPos p_46750_) {
-@@ -743,9 +_,9 @@
+     public boolean isLoaded(final BlockPos pos) {
+@@ -776,9 +_,9 @@
              }
          });
  
 -        for (EnderDragonPart enderdragonpart : this.dragonParts()) {
 +        for (var enderdragonpart : this.getPartEntities()) {
-             if (enderdragonpart != p_46536_
--                && enderdragonpart.parentMob != p_46536_
-+                && enderdragonpart.getParent() != p_46536_
-                 && p_46538_.test(enderdragonpart)
-                 && p_46537_.intersects(enderdragonpart.getBoundingBox())) {
+             if (enderdragonpart != except
+-                && enderdragonpart.parentMob != except
++                && enderdragonpart.getParent() != except
+                 && selector.test(enderdragonpart)
+                 && bb.intersects(enderdragonpart.getBoundingBox())) {
                  list.add(enderdragonpart);
-@@ -778,8 +_,8 @@
+@@ -813,8 +_,8 @@
                  }
              }
  
--            if (p_261454_ instanceof EnderDragon enderdragon) {
+-            if (e instanceof EnderDragon enderdragon) {
 -                for (EnderDragonPart enderdragonpart : enderdragon.getSubEntities()) {
-+            if (p_261454_ .isMultipartEntity()) {
-+                for (var enderdragonpart : p_261454_.getParts()) {
-                     T t = p_261885_.tryCast(enderdragonpart);
-                     if (t != null && p_261688_.test(t)) {
-                         p_262071_.add(t);
-@@ -952,17 +_,16 @@
++            if (e.isMultipartEntity()) {
++                for (var enderdragonpart : e.getParts()) {
+                     T t = type.tryCast(enderdragonpart);
+                     if (t != null && selector.test(t)) {
+                         output.add(t);
+@@ -1000,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
-     public void updateNeighbourForOutputSignal(BlockPos p_46718_, Block p_46719_) {
+     public void updateNeighbourForOutputSignal(final BlockPos pos, final Block changedBlock) {
 -        for (Direction direction : Direction.Plane.HORIZONTAL) {
 +        for (Direction direction : Direction.getUpdateOrder()) {
-             BlockPos blockpos = p_46718_.relative(direction);
+             BlockPos blockpos = pos.relative(direction);
              if (this.hasChunkAt(blockpos)) {
                  BlockState blockstate = this.getBlockState(blockpos);
 -                if (blockstate.is(Blocks.COMPARATOR)) {
--                    this.neighborChanged(blockstate, blockpos, p_46719_, null, false);
+-                    this.neighborChanged(blockstate, blockpos, changedBlock, null, false);
 -                } else if (blockstate.isRedstoneConductor(this, blockpos)) {
-+                blockstate.onNeighborChange(this, blockpos, p_46718_);
++                blockstate.onNeighborChange(this, blockpos, pos);
 +                if (blockstate.isRedstoneConductor(this, blockpos)) {
                      blockpos = blockpos.relative(direction);
                      blockstate = this.getBlockState(blockpos);
 -                    if (blockstate.is(Blocks.COMPARATOR)) {
--                        this.neighborChanged(blockstate, blockpos, p_46719_, null, false);
+-                        this.neighborChanged(blockstate, blockpos, changedBlock, null, false);
 +                    if (blockstate.getWeakChanges(this, blockpos)) {
-+                        blockstate.onNeighborChange(this, blockpos, p_46718_);
++                        blockstate.onNeighborChange(this, blockpos, pos);
                      }
                  }
              }
-@@ -1047,6 +_,20 @@
+@@ -1095,6 +_,20 @@
      }
  
-     public abstract EnvironmentAttributeSystem environmentAttributes();
+     public abstract ClockManager clockManager();
 +
 +    private double maxEntityRadius = 2.0D;
 +
@@ -198,5 +198,5 @@
 +       return maxEntityRadius;
 +    }
  
-     public abstract PotionBrewing potionBrewing();
+     public abstract EnvironmentAttributeSystem environmentAttributes();
  

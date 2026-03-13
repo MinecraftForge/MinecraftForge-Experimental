@@ -3,7 +3,7 @@
 @@ -52,6 +_,11 @@
  
                  for (StructurePiece structurepiece : structurestart.getPieces()) {
-                     if (structurepiece.isCloseToChunk(p_223939_, 12)) {
+                     if (structurepiece.isCloseToChunk(chunkPos, 12)) {
 +                        if (structurepiece instanceof net.minecraftforge.common.world.PieceBeardifierModifier pieceBeardifierModifier) {
 +                            if (pieceBeardifierModifier.getTerrainAdjustment() != TerrainAdjustment.NONE) {
 +                                list1.add(new Beardifier.Rigid(pieceBeardifierModifier.getBeardifierBox(), pieceBeardifierModifier.getTerrainAdjustment(), pieceBeardifierModifier.getGroundLevelDelta()));

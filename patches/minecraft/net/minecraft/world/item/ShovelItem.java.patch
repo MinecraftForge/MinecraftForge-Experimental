@@ -3,9 +3,9 @@
 @@ -42,9 +_,9 @@
              return InteractionResult.PASS;
          } else {
-             Player player = p_43119_.getPlayer();
+             Player player = context.getPlayer();
 -            BlockState blockstate1 = FLATTENABLES.get(blockstate.getBlock());
-+            BlockState blockstate1 = blockstate.getToolModifiedState(p_43119_, net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN, false);
++            BlockState blockstate1 = blockstate.getToolModifiedState(context, net.minecraftforge.common.ToolActions.SHOVEL_FLATTEN, false);
              BlockState blockstate2 = null;
 -            if (blockstate1 != null && level.getBlockState(blockpos.above()).isAir()) {
 +            if (blockstate1 != null && level.isEmptyBlock(blockpos.above())) {

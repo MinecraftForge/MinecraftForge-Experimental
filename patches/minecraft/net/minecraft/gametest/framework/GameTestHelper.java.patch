@@ -1,6 +1,6 @@
 --- a/net/minecraft/gametest/framework/GameTestHelper.java
 +++ b/net/minecraft/gametest/framework/GameTestHelper.java
-@@ -68,7 +_,7 @@
+@@ -71,7 +_,7 @@
  import net.minecraft.world.phys.Vec3;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      private final GameTestInfo testInfo;
      private boolean finalCheckAdded;
  
-@@ -1008,6 +_,12 @@
+@@ -1052,6 +_,12 @@
          return this.testInfo.getTick();
      }
  
@@ -22,7 +22,7 @@
      public AABB getBounds() {
          return this.testInfo.getStructureBounds();
      }
-@@ -1050,5 +_,25 @@
+@@ -1098,6 +_,26 @@
          if (either.right().isPresent()) {
              throw this.assertionException("test.error.set_biome");
          }
@@ -47,4 +47,5 @@
 +            @Override public void testAddedForRerun(GameTestInfo oldInfo, GameTestInfo newInfo, GameTestRunner runner) { }
 +        });
      }
- }
+ 
+     private static Component getItemName(final Item itemType) {

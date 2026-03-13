@@ -1,0 +1,24 @@
+--- a/net/minecraft/client/renderer/block/FluidRenderer.java
++++ b/net/minecraft/client/renderer/block/FluidRenderer.java
+@@ -87,8 +_,11 @@
+         boolean flag5 = shouldRenderFace(fluidState, blockState, Direction.EAST, fluidstate5);
+         if (flag || flag1 || flag5 || flag4 || flag2 || flag3) {
+             FluidModel fluidmodel = this.fluidModels.get(fluidState);
++            var fluidExt = net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(fluidState);
++            fluidmodel = fluidExt.getModel(fluidState, level, pos, fluidmodel);
+             VertexConsumer vertexconsumer = output.getBuilder(fluidmodel.layer());
+-            int i = fluidmodel.tintSource() != null ? fluidmodel.tintSource().colorInWorld(blockState, level, pos) : -1;
++            int i = fluidmodel.tintSource() != null ? fluidmodel.tintSource().colorInWorld(blockState, level, pos) : fluidExt.getTintColor();
++            float alpha = (float)(i >> 24 & 255) / 255.0F;
+             CardinalLighting cardinallighting = level.cardinalLighting();
+             Fluid fluid = fluidState.getType();
+             float f4 = this.getHeight(level, fluid, pos, blockState, fluidState);
+@@ -284,7 +_,7 @@
+                     boolean flag7 = false;
+                     if (fluidmodel.overlayMaterial() != null) {
+                         Block block = blockstate6.getBlock();
+-                        if (block instanceof HalfTransparentBlock || block instanceof LeavesBlock) {
++                        if (blockstate6.shouldDisplayFluidOverlay(level, pos.relative(direction), fluidState)) {
+                             textureatlassprite3 = fluidmodel.overlayMaterial().sprite();
+                             flag7 = true;
+                         }

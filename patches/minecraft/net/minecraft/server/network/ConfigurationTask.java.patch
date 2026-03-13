@@ -8,6 +8,6 @@
 +        start(ctx::send);
 +    }
 +
-     void start(Consumer<Packet<?>> p_299398_);
+     void start(Consumer<Packet<?>> connection);
  
      default boolean tick() {

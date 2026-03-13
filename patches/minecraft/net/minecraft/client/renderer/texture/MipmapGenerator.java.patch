@@ -1,13 +1,13 @@
 --- a/net/minecraft/client/renderer/texture/MipmapGenerator.java
 +++ b/net/minecraft/client/renderer/texture/MipmapGenerator.java
-@@ -112,12 +_,16 @@
-             float f = p_450366_ == MipmapStrategy.STRICT_CUTOUT ? 0.3F : 0.5F;
-             float f1 = flag ? alphaTestCoverage(p_251300_[0], f, 1.0F) : 0.0F;
+@@ -122,12 +_,16 @@
+             float f = mipmapStrategy == MipmapStrategy.STRICT_CUTOUT ? 0.3F : 0.5F;
+             float f1 = flag ? alphaTestCoverage(currentMips[0], f, 1.0F) : 0.0F;
  
 +            int maxMipmapLevel = net.minecraftforge.client.ForgeHooksClient.getMaxMipmapLevel(anativeimage[0].getWidth(), anativeimage[0].getHeight());
-             for (int i = 1; i <= p_252326_; i++) {
-                 if (i < p_251300_.length) {
-                     anativeimage[i] = p_251300_[i];
+             for (int i = 1; i <= newMipLevel; i++) {
+                 if (i < currentMips.length) {
+                     anativeimage[i] = currentMips[i];
                  } else {
                      NativeImage nativeimage = anativeimage[i - 1];
 -                    NativeImage nativeimage1 = new NativeImage(nativeimage.getWidth() >> 1, nativeimage.getHeight() >> 1, false);
@@ -18,7 +18,7 @@
                      int j = nativeimage1.getWidth();
                      int k = nativeimage1.getHeight();
  
-@@ -136,6 +_,7 @@
+@@ -146,6 +_,7 @@
  
                              nativeimage1.setPixel(l, i1, j2);
                          }

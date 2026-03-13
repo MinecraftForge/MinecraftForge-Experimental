@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/gui/screens/advancements/AdvancementsScreen.java
 +++ b/net/minecraft/client/gui/screens/advancements/AdvancementsScreen.java
-@@ -52,6 +_,7 @@
+@@ -51,6 +_,7 @@
      private final Map<AdvancementHolder, AdvancementTab> tabs = Maps.newLinkedHashMap();
      private @Nullable AdvancementTab selectedTab;
      private boolean isScrolling;
 +    private static int tabPage, maxPages;
  
-     public AdvancementsScreen(ClientAdvancements p_97340_) {
-         this(p_97340_, null);
-@@ -65,6 +_,19 @@
+     public AdvancementsScreen(final ClientAdvancements advancements) {
+         this(advancements, null);
+@@ -64,6 +_,19 @@
  
      @Override
      protected void init() {
@@ -28,33 +28,33 @@
          this.layout.addTitleHeader(TITLE, this.font);
          this.tabs.clear();
          this.selectedTab = null;
-@@ -109,7 +_,7 @@
+@@ -106,7 +_,7 @@
              int j = (this.height - 140) / 2;
  
              for (AdvancementTab advancementtab : this.tabs.values()) {
--                if (advancementtab.isMouseOver(i, j, p_431395_.x(), p_431395_.y())) {
-+                if (advancementtab.getPage() == tabPage && advancementtab.isMouseOver(i, j, p_431395_.x(), p_431395_.y())) {
+-                if (advancementtab.isMouseOver(i, j, event.x(), event.y())) {
++                if (advancementtab.getPage() == tabPage && advancementtab.isMouseOver(i, j, event.x(), event.y())) {
                      this.advancements.setSelectedTab(advancementtab.getRootNode().holder(), true);
                      break;
                  }
-@@ -200,10 +_,12 @@
-         p_283395_.blit(RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, p_281890_, p_282532_, 0.0F, 0.0F, 252, 140, 256, 256);
+@@ -197,10 +_,12 @@
+         graphics.blit(RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, xo, yo, 0.0F, 0.0F, 252, 140, 256, 256);
          if (this.tabs.size() > 1) {
              for (AdvancementTab advancementtab : this.tabs.values()) {
 +                if (advancementtab.getPage() == tabPage)
-                 advancementtab.drawTab(p_283395_, p_281890_, p_282532_, p_451461_, p_451545_, advancementtab == this.selectedTab);
+                 advancementtab.extractTab(graphics, xo, yo, mouseX, mouseY, advancementtab == this.selectedTab);
              }
  
              for (AdvancementTab advancementtab1 : this.tabs.values()) {
 +                if (advancementtab1.getPage() == tabPage)
-                 advancementtab1.drawIcon(p_283395_, p_281890_, p_282532_);
+                 advancementtab1.extractIcon(graphics, xo, yo);
              }
          }
-@@ -222,6 +_,7 @@
+@@ -219,6 +_,7 @@
  
          if (this.tabs.size() > 1) {
              for (AdvancementTab advancementtab : this.tabs.values()) {
 +                if (advancementtab.getPage() == tabPage)
-                 if (advancementtab.isMouseOver(p_281519_, p_283371_, p_283556_, p_282458_)) {
-                     p_282784_.setTooltipForNextFrame(this.font, advancementtab.getTitle(), p_283556_, p_282458_);
+                 if (advancementtab.isMouseOver(xo, yo, mouseX, mouseY)) {
+                     graphics.setTooltipForNextFrame(this.font, advancementtab.getTitle(), mouseX, mouseY);
                  }

@@ -9,7 +9,7 @@
      private static final EntityDataAccessor<Boolean> DATA_ID_PADDLE_LEFT = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.BOOLEAN);
      private static final EntityDataAccessor<Boolean> DATA_ID_PADDLE_RIGHT = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.BOOLEAN);
      private static final EntityDataAccessor<Integer> DATA_ID_BUBBLE_TIME = SynchedEntityData.defineId(AbstractBoat.class, EntityDataSerializers.INT);
-@@ -422,7 +_,7 @@
+@@ -416,7 +_,7 @@
                  for (int i2 = i1; i2 < j1; i2++) {
                      blockpos$mutableblockpos.set(l1, k1, i2);
                      FluidState fluidstate = this.level().getFluidState(blockpos$mutableblockpos);
@@ -18,7 +18,7 @@
                          f = Math.max(f, fluidstate.getHeight(this.level(), blockpos$mutableblockpos));
                      }
  
-@@ -468,7 +_,7 @@
+@@ -462,7 +_,7 @@
                                      voxelshape,
                                      BooleanOp.AND
                                  )) {
@@ -27,7 +27,7 @@
                                  k1++;
                              }
                          }
-@@ -497,7 +_,7 @@
+@@ -491,7 +_,7 @@
                  for (int i2 = i1; i2 < j1; i2++) {
                      blockpos$mutableblockpos.set(k1, l1, i2);
                      FluidState fluidstate = this.level().getFluidState(blockpos$mutableblockpos);
@@ -36,28 +36,28 @@
                          float f = l1 + fluidstate.getHeight(this.level(), blockpos$mutableblockpos);
                          this.waterLevel = Math.max((double)f, this.waterLevel);
                          flag |= aabb.minY < f;
-@@ -526,7 +_,7 @@
+@@ -520,7 +_,7 @@
                  for (int i2 = i1; i2 < j1; i2++) {
                      blockpos$mutableblockpos.set(k1, l1, i2);
                      FluidState fluidstate = this.level().getFluidState(blockpos$mutableblockpos);
--                    if (fluidstate.is(FluidTags.WATER)
-+                    if (this.canBoatInFluid(fluidstate)
-                         && d0 < blockpos$mutableblockpos.getY() + fluidstate.getHeight(this.level(), blockpos$mutableblockpos)) {
+-                    if (fluidstate.is(FluidTags.WATER) && d0 < blockpos$mutableblockpos.getY() + fluidstate.getHeight(this.level(), blockpos$mutableblockpos)) {
++                    if (this.canBoatInFluid(fluidstate) && d0 < blockpos$mutableblockpos.getY() + fluidstate.getHeight(this.level(), blockpos$mutableblockpos)) {
                          if (!fluidstate.isSource()) {
                              return AbstractBoat.Status.UNDER_FLOWING_WATER;
-@@ -729,7 +_,7 @@
+                         }
+@@ -722,7 +_,7 @@
          if (!this.isPassenger()) {
-             if (p_455047_) {
+             if (onGround) {
                  this.resetFallDistance();
--            } else if (!this.level().getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && p_456661_ < 0.0) {
-+            } else if (!this.canBoatInFluid(this.level().getFluidState(this.blockPosition().below())) && p_456661_ < 0.0) {
-                 this.fallDistance -= (float)p_456661_;
+-            } else if (!this.level().getFluidState(this.blockPosition().below()).is(FluidTags.WATER) && ya < 0.0) {
++            } else if (!this.canBoatInFluid(this.level().getFluidState(this.blockPosition().below())) && ya < 0.0) {
+                 this.fallDistance -= (float)ya;
              }
          }
-@@ -753,7 +_,7 @@
+@@ -746,7 +_,7 @@
  
      @Override
-     protected boolean canAddPassenger(Entity p_457043_) {
+     protected boolean canAddPassenger(final Entity passenger) {
 -        return this.getPassengers().size() < this.getMaxPassengers() && !this.isEyeInFluid(FluidTags.WATER);
 +        return this.getPassengers().size() < this.getMaxPassengers() && !this.canBoatInFluid(this.getEyeInFluidType());
      }

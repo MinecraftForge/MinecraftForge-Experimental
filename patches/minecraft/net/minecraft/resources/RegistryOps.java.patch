@@ -1,10 +1,10 @@
 --- a/net/minecraft/resources/RegistryOps.java
 +++ b/net/minecraft/resources/RegistryOps.java
 @@ -76,6 +_,22 @@
-             .forGetter(p_255526_ -> null);
+             .forGetter(e -> null);
      }
  
-+    public static <E> com.mojang.serialization.MapCodec<HolderLookup.RegistryLookup<E>> retrieveRegistryLookup(ResourceKey<? extends Registry<? extends E>> resourceKey) {
++    public static <E> com.mojang.serialization.MapCodec<HolderLookup.RegistryLookup<E>> retrieveRegistryLookup(final ResourceKey<? extends Registry<? extends E>> resourceKey) {
 +       return ExtraCodecs.retrieveContext(ops -> {
 +           if (!(ops instanceof RegistryOps<?> registryOps)) {
 +              return DataResult.error(() -> "Not a registry ops");
@@ -20,6 +20,6 @@
 +       });
 +    }
 +
-     public static <E, O> RecordCodecBuilder<O, Holder.Reference<E>> retrieveElement(ResourceKey<E> p_256347_) {
-         ResourceKey<? extends Registry<E>> resourcekey = ResourceKey.createRegistryKey(p_256347_.registry());
+     public static <E, O> RecordCodecBuilder<O, Holder.Reference<E>> retrieveElement(final ResourceKey<E> key) {
+         ResourceKey<? extends Registry<E>> resourcekey = ResourceKey.createRegistryKey(key.registry());
          return ExtraCodecs.retrieveContext(

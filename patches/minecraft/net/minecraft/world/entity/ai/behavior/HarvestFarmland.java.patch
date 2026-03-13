@@ -3,19 +3,19 @@
 @@ -46,7 +_,7 @@
      }
  
-     protected boolean checkExtraStartConditions(ServerLevel p_23174_, Villager p_460921_) {
--        if (!p_23174_.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(p_23174_, p_460921_)) {
+     protected boolean checkExtraStartConditions(final ServerLevel level, final Villager body) {
+-        if (!level.getGameRules().get(GameRules.MOB_GRIEFING)) {
++        if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(level, body)) {
              return false;
-         } else if (!p_460921_.getVillagerData().profession().is(VillagerProfession.FARMER)) {
+         } else if (!body.getVillagerData().profession().is(VillagerProfession.FARMER)) {
              return false;
-@@ -116,6 +_,11 @@
-                             p_23196_.setBlockAndUpdate(this.aboveFarmlandPos, blockstate1);
-                             p_23196_.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(p_457898_, blockstate1));
+@@ -118,6 +_,11 @@
+                             level.setBlockAndUpdate(this.aboveFarmlandPos, blockstate1);
+                             level.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(body, blockstate1));
                              flag = true;
 +                        } else if (itemstack.getItem() instanceof net.minecraftforge.common.IPlantable) {
-+                            if (((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlantType(p_23196_, aboveFarmlandPos) == net.minecraftforge.common.PlantType.CROP) {
-+                                p_23196_.setBlock(aboveFarmlandPos, ((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlant(p_23196_, aboveFarmlandPos), 3);
++                            if (((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlantType(level, aboveFarmlandPos) == net.minecraftforge.common.PlantType.CROP) {
++                                level.setBlock(aboveFarmlandPos, ((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlant(level, aboveFarmlandPos), 3);
 +                                flag = true;
 +                            }
                          }

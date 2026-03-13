@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/entity/npc/villager/AbstractVillager.java
 +++ b/net/minecraft/world/entity/npc/villager/AbstractVillager.java
-@@ -125,6 +_,8 @@
+@@ -138,6 +_,8 @@
          if (this.tradingPlayer instanceof ServerPlayer) {
-             CriteriaTriggers.TRADE.trigger((ServerPlayer)this.tradingPlayer, this, p_459364_.getResult());
+             CriteriaTriggers.TRADE.trigger((ServerPlayer)this.tradingPlayer, this, offer.getResult());
          }
 +
-+        net.minecraftforge.event.ForgeEventFactory.onPlayerTradeWithVillager(this.tradingPlayer, p_459364_, this);
++        net.minecraftforge.event.ForgeEventFactory.onPlayerTradeWithVillager(this.tradingPlayer, offer, this);
      }
  
-     protected abstract void rewardTradeXp(MerchantOffer p_458516_);
+     protected abstract void rewardTradeXp(final MerchantOffer offer);

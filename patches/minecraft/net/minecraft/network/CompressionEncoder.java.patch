@@ -10,15 +10,15 @@
      private final Deflater deflater;
      private int threshold;
 @@ -24,6 +_,12 @@
-                 VarInt.write(p_129454_, 0);
-                 p_129454_.writeBytes(p_129453_);
+                 VarInt.write(out, 0);
+                 out.writeBytes(uncompressed);
              } else {
 +                if (!DISABLE_PACKET_DEBUG && i > net.minecraft.network.CompressionDecoder.MAXIMUM_UNCOMPRESSED_LENGTH) {
-+                     p_129453_.markReaderIndex();
++                    uncompressed.markReaderIndex();
 +                     LOGGER.error("Attempted to send packet over maximum protocol size: {} > {}\nData:\n{}", i, net.minecraft.network.CompressionDecoder.MAXIMUM_UNCOMPRESSED_LENGTH,
-+                            net.minecraftforge.common.util.HexDumper.dump(p_129453_));
-+                     p_129453_.resetReaderIndex();
++                            net.minecraftforge.common.util.HexDumper.dump(uncompressed));
++                     uncompressed.resetReaderIndex();
 +                }
                  byte[] abyte = new byte[i];
-                 p_129453_.readBytes(abyte);
-                 VarInt.write(p_129454_, abyte.length);
+                 uncompressed.readBytes(abyte);
+                 VarInt.write(out, abyte.length);

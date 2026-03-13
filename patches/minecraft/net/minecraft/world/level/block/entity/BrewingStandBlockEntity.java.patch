@@ -1,40 +1,31 @@
 --- a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
-@@ -174,15 +_,18 @@
+@@ -180,9 +_,10 @@
          for (int i = 0; i < 3; i++) {
-             p_155293_.set(i, potionbrewing.mix(itemstack, p_155293_.get(i)));
+             items.set(i, potionbrewing.mix(itemstack, items.get(i)));
          }
-+        net.minecraftforge.event.ForgeEventFactory.onPotionBrewed(p_155293_);
++        net.minecraftforge.event.ForgeEventFactory.onPotionBrewed(items);
  
--        itemstack.shrink(1);
--        ItemStack itemstack1 = itemstack.getItem().getCraftingRemainder();
-+        ItemStack itemstack1 = itemstack.getCraftingRemainder();
-         if (!itemstack1.isEmpty()) {
-+            itemstack.shrink(1);
++        ItemStackTemplate itemstacktemplate = itemstack.getCraftingRemainder();
+         itemstack.shrink(1);
+-        ItemStackTemplate itemstacktemplate = itemstack.getItem().getCraftingRemainder();
+         if (itemstacktemplate != null) {
              if (itemstack.isEmpty()) {
-                 itemstack = itemstack1;
-             } else {
-                 Containers.dropItemStack(p_155291_, p_155292_.getX(), p_155292_.getY(), p_155292_.getZ(), itemstack1);
-             }
-+        } else {
-+            itemstack.shrink(1);
-         }
- 
-         p_155293_.set(3, itemstack);
-@@ -215,6 +_,9 @@
-         if (p_59017_ == 3) {
+                 itemstack = itemstacktemplate.create();
+@@ -221,6 +_,9 @@
+         if (slot == 3) {
              PotionBrewing potionbrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
-             return potionbrewing.isIngredient(p_59018_);
-+        } else if (p_59017_ != 4) {
+             return potionbrewing.isIngredient(itemStack);
++        } else if (slot != 4) {
 +            PotionBrewing potionbrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
-+            return this.getItem(p_59017_).isEmpty() && potionbrewing.isValidInput(p_59018_);
++            return this.getItem(slot).isEmpty() && potionbrewing.isValidInput(itemStack);
          } else {
-             return p_59017_ == 4
-                 ? p_59018_.is(ItemTags.BREWING_FUEL)
-@@ -250,5 +_,34 @@
+             return slot == 4
+                 ? itemStack.is(ItemTags.BREWING_FUEL)
+@@ -251,5 +_,34 @@
      @Override
-     protected AbstractContainerMenu createMenu(int p_58990_, Inventory p_58991_) {
-         return new BrewingStandMenu(p_58990_, p_58991_, this, this.dataAccess);
+     protected AbstractContainerMenu createMenu(final int containerId, final Inventory inventory) {
+         return new BrewingStandMenu(containerId, inventory, this, this.dataAccess);
 +    }
 +
 +    net.minecraftforge.common.util.LazyOptional<? extends net.minecraftforge.items.IItemHandler>[] handlers =

@@ -1,19 +1,19 @@
 --- a/net/minecraft/gametest/framework/GameTestServer.java
 +++ b/net/minecraft/gametest/framework/GameTestServer.java
-@@ -93,7 +_,7 @@
-         Thread p_206607_, LevelStorageSource.LevelStorageAccess p_206608_, PackRepository p_206609_, Optional<String> p_392741_, boolean p_392375_
+@@ -102,7 +_,7 @@
+         final int repeatCount
      ) {
-         p_206609_.reload();
--        ArrayList<String> arraylist = new ArrayList<>(p_206609_.getAvailableIds());
-+        ArrayList<String> arraylist = new ArrayList<>(p_206609_.getSelectedIds()); // Forge: Use the selected datapacks as this takes sorting into account.
+         packRepository.reload();
+-        ArrayList<String> arraylist = new ArrayList<>(packRepository.getAvailableIds());
++        ArrayList<String> arraylist = new ArrayList<>(packRepository.getSelectedIds()); // Forge: Use the selected datapacks as this takes sorting into account.
          arraylist.remove("vanilla");
          arraylist.addFirst("vanilla");
          WorldDataConfiguration worlddataconfiguration = new WorldDataConfiguration(new DataPackConfig(arraylist, List.of()), ENABLED_FEATURES);
-@@ -155,6 +_,7 @@
+@@ -178,6 +_,7 @@
  
      @Override
-     public boolean initServer() {
+     protected boolean initServer() {
 +        if (!net.minecraftforge.server.ServerLifecycleHooks.handleServerAboutToStart(this)) return false;
-         this.setPlayerList(new PlayerList(this, this.registries(), this.playerDataStorage, new EmptyNotificationService()) {});
-         Gizmos.withCollector(GizmoCollector.NOOP);
-         this.loadLevel();
+         this.setPlayerList(new PlayerList(this, this.registries(), this.playerDataStorage, new EmptyNotificationService()) {
+             {
+                 Objects.requireNonNull(GameTestServer.this);

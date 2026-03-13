@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/entity/vehicle/minecart/MinecartSpawner.java
 +++ b/net/minecraft/world/entity/vehicle/minecart/MinecartSpawner.java
-@@ -19,6 +_,11 @@
-         public void broadcastEvent(Level p_451201_, BlockPos p_454356_, int p_454162_) {
-             p_451201_.broadcastEntityEvent(MinecartSpawner.this, (byte)p_454162_);
+@@ -24,6 +_,11 @@
+         public void broadcastEvent(final Level level, final BlockPos pos, final int id) {
+             level.broadcastEntityEvent(MinecartSpawner.this, (byte)id);
          }
 +
 +        @Override

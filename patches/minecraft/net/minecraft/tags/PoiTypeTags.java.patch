@@ -1,8 +1,8 @@
 --- a/net/minecraft/tags/PoiTypeTags.java
 +++ b/net/minecraft/tags/PoiTypeTags.java
 @@ -15,4 +_,12 @@
-     private static TagKey<PoiType> create(String p_215881_) {
-         return TagKey.create(Registries.POINT_OF_INTEREST_TYPE, Identifier.withDefaultNamespace(p_215881_));
+     private static TagKey<PoiType> create(final String name) {
+         return TagKey.create(Registries.POINT_OF_INTEREST_TYPE, Identifier.withDefaultNamespace(name));
      }
 +
 +    public static TagKey<PoiType> create(String namepsace, String path) {

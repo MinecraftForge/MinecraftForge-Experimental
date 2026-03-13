@@ -1,6 +1,6 @@
 --- a/net/minecraft/network/protocol/login/custom/DiscardedQueryPayload.java
 +++ b/net/minecraft/network/protocol/login/custom/DiscardedQueryPayload.java
-@@ -3,9 +_,21 @@
+@@ -3,8 +_,20 @@
  import net.minecraft.network.FriendlyByteBuf;
  import net.minecraft.resources.Identifier;
  
@@ -14,12 +14,11 @@
 +    }
 +
      @Override
-     public void write(FriendlyByteBuf p_299949_) {
+     public void write(final FriendlyByteBuf output) {
 +        if (this.data != null) {
-+            p_299949_.writeBytes(this.data.slice());
++            output.writeBytes(this.data.slice());
 +        } else {
-+            encoder.accept(p_299949_);
++            encoder.accept(output);
 +        }
      }
- 
-     @Override
+ }

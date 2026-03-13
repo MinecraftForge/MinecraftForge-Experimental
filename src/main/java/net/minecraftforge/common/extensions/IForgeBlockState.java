@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -29,7 +30,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.IPlantable;
 
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;

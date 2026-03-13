@@ -9,17 +9,17 @@
 +    }
 +
      public record Data(Map<Character, Ingredient> key, List<String> pattern) {
-         private static final Codec<List<String>> PATTERN_CODEC = Codec.STRING.listOf().comapFlatMap(p_311191_ -> {
--            if (p_311191_.size() > 3) {
+         private static final Codec<List<String>> PATTERN_CODEC = Codec.STRING.listOf().comapFlatMap(strings -> {
+-            if (strings.size() > 3) {
 -                return DataResult.error(() -> "Invalid pattern: too many rows, 3 is maximum");
-+            if (p_311191_.size() > ShapedRecipe.MAX_HEIGHT) {
++            if (strings.size() > ShapedRecipe.MAX_HEIGHT) {
 +                return DataResult.error(() -> "Invalid pattern: too many rows, " + ShapedRecipe.MAX_HEIGHT + " is maximum");
-             } else if (p_311191_.isEmpty()) {
+             } else if (strings.isEmpty()) {
                  return DataResult.error(() -> "Invalid pattern: empty pattern not allowed");
              } else {
-                 int i = p_311191_.getFirst().length();
+                 int i = strings.getFirst().length();
  
-                 for (String s : p_311191_) {
+                 for (String s : strings) {
 -                    if (s.length() > 3) {
 -                        return DataResult.error(() -> "Invalid pattern: too many columns, 3 is maximum");
 +                    if (s.length() > ShapedRecipe.MAX_HEIGHT) {

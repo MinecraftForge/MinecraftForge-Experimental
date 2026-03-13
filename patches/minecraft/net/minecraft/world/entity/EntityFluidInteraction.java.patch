@@ -1,0 +1,170 @@
+--- a/net/minecraft/world/entity/EntityFluidInteraction.java
++++ b/net/minecraft/world/entity/EntityFluidInteraction.java
+@@ -21,16 +_,34 @@
+ import org.jspecify.annotations.Nullable;
+ 
+ public class EntityFluidInteraction {
++    private static final Map<TagKey<Fluid>, java.util.function.Supplier<? extends EntityFluidInteraction.Tracker>> MODDED_TYPES = new java.util.HashMap<>();
++    public static void register(final TagKey<Fluid> fluid) {
++        register(fluid, EntityFluidInteraction.Tracker::new);
++    }
++    public static void register(final TagKey<Fluid> fluid, final java.util.function.Supplier<? extends EntityFluidInteraction.Tracker> factory) {
++        register(fluid, factory);
++    }
++
+     private final Map<TagKey<Fluid>, EntityFluidInteraction.Tracker> trackerByFluid = new Reference2ObjectArrayMap<>();
++    private final Map<net.minecraftforge.fluids.FluidType, EntityFluidInteraction.Tracker> trackerByFluidType = new Reference2ObjectArrayMap();
+ 
+     public EntityFluidInteraction(final Set<TagKey<Fluid>> fluids) {
+         for (TagKey<Fluid> tagkey : fluids) {
+             this.trackerByFluid.put(tagkey, new EntityFluidInteraction.Tracker());
+         }
++        for (var entry : MODDED_TYPES.entrySet()) {
++            if (!fluids.contains(entry.getKey()))
++                this.trackerByFluid.put(entry.getKey(), entry.getValue().get());
++        }
++    }
++
++    public EntityFluidInteraction.@Nullable Tracker getTracker(final TagKey<Fluid> fluid) {
++        return this.trackerByFluid.get(fluid);
+     }
+ 
+     public void update(final Entity entity, final boolean ignoreCurrent) {
+         this.trackerByFluid.values().forEach(EntityFluidInteraction.Tracker::reset);
++        this.trackerByFluidType.values().forEach(EntityFluidInteraction.Tracker::reset);
+         AABB aabb = entity.getFluidInteractionBox();
+         if (aabb != null) {
+             int i = Mth.floor(aabb.minX);
+@@ -45,7 +_,7 @@
+                 double d1 = entity.getEyeY();
+                 int l1 = entity.getBlockZ();
+                 Fluid fluid = null;
+-                EntityFluidInteraction.Tracker entityfluidinteraction$tracker = null;
++                EntityFluidInteraction.Tracker[] trackers = null;
+                 BlockGetter blockgetter = entity.level();
+                 BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+ 
+@@ -61,17 +_,18 @@
+                                     Fluid fluid1 = fluidstate.getType();
+                                     if (fluid1 != fluid) {
+                                         fluid = fluid1;
+-                                        entityfluidinteraction$tracker = this.getTrackerFor(fluid1);
++                                        trackers = this.getTrackersFor(fluid1);
+                                     }
+ 
+-                                    if (entityfluidinteraction$tracker != null) {
++                                    for (var entityfluidinteraction$tracker : trackers) {
+                                         if (i2 == k1 && k2 == l1 && d1 >= d2 && d1 <= d3) {
+                                             entityfluidinteraction$tracker.eyesInside = true;
+                                         }
+ 
+                                         entityfluidinteraction$tracker.height = Math.max(d3 - d0, entityfluidinteraction$tracker.height);
+-                                        if (!ignoreCurrent) {
+-                                            Vec3 vec3 = fluidstate.getFlow(blockgetter, blockpos$mutableblockpos);
++                                        if (!ignoreCurrent || !fluidstate.getType().getFluidType().canPushEntity(entity)) {
++                                            Vec3 vec3 = fluidstate.getFlow(blockgetter, blockpos$mutableblockpos, entity);
++
+                                             if (entityfluidinteraction$tracker.height < 0.4) {
+                                                 vec3 = vec3.scale(entityfluidinteraction$tracker.height);
+                                             }
+@@ -118,15 +_,27 @@
+         return flag;
+     }
+ 
+-    private EntityFluidInteraction.@Nullable Tracker getTrackerFor(final Fluid fluid) {
++    private final EntityFluidInteraction.Tracker[] NONE = new EntityFluidInteraction.Tracker[0];
++
++    private EntityFluidInteraction.@Nullable Tracker[] getTrackersFor(final Fluid fluid) {
++        var ret = new java.util.ArrayList<EntityFluidInteraction.Tracker>(1);
+         for (Entry<TagKey<Fluid>, EntityFluidInteraction.Tracker> entry : this.trackerByFluid.entrySet()) {
+             TagKey<Fluid> tagkey = entry.getKey();
+             if (fluid.is(tagkey)) {
+-                return entry.getValue();
++                ret.add(entry.getValue());
+             }
+         }
+ 
+-        return null;
++        ret.add(this.trackerByFluidType.computeIfAbsent(fluid.getFluidType(), k -> new EntityFluidInteraction.Tracker()));
++        return ret.isEmpty() ? NONE : ret.toArray(EntityFluidInteraction.Tracker[]::new);
++    }
++
++    public void applyCurrentTo(final Entity entity) {
++        for (var entry : this.trackerByFluidType.entrySet()) {
++            if (!entity.isPushedByFluid(entry.getKey()))
++                continue;
++            entry.getValue().applyCurrentTo(entity, entity.getFluidMotionScale(entry.getKey()));
++        }
+     }
+ 
+     public void applyCurrentTo(final TagKey<Fluid> fluid, final Entity entity, final double scale) {
+@@ -141,6 +_,15 @@
+         return entityfluidinteraction$tracker != null ? entityfluidinteraction$tracker.height : 0.0;
+     }
+ 
++    public double getFluidHeight(final Fluid fluid) {
++        return getFluidHeight(fluid.getFluidType());
++    }
++
++    public double getFluidHeight(final net.minecraftforge.fluids.FluidType fluid) {
++        var tracker = this.trackerByFluidType.get(fluid);
++        return tracker == null ? 0 : tracker.height;
++    }
++
+     public boolean isInFluid(final TagKey<Fluid> fluid) {
+         return this.getFluidHeight(fluid) > 0.0;
+     }
+@@ -150,6 +_,39 @@
+         return entityfluidinteraction$tracker != null && entityfluidinteraction$tracker.eyesInside;
+     }
+ 
++    public boolean isEyeInFluid(final Fluid fluid) {
++        return isEyeInFluid(fluid.getFluidType());
++    }
++
++    public boolean isEyeInFluid(final net.minecraftforge.fluids.FluidType fluid) {
++        var tracker = this.trackerByFluidType.get(fluid);
++        return tracker != null && tracker.eyesInside;
++    }
++
++    public net.minecraftforge.fluids.FluidType getMaxHeightFluid() {
++        var ret = net.minecraftforge.common.ForgeMod.EMPTY_TYPE.get();
++        double height = 0;
++        EntityFluidInteraction.Tracker max = null;
++        for (var entry : this.trackerByFluidType.entrySet()) {
++            if (entry.getValue().height > height) {
++                height = entry.getValue().height;
++                ret = entry.getKey();
++            }
++        }
++        return ret;
++    }
++
++    public final boolean isInFluid(java.util.function.BiPredicate<net.minecraftforge.fluids.FluidType, Double> predicate, boolean forAllTypes) {
++        for (var entry : this.trackerByFluidType.entrySet()) {
++            if (predicate.test(entry.getKey(), entry.getValue().height)) {
++                if (!forAllTypes)
++                    return true;
++            } else if (forAllTypes)
++                return false;
++        }
++        return true;
++    }
++
+     private static class Tracker {
+         private double height;
+         private boolean eyesInside;
+@@ -186,6 +_,13 @@
+ 
+                 entity.addDeltaMovement(vec3);
+             }
++        }
++    }
++
++    private static class LavaTracker extends Tracker {
++        @Override
++        public double scale(final Entity entity) {
++            return entity.level().environmentAttributes().getDimensionValue(net.minecraft.world.attribute.EnvironmentAttributes.FAST_LAVA) ? 0.007 : 0.0023333333333333335;
+         }
+     }
+ }

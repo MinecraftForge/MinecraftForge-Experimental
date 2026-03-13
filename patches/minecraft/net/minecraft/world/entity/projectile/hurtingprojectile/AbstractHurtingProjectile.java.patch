@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/projectile/hurtingprojectile/AbstractHurtingProjectile.java
 +++ b/net/minecraft/world/entity/projectile/hurtingprojectile/AbstractHurtingProjectile.java
-@@ -89,7 +_,7 @@
+@@ -91,7 +_,7 @@
                  this.igniteForSeconds(1.0F);
              }
  

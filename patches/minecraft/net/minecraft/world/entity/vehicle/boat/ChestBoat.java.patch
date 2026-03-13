@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/entity/vehicle/boat/ChestBoat.java
 +++ b/net/minecraft/world/entity/vehicle/boat/ChestBoat.java
 @@ -15,4 +_,26 @@
-     protected double rideHeight(EntityDimensions p_451474_) {
-         return p_451474_.height() / 3.0F;
+     protected double rideHeight(final EntityDimensions dimensions) {
+         return dimensions.height() / 3.0F;
      }
 +
 +    private net.minecraftforge.common.util.LazyOptional<?> itemHandler = net.minecraftforge.common.util.LazyOptional.of(() -> new net.minecraftforge.items.wrapper.InvWrapper(this));

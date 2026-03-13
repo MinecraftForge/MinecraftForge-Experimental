@@ -7,7 +7,7 @@ package net.minecraftforge.client.event;
 
 import com.mojang.datafixers.util.Either;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipPositioner;
 import net.minecraft.network.chat.FormattedText;
@@ -41,14 +41,14 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
     public static final EventBus<RenderTooltipEvent> BUS = EventBus.create(RenderTooltipEvent.class);
 
     protected final ItemStack itemStack;
-    protected final GuiGraphics graphics;
+    protected final GuiGraphicsExtractor graphics;
     protected int x;
     protected int y;
     protected Font font;
     protected final List<ClientTooltipComponent> components;
 
     @ApiStatus.Internal
-    protected RenderTooltipEvent(ItemStack itemStack, GuiGraphics graphics, int x, int y, Font font, List<ClientTooltipComponent> components) {
+    protected RenderTooltipEvent(ItemStack itemStack, GuiGraphicsExtractor graphics, int x, int y, Font font, List<ClientTooltipComponent> components) {
         this.itemStack = itemStack;
         this.graphics = graphics;
         this.components = Collections.unmodifiableList(components);
@@ -61,22 +61,15 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * {@return the item stack which the tooltip is being rendered for, or an {@linkplain ItemStack#isEmpty() empty
      * item stack} if there is no associated item stack}
      */
-    
+
     public ItemStack getItemStack() {
         return itemStack;
     }
 
     /**
-     * {@return the gui graphics helper for the gui}
-     */
-    public GuiGraphics getGuiGraphics() {
-        return graphics;
-    }
-
-    /**
      * {@return the graphics helper for the gui}
      */
-    public GuiGraphics getGraphics() {
+    public GuiGraphicsExtractor getGraphics() {
         return graphics;
     }
 
@@ -214,7 +207,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         private Identifier originalBackground;
 
         @ApiStatus.Internal
-        public Pre(ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner, @Nullable Identifier background) {
+        public Pre(ItemStack stack, GuiGraphicsExtractor graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner, @Nullable Identifier background) {
             super(stack, graphics, x, y, font, components);
             this.screenWidth = screenWidth;
             this.screenHeight = screenHeight;

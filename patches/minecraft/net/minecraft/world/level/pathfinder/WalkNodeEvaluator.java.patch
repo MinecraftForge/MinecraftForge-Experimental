@@ -1,47 +1,47 @@
 --- a/net/minecraft/world/level/pathfinder/WalkNodeEvaluator.java
 +++ b/net/minecraft/world/level/pathfinder/WalkNodeEvaluator.java
-@@ -471,6 +_,16 @@
+@@ -484,6 +_,16 @@
                  for (int k = -1; k <= 1; k++) {
                      if (i != 0 || k != 0) {
-                         PathType pathtype = p_334221_.getPathTypeFromState(p_336062_ + i, p_335259_ + j, p_336315_ + k);
+                         PathType pathtype = context.getPathTypeFromState(x + i, y + j, z + k);
 +
-+                        var pos = new BlockPos(p_336062_ + i, p_335259_ + j, p_336315_ + k);
-+                        var blockstate = p_334221_.level().getBlockState(pos);
++                        var pos = new BlockPos(x + i, y + j, z + k);
++                        var blockstate = context.level().getBlockState(pos);
 +
-+                        var blockPathType = blockstate.getAdjacentBlockPathType(p_334221_.level(), pos, null, p_333971_);
-+                        if (blockPathType != null) return blockPathType;
++                        var adjacentBlockPathType = blockstate.getAdjacentBlockPathType(context.level(), pos, null, blockPathType);
++                        if (adjacentBlockPathType != null) return adjacentBlockPathType;
 +
-+                        var fluidPathType = blockstate.getFluidState().getAdjacentBlockPathType(p_334221_.level(), pos, null, p_333971_);
-+                        if (fluidPathType != null) return fluidPathType;
++                        var adjacentFluidPathType = blockstate.getFluidState().getAdjacentBlockPathType(context.level(), pos, null, blockPathType);
++                        if (adjacentFluidPathType != null) return adjacentFluidPathType;
 +
-                         if (pathtype == PathType.DAMAGE_OTHER) {
-                             return PathType.DANGER_OTHER;
+                         if (pathtype == PathType.DAMAGING) {
+                             return PathType.DAMAGING_IN_NEIGHBOR;
                          }
-@@ -497,6 +_,10 @@
-     protected static PathType getPathTypeFromState(BlockGetter p_335222_, BlockPos p_331935_) {
-         BlockState blockstate = p_335222_.getBlockState(p_331935_);
+@@ -510,6 +_,10 @@
+     protected static PathType getPathTypeFromState(final BlockGetter level, final BlockPos pos) {
+         BlockState blockstate = level.getBlockState(pos);
          Block block = blockstate.getBlock();
 +
-+        var type = blockstate.getBlockPathType(p_335222_, p_331935_, null);
++        var type = blockstate.getBlockPathType(level, pos, null);
 +        if (type != null) return type;
 +
          if (blockstate.isAir()) {
              return PathType.OPEN;
          } else if (blockstate.is(BlockTags.TRAPDOORS) || blockstate.is(Blocks.LILY_PAD) || blockstate.is(Blocks.BIG_DRIPLEAF)) {
-@@ -511,6 +_,8 @@
+@@ -524,6 +_,8 @@
              return PathType.COCOA;
          } else if (!blockstate.is(Blocks.WITHER_ROSE) && !blockstate.is(Blocks.POINTED_DRIPSTONE)) {
              FluidState fluidstate = blockstate.getFluidState();
-+            var nonLoggableFluidPathType = fluidstate.getBlockPathType(p_335222_, p_331935_, null, false);
++            var nonLoggableFluidPathType = fluidstate.getBlockPathType(level, pos, null, false);
 +            if (nonLoggableFluidPathType != null) return nonLoggableFluidPathType;
              if (fluidstate.is(FluidTags.LAVA)) {
                  return PathType.LAVA;
              } else if (isBurningBlock(blockstate)) {
-@@ -531,6 +_,8 @@
+@@ -544,6 +_,8 @@
                  if (!blockstate.isPathfindable(PathComputationType.LAND)) {
                      return PathType.BLOCKED;
                  } else {
-+                    var loggableFluidPathType = fluidstate.getBlockPathType(p_335222_, p_331935_, null, true);
++                    var loggableFluidPathType = fluidstate.getBlockPathType(level, pos, null, true);
 +                    if (loggableFluidPathType != null) return loggableFluidPathType;
                      return fluidstate.is(FluidTags.WATER) ? PathType.WATER : PathType.OPEN;
                  }

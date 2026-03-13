@@ -10,4 +10,4 @@
 +    @Deprecated
      Map<Optional<ResourceKey<WorldPreset>>, PresetEditor> EDITORS = Map.of(
          Optional.of(WorldPresets.FLAT),
-         (p_232974_, p_232975_) -> {
+         (parent, settings) -> {

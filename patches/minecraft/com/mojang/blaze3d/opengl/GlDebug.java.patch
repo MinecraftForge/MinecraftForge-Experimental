@@ -1,6 +1,6 @@
 --- a/com/mojang/blaze3d/opengl/GlDebug.java
 +++ b/com/mojang/blaze3d/opengl/GlDebug.java
-@@ -24,6 +_,14 @@
+@@ -22,6 +_,14 @@
  
  @OnlyIn(Dist.CLIENT)
  public class GlDebug {
@@ -15,7 +15,7 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final int CIRCULAR_LOG_SIZE = 10;
      private final Queue<GlDebug.LogEntry> MESSAGE_BUFFER = EvictingQueue.create(10);
-@@ -105,6 +_,8 @@
+@@ -103,6 +_,8 @@
          }
  
          LOGGER.info("OpenGL debug message: {}", gldebug$logentry);
@@ -24,11 +24,21 @@
      }
  
      public List<String> getLastOpenGlDebugMessages() {
-@@ -120,6 +_,7 @@
-     }
+@@ -126,7 +_,7 @@
+                 GlDebug gldebug1 = new GlDebug();
+                 enabledExtensions.add("GL_KHR_debug");
+                 GL11.glEnable(37600);
+-                if (debugSynchronousGlLogs) {
++                if (debugSynchronousGlLogs | PRINT_STACKTRACE_ON_ERROR) {
+                     GL11.glEnable(33346);
+                 }
  
-     public static @Nullable GlDebug enableDebugCallback(int p_394351_, boolean p_393026_, Set<String> p_393339_) {
-+        p_393026_ |= PRINT_STACKTRACE_ON_ERROR;
-         if (p_394351_ <= 0) {
-             return null;
-         } else {
+@@ -140,7 +_,7 @@
+             } else if (glcapabilities.GL_ARB_debug_output && GlDevice.USE_GL_ARB_debug_output) {
+                 GlDebug gldebug = new GlDebug();
+                 enabledExtensions.add("GL_ARB_debug_output");
+-                if (debugSynchronousGlLogs) {
++                if (debugSynchronousGlLogs | PRINT_STACKTRACE_ON_ERROR) {
+                     GL11.glEnable(33346);
+                 }
+ 

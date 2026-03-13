@@ -1,44 +1,51 @@
 --- a/net/minecraft/client/renderer/LevelRenderer.java
 +++ b/net/minecraft/client/renderer/LevelRenderer.java
-@@ -184,6 +_,7 @@
-         this.submitNodeStorage = p_427160_.getSubmitNodeStorage();
-         this.levelRenderState = p_429507_;
-         this.featureRenderDispatcher = p_427160_;
+@@ -189,6 +_,7 @@
+         this.optionsRenderState = gameRenderState.optionsRenderState;
+         this.levelRenderState = gameRenderState.levelRenderState;
+         this.featureRenderDispatcher = featureRenderDispatcher;
 +        net.minecraftforge.client.event.ForgeEventFactoryClient.onInitLevelRenderer();
      }
  
      @Override
-@@ -485,9 +_,10 @@
-         profilerfiller.push("entities");
-         this.extractVisibleEntities(p_109604_, frustum, p_342180_, this.levelRenderState);
-         profilerfiller.popPush("blockEntities");
--        this.extractVisibleBlockEntities(p_109604_, f, this.levelRenderState);
-+        this.extractVisibleBlockEntities(p_109604_, f, this.levelRenderState, frustum);
-         profilerfiller.popPush("blockOutline");
--        this.extractBlockOutline(p_109604_, this.levelRenderState);
-+        this.extractBlockOutline(p_109604_, this.levelRenderState, p_109603_);
-+        p_109603_ = this.levelRenderState.blockOutlineRenderState != null;
-         profilerfiller.popPush("blockBreaking");
-         this.extractBlockDestroyAnimation(p_109604_, this.levelRenderState);
-         profilerfiller.popPush("weather");
-@@ -561,6 +_,7 @@
+@@ -515,8 +_,9 @@
+             this.addSkyPass(framegraphbuilder, cameraState, terrainFog);
          }
  
-         this.addLateDebugPass(framegraphbuilder, this.levelRenderState.cameraRenderState, p_407881_, p_254120_);
++        var hasCustomOutline = this.levelRenderState.blockOutlineRenderState != null && this.levelRenderState.blockOutlineRenderState.customRenderer() != null;
+         this.addMainPass(
+-            framegraphbuilder, frustum, modelViewMatrix, terrainFog, renderOutline, this.levelRenderState, deltaTracker, profilerfiller, chunkSectionsToRender
++            framegraphbuilder, frustum, modelViewMatrix, terrainFog, renderOutline | hasCustomOutline, this.levelRenderState, deltaTracker, profilerfiller, chunkSectionsToRender
+         );
+         PostChain postchain1 = this.minecraft.getShaderManager().getPostChain(ENTITY_OUTLINE_POST_CHAIN_ID, LevelTargetBundle.OUTLINE_TARGETS);
+         if (this.levelRenderState.haveGlowingEntities && postchain1 != null) {
+@@ -543,6 +_,7 @@
+         }
+ 
+         this.addLateDebugPass(framegraphbuilder, this.levelRenderState.cameraRenderState, terrainFog, modelViewMatrix);
 +        net.minecraftforge.client.FramePassManager.insertForgePasses(framegraphbuilder, targets, this.levelRenderState); // Forge: Modded passes are inserted here.
          profilerfiller.popPush("executeFrameGraph");
-         framegraphbuilder.execute(p_367325_, new FrameGraphBuilder.Inspector() {
-             @Override
-@@ -841,7 +_,7 @@
+         framegraphbuilder.execute(resourceAllocator, new FrameGraphBuilder.Inspector() {
+             {
+@@ -580,7 +_,7 @@
+         profilerfiller.popPush("entities");
+         this.extractVisibleEntities(camera, frustum, deltaTracker, this.levelRenderState);
+         profilerfiller.popPush("blockEntities");
+-        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState);
++        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState, frustum);
+         profilerfiller.popPush("blockOutline");
+         this.extractBlockOutline(camera, this.levelRenderState);
+         profilerfiller.popPush("blockBreaking");
+@@ -863,7 +_,7 @@
          }
      }
  
--    private void extractVisibleBlockEntities(Camera p_427254_, float p_426770_, LevelRenderState p_428920_) {
-+    private void extractVisibleBlockEntities(Camera p_427254_, float p_426770_, LevelRenderState p_428920_, Frustum frustum) {
-         Vec3 vec3 = p_427254_.position();
+-    private void extractVisibleBlockEntities(final Camera camera, final float deltaPartialTick, final LevelRenderState levelRenderState) {
++    private void extractVisibleBlockEntities(final Camera camera, final float deltaPartialTick, final LevelRenderState levelRenderState, final Frustum frustum) {
+         Vec3 vec3 = camera.position();
          double d0 = vec3.x();
          double d1 = vec3.y();
-@@ -852,6 +_,7 @@
+@@ -874,6 +_,7 @@
              List<BlockEntity> list = sectionrenderdispatcher$rendersection.getSectionMesh().getRenderableBlockEntities();
              if (!list.isEmpty() && !(sectionrenderdispatcher$rendersection.getVisibility(Util.getMillis()) < 0.3F)) {
                  for (BlockEntity blockentity : list) {
@@ -46,59 +53,57 @@
                      BlockPos blockpos = blockentity.getBlockPos();
                      SortedSet<BlockDestructionProgress> sortedset = this.destructionProgress.get(blockpos.asLong());
                      ModelFeatureRenderer.CrumblingOverlay modelfeaturerenderer$crumblingoverlay;
-@@ -879,6 +_,7 @@
+@@ -902,6 +_,7 @@
              if (blockentity1.isRemoved()) {
                  iterator.remove();
              } else {
 +                if (!frustum.isVisible(blockentity1.getRenderBoundingBox())) continue;
-                 BlockEntityRenderState blockentityrenderstate1 = this.blockEntityRenderDispatcher.tryExtractRenderState(blockentity1, p_426770_, null);
+                 BlockEntityRenderState blockentityrenderstate1 = this.blockEntityRenderDispatcher.tryExtractRenderState(blockentity1, deltaPartialTick, null);
                  if (blockentityrenderstate1 != null) {
-                     p_428920_.blockEntityRenderStates.add(blockentityrenderstate1);
-@@ -935,13 +_,21 @@
-             VertexConsumer vertexconsumer = new SheetedDecalTextureGenerator(
-                 p_365998_.getBuffer(ModelBakery.DESTROY_TYPES.get(blockbreakingrenderstate.progress)), posestack$pose, 1.0F
-             );
--            this.minecraft.getBlockRenderer().renderBreakingTexture(blockbreakingrenderstate.blockState, blockpos, blockbreakingrenderstate, p_366956_, vertexconsumer);
-+            this.minecraft.getBlockRenderer().renderBreakingTexture(blockbreakingrenderstate.blockState, blockpos, blockbreakingrenderstate, p_366956_, vertexconsumer, level.getModelDataManager().getAtOrEmpty(blockpos));
-             p_366956_.popPose();
+                     levelRenderState.blockEntityRenderStates.add(blockentityrenderstate1);
+@@ -938,7 +_,7 @@
+                 SortedSet<BlockDestructionProgress> sortedset = entry.getValue();
+                 if (sortedset != null && !sortedset.isEmpty()) {
+                     int i = sortedset.last().getProgress();
+-                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(blockpos, this.level.getBlockState(blockpos), i));
++                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(blockpos, this.level.getBlockState(blockpos), i, this.level.getModelDataManager().getAtOrEmpty(blockpos)));
+                 }
+             }
          }
-     }
+@@ -966,6 +_,12 @@
  
--    private void extractBlockOutline(Camera p_428965_, LevelRenderState p_424419_) {
-+    private void extractBlockOutline(Camera p_428965_, LevelRenderState p_424419_, boolean shouldRender) {
-         p_424419_.blockOutlineRenderState = null;
-+        var custom = net.minecraftforge.client.ForgeHooksClient.onExtractBlockOutline(this, p_428965_, p_424419_, this.minecraft.hitResult);
+     private void extractBlockOutline(final Camera camera, final LevelRenderState levelRenderState) {
+         levelRenderState.blockOutlineRenderState = null;
++        var custom = net.minecraftforge.client.ForgeHooksClient.onExtractBlockOutline(this, camera, levelRenderState, this.minecraft.hitResult);
 +        if (custom != null) {
-+            p_424419_.blockOutlineRenderState = new BlockOutlineRenderState(BlockPos.ZERO, false, false, net.minecraft.world.phys.shapes.Shapes.empty(), null, null, null, custom);
-+            return;
-+        } else if (!shouldRender) {
++            levelRenderState.blockOutlineRenderState = new BlockOutlineRenderState(BlockPos.ZERO, false, false, net.minecraft.world.phys.shapes.Shapes.empty(), null, null, null, custom);
 +            return;
 +        }
 +
          if (this.minecraft.hitResult instanceof BlockHitResult blockhitresult) {
              if (blockhitresult.getType() != HitResult.Type.MISS) {
                  BlockPos blockpos = blockhitresult.getBlockPos();
-@@ -967,6 +_,10 @@
-     private void renderBlockOutline(MultiBufferSource.BufferSource p_367206_, PoseStack p_365062_, boolean p_368189_, LevelRenderState p_422597_) {
-         BlockOutlineRenderState blockoutlinerenderstate = p_422597_.blockOutlineRenderState;
+@@ -999,6 +_,10 @@
+     ) {
+         BlockOutlineRenderState blockoutlinerenderstate = levelRenderState.blockOutlineRenderState;
          if (blockoutlinerenderstate != null) {
 +            if (blockoutlinerenderstate.customRenderer() != null) {
-+                blockoutlinerenderstate.customRenderer().render(p_367206_, p_365062_, p_368189_, p_422597_);
++                blockoutlinerenderstate.customRenderer().render(bufferSource, poseStack, onlyTranslucentBlocks, levelRenderState);
 +                return;
 +            }
-             if (blockoutlinerenderstate.isTranslucent() == p_368189_) {
-                 Vec3 vec3 = p_422597_.cameraRenderState.pos;
+             if (blockoutlinerenderstate.isTranslucent() == onlyTranslucentBlocks) {
+                 Vec3 vec3 = levelRenderState.cameraRenderState.pos;
                  if (blockoutlinerenderstate.highContrast()) {
-@@ -1435,7 +_,7 @@
+@@ -1491,7 +_,7 @@
          } else {
-             int i = p_398213_.packedBrightness(p_109538_, p_109540_);
-             int j = LightTexture.block(i);
--            int k = p_109539_.getLightEmission();
-+            int k = p_109539_.getLightEmission(p_109538_, p_109540_);
-             if (j < k) {
-                 int l = LightTexture.sky(i);
-                 return LightTexture.pack(k, l);
-@@ -1492,6 +_,18 @@
+             int i = brightnessGetter.packedBrightness(level, pos);
+             int j = LightCoordsUtil.block(i);
+-            int k = state.getLightEmission();
++            int k = state.getLightEmission(level, pos);
+             return j < k ? LightCoordsUtil.withBlock(i, k) : i;
+         }
+     }
+@@ -1539,6 +_,18 @@
  
      public CloudRenderer getCloudRenderer() {
          return this.cloudRenderer;

@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ChiseledBookShelfBlockEntity.java
 @@ -135,4 +_,28 @@
-     public void removeComponentsFromTag(ValueOutput p_405909_) {
-         p_405909_.discard("Items");
+     public void removeComponentsFromTag(final ValueOutput output) {
+         output.discard("Items");
      }
 +
 +    private net.minecraftforge.common.util.LazyOptional<?> itemHandler = net.minecraftforge.common.util.LazyOptional.of(this::createUnSidedHandler);

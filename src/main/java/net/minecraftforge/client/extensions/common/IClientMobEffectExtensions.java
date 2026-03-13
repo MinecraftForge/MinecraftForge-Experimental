@@ -6,7 +6,7 @@
 package net.minecraftforge.client.extensions.common;
 
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -52,14 +52,14 @@ public interface IClientMobEffectExtensions {
      * Renders the text and icon of the specified effect in the player's inventory.
      *
      * @param instance     The effect instance
-     * @param effects       The effect-rendering screen
-     * @param guiGraphics  The gui graphics
+     * @param effects      The effect-rendering screen
+     * @param graphics     The gui graphics
      * @param x            The x coordinate
      * @param y            The y coordinate
      * @param blitOffset   The blit offset
      * @return true to prevent default rendering, false otherwise
      */
-    default boolean renderInventory(MobEffectInstance instance, EffectsInInventory effects, GuiGraphics guiGraphics, int x, int y, int blitOffset) {
+    default boolean extractInventory(MobEffectInstance instance, EffectsInInventory effects, GuiGraphicsExtractor graphics, int x, int y, int blitOffset) {
         return false;
     }
 
@@ -69,14 +69,14 @@ public interface IClientMobEffectExtensions {
      *
      * @param instance    The effect instance
      * @param gui         The gui
-     * @param guiGraphics The gui graphics
+     * @param graphics    The gui graphics
      * @param x           The x coordinate
      * @param y           The y coordinate
      * @param z           The z depth
      * @param alpha       The alpha value. Blinks when the effect is about to run out
      * @return true to prevent default rendering, false otherwise
      */
-    default boolean renderGuiIcon(MobEffectInstance instance, Gui gui, GuiGraphics guiGraphics, int x, int y, float z, float alpha) {
+    default boolean extractGuiIcon(MobEffectInstance instance, Gui gui, GuiGraphicsExtractor graphics, int x, int y, float z, float alpha) {
         return false;
     }
 }

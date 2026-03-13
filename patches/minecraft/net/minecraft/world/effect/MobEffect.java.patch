@@ -11,32 +11,28 @@
      public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MobEffect>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT);
      private static final int AMBIENT_ALPHA = Mth.floor(38.25F);
 @@ -58,12 +_,14 @@
-             int i = p_358853_.isAmbient() ? AMBIENT_ALPHA : 255;
-             return ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, ARGB.color(i, p_19452_));
+             int i = effectInstance.isAmbient() ? AMBIENT_ALPHA : 255;
+             return ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, ARGB.color(i, color));
          };
 +        initClient();
      }
  
-     protected MobEffect(MobEffectCategory p_335432_, int p_334901_, ParticleOptions p_331136_) {
-         this.category = p_335432_;
-         this.color = p_334901_;
-         this.particleFactory = p_326745_ -> p_331136_;
+     protected MobEffect(final MobEffectCategory category, final int color, final ParticleOptions particleOptions) {
+         this.category = category;
+         this.color = color;
+         this.particleFactory = ignored -> particleOptions;
 +        initClient();
      }
  
      public int getBlendInDurationTicks() {
-@@ -202,4 +_,28 @@
-             return new AttributeModifier(this.id, this.amount * (p_332230_ + 1), this.operation);
+@@ -207,5 +_,23 @@
+         public AttributeModifier create(final int amplifier) {
+             return new AttributeModifier(this.id, this.amount * (amplifier + 1), this.operation);
          }
-     }
++    }
 +
-+    // FORGE START
 +    private Object effectRenderer;
-+
-+    /*
-+       DO NOT CALL, IT WILL DISAPPEAR IN THE FUTURE
-+       Call RenderProperties.getEffectRenderer instead
-+     */
++    @org.jetbrains.annotations.ApiStatus.Internal
 +    public Object getEffectRendererInternal() {
 +        return effectRenderer;
 +    }
@@ -51,6 +47,5 @@
 +    }
 +
 +    public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientMobEffectExtensions> consumer) {
-+    }
-+    // END FORGE
+     }
  }

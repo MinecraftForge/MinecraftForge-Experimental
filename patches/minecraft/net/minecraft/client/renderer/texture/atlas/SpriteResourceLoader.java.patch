@@ -4,9 +4,9 @@
                  framesize = new FrameSize(nativeimage.getWidth(), nativeimage.getHeight());
              }
  
-+            SpriteContents contents = net.minecraftforge.client.ForgeHooksClient.loadSpriteContents(p_448404_, p_448405_, framesize, nativeimage, list);
++            SpriteContents contents = net.minecraftforge.client.ForgeHooksClient.loadSpriteContents(spriteLocation, resource, framesize, nativeimage, list);
 +            if (contents != null) return contents;
 +
-             return new SpriteContents(p_448404_, framesize, nativeimage, optional, list, optional1);
+             return new SpriteContents(spriteLocation, framesize, nativeimage, optional, list, optional1);
          };
      }

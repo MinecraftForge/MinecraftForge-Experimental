@@ -24,8 +24,8 @@
 +            return this.builder.containsKey(attribute);
 +        }
  
-         private AttributeInstance create(Holder<Attribute> p_334904_) {
-             AttributeInstance attributeinstance = new AttributeInstance(p_334904_, p_326800_ -> {
+         private AttributeInstance create(final Holder<Attribute> attribute) {
+             AttributeInstance attributeinstance = new AttributeInstance(attribute, attributeInstance -> {
 @@ -91,7 +_,8 @@
  
          public AttributeSupplier build() {

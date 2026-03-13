@@ -1,10 +1,10 @@
 --- a/net/minecraft/world/level/block/grower/TreeGrower.java
 +++ b/net/minecraft/world/level/block/grower/TreeGrower.java
 @@ -128,6 +_,9 @@
-         ResourceKey<ConfiguredFeature<?, ?>> resourcekey = this.getConfiguredMegaFeature(p_309951_);
+         ResourceKey<ConfiguredFeature<?, ?>> resourcekey = this.getConfiguredMegaFeature(random);
          if (resourcekey != null) {
-             Holder<ConfiguredFeature<?, ?>> holder = p_309830_.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).get(resourcekey).orElse(null);
-+            var event = net.minecraftforge.event.ForgeEventFactory.blockGrowFeature(p_309830_, p_309951_, p_310327_, holder);
+             Holder<ConfiguredFeature<?, ?>> holder = level.registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).get(resourcekey).orElse(null);
++            var event = net.minecraftforge.event.ForgeEventFactory.blockGrowFeature(level, random, pos, holder);
 +            holder = event.getFeature();
 +            if (event.getResult().isDenied()) return false;
              if (holder != null) {

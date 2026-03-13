@@ -9,8 +9,8 @@
                  double d0 = this.getDeltaMovement().lengthSqr();
                  if (flag && d0 > 1.0) {
                      BlockHitResult blockhitresult = this.level()
-@@ -171,7 +_,7 @@
-                                 this
+@@ -167,7 +_,7 @@
+                                 new Vec3(this.xo, this.yo, this.zo), this.position(), ClipContext.Block.COLLIDER, ClipContext.Fluid.SOURCE_ONLY, this
                              )
                          );
 -                    if (blockhitresult.getType() != HitResult.Type.MISS && this.level().getFluidState(blockhitresult.getBlockPos()).is(FluidTags.WATER)) {

@@ -3,12 +3,12 @@
 @@ -123,7 +_,10 @@
  
      @Override
-     public boolean canBeAffected(MobEffectInstance p_454269_) {
--        return p_454269_.is(MobEffects.POISON) ? false : super.canBeAffected(p_454269_);
-+        if (p_454269_.getEffect() == MobEffects.POISON) {
-+            return net.minecraftforge.event.ForgeEventFactory.onLivingEffectCanApply(this, p_454269_).getResult().isAllowed();
+     public boolean canBeAffected(final MobEffectInstance newEffect) {
+-        return newEffect.is(MobEffects.POISON) ? false : super.canBeAffected(newEffect);
++        if (newEffect.getEffect() == MobEffects.POISON) {
++            return net.minecraftforge.event.ForgeEventFactory.onLivingEffectCanApply(this, newEffect).getResult().isAllowed();
 +        }
-+        return super.canBeAffected(p_454269_);
++        return super.canBeAffected(newEffect);
      }
  
      public boolean isClimbing() {

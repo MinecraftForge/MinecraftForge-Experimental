@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
@@ -45,7 +46,6 @@ import net.minecraftforge.client.model.data.ModelDataManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;

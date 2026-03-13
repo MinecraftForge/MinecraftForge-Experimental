@@ -3,16 +3,16 @@
 @@ -19,6 +_,10 @@
      }
  
-     public @Nullable T detectPackResources(Path p_298083_, List<ForbiddenSymlinkInfo> p_297322_) throws IOException {
-+        return detectPackResources(p_298083_, p_297322_, true);
+     public @Nullable T detectPackResources(final Path content, final List<ForbiddenSymlinkInfo> issues) throws IOException {
++        return detectPackResources(content, issues, true);
 +    }
 +    @Nullable
-+    public T detectPackResources(Path p_298083_, List<ForbiddenSymlinkInfo> p_297322_, boolean requireMeta) throws IOException {
-         Path path = p_298083_;
++    public T detectPackResources(Path content, List<ForbiddenSymlinkInfo> issues, boolean requireMeta) throws IOException {
+         Path path = content;
  
          BasicFileAttributes basicfileattributes;
 @@ -43,10 +_,11 @@
-             if (!p_297322_.isEmpty()) {
+             if (!issues.isEmpty()) {
                  return null;
              } else {
 -                return !Files.isRegularFile(path.resolve("pack.mcmeta")) ? null : this.createDirectoryPack(path);

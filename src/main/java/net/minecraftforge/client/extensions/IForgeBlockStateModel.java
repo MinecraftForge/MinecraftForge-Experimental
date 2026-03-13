@@ -5,15 +5,15 @@
 
 package net.minecraftforge.client.extensions;
 
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
@@ -34,8 +34,8 @@ public interface IForgeBlockStateModel {
         return modelData;
     }
 
-    default TextureAtlasSprite particleIcon(@NotNull ModelData data) {
-        return self().particleIcon();
+    default Material.Baked particleMaterial(@NotNull ModelData data) {
+        return self().particleMaterial();
     }
 
     /**
@@ -49,22 +49,11 @@ public interface IForgeBlockStateModel {
     }
 
     /**
-     * Collects the parts of this model to render for the specified render type.
-     * Not all paths call this, or use a valid render type. So it is recommended to also implement a sane default in
+     * Collects the parts of this model with the specified ModelData.
+     * Not all paths call this, or pass in empty data. So it is recommended to also implement a sane default in
      * the normal {@link BlockStateModel#collectParts(RandomSource, List)} method.
      */
-    default List<BlockModelPart> collectParts(RandomSource random, ModelData data, @Nullable ChunkSectionLayer renderType) {
-        List<BlockModelPart> list = new ObjectArrayList<>();
-        this.collectParts(random, list, data, renderType);
-        return list;
-    }
-
-    /**
-     * Collects the parts of this model to render for the specified render type.
-     * Not all paths call this, or use a valid render type. So it is recommended to also implement a sane default in
-     * the normal {@link BlockStateModel#collectParts(RandomSource, List)} method.
-     */
-    default void collectParts(RandomSource random, List<BlockModelPart> dest, ModelData data, @Nullable ChunkSectionLayer renderType) {
-        self().collectParts(random, dest);
+    default void collectParts(RandomSource random, List<BlockStateModelPart> output, ModelData data) {
+        self().collectParts(random, output);
     }
 }

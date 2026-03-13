@@ -1,53 +1,48 @@
 --- a/net/minecraft/world/level/block/entity/BlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BlockEntity.java
-@@ -36,7 +_,7 @@
+@@ -39,7 +_,7 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
--public abstract class BlockEntity implements DebugValueSource {
-+public abstract class BlockEntity extends net.minecraftforge.common.capabilities.CapabilityProvider.BlockEntities implements DebugValueSource, net.minecraftforge.common.extensions.IForgeBlockEntity {
+-public abstract class BlockEntity implements DebugValueSource, TypedInstance<BlockEntityType<?>> {
++public abstract class BlockEntity extends net.minecraftforge.common.capabilities.CapabilityProvider.BlockEntities implements DebugValueSource, TypedInstance<BlockEntityType<?>>, net.minecraftforge.common.extensions.IForgeBlockEntity {
      private static final Codec<BlockEntityType<?>> TYPE_CODEC = BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec();
      private static final Logger LOGGER = LogUtils.getLogger();
      private final BlockEntityType<?> type;
-@@ -47,10 +_,12 @@
-     private DataComponentMap components = DataComponentMap.EMPTY;
- 
-     public BlockEntity(BlockEntityType<?> p_155228_, BlockPos p_155229_, BlockState p_155230_) {
-+        super();
-         this.type = p_155228_;
-         this.worldPosition = p_155229_.immutable();
-         this.validateBlockState(p_155230_);
-         this.blockState = p_155230_;
+@@ -54,6 +_,7 @@
+         this.worldPosition = worldPosition.immutable();
+         this.validateBlockState(blockState);
+         this.blockState = blockState;
 +        this.gatherCapabilities();
      }
  
-     private void validateBlockState(BlockState p_345558_) {
-@@ -60,7 +_,7 @@
+     private void validateBlockState(final BlockState blockState) {
+@@ -63,7 +_,7 @@
      }
  
-     public boolean isValidBlockState(BlockState p_345570_) {
--        return this.type.isValid(p_345570_);
-+        return this.getType().isValid(p_345570_);
+     public boolean isValidBlockState(final BlockState blockState) {
+-        return this.type.isValid(blockState);
++        return this.getType().isValid(blockState);
      }
  
-     public static BlockPos getPosFromTag(ChunkPos p_396083_, CompoundTag p_187473_) {
-@@ -91,6 +_,7 @@
+     public static BlockPos getPosFromTag(final ChunkPos base, final CompoundTag entityTag) {
+@@ -94,6 +_,7 @@
      }
  
-     protected void loadAdditional(ValueInput p_409136_) {
-+        if (getCapabilities() != null) p_409136_.read("ForgeCaps", CompoundTag.CODEC).ifPresent(caps -> deserializeCaps(p_409136_.lookup(), caps));
+     protected void loadAdditional(final ValueInput input) {
++        if (getCapabilities() != null) input.read("ForgeCaps", CompoundTag.CODEC).ifPresent(caps -> deserializeCaps(input.lookup(), caps));
      }
  
-     public final void loadWithComponents(ValueInput p_409893_) {
-@@ -103,6 +_,7 @@
+     public final void loadWithComponents(final ValueInput input) {
+@@ -106,6 +_,7 @@
      }
  
-     protected void saveAdditional(ValueOutput p_407573_) {
-+        if (getCapabilities() != null) p_407573_.storeNullable("ForgeCaps", CompoundTag.CODEC, serializeCaps(p_407573_));
+     protected void saveAdditional(final ValueOutput output) {
++        if (getCapabilities() != null) output.storeNullable("ForgeCaps", CompoundTag.CODEC, serializeCaps(output));
      }
  
-     public final CompoundTag saveWithFullMetadata(HolderLookup.Provider p_331193_) {
-@@ -236,6 +_,13 @@
+     public final CompoundTag saveWithFullMetadata(final HolderLookup.Provider registries) {
+@@ -239,6 +_,13 @@
  
      public void setRemoved() {
          this.remove = true;

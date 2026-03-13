@@ -8,32 +8,32 @@
 +        } else if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) {
              if (this.level() instanceof ServerLevel serverlevel) {
                  this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
-                 this.gameEvent(GameEvent.SHEAR, p_454203_);
+                 this.gameEvent(GameEvent.SHEAR, player);
 @@ -170,15 +_,26 @@
  
      @Override
-     public void shear(ServerLevel p_454992_, SoundSource p_460786_, ItemStack p_454795_) {
-+        for (var stack : shearInternal(p_454992_, p_460786_, p_454795_)) {
+     public void shear(final ServerLevel level, final SoundSource soundSource, final ItemStack tool) {
++        for (var stack : shearInternal(level, soundSource, tool)) {
 +            for (int i = 0; i < stack.getCount(); i++) {
 +                this.level().addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(1.0D), this.getZ(), stack.copyWithCount(1)));
 +            }
 +        }
 +    }
 +
-+    private java.util.List<ItemStack> shearInternal(ServerLevel p_454992_, SoundSource p_460786_, ItemStack p_454795_) {
++    private java.util.List<ItemStack> shearInternal(ServerLevel level, SoundSource soundSource, ItemStack tool) {
 +        var ret = new java.util.ArrayList<ItemStack>();
 +        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.COW, time -> {}))
 +            return ret;
-         p_454992_.playSound(null, this, SoundEvents.MOOSHROOM_SHEAR, p_460786_, 1.0F, 1.0F);
-         this.convertTo(EntityType.COW, ConversionParams.single(this, false, false), p_458024_ -> {
-             p_454992_.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(0.5), this.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
-             this.dropFromShearingLootTable(p_454992_, BuiltInLootTables.SHEAR_MOOSHROOM, p_454795_, (p_460709_, p_451895_) -> {
--                for (int i = 0; i < p_451895_.getCount(); i++) {
--                    p_460709_.addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(1.0), this.getZ(), p_451895_.copyWithCount(1)));
+         level.playSound(null, this, SoundEvents.MOOSHROOM_SHEAR, soundSource, 1.0F, 1.0F);
+         this.convertTo(EntityType.COW, ConversionParams.single(this, false, false), cow -> {
+             level.sendParticles(ParticleTypes.EXPLOSION, this.getX(), this.getY(0.5), this.getZ(), 1, 0.0, 0.0, 0.0, 0.0);
+             this.dropFromShearingLootTable(level, BuiltInLootTables.SHEAR_MOOSHROOM, tool, (l, drop) -> {
+-                for (int i = 0; i < drop.getCount(); i++) {
+-                    l.addFreshEntity(new ItemEntity(this.level(), this.getX(), this.getY(1.0), this.getZ(), drop.copyWithCount(1)));
 -                }
-+                ret.add(p_451895_);
++                ret.add(tool);
              });
-+            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_458024_);
++            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, cow);
          });
 +        return ret;
      }

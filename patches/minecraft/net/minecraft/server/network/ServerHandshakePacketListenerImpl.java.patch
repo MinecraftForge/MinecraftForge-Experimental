@@ -3,11 +3,11 @@
 @@ -24,6 +_,7 @@
  
      @Override
-     public void handleIntention(ClientIntentionPacket p_9975_) {
-+        if (!net.minecraftforge.server.ServerLifecycleHooks.handleServerLogin(p_9975_, this.connection)) return;
-         switch (p_9975_.intention()) {
+     public void handleIntention(final ClientIntentionPacket packet) {
++        if (!net.minecraftforge.server.ServerLifecycleHooks.handleServerLogin(packet, this.connection)) return;
+         switch (packet.intention()) {
              case LOGIN:
-                 this.beginLogin(p_9975_, false);
+                 this.beginLogin(packet, false);
 @@ -32,7 +_,7 @@
                  ServerStatus serverstatus = this.server.getStatus();
                  this.connection.setupOutboundProtocol(StatusProtocols.CLIENTBOUND);

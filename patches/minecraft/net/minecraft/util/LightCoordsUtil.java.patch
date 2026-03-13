@@ -1,0 +1,11 @@
+--- a/net/minecraft/util/LightCoordsUtil.java
++++ b/net/minecraft/util/LightCoordsUtil.java
+@@ -10,7 +_,7 @@
+     }
+ 
+     public static int block(final int packed) {
+-        return packed >> 4 & 15;
++        return (packed & 0xFFFF) >> 4; // Forge: Fix fullbright quads showing dark artifacts. Reported as MC-169806
+     }
+ 
+     public static int sky(final int packed) {

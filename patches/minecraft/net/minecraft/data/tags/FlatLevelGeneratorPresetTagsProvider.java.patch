@@ -1,13 +1,13 @@
 --- a/net/minecraft/data/tags/FlatLevelGeneratorPresetTagsProvider.java
 +++ b/net/minecraft/data/tags/FlatLevelGeneratorPresetTagsProvider.java
 @@ -13,6 +_,10 @@
-         super(p_256604_, Registries.FLAT_LEVEL_GENERATOR_PRESET, p_255962_);
+         super(output, Registries.FLAT_LEVEL_GENERATOR_PRESET, lookupProvider);
      }
  
-+    public FlatLevelGeneratorPresetTagsProvider(PackOutput p_256604_, CompletableFuture<HolderLookup.Provider> p_255962_, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
-+        super(p_256604_, Registries.FLAT_LEVEL_GENERATOR_PRESET, p_255962_, modId, existingFileHelper);
++    public FlatLevelGeneratorPresetTagsProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
++        super(output, Registries.FLAT_LEVEL_GENERATOR_PRESET, lookupProvider, modId, existingFileHelper);
 +    }
 +
      @Override
-     protected void addTags(HolderLookup.Provider p_255741_) {
+     protected void addTags(final HolderLookup.Provider registries) {
          this.tag(FlatLevelGeneratorPresetTags.VISIBLE)

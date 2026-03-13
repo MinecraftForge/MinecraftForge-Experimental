@@ -1,19 +1,19 @@
 --- a/net/minecraft/client/multiplayer/ServerStatusPinger.java
 +++ b/net/minecraft/client/multiplayer/ServerStatusPinger.java
-@@ -107,6 +_,7 @@
-                                 p_105461_.run();
+@@ -138,6 +_,7 @@
+                                 onPersistentDataChange.run();
                              }
                          });
-+                        net.minecraftforge.client.ForgeHooksClient.processForgeListPingData(serverstatus, p_105460_);
++                        net.minecraftforge.client.ForgeHooksClient.processForgeListPingData(serverstatus, data);
                          this.pingStart = Util.getMillis();
                          connection.send(new ServerboundPingRequestPacket(this.pingStart));
                          this.success = true;
-@@ -152,7 +_,7 @@
-     }
- 
-     void pingLegacyServer(InetSocketAddress p_171812_, final ServerAddress p_300887_, final ServerData p_171813_, EventLoopGroupHolder p_457463_) {
--        new Bootstrap().group(p_457463_.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
-+        new Bootstrap().group(p_457463_.eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
-             @Override
-             protected void initChannel(Channel p_105498_) {
-                 try {
+@@ -194,7 +_,7 @@
+     private void pingLegacyServer(
+         final InetSocketAddress resolvedAddress, final ServerAddress rawAddress, final ServerData data, final EventLoopGroupHolder eventLoopGroupHolder
+     ) {
+-        new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
++        new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
+             {
+                 Objects.requireNonNull(ServerStatusPinger.this);
+             }

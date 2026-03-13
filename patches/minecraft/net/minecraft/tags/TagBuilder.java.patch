@@ -7,17 +7,16 @@
 -public class TagBuilder {
 +public class TagBuilder implements net.minecraftforge.common.extensions.IForgeRawTagBuilder {
      private final List<TagEntry> entries = new ArrayList<>();
+     private boolean replace = false;
  
-     public static TagBuilder create() {
-@@ -34,5 +_,30 @@
+@@ -44,5 +_,18 @@
  
-     public TagBuilder addOptionalTag(Identifier p_458048_) {
-         return this.add(TagEntry.optionalTag(p_458048_));
+     public TagBuilder addOptionalTag(final Identifier id) {
+         return this.add(TagEntry.optionalTag(id));
 +    }
 +
 +    /** Forge: Used for datagen */
 +    private final List<TagEntry> removeEntries = new ArrayList<>();
-+    private boolean replace = false;
 +
 +    public java.util.stream.Stream<TagEntry> getRemoveEntries() { // should this return the List instead? Might end up with mem leaks from unterminated streams otherwise -Paint_Ninja
 +        return this.removeEntries.stream();
@@ -27,16 +26,5 @@
 +    public TagBuilder remove(TagEntry entry) {
 +        this.removeEntries.add(entry);
 +        return this;
-+    }
-+
-+    /** Forge: Set the replace property of this tag */
-+    public TagBuilder replace(boolean value) {
-+        this.replace = value;
-+        return this;
-+    }
-+
-+    /** Forge: Is this tag set to replace or not? */
-+    public boolean isReplace() {
-+        return this.replace;
      }
  }

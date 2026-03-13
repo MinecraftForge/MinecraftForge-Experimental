@@ -6,32 +6,32 @@
  
 -public abstract class VegetationBlock extends Block {
 +public abstract class VegetationBlock extends Block implements net.minecraftforge.common.IPlantable {
-     protected VegetationBlock(BlockBehaviour.Properties p_395394_) {
-         super(p_395394_);
+     protected VegetationBlock(final BlockBehaviour.Properties properties) {
+         super(properties);
      }
 @@ -21,7 +_,7 @@
      protected abstract MapCodec<? extends VegetationBlock> codec();
  
-     protected boolean mayPlaceOn(BlockState p_395950_, BlockGetter p_394817_, BlockPos p_393668_) {
--        return p_395950_.is(BlockTags.DIRT) || p_395950_.is(Blocks.FARMLAND);
-+        return p_395950_.is(BlockTags.DIRT) || p_395950_.getBlock() instanceof net.minecraft.world.level.block.FarmBlock;
+     protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
+-        return state.is(BlockTags.SUPPORTS_VEGETATION);
++        return state.is(BlockTags.SUPPORTS_VEGETATION) || state.getBlock() instanceof FarmlandBlock;
      }
  
      @Override
 @@ -43,6 +_,9 @@
      @Override
-     protected boolean canSurvive(BlockState p_397664_, LevelReader p_395119_, BlockPos p_393561_) {
-         BlockPos blockpos = p_393561_.below();
-+        if (p_397664_.getBlock() == this) { //Forge: This function is called during world gen and placement, before this block is set, so if we are not 'here' then assume it's the pre-check.
-+            return p_395119_.getBlockState(blockpos).canSustainPlant(p_395119_, blockpos, Direction.UP, this);
+     protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+         BlockPos blockpos = pos.below();
++        if (state.getBlock() == this) { //Forge: This function is called during world gen and placement, before this block is set, so if we are not 'here' then assume it's the pre-check.
++            return level.getBlockState(blockpos).canSustainPlant(level, blockpos, Direction.UP, this);
 +        }
-         return this.mayPlaceOn(p_395119_.getBlockState(blockpos), p_395119_, blockpos);
+         return this.mayPlaceOn(level.getBlockState(blockpos), level, blockpos);
      }
  
 @@ -54,5 +_,11 @@
      @Override
-     protected boolean isPathfindable(BlockState p_392416_, PathComputationType p_395772_) {
-         return p_395772_ == PathComputationType.AIR && !this.hasCollision ? true : super.isPathfindable(p_392416_, p_395772_);
+     protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
+         return type == PathComputationType.AIR && !this.hasCollision ? true : super.isPathfindable(state, type);
 +    }
 +
 +    @Override

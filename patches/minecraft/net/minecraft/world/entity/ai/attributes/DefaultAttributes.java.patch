@@ -3,15 +3,15 @@
 @@ -188,11 +_,12 @@
          .build();
  
-     public static AttributeSupplier getSupplier(EntityType<? extends LivingEntity> p_22298_) {
--        return SUPPLIERS.get(p_22298_);
-+        AttributeSupplier supplier = net.minecraftforge.common.ForgeHooks.getAttributesView().get(p_22298_);
-+        return supplier != null ? supplier : SUPPLIERS.get(p_22298_);
+     public static AttributeSupplier getSupplier(final EntityType<? extends LivingEntity> type) {
+-        return SUPPLIERS.get(type);
++        AttributeSupplier supplier = net.minecraftforge.common.ForgeHooks.getAttributesView().get(type);
++        return supplier != null ? supplier : SUPPLIERS.get(type);
      }
  
-     public static boolean hasSupplier(EntityType<?> p_22302_) {
--        return SUPPLIERS.containsKey(p_22302_);
-+        return SUPPLIERS.containsKey(p_22302_) || net.minecraftforge.common.ForgeHooks.getAttributesView().containsKey(p_22302_);
+     public static boolean hasSupplier(final EntityType<?> type) {
+-        return SUPPLIERS.containsKey(type);
++        return SUPPLIERS.containsKey(type) || net.minecraftforge.common.ForgeHooks.getAttributesView().containsKey(type);
      }
  
      public static void validate() {

@@ -15,22 +15,22 @@
              }
  
 +            Iterable<MobEffectInstance> iterable = collection.stream().filter(net.minecraftforge.client.ForgeHooksClient::shouldRenderEffect).sorted().toList();
-             this.renderEffects(p_456221_, collection, i, l, p_453611_, p_457243_, k);
+             this.extractEffects(graphics, collection, i, l, mouseX, mouseY, k);
          }
      }
-@@ -66,6 +_,11 @@
+@@ -72,6 +_,11 @@
  
          for (MobEffectInstance mobeffectinstance : iterable) {
              boolean flag = mobeffectinstance.isAmbient();
 +            var renderer = net.minecraftforge.client.extensions.common.IClientMobEffectExtensions.of(mobeffectinstance);
-+            if (renderer.renderInventory(mobeffectinstance, this, p_362146_, p_370153_, i, 0)) {
-+                i += p_365612_;
++            if (renderer.extractInventory(mobeffectinstance, this, graphics, x0, i, 0)) {
++                i += yStep;
 +                continue;
 +            }
              Component component = this.getEffectName(mobeffectinstance);
              Component component1 = MobEffectUtil.formatDuration(mobeffectinstance, 1.0F, this.minecraft.level.tickRateManager().tickrate());
-             int j = this.renderBackground(p_362146_, font, component, component1, p_370153_, i, flag, p_457235_);
-@@ -123,5 +_,9 @@
+             int j = this.extractBackground(graphics, font, component, component1, x0, i, flag, maxWidth);
+@@ -136,5 +_,9 @@
          }
  
          return mutablecomponent;

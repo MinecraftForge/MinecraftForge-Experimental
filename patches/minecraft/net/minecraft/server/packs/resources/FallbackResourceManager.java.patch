@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/packs/resources/FallbackResourceManager.java
 +++ b/net/minecraft/server/packs/resources/FallbackResourceManager.java
-@@ -101,8 +_,11 @@
+@@ -103,8 +_,11 @@
  
          for (int i = this.fallbacks.size() - 1; i >= 0; i--) {
              FallbackResourceManager.PackEntry fallbackresourcemanager$packentry = this.fallbacks.get(i);
@@ -11,10 +11,10 @@
 +                var children = pack.getChildren();
 +                var packs = children == null ? List.of(pack) : children;
 +                for (final PackResources packresources : packs) {
-                 IoSupplier<InputStream> iosupplier = packresources.getResource(this.type, p_458089_);
+                 IoSupplier<InputStream> iosupplier = packresources.getResource(this.type, location);
                  if (iosupplier != null) {
                      IoSupplier<ResourceMetadata> iosupplier1;
-@@ -116,6 +_,7 @@
+@@ -118,6 +_,7 @@
                      }
  
                      list.add(new Resource(packresources, iosupplier, iosupplier1));

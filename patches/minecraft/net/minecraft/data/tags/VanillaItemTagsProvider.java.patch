@@ -1,25 +1,25 @@
 --- a/net/minecraft/data/tags/VanillaItemTagsProvider.java
 +++ b/net/minecraft/data/tags/VanillaItemTagsProvider.java
-@@ -19,6 +_,10 @@
-         super(p_275657_, Registries.ITEM, p_275712_, p_405065_ -> p_405065_.builtInRegistryHolder().key());
+@@ -16,6 +_,10 @@
+         super(output, Registries.ITEM, lookupProvider, e -> e.builtInRegistryHolder().key());
      }
  
-+    public VanillaItemTagsProvider(PackOutput p_275657_, CompletableFuture<HolderLookup.Provider> p_275712_, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
-+        super(p_275657_, Registries.ITEM, p_275712_, p_405065_ -> p_405065_.builtInRegistryHolder().key(), modId, existingFileHelper);
++    public VanillaItemTagsProvider(final PackOutput output, final CompletableFuture<HolderLookup.Provider> lookupProvider, String modId, @org.jetbrains.annotations.Nullable net.minecraftforge.common.data.ExistingFileHelper existingFileHelper) {
++        super(output, Registries.ITEM, lookupProvider, e -> e.builtInRegistryHolder().key(), modId, existingFileHelper);
 +    }
 +
      @Override
-     protected void addTags(HolderLookup.Provider p_255639_) {
+     protected void addTags(final HolderLookup.Provider registries) {
          (new BlockItemTagsProvider() {
-@@ -485,6 +_,12 @@
+@@ -578,6 +_,12 @@
          @Override
-         public TagAppender<Block, Block> addOptionalTag(TagKey<Block> p_407315_) {
-             this.itemAppender.addOptionalTag(blockTagToItemTag(p_407315_));
+         public TagAppender<Block, Block> addOptionalTag(final TagKey<Block> tag) {
+             this.itemAppender.addOptionalTag(blockTagToItemTag(tag));
 +            return this;
 +        }
 +
 +        @Override
-+        public TagAppender<Block, Block> remove(Block value) {
++        public TagAppender<Block, Block> remove(final Block value) {
 +            this.itemAppender.remove(Objects.requireNonNull(value.asItem()));
              return this;
          }

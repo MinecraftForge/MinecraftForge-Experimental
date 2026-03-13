@@ -17,4 +17,4 @@
 +    public static class Builder<E> implements net.minecraftforge.common.extensions.IForgeWeightedList.Builder<E> {
          private final ImmutableList.Builder<Weighted<E>> result = ImmutableList.builder();
  
-         public WeightedList.Builder<E> add(E p_395636_) {
+         public WeightedList.Builder<E> add(final E item) {
