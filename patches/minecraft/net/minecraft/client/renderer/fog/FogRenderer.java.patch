@@ -5,9 +5,9 @@
              }
  
 +
-+            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(p_407993_, p_409359_, p_409862_, p_409400_, p_406105_, f, f1, f2);
++            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(p_407993_, p_409359_, p_409862_, p_409400_, p_406105_, f5, f1, f2);
 +
-+            f = fogColor.x();
++            f5 = fogColor.x();
 +            f1 = fogColor.y();
 +            f2 = fogColor.z();
 +
