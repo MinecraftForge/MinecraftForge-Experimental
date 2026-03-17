@@ -5,26 +5,24 @@
 
 package net.minecraftforge.client.model.data;
 
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import org.jetbrains.annotations.Nullable;
+
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 
 import java.util.IdentityHashMap;
 import java.util.Map;
 
-public class MultipartModelData
-{
+public class MultipartModelData {
     public static final ModelProperty<MultipartModelData> PROPERTY = new ModelProperty<>();
 
-    private final Map<BlockModelPart, ModelData> partData;
+    private final Map<BlockStateModelPart, ModelData> partData;
 
-    private MultipartModelData(Map<BlockModelPart, ModelData> partData)
-    {
+    private MultipartModelData(Map<BlockStateModelPart, ModelData> partData) {
         this.partData = partData;
     }
 
     @Nullable
-    public ModelData get(BlockModelPart model)
-    {
+    public ModelData get(BlockStateModelPart model) {
         return partData.get(model);
     }
 
@@ -35,8 +33,7 @@ public class MultipartModelData
      * @param model     The model to get data for
      * @return The data for the part, or the one passed in if not found
      */
-    public static ModelData resolve(ModelData modelData, BlockModelPart model)
-    {
+    public static ModelData resolve(ModelData modelData, BlockStateModelPart model) {
         var multipartData = modelData.get(PROPERTY);
         if (multipartData == null)
             return modelData;
@@ -44,23 +41,19 @@ public class MultipartModelData
         return partData != null ? partData : modelData;
     }
 
-    public static Builder builder()
-    {
+    public static Builder builder() {
         return new Builder();
     }
 
-    public static final class Builder
-    {
-        private final Map<BlockModelPart, ModelData> partData = new IdentityHashMap<>();
+    public static final class Builder {
+        private final Map<BlockStateModelPart, ModelData> partData = new IdentityHashMap<>();
 
-        public Builder with(BlockModelPart model, ModelData data)
-        {
+        public Builder with(BlockStateModelPart model, ModelData data) {
             partData.put(model, data);
             return this;
         }
 
-        public MultipartModelData build()
-        {
+        public MultipartModelData build() {
             return new MultipartModelData(partData);
         }
     }

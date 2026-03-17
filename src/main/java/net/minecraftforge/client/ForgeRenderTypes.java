@@ -6,8 +6,8 @@
 package net.minecraftforge.client;
 
 import com.mojang.blaze3d.pipeline.BlendFunction;
+import com.mojang.blaze3d.pipeline.ColorTargetState;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.platform.DepthTestFunction;
 import com.mojang.blaze3d.platform.DestFactor;
 import com.mojang.blaze3d.platform.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -32,8 +32,6 @@ import org.jetbrains.annotations.ApiStatus;
 public enum ForgeRenderTypes {
     ITEM_LAYERED_SOLID(()-> getItemLayeredSolid(blockAtlas())),
     ITEM_LAYERED_CUTOUT(()-> getItemLayeredCutout(blockAtlas())),
-    ITEM_LAYERED_CUTOUT_MIPPED(()-> getItemLayeredCutoutMipped(blockAtlas())),
-    ITEM_LAYERED_TRANSLUCENT(()-> getItemLayeredTranslucent(blockAtlas())),
     ITEM_UNSORTED_TRANSLUCENT(()-> getUnsortedTranslucent(blockAtlas())),
     ITEM_UNLIT_TRANSLUCENT(()-> getUnlitTranslucent(blockAtlas())),
     ITEM_UNSORTED_UNLIT_TRANSLUCENT(()-> getUnlitTranslucent(blockAtlas(), false));
@@ -70,20 +68,6 @@ public enum ForgeRenderTypes {
     }
 
     /**
-     * @return A RenderType fit for multi-layer cutout-mipped item rendering.
-     */
-    public static RenderType getItemLayeredCutoutMipped(Identifier textureLocation) {
-        return Internal.LAYERED_ITEM_CUTOUT_MIPPED.apply(textureLocation);
-    }
-
-    /**
-     * @return A RenderType fit for multi-layer translucent item rendering.
-     */
-    public static RenderType getItemLayeredTranslucent(Identifier textureLocation) {
-        return Internal.LAYERED_ITEM_TRANSLUCENT.apply(textureLocation);
-    }
-
-    /**
      * @return A RenderType fit for translucent item/entity rendering, but with depth sorting disabled.
      */
     public static RenderType getUnsortedTranslucent(Identifier textureLocation) {
@@ -105,13 +89,6 @@ public enum ForgeRenderTypes {
      */
     public static RenderType getUnlitTranslucent(Identifier textureLocation, boolean sortingEnabled) {
         return (sortingEnabled ? Internal.UNLIT_TRANSLUCENT_SORTED : Internal.UNLIT_TRANSLUCENT_UNSORTED).apply(textureLocation);
-    }
-
-    /**
-     * @return Same as {@link RenderType#entityCutout(Identifier)}, but with mipmapping enabled.
-     */
-    public static RenderType getEntityCutoutMipped(Identifier textureLocation) {
-        return Internal.LAYERED_ITEM_CUTOUT_MIPPED.apply(textureLocation);
     }
 
     /**
@@ -268,35 +245,6 @@ public enum ForgeRenderTypes {
             );
         }
 
-        public static Function<Identifier, RenderType> LAYERED_ITEM_CUTOUT_MIPPED = Util.memoize(Internal::layeredItemCutoutMipped);
-        private static RenderType layeredItemCutoutMipped(Identifier texture) {
-            return RenderType.create("forge_layered_item_cutout_mipped",
-                RenderSetup.builder(RenderPipelines.ENTITY_SMOOTH_CUTOUT)
-                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
-                    .affectsCrumbling()
-                    .withTexture("Sampler0", texture) // Used to have mipmap = true
-                    .useLightmap()
-                    .useOverlay()
-                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                    .createRenderSetup()
-            );
-        }
-
-        public static Function<Identifier, RenderType> LAYERED_ITEM_TRANSLUCENT = Util.memoize(Internal::layeredItemTranslucent);
-        private static RenderType layeredItemTranslucent(Identifier texture) {
-            return RenderType.create("forge_layered_item_translucent",
-                RenderSetup.builder(RenderPipelines.ITEM_ENTITY_TRANSLUCENT_CULL)
-                    .bufferSize(RenderType.TRANSIENT_BUFFER_SIZE)
-                    .affectsCrumbling()
-                    .sortOnUpload()
-                    .withTexture("Sampler0", texture)
-                    .useLightmap()
-                    .useOverlay()
-                    .setOutline(RenderSetup.OutlineProperty.AFFECTS_OUTLINE)
-                    .createRenderSetup()
-            );
-        }
-
         public static Function<Identifier, RenderType> TEXT = Util.memoize(Internal::getText);
         private static RenderType getText(Identifier texture) {
             return RenderType.create(
@@ -371,9 +319,7 @@ public enum ForgeRenderTypes {
 
         private static final RenderPipeline LOADING_PIPELINE = RenderPipeline.builder(RenderPipelines.GUI_TEXTURED_SNIPPET)
                 .withLocation("pipeline/forge/loading_overlay")
-                .withBlend(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE))
-                .withDepthTestFunction(DepthTestFunction.NO_DEPTH_TEST)
-                .withDepthWrite(false)
+                .withColorTargetState(new ColorTargetState(new BlendFunction(SourceFactor.SRC_ALPHA, DestFactor.ONE)))
                 .build();
 
         private static final GpuSampler LOADING_SAMPLER = RenderSystem.getSamplerCache().getSampler(AddressMode.REPEAT, AddressMode.REPEAT, FilterMode.NEAREST, FilterMode.NEAREST, false);

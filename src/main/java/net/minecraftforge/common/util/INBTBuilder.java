@@ -5,12 +5,10 @@
 
 package net.minecraftforge.common.util;
 
-import java.util.List;
 import java.util.UUID;
 
 import net.minecraft.core.UUIDUtil;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.nbt.Tag;
 
 public interface INBTBuilder {
@@ -65,44 +63,14 @@ public interface INBTBuilder {
             return this;
         }
 
-        /** @deprecated Use {@link #putByteArray(String, byte...)} */
-        @Deprecated(forRemoval = true, since = "1.21.5")
-        public Builder putByteArray(String key, List<Byte> value) {
-            var array = new byte[value.size()];
-            for (var i = 0; i < value.size(); i++)
-                array[i] = value.get(i);
-
-            return this.putByteArray(key, array);
-        }
-
         public Builder putIntArray(String key, int... value) {
             tag.putIntArray(key, value);
             return this;
         }
 
-        /** @deprecated Use {@link #putIntArray(String, int...)} */
-        @Deprecated(forRemoval = true, since = "1.21.5")
-        public Builder putIntArray(String key, List<Integer> value) {
-            var array = new int[value.size()];
-            for (var i = 0; i < value.size(); i++)
-                array[i] = value.get(i);
-
-            return this.putIntArray(key, array);
-        }
-
         public Builder putLongArray(String key, long... value) {
             tag.putLongArray(key, value);
             return this;
-        }
-
-        /** @deprecated Use {@link #putLongArray(String, long...)} */
-        @Deprecated(forRemoval = true, since = "1.21.5")
-        public Builder putLongArray(String key, List<Long> value) {
-            var array = new long[value.size()];
-            for (var i = 0; i < value.size(); i++)
-                array[i] = value.get(i);
-
-            return this.putLongArray(key, array);
         }
 
         public Builder put(String key, boolean value) {

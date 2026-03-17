@@ -96,14 +96,6 @@ public class ToolActions
     public static final ToolAction HOE_TILL = ToolAction.get("till");
 
     /**
-     * A tool action corresponding to the 'block' action of shields.
-     *
-     * @deprecated Completely overshadowed by {@link net.minecraft.core.component.DataComponents#BLOCKS_ATTACKS}
-     */
-    @Deprecated(forRemoval = true, since = "1.21.5")
-    public static final ToolAction SHIELD_BLOCK = ToolAction.get("shield_block");
-
-    /**
      * This action corresponds to right-clicking the fishing rod.
      */
     public static final ToolAction FISHING_ROD_CAST = ToolAction.get("fishing_rod_cast");
@@ -117,8 +109,6 @@ public class ToolActions
     @Deprecated(since = "1.21.5")
     public static final Set<ToolAction> DEFAULT_SWORD_ACTIONS = of(SWORD_DIG, SWORD_SWEEP);
     public static final Set<ToolAction> DEFAULT_SHEARS_ACTIONS = of(SHEARS_DIG, SHEARS_HARVEST, SHEARS_CARVE, SHEARS_DISARM);
-    @Deprecated(since = "1.21.5")
-    public static final Set<ToolAction> DEFAULT_SHIELD_ACTIONS = of(SHIELD_BLOCK);
     public static final Set<ToolAction> DEFAULT_FISHING_ROD_ACTIONS = of(FISHING_ROD_CAST);
 
     private static Set<ToolAction> of(ToolAction... actions) {

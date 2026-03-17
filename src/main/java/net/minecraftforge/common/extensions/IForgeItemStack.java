@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
@@ -49,9 +50,9 @@ public interface IForgeItemStack {
      * ItemStack sensitive version of {@link Item#getCraftingRemainder()}.
      * Returns a full ItemStack instance of the result.
      *
-     * @return The resulting ItemStack
+     * @return The resulting ItemStackTemplate
      */
-    default ItemStack getCraftingRemainder() {
+    default ItemStackTemplate getCraftingRemainder() {
         return self().getItem().getCraftingRemainder(self());
     }
 

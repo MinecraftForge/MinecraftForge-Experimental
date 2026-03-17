@@ -50,6 +50,10 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
@@ -66,9 +70,12 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
+import net.minecraft.client.resources.model.sprite.MaterialBaker;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.locale.Language;
 import net.minecraft.network.Connection;
@@ -97,6 +104,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.BlockHitResult;
@@ -276,6 +284,7 @@ public class ForgeHooksClient {
         RegisterColorHandlersEvent.Block.BUS.post(new RegisterColorHandlersEvent.Block(blockColors));
     }
 
+    @SuppressWarnings("rawtypes")
     public static Model getArmorModel(HumanoidRenderState state, ItemStack itemStack, EquipmentSlot slot, HumanoidModel<?> _default) {
         return IClientItemExtensions.of(itemStack).getGenericArmorModel(state, itemStack, slot, _default);
     }
@@ -366,15 +375,13 @@ public class ForgeHooksClient {
         ModelEvent.BakingCompleted.BUS.post(new ModelEvent.BakingCompleted(modelManager, modelBakery));
     }
 
-    public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluidStateIn) {
-        IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
-        Identifier overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
-        var atlas = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS);
-        return new TextureAtlasSprite[] {
-            atlas.getSprite(props.getStillTexture(fluidStateIn, level, pos)),
-            atlas.getSprite(props.getFlowingTexture(fluidStateIn, level, pos)),
-            overlayTexture == null ? null : atlas.getSprite(overlayTexture),
-        };
+    public static Map<Fluid, FluidModel> onFluidModelBake(ModelBakery bakery, MaterialBaker materials, Map<Fluid, FluidModel> vanilla) {
+        var ret = new HashMap<Fluid, FluidModel>();
+        ModelEvent.BakeFluidModels.BUS.post(new ModelEvent.BakeFluidModels(bakery, materials, ret));
+        if (ret.isEmpty())
+            return vanilla;
+        ret.putAll(vanilla);
+        return Map.copyOf(ret);
     }
 
     private static int slotMainHand = 0;
@@ -407,7 +414,7 @@ public class ForgeHooksClient {
         guiGraphics.pose().pushMatrix();
         // We give the absolute Y position of the chat component in the event and account for the chat component's own offsetting here.
         guiGraphics.pose().translate(evt.getPosX(), (float) ((evt.getPosY() - chat.getHeight() + 40) / chat.getScale()));
-        chat.render(guiGraphics, font, tickCount, mouseX, mouseY, false, false);
+        chat.extractRenderState(guiGraphics, font, tickCount, mouseX, mouseY, ChatComponent.DisplayMode.BACKGROUND, false);
         guiGraphics.pose().popMatrix();
     }
 
@@ -729,8 +736,24 @@ public class ForgeHooksClient {
     }
 
     public static boolean isBlockInSolidLayer(BlockState state) {
-        var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        return model.getRenderTypes(state, RandomSource.create(), ModelData.EMPTY).contains(ChunkSectionLayer.SOLID);
+        return Minecraft.getInstance().getModelManager().getBlockStateModelSet().isInSolidLayer(state);
+    }
+
+    public static boolean isModelInSolidLayer(BlockStateModel model) {
+        if (model == null)
+            return true;
+
+        var parts = new java.util.ArrayList<BlockStateModelPart>();
+        model.collectParts(RandomSource.create(), parts, ModelData.EMPTY);
+        return parts.stream().anyMatch(p -> {
+            for (var dir : Direction.valuesView()) {
+                for (var quad : p.getQuads(dir)) {
+                    if (quad.materialInfo().layer() == ChunkSectionLayer.SOLID)
+                        return true;
+                }
+            }
+            return false;
+        });
     }
 
     public static void createWorldConfirmationScreen(Runnable doConfirmedWorldLoad) {
@@ -851,55 +874,6 @@ public class ForgeHooksClient {
         }
 
         return new ForgeBlockModelData(transform, renderType, renderTypeFast, visibility);
-    }
-
-    /** This is a dirty fucking hack, but it needs to send in the top most render type. */
-    public static ModelBaker wrapRenderType(ModelBaker parent, RenderTypeGroup group) {
-        if (group == null || group == RenderTypeGroup.EMPTY || parent.renderType() != null)
-            return parent;
-        return new WrapedModelBaker(parent, group);
-    }
-
-    public static ModelBaker wrapRenderType(ModelBaker parent, RenderTypeGroup group, RenderTypeGroup groupFast) {
-        if (group == null || group == RenderTypeGroup.EMPTY || parent.renderType() != null)
-            return parent;
-        return new WrapedModelBaker(parent, group, groupFast);
-    }
-
-    // a record for performance reasons
-    private record WrapedModelBaker(ModelBaker parent, RenderTypeGroup group, RenderTypeGroup renderTypeFast) implements ModelBaker {
-        private WrapedModelBaker(ModelBaker parent, RenderTypeGroup group) {
-            this(parent, group, RenderTypeGroup.EMPTY);
-        }
-
-        @Override
-        public RenderTypeGroup renderType() {
-            return group;
-        }
-
-        @Override public ResolvedModel getModel(Identifier p_397309_) {
-            return parent.getModel(p_397309_);
-        }
-
-        @Override
-        public SpriteGetter sprites() {
-            return parent.sprites();
-        }
-
-        @Override
-        public <T> T compute(SharedOperationKey<T> p_395456_) {
-            return parent.compute(p_395456_);
-        }
-
-        @Override
-        public BlockModelPart missingBlockModelPart() {
-            return parent.missingBlockModelPart();
-        }
-
-        @Override
-        public PartCache parts() {
-            return parent.parts();
-        }
     }
 
     public static void addFramePass(Identifier rl, FramePassManager.PassDefinition definition) {

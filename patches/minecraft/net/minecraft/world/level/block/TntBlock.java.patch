@@ -5,7 +5,7 @@
      protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
          if (!oldState.is(state.getBlock())) {
 -            if (level.hasNeighborSignal(pos) && prime(level, pos)) {
-+            if (level.hasNeighborSignal(pos) && prime(state, level, pos, null, null)) {
++            if (level.hasNeighborSignal(pos) && onCaughtFire(state, level, pos, null, null)) {
                  level.removeBlock(pos, false);
              }
          }
@@ -14,7 +14,7 @@
          final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
      ) {
 -        if (level.hasNeighborSignal(pos) && prime(level, pos)) {
-+        if (level.hasNeighborSignal(pos) && prime(state, level, pos, null, null)) {
++        if (level.hasNeighborSignal(pos) && onCaughtFire(state, level, pos, null, null)) {
              level.removeBlock(pos, false);
          }
      }
@@ -23,7 +23,7 @@
      public BlockState playerWillDestroy(final Level level, final BlockPos pos, final BlockState state, final Player player) {
          if (!level.isClientSide() && !player.getAbilities().instabuild && state.getValue(UNSTABLE)) {
 -            prime(level, pos);
-+            prime(state, level, pos, null, null);
++            onCaughtFire(state, level, pos, null, null);
          }
  
          return super.playerWillDestroy(level, pos, state, player);
@@ -45,7 +45,7 @@
              return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
          } else {
 -            if (prime(level, pos, player)) {
-+            if (prime(state, level, pos, hitResult.getDirection(), player)) {
++            if (onCaughtFire(state, level, pos, hitResult.getDirection(), player)) {
                  level.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
                  Item item = itemStack.getItem();
                  if (itemStack.is(Items.FLINT_AND_STEEL)) {
@@ -54,7 +54,7 @@
              if (projectile.isOnFire()
                  && projectile.mayInteract(serverlevel, blockpos)
 -                && prime(level, blockpos, entity instanceof LivingEntity ? (LivingEntity)entity : null)) {
-+                && prime(state, level, blockpos, null, entity instanceof LivingEntity ? (LivingEntity)entity : null)) {
++                && onCaughtFire(state, level, blockpos, null, entity instanceof LivingEntity ? (LivingEntity)entity : null)) {
                  level.removeBlock(blockpos, false);
              }
          }
@@ -64,7 +64,7 @@
          builder.add(UNSTABLE);
 +    }
 +
-+    public boolean prime(final BlockState state, final Level level, final BlockPos pos, final net.minecraft.core.@Nullable Direction face, final @Nullable LivingEntity igniter) {
++    public boolean onCaughtFire(final BlockState state, final Level level, final BlockPos pos, final net.minecraft.core.@Nullable Direction face, final @Nullable LivingEntity igniter) {
 +        return prime(level, pos, igniter);
      }
  }

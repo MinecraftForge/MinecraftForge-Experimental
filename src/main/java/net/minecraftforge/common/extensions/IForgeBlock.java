@@ -356,8 +356,8 @@ public interface IForgeBlock {
     * @return True if the soil should be considered fertile.
     */
     default boolean isFertile(BlockState state, BlockGetter level, BlockPos pos) {
-        if (state.getBlock() instanceof FarmBlock)
-            return state.getValue(FarmBlock.MOISTURE) > 0;
+        if (state.getBlock() instanceof FarmlandBlock)
+            return state.getValue(FarmlandBlock.MOISTURE) > 0;
 
         return  false;
     }
@@ -501,7 +501,7 @@ public interface IForgeBlock {
      */
     @Nullable
     default PathType getBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob) {
-        return state.getBlock() == Blocks.LAVA ? PathType.LAVA : state.isBurning(level, pos) ? PathType.DAMAGE_FIRE : null;
+        return state.getBlock() == Blocks.LAVA ? PathType.LAVA : state.isBurning(level, pos) ? PathType.FIRE : null;
     }
 
     /**
@@ -519,8 +519,8 @@ public interface IForgeBlock {
      */
     @Nullable
     default PathType getAdjacentBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob, PathType originalType) {
-        if (state.is(Blocks.SWEET_BERRY_BUSH)) return PathType.DANGER_OTHER;
-        else if (WalkNodeEvaluator.isBurningBlock(state)) return PathType.DANGER_FIRE;
+        if (state.is(Blocks.SWEET_BERRY_BUSH)) return PathType.DAMAGING_IN_NEIGHBOR;
+        else if (WalkNodeEvaluator.isBurningBlock(state)) return PathType.FIRE_IN_NEIGHBOR;
         else return null;
     }
 

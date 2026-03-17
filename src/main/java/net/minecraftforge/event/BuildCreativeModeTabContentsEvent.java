@@ -5,17 +5,14 @@
 
 package net.minecraftforge.event;
 
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.util.MutableHashedLinkedMap;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -33,17 +30,10 @@ import java.util.function.Supplier;
 @NullMarked
 public record BuildCreativeModeTabContentsEvent(
         CreativeModeTab getTab,
-        ResourceKey<CreativeModeTab> getTabKey,
         CreativeModeTab.ItemDisplayParameters getParameters,
         MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility> getEntries
 ) implements RecordEvent, CreativeModeTab.Output {
     public static final EventBus<BuildCreativeModeTabContentsEvent> BUS = EventBus.create(BuildCreativeModeTabContentsEvent.class);
-
-    /** @deprecated {@link BuildCreativeModeTabContentsEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<BuildCreativeModeTabContentsEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 
     @ApiStatus.Internal
     public BuildCreativeModeTabContentsEvent {}

@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -158,7 +159,7 @@ public interface IForgeItem {
      * @return The resulting ItemStack
      */
     @SuppressWarnings("deprecation")
-    default ItemStack getCraftingRemainder(ItemStack itemStack) {
+    default ItemStackTemplate getCraftingRemainder(ItemStack itemStack) {
         return self().getCraftingRemainder();
     }
 
@@ -615,20 +616,9 @@ public interface IForgeItem {
         return false;
     }
 
-    /**
-     * @return The Default Capability Provider for this item, if any.
-     *
-     * @deprecated Use the itemstack-sensitive version instead: {@link #getCapabilityProvider(ItemStack)}
-     */
-    @Nullable
-    @Deprecated(forRemoval = true, since = "1.21.4")
-    default ICapabilityProvider getCapabilityProvider() {
-        return null;
-    }
-
     /** @return The Default Capability Provider for this item, if any, accounting for the given itemstack. */
     @Nullable
     default ICapabilityProvider getCapabilityProvider(ItemStack stack) {
-        return this.getCapabilityProvider();
+        return null;
     }
 }

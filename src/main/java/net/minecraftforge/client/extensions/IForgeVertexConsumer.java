@@ -7,7 +7,8 @@ package net.minecraftforge.client.extensions;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 
 /**
  * Extension interface for {@link VertexConsumer}.

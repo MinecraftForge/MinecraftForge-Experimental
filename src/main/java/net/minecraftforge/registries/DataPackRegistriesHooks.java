@@ -8,6 +8,7 @@ package net.minecraftforge.registries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.RegistryValidator;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
 
@@ -48,7 +49,7 @@ public final class DataPackRegistriesHooks {
         if (data.networkCodec() != null) {
             NETWORKABLE_REGISTRIES.add(loaderData.key());
             SYNCHRONIZED_REGISTRIES_CUSTOM.add(loaderData.key());
-            SYNCHRONIZED_REGISTRIES.add(new RegistryDataLoader.RegistryData<>(loaderData.key(), data.networkCodec(), false));
+            SYNCHRONIZED_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), RegistryValidator.none()));
         }
     }
 

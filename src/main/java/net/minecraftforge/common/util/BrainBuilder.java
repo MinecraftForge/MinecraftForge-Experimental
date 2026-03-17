@@ -56,7 +56,7 @@ public class BrainBuilder<E extends LivingEntity> {
     public BrainBuilder(Brain<E> ignoredBrain) {}
 
     public Brain.Provider<E> provider() {
-        return Brain.provider(this.memoryTypes, this.sensorTypes);
+        return Brain.provider(this.sensorTypes);
     }
 
     public Collection<MemoryModuleType<?>> getMemoryTypes() {
@@ -166,8 +166,8 @@ public class BrainBuilder<E extends LivingEntity> {
     }
 
     @ApiStatus.Internal
-    public Brain<E> makeBrain(Dynamic<?> dynamic) {
-        Brain<E> brain = Brain.provider(this.memoryTypes, this.sensorTypes).makeBrain(dynamic);
+    public Brain<E> makeBrain(final E entity, final Brain.Packed packedBrain) {
+        Brain<E> brain = Brain.provider(this.sensorTypes).makeBrain(entity, packedBrain);
         brain.copyFromBuilder(this);
         return brain;
     }

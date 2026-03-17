@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/inventory/ResultSlot.java
 +++ b/net/minecraft/world/inventory/ResultSlot.java
-@@ -1,4 +_,4 @@
+@@ -51,6 +_,7 @@
      protected void checkTakeAchievements(final ItemStack carried) {
          if (this.removeCount > 0) {
              carried.onCraftedBy(this.player, this.removeCount);

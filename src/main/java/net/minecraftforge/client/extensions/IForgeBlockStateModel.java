@@ -5,23 +5,15 @@
 
 package net.minecraftforge.client.extensions;
 
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
 import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.model.data.ModelData;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import it.unimi.dsi.fastutil.objects.ObjectArrayList;
-
-import java.util.Collection;
 import java.util.List;
 
 @SuppressWarnings("deprecation")
@@ -36,16 +28,6 @@ public interface IForgeBlockStateModel {
 
     default Material.Baked particleMaterial(@NotNull ModelData data) {
         return self().particleMaterial();
-    }
-
-    /**
-     * Gets the set of {@link RenderType render types} to use when drawing this block in the level.
-     * Supported types are those returned by {@link RenderType#chunkBufferLayers()}.
-     * <p>
-     * By default, defers query to {@link ItemBlockRenderTypes}.
-     */
-    default Collection<ChunkSectionLayer> getRenderTypes(@NotNull BlockState state, @NotNull RandomSource rand, @NotNull ModelData data) {
-        return ItemBlockRenderTypes.getRenderLayers(state);
     }
 
     /**

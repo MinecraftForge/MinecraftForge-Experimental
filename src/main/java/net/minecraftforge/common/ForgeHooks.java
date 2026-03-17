@@ -191,6 +191,7 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.loader.TemplateSource;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -226,13 +227,14 @@ public final class ForgeHooks {
         return player.hasCorrectToolForDrops(state);
     }
 
-    public static Brain<?> onLivingMakeBrain(LivingEntity entity, Brain<?> originalBrain, Dynamic<?> dynamic) {
+    public static Brain<?> onLivingMakeBrain(final LivingEntity entity, final Brain<?> originalBrain, final Brain.Packed packedBrain) {
         if (!LivingMakeBrainEvent.BUS.hasListeners())
             return originalBrain;
 
-        BrainBuilder<?> brainBuilder = originalBrain.createBuilder();
+        @SuppressWarnings("unchecked")
+        var brainBuilder = (BrainBuilder<LivingEntity>)originalBrain.createBuilder();
         LivingMakeBrainEvent.BUS.post(new LivingMakeBrainEvent(entity, brainBuilder));
-        return brainBuilder.makeBrain(dynamic);
+        return brainBuilder.makeBrain(entity, packedBrain);
     }
 
     public static boolean onLivingAttack(LivingEntity entity, DamageSource src, float amount) {
@@ -1019,9 +1021,10 @@ public final class ForgeHooks {
     @SuppressWarnings("deprecation")
     public static void onLivingBreathe(LivingEntity entity, int consumeAirAmount, int refillAirAmount) {
         // Check things that vanilla considers to be air - these will cause the air supply to be increased.
-        boolean isAir = entity.getEyeInFluidType().isAir() || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
+        var eyeFluid = entity.getEyeInFluid();
+        boolean isAir = eyeFluid == null || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
         // The following effects cause the entity to not drown, but do not cause the air supply to be increased.
-        boolean canBreathe = !entity.canDrownInFluidType(entity.getEyeInFluidType()) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
+        boolean canBreathe = !entity.canDrownInFluid(eyeFluid) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
         var breatheEvent = ForgeEventFactory.onLivingBreathe(entity, isAir || canBreathe, consumeAirAmount, refillAirAmount, isAir);
         if (breatheEvent.canBreathe()) {
             if (breatheEvent.canRefillAir()) {
@@ -1049,12 +1052,12 @@ public final class ForgeHooks {
             }
         }
 
-        if (!isAir && !entity.level().isClientSide() && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluidType(entity.getEyeInFluidType(), entity)) {
+        if (!isAir && !entity.level().isClientSide() && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluid(entity.getEyeInFluid(), entity)) {
             entity.stopRiding();
         }
     }
 
-    public static void onCreativeModeTabBuildContents(CreativeModeTab tab, ResourceKey<CreativeModeTab> tabKey, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+    public static void onCreativeModeTabBuildContents(CreativeModeTab tab, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
         final var entries = new MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility>(ItemStackLinkedSet.TYPE_AND_TAG,
             (key, left, right) -> {
                 //throw new IllegalStateException("Accidentally adding the same item stack twice " + key.getDisplayName().getString() + " to a Creative Mode Tab: " + tab.getDisplayName().getString());
@@ -1070,7 +1073,7 @@ public final class ForgeHooks {
             entries.put(stack, vis);
         });
 
-        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, tabKey, params, entries));
+        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, params, entries));
 
         for (var entry : entries)
             output.accept(entry.getKey(), entry.getValue());
@@ -1271,8 +1274,22 @@ public final class ForgeHooks {
      *
      *  This is useful for game tests that need a structure, but want to create the contents in code.
      */
-    public static Optional<StructureTemplate> createEmptyStructure(Identifier name) {
-        if (name== null || !"forge".equals(name.getNamespace()))
+    public static TemplateSource emptyStructureSource() {
+        return new TemplateSource(null, null) {
+            @Override
+            public Optional<StructureTemplate> load(Identifier id) {
+                return createEmptyStructure(id);
+            }
+
+            @Override
+            public Stream<Identifier> list() {
+                return Stream.empty();
+            }
+        };
+    }
+
+    private static Optional<StructureTemplate> createEmptyStructure(Identifier name) {
+        if (name == null || !"forge".equals(name.getNamespace()))
             return Optional.empty();
 
         var match = EMPTY_SIZE_PATTERN.matcher(name.getPath());
