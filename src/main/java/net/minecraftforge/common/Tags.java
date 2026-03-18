@@ -1125,44 +1125,46 @@ public class Tags {
         private static void init() {}
 
         //region `forge` tags for Forge-specific tags
+
+        //endregion
+
+        //region `c` tags for common conventions
+        // Note: Other loaders have additional `c` tags that are exclusive to their loader.
+        //       Forge only adopts `c` tags that are common across all loaders.
+        /**
+         * Holds all fluids related to Beetroot Soup.<br></br>
+         * (Standard unit for beetroot soup is 250mb per bowl)
+         */
+        public static final TagKey<Fluid> BEETROOT_SOUP = cTag("beetroot_soup");
+        public static final TagKey<Fluid> EXPERIENCE = cTag("experience");
         /**
          * Holds all fluids that are gaseous at room temperature.
          */
-        public static final TagKey<Fluid> GASEOUS = forgeTag("gaseous");
+        public static final TagKey<Fluid> GASEOUS = cTag("gaseous");
+        /**
+         * Holds all fluids related to Mushroom Stew.<br></br>
+         * (Standard unit for mushroom stew is 250mb per bowl)
+         */
+        public static final TagKey<Fluid> MUSHROOM_STEW = cTag("mushroom_stew");
         /**
          * Holds all fluids related to potions. The effects of the potion fluid should be read from NBT.
          * The effects and color of the potion fluid should be read from {@link net.minecraft.core.component.DataComponents#POTION_CONTENTS}
          * component that people should be attaching to the fluidstack of this fluid.<br></br>
          * (Standard unit for potions is 250mb per bottle)
          */
-        public static final TagKey<Fluid> POTION = forgeTag("potion");
+        public static final TagKey<Fluid> POTION = cTag("potion");
+        /**
+         * Holds all fluids related to Rabbit Stew.<br></br>
+         * (Standard unit for rabbit stew is 250mb per bowl)
+         */
+        public static final TagKey<Fluid> RABBIT_STEW = cTag("rabbit_stew");
         /**
          * Holds all fluids related to Suspicious Stew.
          * The effects of the suspicious stew fluid should be read from {@link net.minecraft.core.component.DataComponents#SUSPICIOUS_STEW_EFFECTS}
          * component that people should be attaching to the fluidstack of this fluid.<br></br>
          * (Standard unit for suspicious stew is 250mb per bowl)
          */
-        public static final TagKey<Fluid> SUSPICIOUS_STEW = forgeTag("suspicious_stew");
-        /**
-         * Holds all fluids related to Mushroom Stew.<br></br>
-         * (Standard unit for mushroom stew is 250mb per bowl)
-         */
-        public static final TagKey<Fluid> MUSHROOM_STEW = forgeTag("mushroom_stew");
-        /**
-         * Holds all fluids related to Rabbit Stew.<br></br>
-         * (Standard unit for rabbit stew is 250mb per bowl)
-         */
-        public static final TagKey<Fluid> RABBIT_STEW = forgeTag("rabbit_stew");
-        /**
-         * Holds all fluids related to Beetroot Soup.<br></br>
-         * (Standard unit for beetroot soup is 250mb per bowl)
-         */
-        public static final TagKey<Fluid> BEETROOT_SOUP = forgeTag("beetroot_soup");
-        //endregion
-
-        //region `c` tags for common conventions
-        // Note: Other loaders have additional `c` tags that are exclusive to their loader.
-        //       Forge only adopts `c` tags that are common across all loaders.
+        public static final TagKey<Fluid> SUSPICIOUS_STEW = cTag("suspicious_stew");
         /**
          * Holds all fluids related to water.
          * This tag is done to help out multi-loader mods/datapacks where the vanilla water tag has attached behaviors outside Forge.
