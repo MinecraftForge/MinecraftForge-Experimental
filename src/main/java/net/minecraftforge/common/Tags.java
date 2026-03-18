@@ -1270,43 +1270,10 @@ public class Tags {
         private static void init() {}
 
         //region `forge` tags for Forge-specific tags
-        public static final TagKey<Biome> IS_COLD_NETHER = forgeTag("is_cold/nether");
-
-        /**
-         * Biomes in the Nether that have sparse vegetation.
-         */
-        public static final TagKey<Biome> IS_SPARSE_NETHER = forgeTag("is_sparse/nether");
-        /**
-         * Biomes in the End that have sparse vegetation.
-         */
-        public static final TagKey<Biome> IS_SPARSE_END = forgeTag("is_sparse/end");
-        /**
-         * Biomes in the Nether that have dense vegetation.
-         */
-        public static final TagKey<Biome> IS_DENSE_NETHER = forgeTag("is_dense/nether");
-        /**
-         * Biomes in the End that have dense vegetation.
-         */
-        public static final TagKey<Biome> IS_DENSE_END = forgeTag("is_dense/end");
-
-        public static final TagKey<Biome> IS_HOT_END = forgeTag("is_hot/end");
-
-        public static final TagKey<Biome> IS_LUSH = forgeTag("is_lush");
-        public static final TagKey<Biome> IS_MAGICAL = forgeTag("is_magical");
         public static final TagKey<Biome> IS_MODIFIED = forgeTag("is_modified");
-
-        public static final TagKey<Biome> IS_RARE = forgeTag("is_rare");
-        public static final TagKey<Biome> IS_PLATEAU = forgeTag("is_plateau");
-
-        /**
-         * Biomes that are able to spawn sand-based blocks on the surface.
-         */
-        public static final TagKey<Biome> IS_SANDY = forgeTag("is_sandy");
 
         public static final TagKey<Biome> IS_WET_NETHER = forgeTag("is_wet/nether");
         public static final TagKey<Biome> IS_WET_END = forgeTag("is_wet/end");
-
-        public static final TagKey<Biome> IS_SPOOKY = forgeTag("is_spooky");
         //endregion
 
         //region `c` tags for common conventions
@@ -1328,15 +1295,21 @@ public class Tags {
         public static final TagKey<Biome> IS_HOT = cTag("is_hot");
         public static final TagKey<Biome> IS_HOT_OVERWORLD = cTag("is_hot/overworld");
         public static final TagKey<Biome> IS_HOT_NETHER = cTag("is_hot/nether");
+        public static final TagKey<Biome> IS_HOT_END = cTag("is_hot/end");
 
         public static final TagKey<Biome> IS_COLD = cTag("is_cold");
+        public static final TagKey<Biome> IS_COLD_NETHER = cTag("is_cold/nether");
         public static final TagKey<Biome> IS_COLD_OVERWORLD = cTag("is_cold/overworld");
         public static final TagKey<Biome> IS_COLD_END = cTag("is_cold/end");
 
         public static final TagKey<Biome> IS_SPARSE_VEGETATION = cTag("is_sparse_vegetation");
         public static final TagKey<Biome> IS_SPARSE_VEGETATION_OVERWORLD = cTag("is_sparse_vegetation/overworld");
+        public static final TagKey<Biome> IS_SPARSE_VEGETATION_NETHER = cTag("is_sparse_vegetation/nether");
+        public static final TagKey<Biome> IS_SPARSE_VEGETATION_END = cTag("is_sparse_vegetation/end");
         public static final TagKey<Biome> IS_DENSE_VEGETATION = cTag("is_dense_vegetation");
         public static final TagKey<Biome> IS_DENSE_VEGETATION_OVERWORLD = cTag("is_dense_vegetation/overworld");
+        public static final TagKey<Biome> IS_DENSE_VEGETATION_NETHER = cTag("is_dense_vegetation/nether");
+        public static final TagKey<Biome> IS_DENSE_VEGETATION_END = cTag("is_dense_vegetation/end");
 
         public static final TagKey<Biome> IS_WET = cTag("is_wet");
         public static final TagKey<Biome> IS_WET_OVERWORLD = cTag("is_wet/overworld");
@@ -1359,6 +1332,8 @@ public class Tags {
         public static final TagKey<Biome> IS_SAVANNA_TREE = cTag("is_tree/savanna");
         public static final TagKey<Biome> IS_JUNGLE_TREE = cTag("is_tree/jungle");
         public static final TagKey<Biome> IS_DECIDUOUS_TREE = cTag("is_tree/deciduous");
+
+        public static final TagKey<Biome> IS_DARK_FOREST = cTag("is_dark_forest");
 
         /**
          * Biomes that spawn as part of giant mountains.
@@ -1505,6 +1480,35 @@ public class Tags {
          * Biomes that spawn as part of the large islands outside the center island in The End dimension.
          */
         public static final TagKey<Biome> IS_OUTER_END_ISLAND = cTag("is_outer_end_island");
+
+        public static final TagKey<Biome> IS_LUSH = cTag("is_lush");
+        public static final TagKey<Biome> IS_MAGICAL = cTag("is_magical");
+        public static final TagKey<Biome> IS_RARE = cTag("is_rare");
+        public static final TagKey<Biome> IS_PLATEAU = cTag("is_plateau");
+        /**
+         * Biomes that are able to spawn sand-based blocks on the surface.
+         */
+        public static final TagKey<Biome> IS_SANDY = cTag("is_sandy");
+        public static final TagKey<Biome> IS_SPOOKY = cTag("is_spooky");
+
+        public static final TagKey<Biome> IS_TEMPERATE = cTag("is_temperate");
+        public static final TagKey<Biome> IS_TEMPERATE_END = cTag("is_temperate/end");
+        public static final TagKey<Biome> IS_TEMPERATE_NETHER = cTag("is_temperate/nether");
+        public static final TagKey<Biome> IS_TEMPERATE_OVERWORLD = cTag("is_temperate/overworld");
+
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE = cTag("primary_wood_type");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_ACACIA = cTag("primary_wood_type/acacia");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_BAMBOO = cTag("primary_wood_type/bamboo");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_BIRCH = cTag("primary_wood_type/birch");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_CHERRY = cTag("primary_wood_type/cherry");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_CRIMSON = cTag("primary_wood_type/crimson");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_DARK_OAK = cTag("primary_wood_type/dark_oak");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_JUNGLE = cTag("primary_wood_type/jungle");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_MANGROVE = cTag("primary_wood_type/mangrove");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_OAK = cTag("primary_wood_type/oak");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_PALE_OAK = cTag("primary_wood_type/pale_oak");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_SPRUCE = cTag("primary_wood_type/spruce");
+        public static final TagKey<Biome> PRIMARY_WOOD_TYPE_WARPED = cTag("primary_wood_type/warped");
         //endregion
 
         //region Redirect fields for improved backward-compatibility
