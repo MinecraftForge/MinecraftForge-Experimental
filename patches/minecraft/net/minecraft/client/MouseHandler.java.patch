@@ -4,7 +4,7 @@
                  this.activeButton = null;
              }
  
-+            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPre(mousebuttoninfo, p_423948_)) return;
++            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPre(mousebuttoninfo, action)) return;
              if (this.minecraft.getOverlay() == null) {
                  if (this.minecraft.screen == null) {
                      if (!this.mouseGrabbed && flag) {
@@ -30,7 +30,7 @@
                      KeyMapping.click(inputconstants$key);
                  }
              }
-+            net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPost(mousebuttoninfo, p_423948_);
++            net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPost(mousebuttoninfo, action);
          }
      }
  

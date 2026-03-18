@@ -22,6 +22,6 @@ public interface IForgeLevelSummary {
         // NOTE: Because CorruptedLevelSummary and SymlinkLevelSummary can have null settings, we need to check it
         var settings = this.self().getSettings();
 
-        return settings != null && settings.getLifecycle().equals(com.mojang.serialization.Lifecycle.experimental());
+        return settings != null && settings.lifecycle().equals(com.mojang.serialization.Lifecycle.experimental());
     }
 }

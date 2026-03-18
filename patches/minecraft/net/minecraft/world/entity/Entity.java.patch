@@ -292,7 +292,7 @@
      }
  
      public void checkDespawn() {
-@@ -3918,6 +_,68 @@
+@@ -3918,6 +_,83 @@
          float f1 = (float)Mth.lerp(d0, (double)this.getXRot(), targetXRot);
          this.setPos(d1, d2, d3);
          this.setRot(f, f1);
@@ -358,6 +358,21 @@
 +    public void revive() {
 +        this.unsetRemoved();
 +        this.reviveCaps();
++    }
++
++    @Override
++    public boolean isInFluidType() {
++        return this.fluidInteraction.isInFluid();
++    }
++
++    @Override
++    public final net.minecraftforge.fluids.FluidType getEyeInFluidType() {
++        return this.fluidInteraction.getEyeFluid();
++    }
++
++    @Override
++    public final boolean isInFluidType(java.util.function.BiPredicate<net.minecraftforge.fluids.FluidType, Double> predicate, boolean forAllTypes) {
++        return this.fluidInteraction.isInFluid(predicate, forAllTypes);
      }
  
      public RandomSource getRandom() {

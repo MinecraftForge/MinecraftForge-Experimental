@@ -93,7 +93,7 @@
                              && slot1.mayPickup(this.minecraft.player)
                              && slot1.hasItem()
 -                            && slot1.container == slot.container
-+                            && slot2.isSameInventory(slot)
++                            && slot1.isSameInventory(slot)
                              && AbstractContainerMenu.canItemQuickReplace(slot1, this.lastQuickMoved, true)) {
                              this.slotClicked(slot1, slot1.index, event.button(), ContainerInput.QUICK_MOVE);
                          }

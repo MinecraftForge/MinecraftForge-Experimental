@@ -103,7 +103,7 @@
          } else if (player.getCooldowns().isOnCooldown(itemStack)) {
              return InteractionResult.PASS;
          } else {
-+            InteractionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClick(p_9262_, p_9265_);
++            InteractionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClick(player, hand);
 +            if (cancelResult != null) return cancelResult;
              int i = itemStack.getCount();
              int j = itemStack.getDamageValue();
@@ -114,7 +114,7 @@
          } else if (this.gameModeForPlayer == GameType.SPECTATOR) {
 +        }
 +
-+        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(p_9266_, p_9269_, blockpos, p_9270_);
++        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player, hand, blockpos, hitResult);
 +        if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock.BUS.post(event)) return event.getCancellationResult();
 +        if (this.gameModeForPlayer == GameType.SPECTATOR) {
              MenuProvider menuprovider = blockstate.getMenuProvider(level, blockpos);
@@ -124,14 +124,14 @@
                  return InteractionResult.PASS;
              }
          } else {
-+            UseOnContext useoncontext = new UseOnContext(p_9266_, p_9269_, p_9270_);
++            UseOnContext useoncontext = new UseOnContext(player, hand, hitResult);
 +            if (!event.getUseItem().isDenied()) {
-+                InteractionResult result = p_9268_.onItemUseFirst(useoncontext);
++                InteractionResult result = itemStack.onItemUseFirst(useoncontext);
 +                if (result != InteractionResult.PASS) return result;
 +            }
              boolean flag = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
              boolean flag1 = player.isSecondaryUseActive() && flag;
-+            flag1 &= !(p_9266_.getMainHandItem().doesSneakBypassUse(p_9267_, blockpos, p_9266_) && p_9266_.getOffhandItem().doesSneakBypassUse(p_9267_, blockpos, p_9266_));
++            flag1 &= !(player.getMainHandItem().doesSneakBypassUse(level, blockpos, player) && player.getOffhandItem().doesSneakBypassUse(level, blockpos, player));
              ItemStack itemstack = itemStack.copy();
 -            if (!flag1) {
 +            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !flag1)) {
@@ -144,7 +144,7 @@
  
 -            if (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack)) {
 -                UseOnContext useoncontext = new UseOnContext(player, hand, hitResult);
-+            if (event.getUseItem().isAllowed() || (!p_9268_.isEmpty() && !p_9266_.getCooldowns().isOnCooldown(p_9268_))) {
++            if (event.getUseItem().isAllowed() || (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack))) {
 +                if (event.getUseItem().isDenied()) return InteractionResult.PASS;
                  InteractionResult interactionresult2;
                  if (player.hasInfiniteMaterials()) {

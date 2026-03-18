@@ -6,6 +6,7 @@
 package net.minecraftforge.common.util;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.saveddata.SavedData;
 import net.minecraft.world.level.saveddata.SavedDataType;
@@ -18,7 +19,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 public class LevelCapabilityData extends SavedData {
     public static SavedDataType<LevelCapabilityData> type(ServerLevel level) {
         return new SavedDataType<LevelCapabilityData>(
-            "capabilities",
+            Identifier.fromNamespaceAndPath("forge", "capabilities"),
             () -> new LevelCapabilityData(level),
             RecordCodecBuilder.create(b ->
                 b.group(

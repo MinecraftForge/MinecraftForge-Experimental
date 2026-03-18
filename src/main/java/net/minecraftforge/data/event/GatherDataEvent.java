@@ -100,7 +100,7 @@ public final class GatherDataEvent implements IModBusEvent {
         }
 
         public DataGenerator makeGenerator(final Function<Path,Path> pathEnhancer, final boolean shouldExecute) {
-            final DataGenerator generator = new DataGenerator(pathEnhancer.apply(path), DetectedVersion.tryDetectVersion(), shouldExecute);
+            final DataGenerator generator = new DataGenerator.Cached(pathEnhancer.apply(path), DetectedVersion.tryDetectVersion(), shouldExecute);
             if (shouldExecute)
                 generators.add(generator);
             return generator;

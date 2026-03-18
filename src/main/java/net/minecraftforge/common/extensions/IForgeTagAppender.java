@@ -80,7 +80,7 @@ public interface IForgeTagAppender<E, T> {
     }
 
     default TagAppender<E, T> replace(boolean value) {
-        self().getInternalBuilder().replace(value);
+        self().getInternalBuilder().setReplace(value);
         return self();
     }
 

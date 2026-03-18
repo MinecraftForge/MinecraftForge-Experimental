@@ -6,7 +6,7 @@
          ParticleProvider<T> particleprovider = (ParticleProvider<T>)this.resourceManager
 -            .getProviders()
 -            .get(BuiltInRegistries.PARTICLE_TYPE.getId(options.getType()));
-+            .getProviders(options.getType());
++            .getProvider(options.getType());
          return particleprovider == null ? null : particleprovider.createParticle(options, this.level, x, y, z, xa, ya, za, this.random);
      }
  

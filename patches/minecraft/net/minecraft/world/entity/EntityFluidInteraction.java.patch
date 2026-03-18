@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityFluidInteraction.java
 +++ b/net/minecraft/world/entity/EntityFluidInteraction.java
-@@ -21,16 +_,34 @@
+@@ -21,16 +_,39 @@
  import org.jspecify.annotations.Nullable;
  
  public class EntityFluidInteraction {
@@ -14,6 +14,8 @@
 +
      private final Map<TagKey<Fluid>, EntityFluidInteraction.Tracker> trackerByFluid = new Reference2ObjectArrayMap<>();
 +    private final Map<net.minecraftforge.fluids.FluidType, EntityFluidInteraction.Tracker> trackerByFluidType = new Reference2ObjectArrayMap();
++    private boolean isInFluid = false;
++    private net.minecraftforge.fluids.FluidType eyeFluid = net.minecraftforge.common.ForgeMod.EMPTY_TYPE.get();
  
      public EntityFluidInteraction(final Set<TagKey<Fluid>> fluids) {
          for (TagKey<Fluid> tagkey : fluids) {
@@ -32,6 +34,9 @@
      public void update(final Entity entity, final boolean ignoreCurrent) {
          this.trackerByFluid.values().forEach(EntityFluidInteraction.Tracker::reset);
 +        this.trackerByFluidType.values().forEach(EntityFluidInteraction.Tracker::reset);
++        this.isInFluid = false;
++        this.eyeFluid = net.minecraftforge.common.ForgeMod.EMPTY_TYPE.get();
++
          AABB aabb = entity.getFluidInteractionBox();
          if (aabb != null) {
              int i = Mth.floor(aabb.minX);
@@ -44,7 +49,14 @@
                  BlockGetter blockgetter = entity.level();
                  BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
  
-@@ -61,17 +_,18 @@
+@@ -55,23 +_,26 @@
+                             blockpos$mutableblockpos.set(i2, j2, k2);
+                             FluidState fluidstate = blockgetter.getFluidState(blockpos$mutableblockpos);
+                             if (!fluidstate.isEmpty()) {
++                                isInFluid = true;
+                                 double d2 = blockpos$mutableblockpos.getY();
+                                 double d3 = d2 + fluidstate.getHeight(blockgetter, blockpos$mutableblockpos);
+                                 if (!(d3 < aabb.minY)) {
                                      Fluid fluid1 = fluidstate.getType();
                                      if (fluid1 != fluid) {
                                          fluid = fluid1;
@@ -56,6 +68,7 @@
 +                                    for (var entityfluidinteraction$tracker : trackers) {
                                          if (i2 == k1 && k2 == l1 && d1 >= d2 && d1 <= d3) {
                                              entityfluidinteraction$tracker.eyesInside = true;
++                                            this.eyeFluid = fluid.getFluidType();
                                          }
  
                                          entityfluidinteraction$tracker.height = Math.max(d3 - d0, entityfluidinteraction$tracker.height);
@@ -98,7 +111,7 @@
      }
  
      public void applyCurrentTo(final TagKey<Fluid> fluid, final Entity entity, final double scale) {
-@@ -141,6 +_,15 @@
+@@ -141,6 +_,19 @@
          return entityfluidinteraction$tracker != null ? entityfluidinteraction$tracker.height : 0.0;
      }
  
@@ -111,13 +124,19 @@
 +        return tracker == null ? 0 : tracker.height;
 +    }
 +
++    public boolean isInFluid() {
++        return this.isInFluid;
++    }
++
      public boolean isInFluid(final TagKey<Fluid> fluid) {
          return this.getFluidHeight(fluid) > 0.0;
      }
-@@ -150,6 +_,39 @@
+@@ -148,6 +_,43 @@
+     public boolean isEyeInFluid(final TagKey<Fluid> fluid) {
+         EntityFluidInteraction.Tracker entityfluidinteraction$tracker = this.trackerByFluid.get(fluid);
          return entityfluidinteraction$tracker != null && entityfluidinteraction$tracker.eyesInside;
-     }
- 
++    }
++
 +    public boolean isEyeInFluid(final Fluid fluid) {
 +        return isEyeInFluid(fluid.getFluidType());
 +    }
@@ -125,6 +144,10 @@
 +    public boolean isEyeInFluid(final net.minecraftforge.fluids.FluidType fluid) {
 +        var tracker = this.trackerByFluidType.get(fluid);
 +        return tracker != null && tracker.eyesInside;
++    }
++
++    public net.minecraftforge.fluids.FluidType getEyeFluid() {
++        return this.eyeFluid;
 +    }
 +
 +    public net.minecraftforge.fluids.FluidType getMaxHeightFluid() {
@@ -149,22 +172,6 @@
 +                return false;
 +        }
 +        return true;
-+    }
-+
-     private static class Tracker {
-         private double height;
-         private boolean eyesInside;
-@@ -186,6 +_,13 @@
- 
-                 entity.addDeltaMovement(vec3);
-             }
-+        }
-+    }
-+
-+    private static class LavaTracker extends Tracker {
-+        @Override
-+        public double scale(final Entity entity) {
-+            return entity.level().environmentAttributes().getDimensionValue(net.minecraft.world.attribute.EnvironmentAttributes.FAST_LAVA) ? 0.007 : 0.0023333333333333335;
-         }
      }
- }
+ 
+     private static class Tracker {

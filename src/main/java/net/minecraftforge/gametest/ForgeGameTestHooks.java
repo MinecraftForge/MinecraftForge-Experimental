@@ -148,7 +148,8 @@ public class ForgeGameTestHooks {
                     gametest.manualOnly(),
                     gametest.maxAttempts(),
                     gametest.requiredSuccesses(),
-                    gametest.skyAccess()
+                    gametest.skyAccess(),
+                    gametest.padding()
                 );
 
                 MethodHandle handle = unreflect(method, owner);

@@ -130,7 +130,7 @@
          }
  
          public void setDifficulty(final Difficulty difficulty) {
-+            net.minecraftforge.event.ForgeEventFactory.onDifficultyChange(p_104852_, this.difficulty);
++            net.minecraftforge.event.ForgeEventFactory.onDifficultyChange(difficulty, this.difficulty);
              this.difficulty = difficulty;
          }
  

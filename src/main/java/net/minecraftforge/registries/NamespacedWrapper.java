@@ -371,9 +371,9 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
     }
 
     @Override
-    public void bindTag(TagKey<T> key, List<Holder<T>> newTags) {
+    public void bindTags(Map<TagKey<T>, List<Holder<T>>> pendingTags) {
         this.validateWrite();
-        this.getOrCreateTagForRegistration(key).bind(newTags);
+        pendingTags.forEach((id, values) -> this.getOrCreateTagForRegistration(id).bind(values));
     }
 
     @Override

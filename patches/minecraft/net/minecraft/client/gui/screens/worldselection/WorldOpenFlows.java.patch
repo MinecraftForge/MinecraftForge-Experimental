@@ -4,7 +4,7 @@
          this.minecraft.setScreenAndShow(new GenericMessageScreen(Component.translatable("selectWorld.resource_load")));
          PackRepository packrepository = ServerPacksSource.createPackRepository(worldAccess);
  
-+        net.minecraftforge.common.ForgeHooks.readAdditionalLevelSaveData(p_333651_, p_333651_.getLevelDirectory());
++        net.minecraftforge.common.ForgeHooks.readAdditionalLevelSaveData(worldAccess, worldAccess.getLevelDirectory());
 +
          WorldStem worldstem;
          try {

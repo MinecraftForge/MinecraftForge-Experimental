@@ -4,7 +4,7 @@
  
      @Override
      public InteractionResult interact(final Player player, final InteractionHand hand, final Vec3 location) {
-+        InteractionResult ret = super.interact(p_459569_, p_455676_);
++        InteractionResult ret = super.interact(player, hand, location);
 +        if (ret.consumesAction()) return ret;
          if (!player.canUseGameMasterBlocks()) {
              return InteractionResult.PASS;

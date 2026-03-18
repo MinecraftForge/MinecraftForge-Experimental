@@ -11,7 +11,7 @@ import net.minecraft.tags.TagEntry;
 
 public interface IForgeRawTagBuilder {
     default TagBuilder getRawBuilder() {
-        return (TagBuilder) this;
+        return (TagBuilder)this;
     }
 
     /**
@@ -42,12 +42,5 @@ public interface IForgeRawTagBuilder {
      */
     default TagBuilder removeTag(final Identifier tagID, final String source) {
         return this.remove(TagEntry.tag(tagID), source);
-    }
-
-    /**
-     * Shorthand version of {@code replace(true)}
-     */
-    default TagBuilder replace() {
-        return this.getRawBuilder().replace(true);
     }
 }

@@ -23,7 +23,7 @@ public class StrictNBTIngredient extends AbstractIngredient {
 
     private final ItemStack stack;
     private StrictNBTIngredient(ItemStack stack) {
-        super(HolderSet.direct(stack.getItemHolder()));
+        super(HolderSet.direct(stack.typeHolder()));
         this.stack = stack;
     }
 

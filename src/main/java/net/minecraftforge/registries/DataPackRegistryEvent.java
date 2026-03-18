@@ -67,8 +67,8 @@ public sealed interface DataPackRegistryEvent {
          * The data will be synced using the network codec and accessible via {@link ClientPacketListener#registryAccess()}.
          * @see #dataPackRegistry(ResourceKey, Codec)
          */
-        public <T> void dataPackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec, @Nullable Codec<T> networkCodec) {
-            this.registryDataList.add(new DataPackRegistryData<>(new RegistryDataLoader.RegistryData<>(registryKey, codec, false), networkCodec));
+        public <T> void dataPackRegistry(ResourceKey<? extends Registry<T>> registryKey, Codec<T> codec, @Nullable Codec<T> networkCodec) {
+            this.registryDataList.add(new DataPackRegistryData<>(new RegistryDataLoader.RegistryData<T>(registryKey, codec), networkCodec));
         }
 
         void process() {

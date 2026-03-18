@@ -34,7 +34,7 @@ import com.google.common.collect.ImmutableList;
 
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.ValidationContext;
+import net.minecraft.world.level.storage.loot.ValidationContextSource;
 import net.minecraft.world.level.storage.loot.entries.CompositeEntryBase;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 
@@ -42,19 +42,19 @@ import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
  * Currently used only for replacing shears item to shears_dig tool action
  */
 public final class ForgeLootTableProvider extends LootTableProvider {
-    private static final String POOLS = "f_7915" + "6_"; // LootTable.Builder.pools
-    private static final String ENTRIES = "f_7902" + "3_"; // LootPool.entries
-    private static final String CONDITIONS = "f_7902" + "4_"; // LootPool.conditions
-    private static final String CHILDREN = "f_7942" + "8_"; // CompositeEntryBase.children
-    private static final String ENTRY_CONDITION = "f_7963" + "6_"; // LootPoolEntryContainer.conditions
-    private static final String TERMS = "f_28560" + "9_"; // CompositeLootItemCondition.terms
+    private static final String POOLS = "pools"; // LootTable.Builder.pools
+    private static final String ENTRIES = "entries"; // LootPool.entries
+    private static final String CONDITIONS = "conditions"; // LootPool.conditions
+    private static final String CHILDREN = "children"; // CompositeEntryBase.children
+    private static final String ENTRY_CONDITION = "conditions"; // LootPoolEntryContainer.conditions
+    private static final String TERMS = "terms"; // CompositeLootItemCondition.terms
 
     public ForgeLootTableProvider(PackOutput pack, CompletableFuture<HolderLookup.Provider> lookup) {
         super(pack, Set.of(), VanillaLootTableProvider.create(pack, lookup).getTables(), lookup);
     }
 
     @Override
-    protected void validate(Registry<LootTable> map, ValidationContext validationcontext, ProblemReporter report) {
+    protected void validate(Registry<LootTable> map, ValidationContextSource validationcontext, ProblemReporter report) {
         // Do not validate against all registered loot tables
     }
 

@@ -259,13 +259,6 @@ public final class ForgeHooks {
         return LivingDamageEvent.BUS.post(event) ? 0 : event.getAmount();
     }
 
-    public static InteractionResult onInteractEntityAt(Entity entity, Player player, Vec3 vec3d, InteractionHand hand) {
-        var ret = new PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, vec3d);
-        if (PlayerInteractEvent.EntityInteractSpecific.BUS.post(ret))
-            return ret.getCancellationResult();
-        return entity.interactAt(player, vec3d, hand);
-    }
-
     public static int getLootingLevel(Entity target, @Nullable Entity killer, @Nullable DamageSource cause) {
         int looting = 0;
         if (killer instanceof LivingEntity living)
@@ -1021,10 +1014,10 @@ public final class ForgeHooks {
     @SuppressWarnings("deprecation")
     public static void onLivingBreathe(LivingEntity entity, int consumeAirAmount, int refillAirAmount) {
         // Check things that vanilla considers to be air - these will cause the air supply to be increased.
-        var eyeFluid = entity.getEyeInFluid();
+        var eyeFluid = entity.getEyeInFluidType();
         boolean isAir = eyeFluid == null || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
         // The following effects cause the entity to not drown, but do not cause the air supply to be increased.
-        boolean canBreathe = !entity.canDrownInFluid(eyeFluid) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
+        boolean canBreathe = !entity.canDrownInFluidType(eyeFluid) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
         var breatheEvent = ForgeEventFactory.onLivingBreathe(entity, isAir || canBreathe, consumeAirAmount, refillAirAmount, isAir);
         if (breatheEvent.canBreathe()) {
             if (breatheEvent.canRefillAir()) {
@@ -1052,7 +1045,7 @@ public final class ForgeHooks {
             }
         }
 
-        if (!isAir && !entity.level().isClientSide() && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluid(entity.getEyeInFluid(), entity)) {
+        if (!isAir && !entity.level().isClientSide() && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluidType(entity.getEyeInFluidType(), entity)) {
             entity.stopRiding();
         }
     }
@@ -1239,8 +1232,9 @@ public final class ForgeHooks {
 
     @Nullable
     public static DyeColor getDyeColorFromItemStack(ItemStack stack) {
-        if (stack.getItem() instanceof DyeItem dye)
-            return dye.getDyeColor();
+        var comp = stack.getComponents().get(DataComponents.DYE);
+        if (comp != null)
+            return comp;
 
         for (int x = 0; x < DyeColor.BLACK.getId(); x++) {
             var color = DyeColor.byId(x);

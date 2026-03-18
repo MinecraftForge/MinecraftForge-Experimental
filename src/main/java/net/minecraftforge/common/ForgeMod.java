@@ -407,7 +407,6 @@ public class ForgeMod {
         context.registerDisplayTest(IExtensionPoint.DisplayTest.IGNORE_ALL_VERSION);
         StartupMessageManager.addModMessage("Forge version "+ForgeVersion.getVersion());
 
-        ServerAboutToStartEvent.BUS.addListener(VillagerTradingManager::loadTrades);
         ForgeInternalHandler.register();
         GatherLoginConfigurationTasksEvent.BUS.addListener(ForgeNetworkConfigurationHandler::gatherInit);
 

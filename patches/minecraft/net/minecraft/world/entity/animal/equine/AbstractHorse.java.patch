@@ -8,17 +8,28 @@
      }
  
      protected void addBehaviourGoals() {
-@@ -279,6 +_,11 @@
+@@ -279,16 +_,19 @@
  
      @Override
      public boolean causeFallDamage(final double fallDistance, final float damageModifier, final DamageSource damageSource) {
+-        if (fallDistance > 1.0) {
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, fallDistance, damageModifier);
 +        if (event == null) return false;
-+        fallDistance = event.getDistance();
-+        damageModifier = event.getDamageMultiplier();
 +
-         if (fallDistance > 1.0) {
++        if (event.getDistance() > 1.0) {
              this.playSound(this.isBaby() ? SoundEvents.HORSE_LAND_BABY : SoundEvents.HORSE_LAND, 0.4F, 1.0F);
+         }
+ 
+-        int i = this.calculateFallDamage(fallDistance, damageModifier);
++        int i = this.calculateFallDamage(event.getDistance(), event.getDamageMultiplier());
+         if (i <= 0) {
+             return false;
+         } else {
+             this.hurt(damageSource, i);
+-            this.propagateFallToPassengers(fallDistance, damageModifier, damageSource);
++            this.propagateFallToPassengers(event.getDistance(), event.getDamageMultiplier(), damageSource);
+             this.playBlockFallSound();
+             return true;
          }
 @@ -344,9 +_,9 @@
      protected void playStepSound(final BlockPos pos, final BlockState blockState) {
