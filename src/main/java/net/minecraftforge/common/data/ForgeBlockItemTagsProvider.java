@@ -185,10 +185,10 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Tags.Blocks.GLASS_BLOCKS_CHEAP,
                 Tags.Blocks.GLASS_BLOCKS_TINTED
             )
-            .addOptionalTag(Tags.Blocks.GLASS);
+            .addOptionalTag(Tags.Blocks.GLASS_BLOCKS);
         tag(Tags.Blocks.GLASS_BLOCKS_COLORLESS, Tags.Items.GLASS_BLOCKS_COLORLESS)
             .add(Blocks.GLASS)
-            .addOptionalTag(Tags.Blocks.GLASS_COLORLESS);
+            .addOptionalTag(Tags.Blocks.GLASS_BLOCKS_COLORLESS);
         tag(Tags.Blocks.GLASS_BLOCKS_TINTED, Tags.Items.GLASS_BLOCKS_TINTED)
             .add(Blocks.TINTED_GLASS)
             .addOptionalTag(Legacy.Blocks.GLASS_TINTED);
@@ -258,10 +258,10 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.BLACK_GLAZED_TERRACOTTA
             );
         //copy(forgeBlockTagKey("gravel"), forgeItemTagKey("gravel"));
-        tag(Tags.Blocks.GRAVEL, Tags.Items.GRAVEL)
+        tag(Tags.Blocks.GRAVELS, Tags.Items.GRAVELS)
             .add(Blocks.GRAVEL); // forge:gravel
         //copy(forgeBlockTagKey("netherrack"), forgeItemTagKey("netherrack"));
-        tag(Tags.Blocks.NETHERRACK, Tags.Items.NETHERRACK)
+        tag(Tags.Blocks.NETHERRACKS, Tags.Items.NETHERRACKS)
             .add(Blocks.NETHERRACK); // forge:netherrack
         tag(Tags.Blocks.OBSIDIANS, Tags.Items.OBSIDIANS)
             .addTags(
@@ -385,14 +385,14 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
         tag(Tags.Blocks.PUMPKINS_JACK_O_LANTERNS, Tags.Items.PUMPKINS_JACK_O_LANTERNS)
             .add(Blocks.JACK_O_LANTERN);
         tag(Tags.Blocks.ROPES, Tags.Items.ROPES);
-        tag(Tags.Blocks.SAND, Tags.Items.SAND) // forge:sand
+        tag(Tags.Blocks.SANDS, Tags.Items.SANDS)
             .addTags(
-                Tags.Blocks.SAND_COLORLESS,
-                Tags.Blocks.SAND_RED
+                Tags.Blocks.SANDS_COLORLESS,
+                Tags.Blocks.SANDS_RED
             );
-        tag(Tags.Blocks.SAND_COLORLESS, Tags.Items.SAND_COLORLESS) // forge:sand/colorless
+        tag(Tags.Blocks.SANDS_COLORLESS, Tags.Items.SANDS_COLORLESS)
             .add(Blocks.SAND);
-        tag(Tags.Blocks.SAND_RED, Tags.Items.SAND_RED) // forge:sand/red
+        tag(Tags.Blocks.SANDS_RED, Tags.Items.SANDS_RED)
             .add(Blocks.RED_SAND);
         tag(Tags.Blocks.SANDSTONE_BLOCKS, Tags.Items.SANDSTONE_BLOCKS)
             .addTags(
@@ -575,22 +575,23 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             );
 
         //copy(forgeBlockTagKey("glass/tinted"), forgeItemTagKey("glass/tinted"));
-        addColored(tag(Tags.Blocks.STAINED_GLASS, Tags.Items.STAINED_GLASS)::add, Tags.Blocks.GLASS, "{color}_stained_glass");
-        addColored(tag(Tags.Blocks.STAINED_GLASS_PANES, Tags.Items.STAINED_GLASS_PANES)::add, Tags.Blocks.GLASS_PANES, "{color}_stained_glass_pane");
+        // todo
+//        addColored(tag(Tags.Blocks.STAINED_GLASS, Tags.Items.STAINED_GLASS)::add, Tags.Blocks.GLASS, "{color}_stained_glass");
+//        addColored(tag(Tags.Blocks.STAINED_GLASS_PANES, Tags.Items.STAINED_GLASS_PANES)::add, Tags.Blocks.GLASS_PANES, "{color}_stained_glass_pane");
 
         // tag(Tags.Blocks.GLASS, Tags.Items.GLASS, forgeBlockTagKey("glass"), forgeItemTagKey("glass")) // these are the same thing
-        tag(Tags.Blocks.GLASS, Tags.Items.GLASS)
-            .addTags(
-                Tags.Blocks.GLASS_COLORLESS,
-                Tags.Blocks.STAINED_GLASS,
-                Legacy.Blocks.GLASS_TINTED
-            );
-        tag(Tags.Blocks.GLASS_COLORLESS, Tags.Items.GLASS_COLORLESS)
+        // todo
+//        tag(Tags.Blocks.GLASS, Tags.Items.GLASS)
+//            .addTags(
+//                Tags.Blocks.GLASS_COLORLESS,
+//                Tags.Blocks.STAINED_GLASS,
+//                Legacy.Blocks.GLASS_TINTED
+//            );
+        tag(Tags.Blocks.GLASS_BLOCKS_COLORLESS, Tags.Items.GLASS_BLOCKS_COLORLESS)
             .add(Blocks.GLASS);
         tag(Legacy.Blocks.GLASS_PANES, Legacy.Items.GLASS_PANES)
             .addTags(
-                Legacy.Blocks.GLASS_PANES_COLORLESS,
-                Tags.Blocks.STAINED_GLASS_PANES
+                Legacy.Blocks.GLASS_PANES_COLORLESS
             );
         tag(Legacy.Blocks.GLASS_PANES_COLORLESS, Legacy.Items.GLASS_PANES_COLORLESS)
             .add(Blocks.GLASS_PANE);

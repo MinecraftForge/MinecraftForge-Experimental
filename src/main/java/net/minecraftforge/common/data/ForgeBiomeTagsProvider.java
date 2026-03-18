@@ -112,9 +112,9 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
                 .add(Biomes.JAGGED_PEAKS)
                 .add(Biomes.FROZEN_PEAKS);
                 //.addOptionalTag(forgeTagKey("is_sparse/overworld")); // can't because forge:is_sparse/overworld contains dripstone caves and eroded badlands, while c:is_sparse_vegetation/overworld does not
-        tag(IS_SPARSE_NETHER); // forge:is_sparse/nether
-        tag(IS_SPARSE_END); // forge:is_sparse/end
-        tag(IS_SPARSE_VEGETATION).addTag(IS_SPARSE_VEGETATION_OVERWORLD).addOptionalTag(IS_SPARSE_NETHER).addOptionalTag(IS_SPARSE_END);
+        tag(IS_SPARSE_VEGETATION_NETHER);
+        tag(IS_SPARSE_VEGETATION_END);
+        tag(IS_SPARSE_VEGETATION).addTag(IS_SPARSE_VEGETATION_OVERWORLD).addOptionalTag(IS_SPARSE_VEGETATION_NETHER).addOptionalTag(IS_SPARSE_VEGETATION_END);
 
         tag(IS_DENSE_VEGETATION_OVERWORLD)
                 .add(Biomes.DARK_FOREST)
@@ -124,9 +124,9 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
                 .add(Biomes.BAMBOO_JUNGLE)
                 .add(Biomes.MANGROVE_SWAMP)
                 .addOptionalTag(forgeTagKey("is_dense/overworld"));
-        tag(IS_DENSE_NETHER);
-        tag(IS_DENSE_END);
-        tag(IS_DENSE_VEGETATION).addTag(IS_DENSE_VEGETATION_OVERWORLD).addOptionalTag(IS_DENSE_NETHER).addOptionalTag(IS_DENSE_END);
+        tag(IS_DENSE_VEGETATION_NETHER);
+        tag(IS_DENSE_VEGETATION_END);
+        tag(IS_DENSE_VEGETATION).addTag(IS_DENSE_VEGETATION_OVERWORLD).addOptionalTag(IS_DENSE_VEGETATION_NETHER).addOptionalTag(IS_DENSE_VEGETATION_END);
 
         tag(IS_WET_OVERWORLD)
                 .add(Biomes.SWAMP)
@@ -215,7 +215,6 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
         tag(IS_OLD_GROWTH).add(Biomes.OLD_GROWTH_BIRCH_FOREST).add(Biomes.OLD_GROWTH_PINE_TAIGA).add(Biomes.OLD_GROWTH_SPRUCE_TAIGA);
         tag(IS_LUSH).add(Biomes.LUSH_CAVES);
         tag(IS_MAGICAL);
-        tag(IS_MODIFIED);
         tag(IS_SANDY).add(Biomes.DESERT).add(Biomes.BADLANDS).add(Biomes.WOODED_BADLANDS).add(Biomes.ERODED_BADLANDS).add(Biomes.BEACH);
         tag(IS_MUSHROOM).add(Biomes.MUSHROOM_FIELDS);
         tag(IS_PLATEAU).add(Biomes.WOODED_BADLANDS).add(Biomes.SAVANNA_PLATEAU).add(Biomes.CHERRY_GROVE).add(Biomes.MEADOW);
@@ -240,65 +239,8 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
 
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
         // TODO: Remove backwards compat tag entries in 1.22
-        tag(Biomes.PLAINS, forgeTagKey("is_plains"));
-        tag(Biomes.DESERT, forgeTagKey("is_hot/overworld"), forgeTagKey("is_dry/overworld"), forgeTagKey("is_sandy"), forgeTagKey("is_desert"));
-        tag(Biomes.TAIGA, forgeTagKey("is_cold/overworld"), forgeTagKey("is_coniferous"));
-        tag(Biomes.SWAMP, forgeTagKey("is_wet/overworld"), forgeTagKey("is_swamp"));
-        tag(Biomes.NETHER_WASTES, forgeTagKey("is_hot/nether"), forgeTagKey("is_dry/nether"));
-        tag(Biomes.THE_END, forgeTagKey("is_cold/end"), forgeTagKey("is_dry/end"));
-        tag(Biomes.FROZEN_OCEAN, forgeTagKey("is_cold/overworld"), forgeTagKey("is_snowy"));
-        tag(Biomes.FROZEN_RIVER, forgeTagKey("is_cold/overworld"), forgeTagKey("is_snowy"));
-        tag(Biomes.SNOWY_PLAINS, forgeTagKey("is_cold/overworld"), forgeTagKey("is_snowy"), forgeTagKey("is_wasteland"), forgeTagKey("is_plains"));
-        tag(Biomes.MUSHROOM_FIELDS, forgeTagKey("is_mushroom"), forgeTagKey("is_rare"));
-        tag(Biomes.JUNGLE, forgeTagKey("is_hot/overworld"), forgeTagKey("is_wet/overworld"), forgeTagKey("is_dense/overworld"));
-        tag(Biomes.SPARSE_JUNGLE, forgeTagKey("is_hot/overworld"), forgeTagKey("is_wet/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.BEACH, forgeTagKey("is_wet/overworld"), forgeTagKey("is_sandy"));
-        tag(Biomes.SNOWY_BEACH, forgeTagKey("is_cold/overworld"), forgeTagKey("is_snowy"));
-        tag(Biomes.DARK_FOREST, forgeTagKey("is_spooky"), forgeTagKey("is_dense/overworld"));
-        tag(Biomes.SNOWY_TAIGA, forgeTagKey("is_cold/overworld"), forgeTagKey("is_coniferous"), forgeTagKey("is_snowy"));
-        tag(Biomes.OLD_GROWTH_PINE_TAIGA, forgeTagKey("is_cold/overworld"), forgeTagKey("is_coniferous"));
-        tag(Biomes.WINDSWEPT_FOREST, forgeTagKey("is_sparse/overworld"));
-        tag(Biomes.SAVANNA, forgeTagKey("is_hot/overworld"), forgeTagKey("is_sparse/overworld"));
-        tag(Biomes.SAVANNA_PLATEAU, forgeTagKey("is_hot/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_rare"), forgeTagKey("is_slope"), Tags.Biomes.IS_PLATEAU);
-        tag(Biomes.BADLANDS, forgeTagKey("is_sandy"), forgeTagKey("is_dry/overworld"));
-        tag(Biomes.WOODED_BADLANDS, forgeTagKey("is_sandy"), forgeTagKey("is_dry/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_slope"), Tags.Biomes.IS_PLATEAU);
-        tag(Biomes.MEADOW, forgeTagKey("is_plains"), Tags.Biomes.IS_PLATEAU, forgeTagKey("is_slope"));
-        tag(Biomes.GROVE, forgeTagKey("is_cold/overworld"), forgeTagKey("is_coniferous"), forgeTagKey("is_snowy"), forgeTagKey("is_slope"));
-        tag(Biomes.SNOWY_SLOPES, forgeTagKey("is_cold/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_snowy"), forgeTagKey("is_slope"));
-        tag(Biomes.JAGGED_PEAKS, forgeTagKey("is_cold/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_snowy"), forgeTagKey("is_peak"));
-        tag(Biomes.FROZEN_PEAKS, forgeTagKey("is_cold/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_snowy"), forgeTagKey("is_peak"));
-        tag(Biomes.STONY_PEAKS, forgeTagKey("is_hot/overworld"), forgeTagKey("is_peak"));
-        tag(Biomes.SMALL_END_ISLANDS, forgeTagKey("is_cold/end"), forgeTagKey("is_dry/end"));
-        tag(Biomes.END_MIDLANDS, forgeTagKey("is_cold/end"), forgeTagKey("is_dry/end"));
-        tag(Biomes.END_HIGHLANDS, forgeTagKey("is_cold/end"), forgeTagKey("is_dry/end"));
-        tag(Biomes.END_BARRENS, forgeTagKey("is_cold/end"), forgeTagKey("is_dry/end"));
-        tag(Biomes.WARM_OCEAN, forgeTagKey("is_hot/overworld"));
-        tag(Biomes.COLD_OCEAN, forgeTagKey("is_cold/overworld"));
-        tag(Biomes.DEEP_COLD_OCEAN, forgeTagKey("is_cold/overworld"));
-        tag(Biomes.DEEP_FROZEN_OCEAN, forgeTagKey("is_cold/overworld"));
-        tag(Biomes.THE_VOID, forgeTagKey("is_void"));
-        tag(Biomes.SUNFLOWER_PLAINS, forgeTagKey("is_plains"), forgeTagKey("is_rare"));
-        tag(Biomes.WINDSWEPT_GRAVELLY_HILLS, forgeTagKey("is_sparse/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.FLOWER_FOREST, forgeTagKey("is_rare"));
-        tag(Biomes.ICE_SPIKES, forgeTagKey("is_cold/overworld"), forgeTagKey("is_snowy"), forgeTagKey("is_rare"));
-        tag(Biomes.OLD_GROWTH_BIRCH_FOREST, forgeTagKey("is_dense/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.OLD_GROWTH_SPRUCE_TAIGA, forgeTagKey("is_dense/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.WINDSWEPT_SAVANNA, forgeTagKey("is_hot/overworld"), forgeTagKey("is_dry/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.ERODED_BADLANDS, forgeTagKey("is_hot/overworld"), forgeTagKey("is_dry/overworld"), forgeTagKey("is_sparse/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.BAMBOO_JUNGLE, forgeTagKey("is_hot/overworld"), forgeTagKey("is_wet/overworld"), forgeTagKey("is_rare"));
-        tag(Biomes.LUSH_CAVES, forgeTagKey("is_cave"), forgeTagKey("is_lush"), forgeTagKey("is_wet/overworld"));
-        tag(Biomes.DRIPSTONE_CAVES, forgeTagKey("is_cave"), forgeTagKey("is_sparse/overworld"));
-        tag(Biomes.SOUL_SAND_VALLEY, forgeTagKey("is_hot/nether"), forgeTagKey("is_dry/nether"));
-        tag(Biomes.CRIMSON_FOREST, forgeTagKey("is_hot/nether"), forgeTagKey("is_dry/nether"));
-        tag(Biomes.WARPED_FOREST, forgeTagKey("is_hot/nether"), forgeTagKey("is_dry/nether"));
-        tag(Biomes.BASALT_DELTAS, forgeTagKey("is_hot/nether"), forgeTagKey("is_dry/nether"));
-        tag(Biomes.MANGROVE_SWAMP, forgeTagKey("is_wet/overworld"), forgeTagKey("is_hot/overworld"), forgeTagKey("is_swamp"));
-        tag(Biomes.DEEP_DARK, forgeTagKey("is_cave"), forgeTagKey("is_rare"), forgeTagKey("is_spooky"));
-
         tag(forgeTagKey("is_hot")).addTag(forgeTagKey("is_hot/overworld")).addTag(forgeTagKey("is_hot/nether")).addOptionalTag(Tags.Biomes.IS_HOT_END);
         tag(forgeTagKey("is_cold")).addTag(forgeTagKey("is_cold/overworld")).addOptionalTag(Tags.Biomes.IS_COLD_NETHER).addTag(forgeTagKey("is_cold/end"));
-        tag(forgeTagKey("is_sparse")).addTag(forgeTagKey("is_sparse/overworld")).addOptionalTag(Tags.Biomes.IS_SPARSE_NETHER).addOptionalTag(Tags.Biomes.IS_SPARSE_END);
-        tag(forgeTagKey("is_dense")).addTag(forgeTagKey("is_dense/overworld")).addOptionalTag(Tags.Biomes.IS_DENSE_NETHER).addOptionalTag(Tags.Biomes.IS_DENSE_END);
         tag(forgeTagKey("is_wet")).addTag(forgeTagKey("is_wet/overworld")).addOptionalTag(Tags.Biomes.IS_WET_NETHER).addOptionalTag(Tags.Biomes.IS_WET_END);
         tag(forgeTagKey("is_dry")).addTag(forgeTagKey("is_dry/overworld")).addTag(forgeTagKey("is_dry/nether")).addTag(forgeTagKey("is_dry/end"));
         tag(forgeTagKey("is_dead"));

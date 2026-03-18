@@ -300,82 +300,16 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 ItemTags.DURABILITY_ENCHANTABLE,
                 ItemTags.VANISHING_ENCHANTABLE
             );
-
-        tag(forgeItemTagKey("bones")).add(Items.BONE);
-        // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
-        // TODO: Remove backwards compat tag entries in 1.22
-        tag(forgeItemTagKey("crops"))
-                .addTags(forgeItemTagKey("crops/beetroot"), forgeItemTagKey("crops/carrot"), forgeItemTagKey("crops/nether_wart"),
-                        forgeItemTagKey("crops/potato"), forgeItemTagKey("crops/wheat"));
-        tag(forgeItemTagKey("crops/beetroot")).add(Items.BEETROOT);
-        tag(forgeItemTagKey("crops/carrot")).add(Items.CARROT);
-        tag(forgeItemTagKey("crops/nether_wart")).add(Items.NETHER_WART);
-        tag(forgeItemTagKey("crops/potato")).add(Items.POTATO);
-        tag(forgeItemTagKey("crops/wheat")).add(Items.WHEAT);
-        tag(forgeItemTagKey("foods/pie")).add(Items.PUMPKIN_PIE);
-        tag(forgeItemTagKey("dusts")).addTags(forgeItemTagKey("dusts/glowstone"), Tags.Items.DUSTS_PRISMARINE, forgeItemTagKey("dusts/redstone"));
-        tag(forgeItemTagKey("dusts/glowstone")).add(Items.GLOWSTONE_DUST);
-        tag(forgeItemTagKey("dusts/prismarine")).add(Items.PRISMARINE_SHARD);
-        tag(forgeItemTagKey("dusts/redstone")).add(Items.REDSTONE);
-        addColored(tag(forgeItemTagKey("dyes"))::addTags, forgeItemTagKey("dyes"), "{color}_dye");
-        tag(forgeItemTagKey("eggs")).add(Items.EGG);
-        tag(forgeItemTagKey("enchanting_fuels")).addTag(forgeItemTagKey("gems/lapis"));
-        tag(forgeItemTagKey("ender_pearls")).add(Items.ENDER_PEARL);
-        tag(forgeItemTagKey("feathers")).add(Items.FEATHER);
-        tag(forgeItemTagKey("gems"))
-                .addTags(forgeItemTagKey("gems/amethyst"), forgeItemTagKey("gems/diamond"), forgeItemTagKey("gems/emerald"),
-                        forgeItemTagKey("gems/lapis"), forgeItemTagKey("gems/prismarine"), forgeItemTagKey("gems/quartz"));
-        tag(forgeItemTagKey("gems/amethyst")).add(Items.AMETHYST_SHARD);
-        tag(forgeItemTagKey("gems/diamond")).add(Items.DIAMOND);
-        tag(forgeItemTagKey("gems/emerald")).add(Items.EMERALD);
-        tag(forgeItemTagKey("gems/lapis")).add(Items.LAPIS_LAZULI);
-        tag(forgeItemTagKey("gems/prismarine")).add(Items.PRISMARINE_CRYSTALS);
-        tag(forgeItemTagKey("gems/quartz")).add(Items.QUARTZ);
-        tag(forgeItemTagKey("gunpowder")).add(Items.GUNPOWDER);
-        tag(forgeItemTagKey("heads")).add(Items.CREEPER_HEAD, Items.DRAGON_HEAD, Items.PLAYER_HEAD, Items.SKELETON_SKULL, Items.WITHER_SKELETON_SKULL, Items.ZOMBIE_HEAD);
-        tag(forgeItemTagKey("ingots"))
-                .addTags(forgeItemTagKey("ingots/brick"), forgeItemTagKey("ingots/copper"), forgeItemTagKey("ingots/gold"),
-                        forgeItemTagKey("ingots/iron"), forgeItemTagKey("ingots/netherite"), forgeItemTagKey("ingots/nether_brick"));
-        tag(forgeItemTagKey("ingots/brick")).add(Items.BRICK);
-        tag(forgeItemTagKey("ingots/copper")).add(Items.COPPER_INGOT);
-        tag(forgeItemTagKey("ingots/gold")).add(Items.GOLD_INGOT);
-        tag(forgeItemTagKey("ingots/iron")).add(Items.IRON_INGOT);
-        tag(forgeItemTagKey("ingots/netherite")).add(Items.NETHERITE_INGOT);
-        tag(forgeItemTagKey("ingots/nether_brick")).add(Items.NETHER_BRICK);
-        tag(forgeItemTagKey("leather")).add(Items.LEATHER);
-        tag(forgeItemTagKey("mushrooms")).add(Items.BROWN_MUSHROOM, Items.RED_MUSHROOM);
-        tag(forgeItemTagKey("nether_stars")).add(Items.NETHER_STAR);
-        tag(forgeItemTagKey("nuggets")).addTags(forgeItemTagKey("nuggets/iron"), forgeItemTagKey("nuggets/gold"));
-        tag(forgeItemTagKey("nuggets/iron")).add(Items.IRON_NUGGET);
-        tag(forgeItemTagKey("nuggets/gold")).add(Items.GOLD_NUGGET);
-        tag(forgeItemTagKey("raw_materials")).addTags(forgeItemTagKey("raw_materials/copper"), forgeItemTagKey("raw_materials/gold"), forgeItemTagKey("raw_materials/iron"));
-        tag(forgeItemTagKey("raw_materials/copper")).add(Items.RAW_COPPER);
-        tag(forgeItemTagKey("raw_materials/gold")).add(Items.RAW_GOLD);
-        tag(forgeItemTagKey("raw_materials/iron")).add(Items.RAW_IRON);
-        tag(forgeItemTagKey("rods")).addTags(forgeItemTagKey("rods/blaze"), forgeItemTagKey("rods/wooden"));
-        tag(forgeItemTagKey("rods/blaze")).add(Items.BLAZE_ROD);
-        tag(forgeItemTagKey("rods/wooden")).add(Items.STICK);
         tag(Tags.Items.SEEDS).addTags(Tags.Items.SEEDS_BEETROOT, Tags.Items.SEEDS_MELON, Tags.Items.SEEDS_PUMPKIN, Tags.Items.SEEDS_WHEAT);
         tag(Tags.Items.SEEDS_BEETROOT).add(Items.BEETROOT_SEEDS);
         tag(Tags.Items.SEEDS_MELON).add(Items.MELON_SEEDS);
         tag(Tags.Items.SEEDS_PUMPKIN).add(Items.PUMPKIN_SEEDS);
         tag(Tags.Items.SEEDS_WHEAT).add(Items.WHEAT_SEEDS);
-        tag(forgeItemTagKey("shears")).add(Items.SHEARS); // yes, it's forge:shears not forge:tools/shears
-        tag(forgeItemTagKey("slimeballs")).add(Items.SLIME_BALL);
-        tag(forgeItemTagKey("string")).add(Items.STRING);
-        tag(forgeItemTagKey("tools/shields")).add(Items.SHIELD);
-        tag(forgeItemTagKey("tools/bows")).add(Items.BOW);
-        tag(forgeItemTagKey("tools/crossbows")).add(Items.CROSSBOW);
-        tag(forgeItemTagKey("tools/fishing_rods")).add(Items.FISHING_ROD);
-        tag(forgeItemTagKey("tools/tridents")).add(Items.TRIDENT);
-        tag(forgeItemTagKey("tools"))
-                .addTags(ItemTags.SWORDS, ItemTags.AXES, ItemTags.PICKAXES, ItemTags.SHOVELS, ItemTags.HOES)
-                .addTags(forgeItemTagKey("tools/shields"), forgeItemTagKey("tools/bows"), forgeItemTagKey("tools/crossbows"), forgeItemTagKey("tools/fishing_rods"), forgeItemTagKey("tools/tridents"));
-        tag(Tags.Items.ARMORS_HELMETS).add(Items.LEATHER_HELMET, Items.TURTLE_HELMET, Items.CHAINMAIL_HELMET, Items.IRON_HELMET, Items.GOLDEN_HELMET, Items.DIAMOND_HELMET, Items.NETHERITE_HELMET);
-        tag(Tags.Items.ARMORS_CHESTPLATES).add(Items.LEATHER_CHESTPLATE, Items.CHAINMAIL_CHESTPLATE, Items.IRON_CHESTPLATE, Items.GOLDEN_CHESTPLATE, Items.DIAMOND_CHESTPLATE, Items.NETHERITE_CHESTPLATE);
-        tag(Tags.Items.ARMORS_LEGGINGS).add(Items.LEATHER_LEGGINGS, Items.CHAINMAIL_LEGGINGS, Items.IRON_LEGGINGS, Items.GOLDEN_LEGGINGS, Items.DIAMOND_LEGGINGS, Items.NETHERITE_LEGGINGS);
-        tag(Tags.Items.ARMORS_BOOTS).add(Items.LEATHER_BOOTS, Items.CHAINMAIL_BOOTS, Items.IRON_BOOTS, Items.GOLDEN_BOOTS, Items.DIAMOND_BOOTS, Items.NETHERITE_BOOTS);
-        tag(forgeItemTagKey("armors")).addTags(Tags.Items.ARMORS_HELMETS, Tags.Items.ARMORS_CHESTPLATES, Tags.Items.ARMORS_LEGGINGS, Tags.Items.ARMORS_BOOTS);
+
+        tag(Tags.Items.BONES).add(Items.BONE);
+        // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
+        // TODO: Remove backwards compat tag entries in 1.22
+        addColored(tag(forgeItemTagKey("dyes"))::addTags, forgeItemTagKey("dyes"), "{color}_dye");
     }
 
     private void addColored(TagKey<Item> group, String pattern) {

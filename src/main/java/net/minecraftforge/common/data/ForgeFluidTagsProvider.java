@@ -39,12 +39,7 @@ public final class ForgeFluidTagsProvider extends FluidTagsProvider {
         tag(RABBIT_STEW);
         tag(BEETROOT_SOUP);
         tag(HIDDEN_FROM_RECIPE_VIEWERS);
-
-        // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
-        // TODO: Remove backwards compat tag entries in 1.22
-        tag(forgeTagKey("milk"))
-            .addOptional(ForgeMod.MILK.getKey().identifier())
-            .addOptional(ForgeMod.FLOWING_MILK.getKey().identifier());
+        tag(EXPERIENCE);
     }
 
     private static TagKey<Fluid> forgeTagKey(String path) {
