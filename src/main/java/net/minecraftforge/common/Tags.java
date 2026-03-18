@@ -450,81 +450,6 @@ public class Tags {
         private static void init() {}
 
         //region `forge` tags for Forge-specific tags
-        public static final TagKey<Item> BONES = forgeTag("bones");
-        public static final TagKey<Item> CHESTS_ENDER = forgeTag("chests/ender");
-        public static final TagKey<Item> CHESTS_TRAPPED = forgeTag("chests/trapped");
-        public static final TagKey<Item> COBBLESTONE_NORMAL = forgeTag("cobblestone/normal");
-        public static final TagKey<Item> COBBLESTONE_INFESTED = forgeTag("cobblestone/infested");
-        public static final TagKey<Item> COBBLESTONE_MOSSY = forgeTag("cobblestone/mossy");
-        public static final TagKey<Item> COBBLESTONE_DEEPSLATE = forgeTag("cobblestone/deepslate");
-        public static final TagKey<Item> EGGS = forgeTag("eggs");
-        public static final TagKey<Item> END_STONES = forgeTag("end_stones");
-        public static final TagKey<Item> FEATHERS = forgeTag("feathers");
-        public static final TagKey<Item> FENCE_GATES = forgeTag("fence_gates");
-        public static final TagKey<Item> FENCE_GATES_WOODEN = forgeTag("fence_gates/wooden");
-        public static final TagKey<Item> FENCES = forgeTag("fences");
-        public static final TagKey<Item> FENCES_NETHER_BRICK = forgeTag("fences/nether_brick");
-        public static final TagKey<Item> FENCES_WOODEN = forgeTag("fences/wooden");
-        public static final TagKey<Item> GRAVEL = forgeTag("gravel");
-        public static final TagKey<Item> GUNPOWDER = forgeTag("gunpowder");
-        public static final TagKey<Item> MUSHROOMS = forgeTag("mushrooms");
-        public static final TagKey<Item> NETHER_STARS = forgeTag("nether_stars");
-        public static final TagKey<Item> NETHERRACK = forgeTag("netherrack");
-        /**
-         * Blocks which are often replaced by deepslate ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_DEEPSLATE}, during world generation
-         */
-        public static final TagKey<Item> ORE_BEARING_GROUND_DEEPSLATE = forgeTag("ore_bearing_ground/deepslate");
-        /**
-         * Blocks which are often replaced by netherrack ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_NETHERRACK}, during world generation
-         */
-        public static final TagKey<Item> ORE_BEARING_GROUND_NETHERRACK = forgeTag("ore_bearing_ground/netherrack");
-        /**
-         * Blocks which are often replaced by stone ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_STONE}, during world generation
-         */
-        public static final TagKey<Item> ORE_BEARING_GROUND_STONE = forgeTag("ore_bearing_ground/stone");
-        /**
-         * Ores which on average result in more than one resource worth of materials
-         */
-        public static final TagKey<Item> ORE_RATES_DENSE = forgeTag("ore_rates/dense");
-        /**
-         * Ores which on average result in one resource worth of materials
-         */
-        public static final TagKey<Item> ORE_RATES_SINGULAR = forgeTag("ore_rates/singular");
-        /**
-         * Ores which on average result in less than one resource worth of materials
-         */
-        public static final TagKey<Item> ORE_RATES_SPARSE = forgeTag("ore_rates/sparse");
-        public static final TagKey<Item> ORES_COAL = forgeTag("ores/coal");
-        public static final TagKey<Item> ORES_COPPER = forgeTag("ores/copper");
-        public static final TagKey<Item> ORES_DIAMOND = forgeTag("ores/diamond");
-        public static final TagKey<Item> ORES_EMERALD = forgeTag("ores/emerald");
-        public static final TagKey<Item> ORES_GOLD = forgeTag("ores/gold");
-        public static final TagKey<Item> ORES_IRON = forgeTag("ores/iron");
-        public static final TagKey<Item> ORES_LAPIS = forgeTag("ores/lapis");
-        public static final TagKey<Item> ORES_REDSTONE = forgeTag("ores/redstone");
-        /**
-         * Ores in deepslate (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_DEEPSLATE}) which could logically use deepslate as recipe input or output
-         */
-        public static final TagKey<Item> ORES_IN_GROUND_DEEPSLATE = forgeTag("ores_in_ground/deepslate");
-        /**
-         * Ores in netherrack (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_NETHERRACK}) which could logically use netherrack as recipe input or output
-         */
-        public static final TagKey<Item> ORES_IN_GROUND_NETHERRACK = forgeTag("ores_in_ground/netherrack");
-        /**
-         * Ores in stone (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_STONE}) which could logically use stone as recipe input or output
-         */
-        public static final TagKey<Item> ORES_IN_GROUND_STONE = forgeTag("ores_in_ground/stone");
-
-        public static final TagKey<Item> SAND = forgeTag("sand");
-        public static final TagKey<Item> SAND_COLORLESS = forgeTag("sand/colorless");
-        public static final TagKey<Item> SAND_RED = forgeTag("sand/red");
-
-        public static final TagKey<Item> SEEDS = forgeTag("seeds");
-        public static final TagKey<Item> SEEDS_BEETROOT = forgeTag("seeds/beetroot");
-        public static final TagKey<Item> SEEDS_MELON = forgeTag("seeds/melon");
-        public static final TagKey<Item> SEEDS_PUMPKIN = forgeTag("seeds/pumpkin");
-        public static final TagKey<Item> SEEDS_WHEAT = forgeTag("seeds/wheat");
-
         /**
          * Controls what items can be consumed for enchanting such as Enchanting Tables.
          * This tag defaults to {@link net.minecraft.world.item.Items#LAPIS_LAZULI} when not present in any datapacks, including forge client on vanilla server
@@ -545,10 +470,12 @@ public class Tags {
         //       Forge only adopts `c` tags that are common across all loaders.
         public static final TagKey<Item> BARRELS = cTag("barrels");
         public static final TagKey<Item> BARRELS_WOODEN = cTag("barrels/wooden");
+        public static final TagKey<Item> BONES = cTag("bones");
         public static final TagKey<Item> BOOKSHELVES = cTag("bookshelves");
         public static final TagKey<Item> BRICKS = cTag("bricks");
         public static final TagKey<Item> BRICKS_NORMAL = cTag("bricks/normal");
         public static final TagKey<Item> BRICKS_NETHER = cTag("bricks/nether");
+        public static final TagKey<Item> BRICKS_RESIN = cTag("bricks/resin");
         public static final TagKey<Item> BUCKETS = cTag("buckets");
         public static final TagKey<Item> BUCKETS_EMPTY = cTag("buckets/empty");
         /**
@@ -574,7 +501,13 @@ public class Tags {
         public static final TagKey<Item> CHAINS = cTag("chains");
         public static final TagKey<Item> CHESTS = cTag("chests");
         public static final TagKey<Item> CHESTS_WOODEN = cTag("chests/wooden");
+        public static final TagKey<Item> CHESTS_ENDER = cTag("chests/ender");
+        public static final TagKey<Item> CHESTS_TRAPPED = cTag("chests/trapped");
         public static final TagKey<Item> COBBLESTONES = cTag("cobblestones");
+        public static final TagKey<Item> COBBLESTONE_NORMAL = cTag("cobblestone/normal");
+        public static final TagKey<Item> COBBLESTONE_INFESTED = cTag("cobblestone/infested");
+        public static final TagKey<Item> COBBLESTONE_MOSSY = cTag("cobblestone/mossy");
+        public static final TagKey<Item> COBBLESTONE_DEEPSLATE = cTag("cobblestone/deepslate");
         public static final TagKey<Item> CONCRETES = cTag("concretes");
         /**
          * Block tag equivalent is {@link BlockTags#CONCRETE_POWDER}
@@ -584,6 +517,8 @@ public class Tags {
          * For blocks that are similar to amethyst where they have clusters forming from budding blocks
          */
         public static final TagKey<Item> CLUSTERS = cTag("clusters");
+        public static final TagKey<Item> CLUMPS = cTag("clumps");
+        public static final TagKey<Item> CLUMPS_RESIN = cTag("clumps/resin");
         /**
          * For raw materials harvested from growable plants. Crop items can be edible like carrots or
          * non-edible like wheat and cocoa beans.
@@ -602,6 +537,15 @@ public class Tags {
         public static final TagKey<Item> DUSTS = cTag("dusts");
         public static final TagKey<Item> DUSTS_REDSTONE = cTag("dusts/redstone");
         public static final TagKey<Item> DUSTS_GLOWSTONE = cTag("dusts/glowstone");
+
+        public static final TagKey<Item> DRINKS = cTag("drinks");
+        public static final TagKey<Item> DRINKS_HONEY = cTag("drinks/honey");
+        public static final TagKey<Item> DRINKS_JUICE = cTag("drinks/juice");
+        public static final TagKey<Item> DRINKS_MAGIC = cTag("drinks/magic");
+        public static final TagKey<Item> DRINKS_MILK = cTag("drinks/milk");
+        public static final TagKey<Item> DRINKS_OMINOUS = cTag("drinks/ominous");
+        public static final TagKey<Item> DRINKS_WATER = cTag("drinks/water");
+        public static final TagKey<Item> DRINKS_WATERY = cTag("drinks/watery");
 
         /**
          * Tag that holds all blocks and items that can be dyed a specific color.
@@ -644,7 +588,16 @@ public class Tags {
         public static final TagKey<Item> DYES_ORANGE = DyeColor.ORANGE.getTag();
         public static final TagKey<Item> DYES_WHITE = DyeColor.WHITE.getTag();
 
+        public static final TagKey<Item> EGGS = cTag("eggs");
+        public static final TagKey<Item> END_STONES = cTag("end_stones");
         public static final TagKey<Item> ENDER_PEARLS = cTag("ender_pearls");
+
+        public static final TagKey<Item> FEATHERS = cTag("feathers");
+        public static final TagKey<Item> FENCE_GATES = cTag("fence_gates");
+        public static final TagKey<Item> FENCE_GATES_WOODEN = cTag("fence_gates/wooden");
+        public static final TagKey<Item> FENCES = cTag("fences");
+        public static final TagKey<Item> FENCES_NETHER_BRICK = cTag("fences/nether_brick");
+        public static final TagKey<Item> FENCES_WOODEN = cTag("fences/wooden");
         /**
          * For bonemeal-like items that can grow plants.
          */
@@ -735,6 +688,9 @@ public class Tags {
         public static final TagKey<Item> GLASS_PANES_COLORLESS = cTag("glass_panes/colorless");
         public static final TagKey<Item> GLAZED_TERRACOTTAS = cTag("glazed_terracottas");
 
+        public static final TagKey<Item> GRAVELS = cTag("gravels");
+        public static final TagKey<Item> GUNPOWDER = cTag("gunpowder");
+
         /**
          * Tag that holds all items that recipe viewers should not show to users.
          */
@@ -746,17 +702,68 @@ public class Tags {
          */
         public static final TagKey<Item> OBSIDIANS_NORMAL = cTag("obsidians/normal");
         public static final TagKey<Item> OBSIDIANS_CRYING = cTag("obsidians/crying");
+        /**
+         * Blocks which are often replaced by deepslate ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_DEEPSLATE}, during world generation
+         */
+        public static final TagKey<Item> ORE_BEARING_GROUND_DEEPSLATE = cTag("ore_bearing_ground/deepslate");
+        /**
+         * Blocks which are often replaced by netherrack ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_NETHERRACK}, during world generation
+         */
+        public static final TagKey<Item> ORE_BEARING_GROUND_NETHERRACK = cTag("ore_bearing_ground/netherrack");
+        /**
+         * Blocks which are often replaced by stone ores, i.e. the ores in the tag {@link #ORES_IN_GROUND_STONE}, during world generation
+         */
+        public static final TagKey<Item> ORE_BEARING_GROUND_STONE = cTag("ore_bearing_ground/stone");
+        /**
+         * Ores which on average result in more than one resource worth of materials
+         */
+        public static final TagKey<Item> ORE_RATES_DENSE = cTag("ore_rates/dense");
+        /**
+         * Ores which on average result in one resource worth of materials
+         */
+        public static final TagKey<Item> ORE_RATES_SINGULAR = cTag("ore_rates/singular");
+        /**
+         * Ores which on average result in less than one resource worth of materials
+         */
+        public static final TagKey<Item> ORE_RATES_SPARSE = cTag("ore_rates/sparse");
+        public static final TagKey<Item> ORES_COAL = cTag("ores/coal");
+        public static final TagKey<Item> ORES_COPPER = cTag("ores/copper");
+        public static final TagKey<Item> ORES_DIAMOND = cTag("ores/diamond");
+        public static final TagKey<Item> ORES_EMERALD = cTag("ores/emerald");
+        public static final TagKey<Item> ORES_GOLD = cTag("ores/gold");
+        public static final TagKey<Item> ORES_IRON = cTag("ores/iron");
+        public static final TagKey<Item> ORES_LAPIS = cTag("ores/lapis");
+        public static final TagKey<Item> ORES_REDSTONE = cTag("ores/redstone");
+        /**
+         * Ores in deepslate (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_DEEPSLATE}) which could logically use deepslate as recipe input or output
+         */
+        public static final TagKey<Item> ORES_IN_GROUND_DEEPSLATE = cTag("ores_in_ground/deepslate");
+        /**
+         * Ores in netherrack (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_NETHERRACK}) which could logically use netherrack as recipe input or output
+         */
+        public static final TagKey<Item> ORES_IN_GROUND_NETHERRACK = cTag("ores_in_ground/netherrack");
+        /**
+         * Ores in stone (or in equivalent blocks in the tag {@link #ORE_BEARING_GROUND_STONE}) which could logically use stone as recipe input or output
+         */
+        public static final TagKey<Item> ORES_IN_GROUND_STONE = cTag("ores_in_ground/stone");
         public static final TagKey<Item> INGOTS = cTag("ingots");
         public static final TagKey<Item> INGOTS_COPPER = cTag("ingots/copper");
         public static final TagKey<Item> INGOTS_GOLD = cTag("ingots/gold");
         public static final TagKey<Item> INGOTS_IRON = cTag("ingots/iron");
         public static final TagKey<Item> INGOTS_NETHERITE = cTag("ingots/netherite");
         public static final TagKey<Item> LEATHERS = cTag("leathers");
+        public static final TagKey<Item> MUSHROOMS = cTag("mushrooms");
         /**
          * For music disc-like materials to be used in recipes.
          * A pancake with a JUKEBOX_PLAYABLE component attached to play in Jukeboxes as an Easter Egg is not a music disc and would not go in this tag.
          */
         public static final TagKey<Item> MUSIC_DISCS = cTag("music_discs");
+        public static final TagKey<Item> NATURAL_LOGS = cTag("natural_logs");
+        public static final TagKey<Item> NATURAL_LOGS_NETHER = cTag("natural_logs/nether");
+        public static final TagKey<Item> NATURAL_LOGS_OVERWORLD = cTag("natural_logs/overworld");
+        public static final TagKey<Item> NATURAL_WOODS = cTag("natural_woods");
+        public static final TagKey<Item> NETHER_STARS = cTag("nether_stars");
+        public static final TagKey<Item> NETHERRACKS = forgeTag("netherracks");
         public static final TagKey<Item> NUGGETS = cTag("nuggets");
         public static final TagKey<Item> NUGGETS_COPPER = cTag("nuggets/copper");
         public static final TagKey<Item> NUGGETS_GOLD = cTag("nuggets/gold");
@@ -764,6 +771,8 @@ public class Tags {
         public static final TagKey<Item> ORES = cTag("ores");
         public static final TagKey<Item> ORES_NETHERITE_SCRAP = cTag("ores/netherite_scrap");
         public static final TagKey<Item> ORES_QUARTZ = cTag("ores/quartz");
+        public static final TagKey<Item> POTIONS = cTag("potions");
+        public static final TagKey<Item> POTIONS_BOTTLE = cTag("potions/bottle");
         public static final TagKey<Item> PLAYER_WORKSTATIONS_CRAFTING_TABLES = cTag("player_workstations/crafting_tables");
         public static final TagKey<Item> PLAYER_WORKSTATIONS_FURNACES = cTag("player_workstations/furnaces");
         public static final TagKey<Item> PUMPKINS = cTag("pumpkins");
@@ -789,6 +798,18 @@ public class Tags {
          */
         public static final TagKey<Item> RODS_WOODEN = cTag("rods/wooden");
         public static final TagKey<Item> ROPES = cTag("ropes");
+
+        public static final TagKey<Item> SANDS = cTag("sands");
+        public static final TagKey<Item> SANDS_COLORLESS = cTag("sands/colorless");
+        public static final TagKey<Item> SANDS_RED = cTag("sands/red");
+
+        public static final TagKey<Item> SEEDS = cTag("seeds");
+        public static final TagKey<Item> SEEDS_BEETROOT = cTag("seeds/beetroot");
+        public static final TagKey<Item> SEEDS_MELON = cTag("seeds/melon");
+        public static final TagKey<Item> SEEDS_PITCHER_PLANT = cTag("seeds/pitcher_plant");
+        public static final TagKey<Item> SEEDS_PUMPKIN = cTag("seeds/pumpkin");
+        public static final TagKey<Item> SEEDS_TORCHFLOWER = cTag("seeds/torchflower");
+        public static final TagKey<Item> SEEDS_WHEAT = cTag("seeds/wheat");
 
         public static final TagKey<Item> SANDSTONE_BLOCKS = cTag("sandstone/blocks");
         public static final TagKey<Item> SANDSTONE_SLABS = cTag("sandstone/slabs");
@@ -831,6 +852,7 @@ public class Tags {
         public static final TagKey<Item> STORAGE_BLOCKS_RAW_GOLD = cTag("storage_blocks/raw_gold");
         public static final TagKey<Item> STORAGE_BLOCKS_RAW_IRON = cTag("storage_blocks/raw_iron");
         public static final TagKey<Item> STORAGE_BLOCKS_REDSTONE = cTag("storage_blocks/redstone");
+        public static final TagKey<Item> STORAGE_BLOCKS_RESIN = cTag("storage_blocks/resin");
         public static final TagKey<Item> STORAGE_BLOCKS_SLIME = cTag("storage_blocks/slime");
         public static final TagKey<Item> STORAGE_BLOCKS_WHEAT = cTag("storage_blocks/wheat");
         public static final TagKey<Item> STRINGS = cTag("strings");
@@ -922,6 +944,7 @@ public class Tags {
          * @see ToolActions
          */
         public static final TagKey<Item> TOOLS_MACE = cTag("tools/mace");
+        public static final TagKey<Item> TOOLS_WRENCH = cTag("tools/wrench");
         /**
          * A tag containing melee-based weapons for recipes and loot tables.
          * Tools are considered melee if they are intentionally intended to be used for melee attack as a primary purpose.
@@ -954,6 +977,10 @@ public class Tags {
          * Collects the 4 vanilla armor tags into one parent collection for ease.
          */
         public static final TagKey<Item> ARMORS = cTag("armors");
+        public static final TagKey<Item> ARMORS_HORSE = cTag("armors/horse");
+        public static final TagKey<Item> ARMORS_HUMANOID = cTag("armors/humanoid");
+        public static final TagKey<Item> ARMORS_NAUTILUS = cTag("armors/nautilus");
+        public static final TagKey<Item> ARMORS_WOLF = cTag("armors/wolf");
         /**
          * Collects the many enchantable tags into one parent collection for ease.
          */
