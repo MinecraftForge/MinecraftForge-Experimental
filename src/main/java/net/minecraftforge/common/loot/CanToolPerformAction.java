@@ -11,10 +11,10 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraftforge.common.ToolAction;
 import org.jetbrains.annotations.NotNull;
 
@@ -27,11 +27,10 @@ public record CanToolPerformAction(ToolAction action) implements LootItemConditi
     public static final MapCodec<CanToolPerformAction> CODEC = RecordCodecBuilder.mapCodec(b -> b.group(
         ToolAction.CODEC.fieldOf("action").forGetter(CanToolPerformAction::action)
     ).apply(b, CanToolPerformAction::new));
-    public static final LootItemConditionType TYPE = new LootItemConditionType(CODEC);
 
     @Override
-    public @NotNull LootItemConditionType getType() {
-        return TYPE;
+    public @NotNull MapCodec<CanToolPerformAction> codec() {
+        return CODEC;
     }
 
     @Override
@@ -41,8 +40,13 @@ public record CanToolPerformAction(ToolAction action) implements LootItemConditi
 
     @Override
     public boolean test(LootContext ctx) {
-        ItemStack itemstack = ctx.getOptionalParameter(LootContextParams.TOOL);
-        return itemstack != null && itemstack.canPerformAction(this.action);
+        var instance = ctx.getOptionalParameter(LootContextParams.TOOL);
+        ItemStack item = null;
+        if (instance instanceof ItemStack stack)
+            item = stack;
+        else if (instance instanceof ItemStackTemplate template)
+            item = template.create();
+        return item != null && item.canPerformAction(this.action);
     }
 
     public static LootItemCondition.Builder canToolPerformAction(ToolAction action) {

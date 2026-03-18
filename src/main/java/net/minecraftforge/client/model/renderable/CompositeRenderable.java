@@ -7,6 +7,8 @@ package net.minecraftforge.client.model.renderable;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
+
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.resources.Identifier;
@@ -68,6 +70,7 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
     private static class Mesh {
         private final Identifier texture;
         private final List<BakedQuad> quads = new ArrayList<>();
+        private final QuadInstance quadInstance = new QuadInstance();
 
         public Mesh(Identifier texture) {
             this.texture = texture;
@@ -75,8 +78,11 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
 
         public void render(PoseStack poseStack, MultiBufferSource bufferSource, ITextureRenderTypeLookup textureRenderTypeLookup, int lightmap, int overlay) {
             var consumer = bufferSource.getBuffer(textureRenderTypeLookup.get(texture));
+            quadInstance.setLightCoords(lightmap);
+            quadInstance.setOverlayCoords(overlay);
+
             for (var quad : quads)
-                consumer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, lightmap, overlay);
+                consumer.putBakedQuad(poseStack.last(), quad, quadInstance);
         }
     }
 

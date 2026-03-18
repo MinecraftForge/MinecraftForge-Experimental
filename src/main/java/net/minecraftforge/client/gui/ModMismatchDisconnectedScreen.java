@@ -20,7 +20,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import net.minecraft.ChatFormatting;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -98,13 +98,12 @@ public class ModMismatchDisconnectedScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTicks);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
         int textYOffset = hasMismatches ? 18 : 0;
-        guiGraphics.drawCenteredString(this.font, this.title, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset - 9 * 2, 0xAAAAAA);
-        var lineCollector = guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.notClickable(false));
+        guiGraphics.centeredText(this.font, this.title, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset - 9 * 2, 0xAAAAAA);
+        var lineCollector = guiGraphics.textRenderer(GuiGraphicsExtractor.HoveredTextEffects.notClickable(false), null);
         this.message.visitLines(TextAlignment.CENTER, this.width / 2, (this.height - this.listHeight - this.textHeight) / 2 - textYOffset, 9, lineCollector);
-        super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
     }
 
     class MismatchInfoPanel extends ScrollPanel {
@@ -251,7 +250,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
         }
 
         @Override
-        protected void drawPanel(GuiGraphics guiGraphics, int entryRight, int relativeY, int mouseX, int mouseY) {
+        protected void drawPanel(GuiGraphicsExtractor guiGraphics, int entryRight, int relativeY, int mouseX, int mouseY) {
             int i = 0;
 
             for (Pair<FormattedCharSequence, Pair<FormattedCharSequence, FormattedCharSequence>> line : lineTable) {
@@ -261,10 +260,10 @@ public class ModMismatchDisconnectedScreen extends Screen {
                 int color = 0xFFFFFF; //Optional.ofNullable(font.substrByWidth(name, 0)).map(Style::getColor).map(TextColor::getValue).orElse(0xFFFFFF);
                 //Only indent the given name if a version string is present. This makes it easier to distinguish table section headers and mod entries
                 int nameLeft = left + border + (versions == null ? 0 : nameIndent);
-                guiGraphics.drawString(font, name, nameLeft, relativeY + i * 12, color, false);
+                guiGraphics.text(font, name, nameLeft, relativeY + i * 12, color, false);
                 if (versions != null) {
-                    guiGraphics.drawString(font, versions.getLeft(), left + border + nameIndent + nameWidth, relativeY + i * 12, color, false);
-                    guiGraphics.drawString(font, versions.getRight(), left + border + nameIndent + nameWidth + versionWidth, relativeY + i * 12, color, false);
+                    guiGraphics.text(font, versions.getLeft(), left + border + nameIndent + nameWidth, relativeY + i * 12, color, false);
+                    guiGraphics.text(font, versions.getRight(), left + border + nameIndent + nameWidth + versionWidth, relativeY + i * 12, color, false);
                 }
 
                 i++;
@@ -272,11 +271,11 @@ public class ModMismatchDisconnectedScreen extends Screen {
         }
 
         @Override
-        public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTicks) {
-            super.render(guiGraphics, mouseX, mouseY, partialTicks);
+        public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTicks) {
+            super.extractRenderState(guiGraphics, mouseX, mouseY, partialTicks);
             Style style = getComponentStyleAt(mouseX, mouseY);
             if (style != null && style.getHoverEvent() != null)
-                guiGraphics.renderComponentHoverEffect(font, style, mouseX, mouseY);
+                guiGraphics.componentHoverEffect(font, style, mouseX, mouseY);
         }
 
         public Style getComponentStyleAt(double x, double y) {

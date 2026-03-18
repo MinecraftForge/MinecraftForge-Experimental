@@ -10,10 +10,10 @@ import org.jetbrains.annotations.Nullable;
 
 import com.mojang.math.Transformation;
 
-import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.resources.model.ModelDiscovery.ModelWrapper;
 import net.minecraft.client.resources.model.ResolvedModel;
+import net.minecraft.client.resources.model.cuboid.CuboidModel;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.ForgeBlockModelData;
 
@@ -29,11 +29,11 @@ public record ModelContext(
     }
 
     private static ForgeBlockModelData makeData(ResolvedModel self, ResolvedModel parent) {
-        var data = self.wrapped() instanceof BlockModel block ? block.forgeData() : null;
+        var data = self.wrapped() instanceof CuboidModel block ? block.forgeData() : null;
 
         var p = parent;
         while (p != null && (data == null || !data.full())) {
-            if (p.wrapped() instanceof BlockModel block) {
+            if (p.wrapped() instanceof CuboidModel block) {
                 if (data == null)
                     data = block.forgeData();
                 else
@@ -72,7 +72,7 @@ public record ModelContext(
 
     @Override
     public Transformation getRootTransform() {
-        return data == null ? Transformation.identity() : data.transform().orElse(Transformation.identity());
+        return data == null ? Transformation.IDENTITY : data.transform().orElse(Transformation.IDENTITY);
     }
 
     @Override

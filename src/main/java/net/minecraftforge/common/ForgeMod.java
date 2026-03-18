@@ -8,6 +8,7 @@ package net.minecraftforge.common;
 import net.minecraft.DetectedVersion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BiomeColors;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -30,14 +31,13 @@ import net.minecraft.world.entity.ai.attributes.RangedAttribute;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.item.Items;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.pathfinder.PathType;
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.data.ExistingFileHelper;
@@ -262,11 +262,6 @@ public class ForgeMod {
                         public int getTintColor() {
                             return 0xFF3F76E4;
                         }
-
-                        @Override
-                        public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-                            return BiomeColors.getAverageWaterColor(getter, pos) | 0xFF000000;
-                        }
                     });
                 }
             });
@@ -315,10 +310,10 @@ public class ForgeMod {
                 }
             });
 
-    private static final DeferredRegister<LootItemConditionType> LOOT_CONDITION_TYPES = deferred(Registries.LOOT_CONDITION_TYPE);
+    private static final DeferredRegister<MapCodec<? extends LootItemCondition>> LOOT_CONDITION_TYPES = deferred(Registries.LOOT_CONDITION_TYPE);
     static {
-        LOOT_CONDITION_TYPES.register("loot_table_id", () -> LootTableIdCondition.TYPE);
-        LOOT_CONDITION_TYPES.register("can_tool_perform_action", () -> CanToolPerformAction.TYPE);
+        LOOT_CONDITION_TYPES.register("loot_table_id", () -> LootTableIdCondition.CODEC);
+        LOOT_CONDITION_TYPES.register("can_tool_perform_action", () -> CanToolPerformAction.CODEC);
     }
 
     private static final DeferredRegister<MapCodec<? extends ICondition>> CONDITION_SERIALIZERS = deferred(ForgeRegistries.Keys.CONDITION_SERIALIZERS);

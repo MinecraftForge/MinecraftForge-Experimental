@@ -15,10 +15,12 @@ import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.util.Mth;
 import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.client.model.geometry.IGeometryBakingContext;
@@ -313,7 +315,7 @@ public class ObjModel {
         int uv2 = 0;
         if (emissiveAmbient) {
             int fakeLight = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
-            uv2 = LightTexture.pack(fakeLight, fakeLight);
+            uv2 = LightCoordsUtil.pack(fakeLight, fakeLight);
             quadBaker.setShade(fakeLight == 0 && shadeQuads);
         } else
             quadBaker.setShade(shadeQuads);
@@ -522,16 +524,16 @@ public class ObjModel {
                 return;
 
             var material = UnbakedGeometryHelper.resolveDirtyMaterial(mat.diffuseColorMap, slots);
-            var texture = baker.sprites().get(material, name);
+            var texture = baker.materials().get(material, name);
             int tintIndex = mat.diffuseTintIndex;
             Vector4f colorTint = mat.diffuseColor;
 
-            // TODO: [Forge][Rendering] Models contains the transforms so we shouldnt care about them here.
+            // TODO: [Forge][Rendering] Models contains the transforms so we shouldn't care about them here.
             //var rootTransform = context.getRootTransform();
             //var transform = rootTransform.isIdentity() ? modelTransform.transformation() : modelTransform.transformation().compose(rootTransform);
-            var transform = Transformation.identity();
+            var transform = Transformation.IDENTITY;
             for (int[][] face : faces) {
-                Pair<BakedQuad, Direction> quad = makeQuad(face, tintIndex, colorTint, mat.ambientColor, texture, transform);
+                Pair<BakedQuad, Direction> quad = makeQuad(face, tintIndex, colorTint, mat.ambientColor, texture.sprite(), transform);
                 if (quad.getRight() == null)
                     builder.addUnculledFace(quad.getLeft());
                 else
@@ -549,11 +551,11 @@ public class ObjModel {
             final List<BakedQuad> quads = new ArrayList<>();
 
             for (var face : this.faces) {
-                var pair = makeQuad(face, tintIndex, colorTint, mat.ambientColor, UnitTextureAtlasSprite.INSTANCE, Transformation.identity());
+                var pair = makeQuad(face, tintIndex, colorTint, mat.ambientColor, UnitTextureAtlasSprite.INSTANCE, Transformation.IDENTITY);
                 quads.add(pair.getLeft());
             }
 
-            Identifier textureLocation = UnbakedGeometryHelper.resolveDirtyMaterial(mat.diffuseColorMap, textures).texture();
+            Identifier textureLocation = UnbakedGeometryHelper.resolveDirtyMaterial(mat.diffuseColorMap, textures).sprite();
             Identifier texturePath = textureLocation.withPath(p -> "textures/" + p + ".png");
 
             builder.addMesh(texturePath, quads);

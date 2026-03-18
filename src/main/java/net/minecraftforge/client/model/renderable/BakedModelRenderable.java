@@ -6,10 +6,12 @@
 package net.minecraftforge.client.model.renderable;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.QuadInstance;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
-import net.minecraft.client.renderer.block.model.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -38,7 +40,7 @@ public class BakedModelRenderable implements IRenderable<BakedModelRenderable.Co
      * @see net.minecraftforge.client.event.ModelEvent.RegisterModelStateDefinitions
      */
     public static BakedModelRenderable of(BlockState state) {
-        return of(Minecraft.getInstance().getModelManager().getBlockModelShaper().getBlockModel(state));
+        return of(Minecraft.getInstance().getModelManager().getBlockStateModelSet().get(state));
     }
 
     /**
@@ -62,12 +64,19 @@ public class BakedModelRenderable implements IRenderable<BakedModelRenderable.Co
         var randomSource = context.randomSource();
         randomSource.setSeed(context.seed());
         // Given the lack of context, the requested render type has to be null to ensure the model renders all of its geometry
-        var parts = new ArrayList<BlockModelPart>();
-        model.collectParts(randomSource, parts, context.data(), null);
+        var parts = new ArrayList<BlockStateModelPart>();
+        model.collectParts(randomSource, parts, context.data());
+
+        // Not sure how we're suppoed to put the tint index, that comes from the Material
+        var quadInstance = new QuadInstance();
+        quadInstance.setLightCoords(lightmap);
+        quadInstance.setOverlayCoords(overlay);
+
         for (var part : parts) {
             for (var direction : Direction.valuesView()) {
                 for (var quad : part.getQuads(direction)) {
-                    buffer.putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay);
+                    buffer.putBakedQuad(poseStack.last(), quad, quadInstance);
+                    //buffer.putBulkData(poseStack.last(), quad, tint.x(), tint.y(), tint.z(), tint.w(), lightmap, overlay);
                 }
             }
         }

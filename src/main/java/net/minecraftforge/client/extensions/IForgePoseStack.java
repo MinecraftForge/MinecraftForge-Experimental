@@ -26,14 +26,14 @@ public interface IForgePoseStack {
         final PoseStack self = self();
         self.pushPose();
 
-        var trans = transformation.getTranslation();
+        var trans = transformation.translation();
         self.translate(trans.x(), trans.y(), trans.z());
 
-        self.mulPose(transformation.getLeftRotation());
+        self.mulPose(transformation.leftRotation());
 
-        var scale = transformation.getScale();
+        var scale = transformation.scale();
         self.scale(scale.x(), scale.y(), scale.z());
 
-        self.mulPose(transformation.getRightRotation());
+        self.mulPose(transformation.rightRotation());
     }
 }

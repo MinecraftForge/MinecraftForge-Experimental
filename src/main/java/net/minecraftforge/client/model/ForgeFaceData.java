@@ -13,12 +13,9 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-
 /**
  * Holds extra data that may be injected into a face.<p>
- * Used by {@link ItemLayerGeometry}, {@link BlockElement} and {@link BlockElementFace}
+ * Used by {@link BlockElement} and {@link BlockElementFace}
  *
  * @param ambientOcclusion If this face has AO
  * @param calculateNormals If we should manually calculate the normals for this block or inherit facing normals like vanilla

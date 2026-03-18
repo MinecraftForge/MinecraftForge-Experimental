@@ -414,7 +414,7 @@ public final class ForgeHooks {
         var lookup = level.holderLookup(Registries.ENCHANTMENT);
         int fortuneLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.FORTUNE), stack);
         int silkTouchLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.SILK_TOUCH), stack);
-        int exp = state.getExpDrop(level, level.random, pos, fortuneLevel, silkTouchLevel);
+        int exp = state.getExpDrop(level, level.getRandom(), pos, fortuneLevel, silkTouchLevel);
         if (exp > 0)
             state.getBlock().popExperience(level, pos, exp);
     }
@@ -565,8 +565,8 @@ public final class ForgeHooks {
     @NotNull
     public static ItemStack getCraftingRemainingItem(@NotNull ItemStack stack) {
         var remainder = stack.getCraftingRemainder();
-        if (!remainder.isEmpty()) {
-            stack = remainder;
+        if (remainder != null) {
+            stack = remainder.create();
             if (!stack.isEmpty() && stack.isDamageableItem() && stack.getDamageValue() > stack.getMaxDamage()) {
                 ForgeEventFactory.onPlayerDestroyItem(CRAFTING_PLAYER.get(), stack, (EquipmentSlot)null);
                 return ItemStack.EMPTY;

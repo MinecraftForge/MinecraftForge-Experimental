@@ -6,7 +6,9 @@
 package net.minecraftforge.client.model;
 
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.block.model.BakedQuad;
+
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+
 import org.joml.Vector3f;
 import org.joml.Vector3fc;
 import org.joml.Vector4f;
@@ -44,7 +46,7 @@ public final class QuadTransformers {
 
             return new BakedQuad(positions[0], positions[1], positions[2], positions[3],
                     quad.packedUV0(), quad.packedUV1(), quad.packedUV2(), quad.packedUV3(),
-                    quad.tintIndex(), quad.direction(), quad.sprite(), quad.shade(), quad.lightEmission(), quad.ambientOcclusion());
+                    quad.direction(), quad.materialInfo());
         };
     }
     /**

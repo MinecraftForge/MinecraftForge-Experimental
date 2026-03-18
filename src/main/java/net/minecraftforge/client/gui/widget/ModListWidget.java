@@ -6,7 +6,7 @@
 package net.minecraftforge.client.gui.widget;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
@@ -45,8 +45,8 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
     }
 
     @Override
-    protected void renderSelection(GuiGraphics gui, ModListWidget.ModEntry entry, int color) {
-        int widthOffset = this.scrollbarVisible() ? 11 : 4;
+    protected void extractSelection(GuiGraphicsExtractor gui, ModListWidget.ModEntry entry, int color) {
+        int widthOffset = this.scrollable() ? 11 : 4;
         int top = entry.getContentY();
         int left  = entry.getContentX();
         int right = left + entry.getWidth() - widthOffset;
@@ -75,7 +75,7 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
         }
 
         @Override
-        public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+        public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
             int top = this.getContentY();
             int left = this.getContentX();
             int entryHeight = this.getContentBottom();
@@ -84,9 +84,9 @@ public class ModListWidget extends ObjectSelectionList<ModListWidget.ModEntry> {
             Component version = Component.literal(stripControlCodes(MavenVersionStringHelper.artifactVersionToString(modInfo.getVersion())));
             VersionChecker.CheckResult vercheck = VersionChecker.getResult(modInfo);
             Font font = this.parent.getFontRenderer();
-            var barOffset = ModListWidget.this.scrollbarVisible() ? 6 : 0;
-            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(name,    listWidth - 6 - barOffset))), left + 3, top + 2, 0xFFFFFFFF, false);
-            guiGraphics.drawString(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(version, listWidth - 6 - barOffset))), left + 3, top + 2 + font.lineHeight, 0xFFCCCCCC, false);
+            var barOffset = ModListWidget.this.scrollable() ? 6 : 0;
+            guiGraphics.text(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(name,    listWidth - 6 - barOffset))), left + 3, top + 2, 0xFFFFFFFF, false);
+            guiGraphics.text(font, Language.getInstance().getVisualOrder(FormattedText.composite(font.substrByWidth(version, listWidth - 6 - barOffset))), left + 3, top + 2 + font.lineHeight, 0xFFCCCCCC, false);
             if (vercheck.status().shouldDraw()) {
                 //TODO: [Forge][ModList] Consider adding more icons for visualization
                 guiGraphics.pose().pushMatrix();
