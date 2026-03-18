@@ -34,12 +34,13 @@ For support and questions, visit [the Support Forum][Support-Forum] or [the Forg
 
 We require the version of Java that Minecraft requires, which is currently:
 
-| Minecraft     | Java              |
-|---------------|-------------------|
-| 1.20.6+       | [21][Adoptium-21] |
-| 1.18 - 1.20.4 | [17][Adoptium-17] |
-| 1.17.1        | [16][Adoptium-16] |
-| 1.16.5-       | [8][Adoptium-8]   |
+| Minecraft        | Java              |
+|------------------|-------------------|
+| 26.1+            | [25][Adoptium-25] |
+| 1.20.6 - 1.21.11 | [21][Adoptium-21] |
+| 1.18 - 1.20.4    | [17][Adoptium-17] |
+| 1.17.1           | [16][Adoptium-16] |
+| 1.16.5-          | [8][Adoptium-8]   |
 
 **If you are on Windows and have difficulty using Java to launch JAR files, consider using [Jarfix by Johann Löfflmann][Jarfix].**
 
@@ -80,6 +81,7 @@ YourKit for providing us accesss to their [YourKit Java Profiler] which helps id
 
 [Download]: https://files.minecraftforge.net/
 
+[Adoptium-25]: https://adoptium.net/temurin/releases/?version=25
 [Adoptium-21]: https://adoptium.net/temurin/releases/?version=21
 [Adoptium-17]: https://adoptium.net/temurin/releases/?version=17
 [Adoptium-16]: https://adoptium.net/temurin/releases/?version=16
