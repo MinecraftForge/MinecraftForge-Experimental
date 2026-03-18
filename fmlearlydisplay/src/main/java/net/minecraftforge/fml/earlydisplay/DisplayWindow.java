@@ -312,12 +312,12 @@ public class DisplayWindow implements ImmediateWindowProvider {
         LOGGER.error("ERROR DISPLAY\n"+msgBuilder);
         // we show the display on a new dedicated thread
         Executors.newSingleThreadExecutor().submit(()-> {
-            var res = TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", msgBuilder.toString(), "yesno", "error", false);
-            if (res) {
+            var res = TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", msgBuilder.toString(), "yesno", "error", 0);
+            if (res != 0) {
                 try {
                     Desktop.getDesktop().browse(URI.create(ERROR_URL));
                 } catch (IOException ioe) {
-                    TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", "Sadly, we couldn't open your browser.\nVisit " + ERROR_URL, "ok", "error", false);
+                    TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", "Sadly, we couldn't open your browser.\nVisit " + ERROR_URL, "ok", "error", 0);
                 }
             }
             System.exit(1);
