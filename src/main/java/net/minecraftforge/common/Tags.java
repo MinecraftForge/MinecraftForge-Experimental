@@ -282,17 +282,6 @@ public class Tags {
         public static final TagKey<Block> VILLAGER_JOB_SITES = cTag("villager_job_sites");
         //endregion
 
-        //region Redirect fields for improved backward-compatibility
-        // TODO: Remove backwards compat redirect fields in 1.22
-        /** @deprecated Use {@link #COBBLESTONES} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Block> COBBLESTONE = COBBLESTONES;
-
-        /** @deprecated Use {@link #GLASS_BLOCKS_CHEAP} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Block> GLASS_SILICA = GLASS_BLOCKS_CHEAP;
-        //endregion
-
         //region Forge tags that now map to combining multiple `c` tags
         // Kept for binary compatibility
         // TODO: Remove these in 1.22
@@ -987,31 +976,6 @@ public class Tags {
         public static final TagKey<Item> ENCHANTABLES = cTag("enchantables");
         //endregion
 
-        //region Redirect fields for improved backward-compatibility
-        // TODO: Remove backwards compat redirect fields in 1.22
-        /** @deprecated Use {@link #COBBLESTONES} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> COBBLESTONE = COBBLESTONES;
-        /** @deprecated Use {@link #LEATHERS} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> LEATHER = LEATHERS;
-        /** @deprecated Use {@link #SANDSTONE_BLOCKS} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> SANDSTONE = SANDSTONE_BLOCKS;
-        /** @deprecated Use {@link #STONES} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> STONE = STONES;
-        /** @deprecated Use {@link #TOOLS_SHEAR} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> SHEARS = TOOLS_SHEAR;
-        /** @deprecated Use {@link #TOOLS_SPEAR} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> TOOLS_TRIDENTS = TOOLS_SPEAR;
-        /** @deprecated Use {@link #STRINGS} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Item> STRING = STRINGS;
-        //endregion
-
         //region Forge tags that now map to combining multiple `c` tags
         // Kept for binary compatibility
         // TODO: Remove these in 1.22
@@ -1509,34 +1473,6 @@ public class Tags {
         public static final TagKey<Biome> PRIMARY_WOOD_TYPE_PALE_OAK = cTag("primary_wood_type/pale_oak");
         public static final TagKey<Biome> PRIMARY_WOOD_TYPE_SPRUCE = cTag("primary_wood_type/spruce");
         public static final TagKey<Biome> PRIMARY_WOOD_TYPE_WARPED = cTag("primary_wood_type/warped");
-        //endregion
-
-        //region Redirect fields for improved backward-compatibility
-        // TODO: Remove backwards compat redirect fields in 1.22
-        /** @deprecated Use {@link #IS_SPARSE_VEGETATION} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_SPARSE = IS_SPARSE_VEGETATION;
-        /** @deprecated Use {@link #IS_SPARSE_VEGETATION_OVERWORLD} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_SPARSE_OVERWORLD = IS_SPARSE_VEGETATION_OVERWORLD;
-
-        /** @deprecated Use {@link #IS_DENSE_VEGETATION} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_DENSE = IS_DENSE_VEGETATION;
-        /** @deprecated Use {@link #IS_DENSE_VEGETATION_OVERWORLD} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_DENSE_OVERWORLD = IS_DENSE_VEGETATION_OVERWORLD;
-
-        /** @deprecated Use {@link #IS_AQUATIC} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_WATER = IS_AQUATIC;
-
-        /** @deprecated Use {@link #IS_MOUNTAIN_SLOPE} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_SLOPE = IS_MOUNTAIN_SLOPE;
-        /** @deprecated Use {@link #IS_MOUNTAIN_PEAK} instead */
-        @Deprecated(forRemoval = true, since = "1.21")
-        public static final TagKey<Biome> IS_PEAK = IS_MOUNTAIN_PEAK;
         //endregion
 
         private static TagKey<Biome> cTag(String name) {
