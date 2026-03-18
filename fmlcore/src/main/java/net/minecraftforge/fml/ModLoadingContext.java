@@ -32,11 +32,7 @@ public class ModLoadingContext {
         return context.get();
     }
 
-    /**
-     * @deprecated Going to be moved to ForgeHooks for Internal use.
-     */
-    @Deprecated(forRemoval = true, since="1.21.1")
-    public void setActiveContainer(final ModContainer container) {
+    void setActiveContainer(final ModContainer container) {
         this.activeContainer = container;
         this.languageExtension = container == null ? null : container.contextExtension.get();
     }

@@ -6,11 +6,9 @@
 package net.minecraftforge.client.event;
 
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -63,12 +61,6 @@ public sealed interface TextureStitchEvent {
      */
     record Post(TextureAtlas getAtlas) implements RecordEvent, TextureStitchEvent {
         public static final EventBus<Post> BUS = EventBus.create(Post.class);
-
-        /** @deprecated {@link TextureStitchEvent.Post} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<Post> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
 
         @ApiStatus.Internal
         public Post {}

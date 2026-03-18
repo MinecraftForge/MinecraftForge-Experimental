@@ -366,13 +366,6 @@ public class ModLoader {
         return loadingStateValid;
     }
 
-    /** @deprecated Use {@link #hasCompletedState(IModLoadingState)} instead */
-    @Deprecated(forRemoval = true)
-    public boolean hasCompletedState(final String stateName) {
-        IModLoadingState state = stateManager.findState(stateName);
-        return completedStates.contains(state);
-    }
-
     public boolean hasCompletedState(IModLoadingState state) {
         return completedStates.contains(state);
     }

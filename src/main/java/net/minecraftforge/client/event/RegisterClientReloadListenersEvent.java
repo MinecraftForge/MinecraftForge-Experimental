@@ -9,12 +9,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.server.packs.resources.PreparableReloadListener;
 import net.minecraft.server.packs.resources.ReloadableResourceManager;
 import net.minecraftforge.event.AddReloadListenerEvent;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -29,12 +27,6 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public final class RegisterClientReloadListenersEvent extends MutableEvent implements SelfDestructing {
     public static final EventBus<RegisterClientReloadListenersEvent> BUS = EventBus.create(RegisterClientReloadListenersEvent.class);
-
-    /** @deprecated {@link RegisterClientReloadListenersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<RegisterClientReloadListenersEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 
     private final ReloadableResourceManager resourceManager;
 

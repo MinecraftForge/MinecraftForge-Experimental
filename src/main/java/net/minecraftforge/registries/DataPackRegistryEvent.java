@@ -12,12 +12,9 @@ import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
@@ -32,12 +29,6 @@ public sealed interface DataPackRegistryEvent {
      */
     final class NewRegistry extends MutableEvent implements DataPackRegistryEvent {
         public static final EventBus<NewRegistry> BUS = EventBus.create(NewRegistry.class);
-
-        /** @deprecated {@link DataPackRegistryEvent.NewRegistry} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-        @Deprecated(forRemoval = true, since = "1.21.9")
-        public static EventBus<NewRegistry> getBus(BusGroup modBusGroup) {
-            return BUS;
-        }
 
         private final List<DataPackRegistryData<?>> registryDataList = new ArrayList<>();
 

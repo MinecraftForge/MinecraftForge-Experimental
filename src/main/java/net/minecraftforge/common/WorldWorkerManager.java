@@ -10,7 +10,7 @@ import net.minecraftforge.eventbus.api.listener.EventListener;
 
 import java.util.ArrayList;
 
-public class WorldWorkerManager {
+public final class WorldWorkerManager {
     private static final ArrayList<IWorker> workers = new ArrayList<>();
     private static long startTime = -1;
     private static int index = 0;
@@ -46,17 +46,11 @@ public class WorldWorkerManager {
         }
     }
 
-    @Deprecated(forRemoval = true, since = "1.21.8")
-    public static void tick(boolean start) {
-        if (start) startTick();
-        else endTick();
-    }
-
     public static synchronized void addWorker(IWorker worker) {
         workers.add(worker);
         if (tickStartListener == null) {
-            tickStartListener = TickEvent.ServerTickEvent.Pre.BUS.addListener(event -> startTick());
-            tickEndListener = TickEvent.ServerTickEvent.Post.BUS.addListener(event -> endTick());
+            tickStartListener = TickEvent.ServerTickEvent.Pre.BUS.addListener(_ -> startTick());
+            tickEndListener = TickEvent.ServerTickEvent.Post.BUS.addListener(_ -> endTick());
         }
     }
 

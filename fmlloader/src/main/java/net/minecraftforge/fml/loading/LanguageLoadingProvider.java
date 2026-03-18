@@ -41,12 +41,6 @@ public class LanguageLoadingProvider {
         loadLanguageProviders();
     }
 
-    /** This doesn't actually do anything with the argument, so just call reload(). Not sure when cpw broke that. */
-    @Deprecated(forRemoval = true, since = "1.20.2")
-    public void addAdditionalLanguages(List<ModFile> modFiles) {
-        reload();
-    }
-
     /*==========================================================================*
      *                        INTERNAL SHIT                                     *
      *==========================================================================*/

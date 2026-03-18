@@ -14,10 +14,8 @@ import java.util.function.Consumer;
 import java.util.function.Supplier;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -26,12 +24,6 @@ import org.slf4j.Logger;
  */
 public final class NewRegistryEvent extends MutableEvent {
     public static final EventBus<NewRegistryEvent> BUS = EventBus.create(NewRegistryEvent.class);
-
-    /** @deprecated {@link NewRegistryEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<NewRegistryEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 
     private static final Logger LOGGER = LogUtils.getLogger();
     private final List<RegistryData<?>> registries = new ArrayList<>();
