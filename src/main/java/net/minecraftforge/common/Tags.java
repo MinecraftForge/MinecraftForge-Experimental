@@ -983,11 +983,6 @@ public class Tags {
     public static class Biomes {
         private static void init() {}
 
-        //region `forge` tags for Forge-specific tags
-        public static final TagKey<Biome> IS_WET_NETHER = forgeTag("is_wet/nether");
-        public static final TagKey<Biome> IS_WET_END = forgeTag("is_wet/end");
-        //endregion
-
         //region `c` tags for common conventions
         // Note: Other loaders have additional `c` tags that are exclusive to their loader.
         //       Forge only adopts `c` tags that are common across all loaders.
@@ -1025,6 +1020,8 @@ public class Tags {
 
         public static final TagKey<Biome> IS_WET = cTag("is_wet");
         public static final TagKey<Biome> IS_WET_OVERWORLD = cTag("is_wet/overworld");
+        public static final TagKey<Biome> IS_WET_NETHER = cTag("is_wet/nether");
+        public static final TagKey<Biome> IS_WET_END = cTag("is_wet/end");
         public static final TagKey<Biome> IS_DRY = cTag("is_dry");
         public static final TagKey<Biome> IS_DRY_OVERWORLD = cTag("is_dry/overworld");
         public static final TagKey<Biome> IS_DRY_NETHER = cTag("is_dry/nether");
