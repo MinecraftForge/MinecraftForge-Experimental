@@ -24,7 +24,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
 @ApiStatus.Internal
-class ModStateTransitionHelper {
+final class ModStateTransitionHelper {
     static final IModStateTransition NOOP = new NoopTransition();
     record NoopTransition() implements IModStateTransition {
         @Override

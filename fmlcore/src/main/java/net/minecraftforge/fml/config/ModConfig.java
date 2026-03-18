@@ -40,8 +40,9 @@ public class ModConfig
 
     private static String defaultConfigName(Type type, String modId) {
         // config file name would be "forge-client.toml" and "forge-server.toml"
-        return String.format(Locale.ROOT, "%s-%s.toml", modId, type.extension());
+        return modId + '-' + type.extension() + ".toml";
     }
+
     public Type getType() {
         return type;
     }

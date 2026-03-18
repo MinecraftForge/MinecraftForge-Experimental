@@ -5,41 +5,27 @@
 
 package net.minecraftforge.fml;
 
-import com.google.common.collect.Streams;
 import net.minecraftforge.forgespi.language.IModInfo;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
-public class ModLoadingWarning {
-    /**
-     * Mod Info for mod with warning
-     */
-    private final IModInfo modInfo;
-    /**
-     * The stage where this warning was encountered
-     */
-    private final ModLoadingStage warningStage;
-
-    /**
-     * I18N message to use for display
-     */
-    private final String i18nMessage;
-
-    /**
-     * Context for message display
-     */
-    private final List<Object> context;
-
+/**
+ * @param modInfo Mod info for mod with warning
+ * @param warningStage The stage where this warning was encountered
+ * @param i18nMessage I18N message to use for display
+ * @param context Context for message display
+ */
+public record ModLoadingWarning(IModInfo modInfo, ModLoadingStage warningStage, String i18nMessage, List<Object> context) {
     public ModLoadingWarning(final IModInfo modInfo, final ModLoadingStage warningStage, final String i18nMessage, Object... context) {
-        this.modInfo = modInfo;
-        this.warningStage = warningStage;
-        this.i18nMessage = i18nMessage;
-        this.context = Arrays.asList(context);
+        this(modInfo, warningStage, i18nMessage, List.of(context));
+    }
+
+    public ModLoadingWarning {
+        context = List.copyOf(context);
     }
 
     public String formatToString() {
-        return Bindings.getMessageParser().get().parseMessage(i18nMessage, Streams.concat(Stream.of(modInfo, warningStage), context.stream()).toArray());
+        return Bindings.getMessageParser().get().parseMessage(i18nMessage, Stream.concat(Stream.of(modInfo, warningStage), context.stream()).toArray());
     }
 }
