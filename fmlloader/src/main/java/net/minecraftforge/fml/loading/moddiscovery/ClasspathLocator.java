@@ -45,7 +45,7 @@ public final class ClasspathLocator extends AbstractModProvider implements IModL
         // Find 'minecraft' during dev time this is also Forge. So skip it.
         // Can return null for dedicated server as Minecraft isn't on the classpath
         // On the client it doesn't matter as it's the vanilla jar so wouldnt have mods.toml in it.
-        var minecraft = getPathFromResource(cl, "net/minecraft/obfuscate/DontObfuscate.class");
+        var minecraft = getPathFromResource(cl, "net/minecraft/world/item/Item.class");
 
         var claimed = new HashSet<Path>();
         var tomls = getUrls(cl, MODS_TOML);

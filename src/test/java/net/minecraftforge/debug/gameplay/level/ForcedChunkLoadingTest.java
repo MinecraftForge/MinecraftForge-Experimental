@@ -44,7 +44,7 @@ public class ForcedChunkLoadingTest extends BaseTestMod {
             chunk = level.getChunk(origin.offset(x, 0, z));
 
             // If the chunk is already ticking, we can't force it
-            chunk = chunkSource.isPositionTicking(chunk.getPos().toLong()) ? null : chunk;
+            chunk = chunkSource.isPositionTicking(chunk.getPos().pack()) ? null : chunk;
         }
 
         if (chunk == null) {
@@ -55,15 +55,15 @@ public class ForcedChunkLoadingTest extends BaseTestMod {
         }
 
         var pos = chunk.getPos();
-        var posLong = pos.toLong();
+        var posLong = pos.pack();
         helper.say("Attempting to force far away chunk: " + pos, ChatFormatting.YELLOW);
         chunkSource.updateChunkForced(pos, true);
 
         helper.runAfterDelay(20, () -> {
             helper.assertTrue(chunkSource.chunkMap.getDistanceManager().shouldForceTicks(posLong), "Chunk is not ticketed as a force loaded chunk");
-            helper.assertTrue(chunkSource.chunkMap.getDistanceManager().inEntityTickingRange(pos.toLong()), "Forced chunk cannot tick entities");
-            helper.assertTrue(chunkSource.chunkMap.getDistanceManager().inBlockTickingRange(pos.toLong()), "Forced chunk cannot tick blocks");
-            helper.assertTrue(chunkSource.hasChunk(pos.x, pos.z), "Chunk is not loaded despite being ticketed as a force loaded chunk");
+            helper.assertTrue(chunkSource.chunkMap.getDistanceManager().inEntityTickingRange(pos.pack()), "Forced chunk cannot tick entities");
+            helper.assertTrue(chunkSource.chunkMap.getDistanceManager().inBlockTickingRange(pos.pack()), "Forced chunk cannot tick blocks");
+            helper.assertTrue(chunkSource.hasChunk(pos.x(), pos.z()), "Chunk is not loaded despite being ticketed as a force loaded chunk");
             helper.succeed();
         });
     }

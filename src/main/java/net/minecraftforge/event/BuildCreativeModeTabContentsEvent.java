@@ -5,6 +5,7 @@
 
 package net.minecraftforge.event;
 
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +31,7 @@ import java.util.function.Supplier;
 @NullMarked
 public record BuildCreativeModeTabContentsEvent(
         CreativeModeTab getTab,
+        ResourceKey<CreativeModeTab> getTabKey,
         CreativeModeTab.ItemDisplayParameters getParameters,
         MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility> getEntries
 ) implements RecordEvent, CreativeModeTab.Output {

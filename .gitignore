@@ -46,3 +46,4 @@ src/*/generated/**/.cache/
 /*/.gitignore
 /*/.factorypath
 /*/.apt_generated/
+/fmlcore/logs/

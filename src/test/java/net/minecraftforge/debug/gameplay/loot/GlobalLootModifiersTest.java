@@ -308,12 +308,11 @@ public class GlobalLootModifiersTest extends BaseTestMod {
 
         private static ItemStack smelt(ItemStack stack, LootContext context) {
             var mgr = context.getLevel().recipeAccess();
-            var reg = context.getLevel().registryAccess();
             var inv = new SingleRecipeInput(stack);
             return mgr
                 .getRecipeFor(RecipeType.SMELTING, inv, context.getLevel())
                 .map(holder -> holder.value())
-                .map(recipe -> recipe.assemble(inv, reg))
+                .map(recipe -> recipe.assemble(inv))
                 .filter(itemStack -> !itemStack.isEmpty())
                 .map(itemStack -> ItemHandlerHelper.copyStackWithSize(itemStack, stack.getCount() * itemStack.getCount()))
                 .orElse(stack);
@@ -347,8 +346,8 @@ public class GlobalLootModifiersTest extends BaseTestMod {
             //return early if silk-touch is already applied (otherwise we'll get stuck in an infinite loop).
             var silk = context.getLevel().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH);
             var silkLevel = EnchantmentHelper.getItemEnchantmentLevel(silk, ctxTool);
-            if (ctxTool == null || ctxTool.isEmpty() || silkLevel > 0) return generatedLoot;
-            var fakeTool = ctxTool.copy();
+            if (ctxTool == null || ctxTool.count() == 0 || silkLevel > 0) return generatedLoot;
+            var fakeTool = ((ItemStack)ctxTool).copy();
             fakeTool.enchant(silk, 1);
             var params = new LootParams.Builder(context.getParams())
                 .withParameter(LootContextParams.TOOL, fakeTool)

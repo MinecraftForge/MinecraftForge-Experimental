@@ -8,9 +8,9 @@ package net.minecraftforge.debug.gameplay.block;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -38,7 +38,7 @@ public class ChorusBlockPlacementTest extends BaseTestMod {
     @GameTest
     public static void custom_placeable_block(GameTestHelper helper) {
         var custom = helper.setAssertAndGetBlock(BlockPos.ZERO, BLOCK.get());
-        helper.assertTrue(custom.is(Tags.Blocks.CHORUS_ADDITIONALLY_GROWS_ON), () -> "Block %s is not placeable on chorus".formatted(custom.getBlock()));
+        helper.assertTrue(custom.is(BlockTags.SUPPORTS_CHORUS_PLANT), () -> "Block %s is not placeable on chorus".formatted(custom.getBlock()));
 
         helper.setAndAssertBlock(BlockPos.ZERO.above(), Blocks.CHORUS_FLOWER);
         helper.runAfterDelay(1, () -> {
@@ -48,17 +48,17 @@ public class ChorusBlockPlacementTest extends BaseTestMod {
     }
 
     private void gatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(event.includeServer(), new BlockTags(event));
+        event.getGenerator().addProvider(event.includeServer(), new BlockTagProvider(event));
     }
 
-    private static final class BlockTags extends BlockTagsProvider {
-        public BlockTags(GatherDataEvent event) {
+    private static final class BlockTagProvider extends BlockTagsProvider {
+        public BlockTagProvider(GatherDataEvent event) {
             super(event.getGenerator().getPackOutput(), event.getLookupProvider(), MOD_ID, event.getExistingFileHelper());
         }
 
         @Override
         protected void addTags(HolderLookup.Provider provider) {
-            this.tag(Tags.Blocks.CHORUS_ADDITIONALLY_GROWS_ON).add(BLOCK.get());
+            this.tag(BlockTags.SUPPORTS_CHORUS_PLANT).add(BLOCK.get());
         }
     }
 }

@@ -17,6 +17,7 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.fml.common.Mod;
@@ -64,7 +65,7 @@ public class ShearsBehaviorTest extends BaseTestMod {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var shears = CUSTOM_SHEARS_HARVEST_ITEM.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, shears);
-        var result = player.interactOn(cow, InteractionHand.MAIN_HAND);
+        var result = player.interactOn(cow, InteractionHand.MAIN_HAND, Vec3.ZERO);
 
         // assert
         helper.assertTrue(result.consumesAction(), "Using custom shears on leashed cow should result in consume action");
@@ -92,7 +93,7 @@ public class ShearsBehaviorTest extends BaseTestMod {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var shears = CUSTOM_SHEARS_HARVEST_ITEM.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, shears);
-        var result = player.interactOn(knot, InteractionHand.MAIN_HAND);
+        var result = player.interactOn(knot, InteractionHand.MAIN_HAND, Vec3.ZERO);
 
         // assert
         helper.assertTrue(result.consumesAction(), "Using custom shears on leash knot should result in consume action");
@@ -116,7 +117,7 @@ public class ShearsBehaviorTest extends BaseTestMod {
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         var shears = CUSTOM_SHEARS_ITEM.get().getDefaultInstance();
         player.setItemInHand(InteractionHand.MAIN_HAND, shears);
-        var result = player.interactOn(golem, InteractionHand.MAIN_HAND);
+        var result = player.interactOn(golem, InteractionHand.MAIN_HAND, Vec3.ZERO);
 
         // assert
         helper.assertTrue(result.consumesAction(), "Using custom shears on copper golem should result in consume action");

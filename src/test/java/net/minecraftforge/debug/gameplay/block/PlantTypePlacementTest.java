@@ -46,7 +46,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         map.put(BlockTags.SAND,       List.of(SAND, RED_SAND, SUSPICIOUS_SAND));
         map.put(BlockTags.TERRACOTTA, List.of(TERRACOTTA, WHITE_TERRACOTTA, ORANGE_TERRACOTTA, MAGENTA_TERRACOTTA, LIGHT_BLUE_TERRACOTTA, YELLOW_TERRACOTTA, LIME_TERRACOTTA, PINK_TERRACOTTA, GRAY_TERRACOTTA, LIGHT_GRAY_TERRACOTTA, CYAN_TERRACOTTA, PURPLE_TERRACOTTA, BLUE_TERRACOTTA, BROWN_TERRACOTTA, GREEN_TERRACOTTA, RED_TERRACOTTA, BLACK_TERRACOTTA));
         map.put(BlockTags.NYLIUM,     List.of(CRIMSON_NYLIUM, WARPED_NYLIUM));
-        map.put(BlockTags.MUSHROOM_GROW_BLOCK, List.of(MYCELIUM, PODZOL, CRIMSON_NYLIUM, WARPED_NYLIUM));
+        map.put(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT, List.of(MYCELIUM, PODZOL, CRIMSON_NYLIUM, WARPED_NYLIUM));
     });
 
     private record Info(Consumer<GameTestHelper> handler, List<Block> blocks) {}
@@ -88,12 +88,12 @@ public class PlantTypePlacementTest extends BaseTestMod {
         map.put(EyeblossomBlock.class, of(this::vegitation, CLOSED_EYEBLOSSOM, OPEN_EYEBLOSSOM));
         map.put(WitherRoseBlock.class, of(this::withrose, WITHER_ROSE));
 
-        map.put(FungusBlock.class,        of(this::nether_fungus, CRIMSON_FUNGUS, WARPED_FUNGUS));
+        map.put(NetherFungusBlock.class,  of(this::nether_fungus, CRIMSON_FUNGUS, WARPED_FUNGUS));
         map.put(LeafLitterBlock.class,    of(this::todo, LEAF_LITTER));
         map.put(MushroomBlock.class,      of(this::mushroom, BROWN_MUSHROOM, RED_MUSHROOM));
         map.put(NetherSproutsBlock.class, of(this::nether_vegitation, NETHER_SPROUTS));
         map.put(NetherWartBlock.class,    of(this::netherwart, NETHER_WART));
-        map.put(RootsBlock.class,         of(this::nether_vegitation, CRIMSON_ROOTS, WARPED_ROOTS));
+        map.put(NetherRootsBlock.class,   of(this::nether_vegitation, CRIMSON_ROOTS, WARPED_ROOTS));
 
         map.put(SaplingBlock.class,           of(this::vegitation, ACACIA_SAPLING, BIRCH_SAPLING, CHERRY_SAPLING, DARK_OAK_SAPLING, JUNGLE_SAPLING, OAK_SAPLING, PALE_OAK_SAPLING, SPRUCE_SAPLING));
         map.put(MangrovePropaguleBlock.class, of(this::vegitation_and_clay, MANGROVE_PROPAGULE));
@@ -103,7 +103,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         map.put(StemBlock.class,           of(this::farmland, MELON_STEM, PUMPKIN_STEM));
         map.put(SweetBerryBushBlock.class, of(this::vegitation, SWEET_BERRY_BUSH));
         map.put(TallGrassBlock.class,      of(this::vegitation, FERN, SHORT_GRASS));
-        map.put(WaterlilyBlock.class,      of(this::todo, LILY_PAD));
+        map.put(LilyPadBlock.class,        of(this::todo, LILY_PAD));
     });
 
     @SafeVarargs
@@ -160,7 +160,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         // these need special case
         var special = List.of(BAMBOO, BAMBOO_SAPLING);
 
-        testTag(helper, BlockTags.BAMBOO_PLANTABLE_ON, soils);
+        testTag(helper, BlockTags.SUPPORTS_BAMBOO, soils);
         soils.removeAll(special);
 
         var pos = iterate(helper, plants, soils);
@@ -320,7 +320,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         // RootsBlock         = VEGITATION || Tags.NYLIUM, SOUL_SOIL
         var plants = plants(
             NetherSproutsBlock.class, // 1
-            RootsBlock.class          // 2
+            NetherRootsBlock.class    // 2
         );
         var nylium = testTag(helper, BlockTags.NYLIUM, TAGS.get(BlockTags.NYLIUM));
         var soils = Stream.concat(nylium.stream(), vegitationSoils(helper, SOUL_SOIL).stream()).distinct().toList();
@@ -331,8 +331,12 @@ public class PlantTypePlacementTest extends BaseTestMod {
 
     @GameTest(structure = "forge:empty15x3x2") // (dirt(10) + FARMLAND + nylium(2) + SOUL_SOIL + MYCELIUM) * 2 plants
     public void nether_fungus(GameTestHelper helper) {
-        // FungusBlock = VEGITATION || Tags.NYLIUM, MYCELIUM, SOUL_SOIL
-        var plants = plants(FungusBlock.class);
+
+        // SUPPORTS_VEGETATION = VEGITATION || Tags.NYLIUM, MYCELIUM, SOUL_SOIL
+
+        // CRIMSON_FUNGUS = SUPPORTS_CRIMSON_FUNGUS = SUPPORTS_VEGETATION
+        // WARPED_FUNGUS = SUPPORTS_WARPED_FUNGUS = SUPPORTS_CRIMSON_FUNGUS
+        var plants = plants(NetherFungusBlock.class);
         var nylium = testTag(helper, BlockTags.NYLIUM, TAGS.get(BlockTags.NYLIUM));
         var soils = Stream.concat(nylium.stream(), vegitationSoils(helper, MYCELIUM, SOUL_SOIL).stream()).distinct().toList();
 
@@ -358,11 +362,11 @@ public class PlantTypePlacementTest extends BaseTestMod {
 
     @GameTest(structure = "forge:empty31x3x3") // 3 plants (sand(3) + dirt(10) + terracotta(17) + FARMLAND) * plants(3)
     public void dry_vegitation(GameTestHelper helper) {
-        // DryVegetationBlock = Tag.DRY_VEGETATION_MAY_PLACE_ON
+        // DryVegetationBlock = Tag.SUPPORTS_DRY_VEGETATION
         var plants = plants(DryVegetationBlock.class, ShortDryGrassBlock.class, TallDryGrassBlock.class);
         var terracotta = testTag(helper, BlockTags.TERRACOTTA, TAGS.get(BlockTags.TERRACOTTA));
         var soils = Streams.concat(sandAndDirt(helper, FARMLAND).stream(), terracotta.stream()).toList();
-        testTag(helper, BlockTags.DRY_VEGETATION_MAY_PLACE_ON, soils);
+        testTag(helper, BlockTags.SUPPORTS_DRY_VEGETATION, soils);
         iterate(helper, plants, soils);
         helper.succeed();
     }
@@ -397,7 +401,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         // I would rather make a enclosed box, but lighting doesn't propagate for some reason.
 
 
-        var soil = testTag(helper, BlockTags.MUSHROOM_GROW_BLOCK, TAGS.get(BlockTags.MUSHROOM_GROW_BLOCK));
+        var soil = testTag(helper, BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT, TAGS.get(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT));
         iterate(helper, plants, soil);
 
         // delay a handful of ticks to propagate lighting

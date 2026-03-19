@@ -6,7 +6,7 @@
 package net.minecraftforge.debug.client;
 
 import net.minecraft.client.renderer.LevelTargetBundle;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraftforge.client.FramePassManager;
 import net.minecraftforge.client.event.AddFramePassEvent;
 import net.minecraftforge.common.extensions.IForgeGameTestHelper;
@@ -59,7 +59,7 @@ public class RenderFrameLayerTest extends BaseTestMod {
             public void executes(LevelRenderState state) {
                 PoseStack ps = new PoseStack();
                 passOne.set(true);
-                ps.translate(state.cameraRenderState.entityPos.multiply(-1,-1,-1));
+                ps.translate(state.cameraRenderState.pos.multiply(-1,-1,-1));
                 ps.pushPose();
                 Gizmos.cuboid(
                     new AABB(0, -60, 0, 10, -50, 10),
@@ -80,7 +80,7 @@ public class RenderFrameLayerTest extends BaseTestMod {
             public void executes(LevelRenderState state) {
                 PoseStack ps = new PoseStack();
                 passTwo.set(true);
-                ps.translate(state.cameraRenderState.entityPos.multiply(-1,-1,-1));
+                ps.translate(state.cameraRenderState.pos.multiply(-1,-1,-1));
                 ps.pushPose();
                 Gizmos.cuboid(
                     new AABB(0, -60, 0, 10, -50, 10).contract(1, 1, 1),

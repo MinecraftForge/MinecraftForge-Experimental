@@ -51,6 +51,7 @@ import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -1051,6 +1052,11 @@ public final class ForgeHooks {
     }
 
     public static void onCreativeModeTabBuildContents(CreativeModeTab tab, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+        if (!BuildCreativeModeTabContentsEvent.BUS.hasListeners()) {
+            originalGenerator.accept(params, output);
+            return;
+        }
+
         final var entries = new MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility>(ItemStackLinkedSet.TYPE_AND_TAG,
             (key, left, right) -> {
                 //throw new IllegalStateException("Accidentally adding the same item stack twice " + key.getDisplayName().getString() + " to a Creative Mode Tab: " + tab.getDisplayName().getString());
@@ -1066,7 +1072,11 @@ public final class ForgeHooks {
             entries.put(stack, vis);
         });
 
-        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, params, entries));
+        var key = BuiltInRegistries.CREATIVE_MODE_TAB
+                .getResourceKey(tab)
+                .orElseThrow(() -> new IllegalStateException("Unregistered creative tab: " + tab));
+
+        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, key, params, entries));
 
         for (var entry : entries)
             output.accept(entry.getKey(), entry.getValue());

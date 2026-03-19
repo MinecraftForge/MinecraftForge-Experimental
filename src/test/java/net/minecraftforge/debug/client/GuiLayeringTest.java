@@ -7,7 +7,7 @@ package net.minecraftforge.debug.client;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -50,10 +50,9 @@ public class GuiLayeringTest {
             }
 
             @Override
-            public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks) {
-                this.renderBackground(graphics, mouseX, mouseY, partialTicks);
-                graphics.drawString(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
-                super.render(graphics, mouseX, mouseY, partialTicks);
+            public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks) {
+                graphics.text(this.font, this.title, this.width / 2, 15, 0xFFFFFF);
+                super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
             }
 
             @Override

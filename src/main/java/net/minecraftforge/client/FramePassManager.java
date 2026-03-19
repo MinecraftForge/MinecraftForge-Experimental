@@ -42,28 +42,12 @@ public class FramePassManager {
          * A FramePass must bind to at least ONE target. Otherwise, you get freaky issues with >1 modded passes.
          * Additionally, this method should be used for extracting render states into instance variables if desired.
          */
-        default void extracts(LevelTargetBundle bundle, FramePass pass) {
-            targets(bundle, pass);
-        }
-
-        /**
-         * Prefer {@link PassDefinition#extracts}
-         */
-        @Deprecated(forRemoval = true, since = "1.21.10")
-        default void targets(LevelTargetBundle bundle, FramePass pass) {}
+        void extracts(LevelTargetBundle bundle, FramePass pass);
 
         /**
          * Use to define what your pass does during the render stage.
          */
-        default void executes(LevelRenderState state) {
-            executes();
-        };
-
-        /**
-         * Use to define what your pass does during the render stage, prefer {@link PassDefinition#executes(LevelRenderState)}.
-         */
-        @Deprecated(forRemoval = true, since = "1.21.10")
-        default void executes(){};
+        void executes(LevelRenderState state);
     }
 
     private record PassInfo(String name, PassDefinition pass){}
