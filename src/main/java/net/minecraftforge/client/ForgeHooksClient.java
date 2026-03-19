@@ -735,27 +735,6 @@ public class ForgeHooksClient {
         return font.split(text, maxWidth).stream().map(ClientTooltipComponent::create);
     }
 
-    public static boolean isBlockInSolidLayer(BlockState state) {
-        return Minecraft.getInstance().getModelManager().getBlockStateModelSet().isInSolidLayer(state);
-    }
-
-    public static boolean isModelInSolidLayer(BlockStateModel model) {
-        if (model == null)
-            return true;
-
-        var parts = new java.util.ArrayList<BlockStateModelPart>();
-        model.collectParts(RandomSource.create(), parts, ModelData.EMPTY);
-        return parts.stream().anyMatch(p -> {
-            for (var dir : Direction.valuesView()) {
-                for (var quad : p.getQuads(dir)) {
-                    if (quad.materialInfo().layer() == ChunkSectionLayer.SOLID)
-                        return true;
-                }
-            }
-            return false;
-        });
-    }
-
     public static void createWorldConfirmationScreen(Runnable doConfirmedWorldLoad) {
         Component title = Component.translatable("selectWorld.backupQuestion.experimental");
         Component msg = Component.translatable("selectWorld.backupWarning.experimental")
