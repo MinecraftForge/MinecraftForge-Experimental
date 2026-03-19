@@ -8,6 +8,8 @@ package net.minecraftforge.debug.creativetabs;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jspecify.annotations.Nullable;
+
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -146,15 +148,16 @@ public class CreativeModeTabTest {
     }
 
     private static class CreativeModeColorTab extends CreativeModeTab {
-        private final List<ItemStack> iconItems;
+        private @Nullable List<ItemStack> iconItems;
 
         public CreativeModeColorTab(CreativeModeTab.Builder builder) {
             super(builder);
-            this.iconItems = getDyes();
         }
 
         @Override
         public ItemStack getIconItem() {
+            if (iconItems == null)
+                iconItems = getDyes();
             int idx = (int)(System.currentTimeMillis() / 1200) % iconItems.size();
             return iconItems.get(idx);
         }

@@ -239,6 +239,7 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
 
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
         // TODO: Remove backwards compat tag entries in 1.22
+        /*
         tag(forgeTagKey("is_hot")).addTag(forgeTagKey("is_hot/overworld")).addTag(forgeTagKey("is_hot/nether")).addOptionalTag(Tags.Biomes.IS_HOT_END);
         tag(forgeTagKey("is_cold")).addTag(forgeTagKey("is_cold/overworld")).addOptionalTag(Tags.Biomes.IS_COLD_NETHER).addTag(forgeTagKey("is_cold/end"));
         tag(forgeTagKey("is_wet")).addTag(forgeTagKey("is_wet/overworld")).addOptionalTag(Tags.Biomes.IS_WET_NETHER).addOptionalTag(Tags.Biomes.IS_WET_END);
@@ -248,6 +249,7 @@ public final class ForgeBiomeTagsProvider extends BiomeTagsProvider {
         tag(forgeTagKey("is_water")).addTag(BiomeTags.IS_OCEAN).addTag(BiomeTags.IS_RIVER);
         tag(forgeTagKey("is_mountain")).addTag(forgeTagKey("is_peak")).addTag(forgeTagKey("is_slope"));
         tag(forgeTagKey("is_underground")).addTag(forgeTagKey("is_cave"));
+        */
     }
 
     @SafeVarargs
