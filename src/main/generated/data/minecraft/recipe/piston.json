@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "#": "#forge:cobblestone/normal",
+    "#": "#c:cobblestone/normal",
     "R": "minecraft:redstone",
     "T": "#minecraft:planks",
     "X": "#c:ingots/iron"
@@ -13,7 +13,6 @@
     "#R#"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:piston"
   }
 }

@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "#": "#c:gems/diamond",
-    "C": "#forge:cobblestone/deepslate",
+    "C": "#c:cobblestone/deepslate",
     "S": "minecraft:silence_armor_trim_smithing_template"
   },
   "pattern": [

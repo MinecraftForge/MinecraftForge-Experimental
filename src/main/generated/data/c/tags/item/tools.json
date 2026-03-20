@@ -16,6 +16,7 @@
     "#c:tools/mace",
     "#c:tools/mining_tool",
     "#c:tools/melee_weapon",
-    "#c:tools/ranged_weapon"
+    "#c:tools/ranged_weapon",
+    "#c:tools/wrench"
   ]
 }

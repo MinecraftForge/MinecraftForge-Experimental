@@ -4,9 +4,9 @@
     "#minecraft:chest_armor",
     "#minecraft:leg_armor",
     "#minecraft:foot_armor",
-    {
-      "id": "#forge:armors",
-      "required": false
-    }
+    "#c:armors/horse",
+    "#c:armors/nautilus",
+    "#c:armors/wolf",
+    "#c:armors/humanoid"
   ]
 }

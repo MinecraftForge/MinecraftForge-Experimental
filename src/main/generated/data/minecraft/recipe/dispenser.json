@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "#": "#forge:cobblestone/normal",
+    "#": "#c:cobblestone/normal",
     "R": "minecraft:redstone",
     "X": "minecraft:bow"
   },
@@ -12,7 +12,6 @@
     "#R#"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:dispenser"
   }
 }
