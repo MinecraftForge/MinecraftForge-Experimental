@@ -7,7 +7,6 @@ package net.minecraftforge.client.loading;
 
 import com.mojang.blaze3d.platform.Monitor;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.BackendCreationException;
 import com.mojang.blaze3d.systems.GpuBackend;
 
 import net.minecraft.client.Minecraft;
@@ -28,7 +27,7 @@ public final class NoVizFallback {
         return () -> {
             try {
                 return WINDOW = Window.createGlfwWindow(width, height, title, monitor, (GpuBackend)backend.get());
-            } catch (BackendCreationException e) {
+            } catch (Throwable e) {
                 return sneak(e);
             }
         };
