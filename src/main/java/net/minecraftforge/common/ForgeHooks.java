@@ -805,7 +805,7 @@ public final class ForgeHooks {
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
         CompoundTag fmlData = new CompoundTag();
         ListTag modList = new ListTag();
-        ModList.get().getMods().forEach(mi -> {
+        ModList.getMods().forEach(mi -> {
             final CompoundTag mod = new CompoundTag();
             mod.putString("ModId", mi.getModId());
             mod.putString("ModVersion", MavenVersionStringHelper.artifactVersionToString(mi.getVersion()));
@@ -850,7 +850,7 @@ public final class ForgeHooks {
 
                 String modVersion = mod.getStringOr("ModVersion", null);
                 final var previousVersion = new DefaultArtifactVersion(modVersion);
-                ModList.get().getModContainerById(modId).ifPresentOrElse(container -> {
+                ModList.getModContainerById(modId).ifPresentOrElse(container -> {
                     final var loadingVersion = container.getModInfo().getVersion();
                     if (!loadingVersion.equals(previousVersion)) {
                         // Enqueue mismatched versions for bulk event

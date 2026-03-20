@@ -45,7 +45,9 @@ public class ResourcePackLoader {
     }
 
     public static List<String> getPackNames() {
-        return ModList.get().applyForEachModFile(mf->"mod:"+mf.getModInfos().getFirst().getModId()).filter(n->!n.equals("mod:minecraft")).toList();
+        return ModList.applyForEachModFile(mf -> "mod:" + mf.getModInfos().getFirst().getModId())
+                .filter(n -> !n.equals("mod:minecraft"))
+                .toList();
     }
 
     public static <V> Comparator<Map.Entry<String,V>> getSorter() {
@@ -53,7 +55,7 @@ public class ResourcePackLoader {
         order.add("vanilla");
         order.add("mod_resources");
 
-        ModList.get().getModFiles().stream()
+        ModList.getModFiles().stream()
                 .filter(mf -> mf.requiredLanguageLoaders().stream().noneMatch(ls->ls.languageName().equals("minecraft")))
                 .map(e -> e.getMods().getFirst().getModId())
                 .map(e -> "mod:" + e)
@@ -82,7 +84,7 @@ public class ResourcePackLoader {
         var version = DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES);
         var hiddenPacks = new ArrayList<PackResources>();
 
-        for (var mod : ModList.get().getModFiles()) {
+        for (var mod : ModList.getModFiles()) {
             if (mod.requiredLanguageLoaders().stream().anyMatch(ls -> ls.languageName().equals("minecraft")))
                 continue;
 

@@ -29,7 +29,7 @@ public final class InterModComms {
      * @return true if the message was enqueued for sending (the target modid is loaded)
      */
     public static boolean sendTo(final String modId, final String method, final Supplier<?> thing) {
-        if (!ModList.get().isLoaded(modId)) return false;
+        if (!ModList.isLoaded(modId)) return false;
         containerQueues.computeIfAbsent(modId, _ -> new ConcurrentLinkedQueue<>())
                 .add(new IMCMessage(ModLoadingContext.get().getActiveContainer().getModId(), modId, method, thing));
         return true;
@@ -45,7 +45,7 @@ public final class InterModComms {
      * @return true if the message was enqueued for sending (the target modid is loaded)
      */
     public static boolean sendTo(final String senderModId, final String modId, final String method, final Supplier<?> thing) {
-        if (!ModList.get().isLoaded(modId)) return false;
+        if (!ModList.isLoaded(modId)) return false;
         containerQueues.computeIfAbsent(modId, _ -> new ConcurrentLinkedQueue<>())
                 .add(new IMCMessage(senderModId, modId, method, thing));
         return true;

@@ -31,7 +31,7 @@ public class AddPackFinderEventTest {
     @SubscribeEvent
     public void addPackFinders(AddPackFindersEvent event) {
         if (event.getPackType() == PackType.CLIENT_RESOURCES) {
-            var resourcePath = ModList.get().getModFileById(MODID).getFile().findResource("test_nested_resource_pack");
+            var resourcePath = ModList.getModFileById(MODID).getFile().findResource("test_nested_resource_pack");
             var supplier = new PathResourcesSupplier(resourcePath, false);
             var pack = Pack.readMetaAndCreate("builtin/add_pack_finders_test", Component.literal("display name"), false, supplier, PackType.CLIENT_RESOURCES, Pack.Position.BOTTOM, PackSource.BUILT_IN);
             event.addRepositorySource((packConsumer) -> packConsumer.accept(pack));

@@ -88,8 +88,8 @@ public final class CapabilityManager {
     private static final Map<Key, Capability<?>> providers = new HashMap<>();
 
     @ApiStatus.Internal
-    public static void injectCapabilities(ModList modlist) {
-        var autos = modlist.getAllScanData().stream()
+    public static void injectCapabilities() {
+        var autos = ModList.getAllScanData().stream()
             .flatMap(e -> e.getAnnotations().stream())
             .filter(a -> AUTO_REGISTER.equals(a.annotationType()))
             .map(ModFileScanData.AnnotationData::clazz)

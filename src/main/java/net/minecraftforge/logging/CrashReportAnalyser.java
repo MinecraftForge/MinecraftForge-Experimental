@@ -122,21 +122,20 @@ public final class CrashReportAnalyser {
      * Iterates over all loaded mods, resolving and caching their package names with the corresponding {@link IModInfo}.
      * **/
     private static void cacheModList() {
-        ModList modList = ModList.get();
         ModuleLayer gameLayer = FMLLoader.getGameLayer();
 
-        if (modList != null) {
-            modList.getMods().forEach(iModInfo -> {
-                //Don't cache minecraft or forge as they will always be included in the stacktrace
-                if (!iModInfo.getModId().equals("forge") && !iModInfo.getModId().equals("minecraft")) {
-                    Set<String> packages = new HashSet<>();
+        ModList.getMods().forEach(iModInfo -> {
+            //Don't cache minecraft or forge as they will always be included in the stacktrace
+            if (!iModInfo.getModId().equals("forge") && !iModInfo.getModId().equals("minecraft")) {
+                Set<String> packages = new HashSet<>();
 
-                    gameLayer.findModule(iModInfo.getModId()).ifPresent(module -> packages.addAll(module.getPackages()));
+                gameLayer.findModule(iModInfo.getModId()).ifPresent(module -> packages.addAll(module.getPackages()));
 
-                    packages.forEach(s ->  PACKAGE_MOD_CACHE.put(s, iModInfo));
+                for (String s : packages) {
+                    PACKAGE_MOD_CACHE.put(s, iModInfo);
                 }
-            });
-        }
+            }
+        });
     }
 
     private static void identifyByClass(StackTraceElement stackTraceElement) {

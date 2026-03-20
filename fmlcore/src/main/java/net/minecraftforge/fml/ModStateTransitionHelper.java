@@ -94,7 +94,7 @@ final class ModStateTransitionHelper {
             completableFutures.add(preDispatchHook);
 
         var modFutures = new LinkedHashMap<String, CompletableFuture<Void>>();
-        for (var mod : ModList.get().getLoadedMods()) {
+        for (var mod : ModList.getLoadedMods()) {
 
             CompletableFuture<Void> parent = null;
             if (mod.dependencies.isEmpty()) {

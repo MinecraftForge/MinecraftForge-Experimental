@@ -93,8 +93,8 @@ public class VersionChecker {
                     return;
                 }
 
-                var mc = ModList.get().getModContainerById("minecraft");
-                var forge = ModList.get().getModContainerById("forge");
+                var mc = ModList.getModContainerById("minecraft");
+                var forge = ModList.getModContainerById("forge");
                 this.mcVersion = mc.get().getModInfo().getVersion().toString();
 
                 this.agent = "Java-http-client/" + System.getProperty("java.version")
@@ -223,7 +223,7 @@ public class VersionChecker {
     // Gather a list of mods that have opted in to this update system by providing a URL.
     private static List<IModInfo> gatherMods() {
         List<IModInfo> ret = new LinkedList<>();
-        for (IModInfo info : ModList.get().getMods()) {
+        for (IModInfo info : ModList.getMods()) {
             if (info.getUpdateURL().isPresent())
                 ret.add(info);
         }

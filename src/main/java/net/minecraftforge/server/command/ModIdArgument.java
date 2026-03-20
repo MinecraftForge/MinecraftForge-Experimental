@@ -35,7 +35,7 @@ public class ModIdArgument implements ArgumentType<String> {
 
     @Override
     public <S> CompletableFuture<Suggestions> listSuggestions(final CommandContext<S> context, final SuggestionsBuilder builder) {
-        return SharedSuggestionProvider.suggest(ModList.get().applyForEachModContainer(ModContainer::getModId), builder);
+        return SharedSuggestionProvider.suggest(ModList.applyForEachModContainer(ModContainer::getModId), builder);
     }
 
     @Override

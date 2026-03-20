@@ -43,7 +43,7 @@ public class ModLoadingContext {
      */
     @Deprecated(forRemoval = true, since="1.21.1")
     public ModContainer getActiveContainer() {
-        return activeContainer == null ? ModList.get().getModContainerById("minecraft").orElseThrow(()->new RuntimeException("Where is minecraft???!")) : activeContainer;
+        return activeContainer == null ? ModList.getModContainerById("minecraft").orElseThrow(()->new RuntimeException("Where is minecraft???!")) : activeContainer;
     }
 
     /**

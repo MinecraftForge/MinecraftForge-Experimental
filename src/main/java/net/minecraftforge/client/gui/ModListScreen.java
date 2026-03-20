@@ -103,7 +103,7 @@ public class ModListScreen extends Screen {
     public ModListScreen(Screen parentScreen) {
         super(Component.translatable("fml.menu.mods.title"));
         this.parentScreen = parentScreen;
-        this.mods = ModList.get().getMods();
+        this.mods = ModList.getMods();
         this.unsortedMods = List.copyOf(this.mods);
     }
 
@@ -391,7 +391,7 @@ public class ModListScreen extends Screen {
 
             try {
                 NativeImage logo = null;
-                var modfile = ModList.get().getModFileById(selectedMod.getModId());
+                var modfile = ModList.getModFileById(selectedMod.getModId());
                 if (modfile != null) {
                     var path = modfile.getFile().findResource(logoFile);
                     if (Files.exists(path))
@@ -423,7 +423,7 @@ public class ModListScreen extends Screen {
 
         lines.add(selectedMod.getDisplayName());
         lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.version", MavenVersionStringHelper.artifactVersionToString(selectedMod.getVersion())));
-        lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.idstate", selectedMod.getModId(), ModList.get().getModContainerById(selectedMod.getModId()).
+        lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.idstate", selectedMod.getModId(), ModList.getModContainerById(selectedMod.getModId()).
                 map(ModContainer::getCurrentState).map(Object::toString).orElse("NONE")));
 
         selectedMod.getConfig().getConfigElement("credits").ifPresent(credits->

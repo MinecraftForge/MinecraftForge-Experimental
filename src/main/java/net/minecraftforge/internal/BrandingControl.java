@@ -38,7 +38,7 @@ public final class BrandingControl {
             // We only have Forge Betas on the "XX.0.XX" versions anyways.
             boolean beta = "0".equals(forge[0].split("\\.")[1]);
             var name = beta ? "§eForge Beta§f " : "Forge ";
-            list.add(name + forge[0] + " (" + ForgeI18n.parseMessage("fml.menu.loadingmods", ModList.get().size()) + ")");
+            list.add(name + forge[0] + " (" + ForgeI18n.parseMessage("fml.menu.loadingmods", ModList.size()) + ")");
 
             // Extra forge version info (like branch)
             if (forge.length > 1) list.add("Branch " + forge[1]);

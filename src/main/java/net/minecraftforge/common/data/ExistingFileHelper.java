@@ -123,7 +123,7 @@ public class ExistingFileHelper {
         }
 
         for (String existingMod : existingMods) {
-            IModFileInfo modFileInfo = ModList.get().getModFileById(existingMod);
+            IModFileInfo modFileInfo = ModList.getModFileById(existingMod);
             if (modFileInfo != null) {
                 var root = modFileInfo.getFile().findResource("/");
                 var supplier = new PathResourcesSupplier(root);

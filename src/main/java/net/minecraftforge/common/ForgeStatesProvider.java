@@ -29,7 +29,7 @@ public class ForgeStatesProvider implements IModStateProvider {
     }
 
     private static ModLoadingState gather(String name, ModLoadingState after, Runnable inline) {
-        return gather(name, after).withInline(ml -> inline.run());
+        return gather(name, after).withInline(inline);
     }
 
     private static ModLoadingState.Builder complete(String name, ModLoadingState after) {
@@ -37,7 +37,7 @@ public class ForgeStatesProvider implements IModStateProvider {
     }
 
     private static ModLoadingState complete(String name, ModLoadingState after, Runnable inline) {
-        return complete(name, after).withInline(ml -> inline.run());
+        return complete(name, after).withInline(inline);
     }
 
     @Override

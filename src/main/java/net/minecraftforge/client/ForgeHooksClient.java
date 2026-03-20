@@ -520,7 +520,7 @@ public class ForgeHooksClient {
             boolean channelsMatch = NetworkRegistry.checkListPingCompatibilityForClient(remoteChannels);
             AtomicBoolean result = new AtomicBoolean(true);
             final List<String> extraClientMods = new ArrayList<>();
-            ModList.get().forEachModContainer((modid, mc) ->
+            ModList.forEachModContainer((modid, mc) ->
                     mc.getCustomExtension(IExtensionPoint.DisplayTest.class).ifPresent(ext-> {
                         boolean foundModOnServer = ext.remoteVersionTest().test(mods.get(modid), true);
                         result.compareAndSet(true, foundModOnServer);
@@ -531,8 +531,8 @@ public class ForgeHooksClient {
             boolean modsMatch = result.get();
 
             final Map<String, String> extraServerMods = mods.entrySet().stream().
-                    filter(e -> !Objects.equals(IExtensionPoint.DisplayTest.IGNORESERVERONLY, e.getValue())).
-                    filter(e -> !ModList.get().isLoaded(e.getKey())).
+                    filter(e -> !IExtensionPoint.DisplayTest.IGNORESERVERONLY.equals(e.getValue())).
+                    filter(e -> !ModList.isLoaded(e.getKey())).
                     collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             LOGGER.debug(CLIENTHOOKS, "Received FML ping data from server at {}: FMLNETVER={}, mod list is compatible : {}, channel list is compatible: {}, extra server mods: {}", target.ip, fmlver, modsMatch, channelsMatch, extraServerMods);

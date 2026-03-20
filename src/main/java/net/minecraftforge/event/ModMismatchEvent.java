@@ -64,7 +64,7 @@ public final class ModMismatchEvent implements IModBusEvent {
         this.levelDirectory = levelDirectory;
         this.resolved = new HashMap<>(previousVersions.size());
         this.versionDifferences = new HashMap<>();
-        previousVersions.forEach((modId, version) -> versionDifferences.put(modId, new MismatchedVersionInfo(version, ModList.get()
+        previousVersions.forEach((modId, version) -> versionDifferences.put(modId, new MismatchedVersionInfo(version, ModList
                 .getModContainerById(modId)
                 .map(ModContainer::getModInfo)
                 .map(IModInfo::getVersion)

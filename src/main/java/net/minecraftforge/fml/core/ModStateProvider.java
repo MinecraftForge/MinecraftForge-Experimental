@@ -6,10 +6,10 @@
 package net.minecraftforge.fml.core;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.IModLoadingState;
 import net.minecraftforge.fml.IModStateProvider;
 import net.minecraftforge.fml.ModContainer;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingPhase;
 import net.minecraftforge.fml.ModLoadingStage;
 import net.minecraftforge.fml.ModLoadingState;
@@ -55,7 +55,7 @@ public class ModStateProvider implements IModStateProvider {
      */
     public static final ModLoadingState CONSTRUCT = ModLoadingState.of("CONSTRUCT", ModLoadingPhase.GATHER)
         .after(VALIDATE)
-        .message(ml -> "Constructing %d mods".formatted(ml.size()))
+        .message(() -> "Constructing %d mods".formatted(ModList.size()))
         .withTransition(new ParallelTransition(ModLoadingStage.CONSTRUCT, FMLConstructModEvent::new));
 
     /**
@@ -63,7 +63,7 @@ public class ModStateProvider implements IModStateProvider {
      * {@linkplain Dist#CLIENT client-side} mod configurations.
      */
     public static final ModLoadingState CONFIG_LOAD = ModLoadingState.of("CONFIG_LOAD", ModLoadingPhase.LOAD)
-        .withInline(ml -> {
+        .withInline(() -> {
             if (FMLEnvironment.dist.isClient()) ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
             ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
         });
@@ -128,7 +128,7 @@ public class ModStateProvider implements IModStateProvider {
      */
     public static  final ModLoadingState COMPLETE = ModLoadingState.of("COMPLETE", ModLoadingPhase.COMPLETE)
         .after(PROCESS_IMC)
-        .message(ml -> "completing load of %d mods".formatted(ml.size()))
+        .message(() -> "completing load of %d mods".formatted(ModList.size()))
         .withTransition(new ParallelTransition(ModLoadingStage.COMPLETE, FMLLoadCompleteEvent::new));
 
     /**

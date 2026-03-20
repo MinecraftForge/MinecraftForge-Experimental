@@ -10,9 +10,9 @@ import net.minecraftforge.fml.loading.progress.ProgressMeter;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * A mod loading state. During mod loading, the mod loader transitions between states in a defined sorted list of states,
@@ -42,19 +42,21 @@ public interface IModLoadingState {
     /**
      * {@return a function returning a human-friendly message for this state}
      */
-    Function<ModList, String> message();
+    Supplier<String> message();
 
     /**
      * @return a function that computes the size of this transition based on the size of the modlist.
      * Used to compute progress.
      */
-    ToIntFunction<ModList> size();
+    default IntSupplier size() {
+        return ModList::size;
+    }
 
     /**
      * {@return an optional runnable, which runs before starting the transition from this state to the next}
      * @see #buildTransition(Executor, Executor, ProgressMeter, Function, Function)
      */
-    Optional<Consumer<ModList>> inlineRunnable();
+    Optional<Runnable> inlineRunnable();
 
     /**
      * Builds the transition task for this state with a blank pre-sync and post-sync task.

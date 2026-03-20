@@ -11,9 +11,9 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.function.ToIntFunction;
+import java.util.function.IntSupplier;
+import java.util.function.Supplier;
 
 /**
  * Implementation of the {@link IModLoadingState} interface.
@@ -28,10 +28,10 @@ import java.util.function.ToIntFunction;
 public record ModLoadingState(
     String name,
     String previous,
-    Function<ModList, String> message,
-    ToIntFunction<ModList> size,
+    Supplier<String> message,
+    IntSupplier size,
     ModLoadingPhase phase,
-    Optional<Consumer<ModList>> inlineRunnable,
+    Optional<Runnable> inlineRunnable,
     Optional<IModStateTransition> transition
 ) implements IModLoadingState {
     @Override
@@ -60,7 +60,7 @@ public record ModLoadingState(
      */
     @Deprecated(since = "1.21.3", forRemoval = true)
     public static ModLoadingState empty(final String name, final String previous, final ModLoadingPhase phase) {
-        return new ModLoadingState(name, previous, ml -> "", ml -> 0, phase, Optional.empty(), Optional.empty());
+        return new ModLoadingState(name, previous, () -> "", () -> 0, phase, Optional.empty(), Optional.empty());
     }
 
     /**
@@ -94,7 +94,7 @@ public record ModLoadingState(
      */
     @Deprecated(since = "1.21.3", forRemoval = true)
     public static ModLoadingState withTransition(final String name, final String previous,
-                                                 final Function<ModList, String> message, final ModLoadingPhase phase,
+                                                 final Supplier<String> message, final ModLoadingPhase phase,
                                                  final IModStateTransition transition) {
         return of(name, phase).after(previous).message(message).withTransition(transition);
     }
@@ -113,7 +113,7 @@ public record ModLoadingState(
      */
     @Deprecated(since = "1.21.3", forRemoval = true)
     public static ModLoadingState withInline(final String name, final String previous, final ModLoadingPhase phase,
-                                             final Consumer<ModList> inline) {
+                                             final Runnable inline) {
         return of(name, phase).after(previous).withInline(inline);
     }
 
@@ -137,12 +137,12 @@ public record ModLoadingState(
         return result;
     }
 
-    public static class Builder {
+    public static final class Builder {
         private final String name;
         private final ModLoadingPhase phase;
         private String after;
-        private Function<ModList, String> message = null;
-        private ToIntFunction<ModList> size = null;
+        private Supplier<String> message = null;
+        private IntSupplier size = null;
 
         private Builder(final String name, final ModLoadingPhase phase) {
             this.name = name;
@@ -155,28 +155,28 @@ public record ModLoadingState(
             return this;
         }
 
-        public Builder message(final String value) { return message(ml -> value); }
-        public Builder message(final Function<ModList, String> value) {
+        public Builder message(final String value) { return message(() -> value); }
+        public Builder message(final Supplier<String> value) {
             this.message = value;
             return this;
         }
 
-        public Builder size(final int value) { return size(ml -> value); }
-        public Builder size(final ToIntFunction<ModList> value) {
+        public Builder size(final int value) { return size(() -> value); }
+        public Builder size(final IntSupplier value) {
             this.size = value;
             return this;
         }
 
         public ModLoadingState empty() {
-            return new ModLoadingState(name, after, message != null ? message : ml -> "", size != null ? size : ml -> 0, phase, Optional.empty(), Optional.empty());
+            return new ModLoadingState(name, after, message != null ? message : () -> "", size != null ? size : () -> 0, phase, Optional.empty(), Optional.empty());
         }
 
         public ModLoadingState withTransition(final IModStateTransition transition) {
-            return new ModLoadingState(name, after, message != null ? message : ml -> "Processing transition " + name, size != null ? size : ModList::size, phase, Optional.empty(), Optional.of(transition));
+            return new ModLoadingState(name, after, message != null ? message : () -> "Processing transition " + name, size != null ? size : ModList::size, phase, Optional.empty(), Optional.of(transition));
         }
 
-        public ModLoadingState withInline(final Consumer<ModList> inline) {
-            return new ModLoadingState(name, after, message != null ? message : ml -> "Processing work " + name, size != null ? size : ml -> 0, phase, Optional.of(inline), Optional.empty());
+        public ModLoadingState withInline(final Runnable inline) {
+            return new ModLoadingState(name, after, message != null ? message : () -> "Processing work " + name, size != null ? size : () -> 0, phase, Optional.of(inline), Optional.empty());
         }
     }
 }

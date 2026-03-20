@@ -67,7 +67,7 @@ public class ModMismatchDisconnectedScreen extends Screen {
         this.listHeight = hasMismatches ? 140 : 0;
 
         this.allModIds = data.mods().keySet().stream().distinct().collect(Collectors.toList());
-        this.presentModUrls = ModList.get().getMods().stream()
+        this.presentModUrls = ModList.getMods().stream()
             .filter(info -> allModIds.contains(info.getModId()))
             .map(info -> Pair.of(info.getModId(), (String)info.getConfig().getConfigElement("displayURL").orElse("")))
             .collect(Collectors.toMap(Pair::getLeft, Pair::getRight));

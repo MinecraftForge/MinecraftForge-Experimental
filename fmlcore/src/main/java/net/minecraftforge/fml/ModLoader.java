@@ -5,7 +5,6 @@
 
 package net.minecraftforge.fml;
 
-import com.google.common.collect.ImmutableList;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
@@ -14,7 +13,6 @@ import net.minecraftforge.fml.loading.ImmediateWindowHandler;
 import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.InvalidModIdentifier;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -82,7 +80,6 @@ public class ModLoader {
     private static boolean loadingStateValid;
     private final Consumer<String> statusConsumer = StartupNotificationManager.modLoaderConsumer().orElse(msg -> {});
     private final Set<IModLoadingState> completedStates = new HashSet<>();
-    private ModList modList;
 
     private ModLoader() {
         var loadingModList = this.loadingModList = FMLLoader.getLoadingModList();
@@ -146,12 +143,10 @@ public class ModLoader {
         ForgeFeature.registerFeature("openGLVersion", ForgeFeature.VersionFeatureTest.forVersionString(IModInfo.DependencySide.CLIENT, ImmediateWindowHandler.getGLVersion()));
         loadingStateValid = true;
         FMLLoader.backgroundScanHandler.waitForScanToComplete(periodicTask);
-        final ModList modList = ModList.of(loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList(),
-                loadingModList.getMods());
         if (!this.loadingExceptions.isEmpty()) {
             LOGGER.fatal(CORE, "Error during pre-loading phase", loadingExceptions.getFirst());
             statusConsumer.accept("ERROR DURING MOD LOADING");
-            modList.setLoadedMods(Collections.emptyList());
+            ModList.setLoadedMods(Collections.emptyList());
             loadingStateValid = false;
             throw new LoadingFailedException(loadingExceptions);
         }
@@ -166,7 +161,7 @@ public class ModLoader {
         if (!failedBounds.isEmpty()) {
             LOGGER.fatal(CORE, "Failed to validate feature bounds for mods: {}", failedBounds);
             statusConsumer.accept("ERROR DURING MOD LOADING");
-            modList.setLoadedMods(Collections.emptyList());
+            ModList.setLoadedMods(Collections.emptyList());
             loadingStateValid = false;
             throw new LoadingFailedException(failedBounds.stream()
                     .map(fb -> new ModLoadingException(fb.modInfo(), ModLoadingStage.CONSTRUCT, "fml.modloading.feature.missing", null, fb, ForgeFeature.featureValue(fb)))
@@ -183,7 +178,7 @@ public class ModLoader {
         if (!loadingExceptions.isEmpty()) {
             LOGGER.fatal(CORE, "Failed to initialize mod containers", loadingExceptions.getFirst());
             statusConsumer.accept("ERROR DURING MOD LOADING");
-            modList.setLoadedMods(Collections.emptyList());
+            ModList.setLoadedMods(Collections.emptyList());
             loadingStateValid = false;
             throw new LoadingFailedException(loadingExceptions);
         }
@@ -208,10 +203,9 @@ public class ModLoader {
             }
         }
 
-        modList.setLoadedMods(modContainers.values().stream().toList());
-        this.modList = modList;
+        ModList.setLoadedMods(modContainers.values().stream().toList());
         var stateList = stateManager.getStates(ModLoadingPhase.GATHER);
-        var progress = StartupMessageManager.addProgressBar("Mod Gather", stateList.stream().mapToInt(mls -> mls.size().applyAsInt(this.modList)).sum());
+        var progress = StartupMessageManager.addProgressBar("Mod Gather", stateList.stream().mapToInt(mls -> mls.size().getAsInt()).sum());
         for (IModLoadingState mls : stateList) {
             dispatchAndHandleError(mls, syncExecutor, parallelExecutor, periodicTask, progress);
         }
@@ -220,7 +214,7 @@ public class ModLoader {
 
     public void loadMods(final ModWorkManager.DrivenExecutor syncExecutor, final Executor parallelExecutor, final Runnable periodicTask) {
         var stateList = stateManager.getStates(ModLoadingPhase.LOAD);
-        var progress = StartupMessageManager.addProgressBar("Mod Loading", stateList.stream().mapToInt(mls -> mls.size().applyAsInt(modList)).sum());
+        var progress = StartupMessageManager.addProgressBar("Mod Loading", stateList.stream().mapToInt(mls -> mls.size().getAsInt()).sum());
         for (IModLoadingState mls : stateList) {
             dispatchAndHandleError(mls, syncExecutor, parallelExecutor, periodicTask, progress);
         }
@@ -229,13 +223,13 @@ public class ModLoader {
 
     public void finishMods(final ModWorkManager.DrivenExecutor syncExecutor, final Executor parallelExecutor, final Runnable periodicTask) {
         var stateList = stateManager.getStates(ModLoadingPhase.COMPLETE);
-        var progress = StartupMessageManager.addProgressBar("Mod Complete", stateList.stream().mapToInt(mls -> mls.size().applyAsInt(modList)).sum());
+        var progress = StartupMessageManager.addProgressBar("Mod Complete", stateList.stream().mapToInt(mls -> mls.size().getAsInt()).sum());
         for (IModLoadingState mls : stateList) {
             dispatchAndHandleError(mls, syncExecutor, parallelExecutor, periodicTask, progress);
         }
 
         var modBusGroups = Set.of(
-                modList.getLoadedMods().stream()
+                ModList.getLoadedMods().stream()
                         .map(ModContainer::getModBusGroup)
                         .filter(Objects::nonNull)
                         .toArray(BusGroup[]::new)
@@ -245,7 +239,7 @@ public class ModLoader {
         }
         parallelExecutor.execute(BusGroup.DEFAULT::trim);
 
-        statusConsumer.accept("Mod loading complete - %d mods loaded".formatted(this.modList.size()));
+        statusConsumer.accept("Mod loading complete - %d mods loaded".formatted(ModList.size()));
         progress.complete();
     }
 
@@ -266,10 +260,10 @@ public class ModLoader {
         completedStates.add(state);
     }
 
-    private void handleInlineTransition(final Consumer<ModList> transition, final IModLoadingState state, final ModWorkManager.DrivenExecutor syncExecutor, final Runnable ticker) {
+    private void handleInlineTransition(final Runnable transition, final IModLoadingState state, final ModWorkManager.DrivenExecutor syncExecutor, final Runnable ticker) {
         var pb = StartupMessageManager.addProgressBar("State transition " + state.name() + " running", 0);
         syncExecutor.drive(ticker);
-        transition.accept(this.modList);
+        transition.run();
         syncExecutor.drive(ticker);
         pb.complete();
         syncExecutor.drive(ticker);
@@ -375,7 +369,7 @@ public class ModLoader {
             LOGGER.error("Cowardly refusing to send event generator to a broken mod state");
             return;
         }
-        for (var mod : ModList.get().getLoadedMods())
+        for (var mod : ModList.getLoadedMods())
             mod.acceptEvent(generator.apply(mod));
     }
 
@@ -384,7 +378,7 @@ public class ModLoader {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;
         }
-        for (var mod : ModList.get().getLoadedMods())
+        for (var mod : ModList.getLoadedMods())
             mod.acceptEvent(e);
     }
 
@@ -393,7 +387,7 @@ public class ModLoader {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return e;
         }
-        for (var mod : ModList.get().getLoadedMods())
+        for (var mod : ModList.getLoadedMods())
             mod.acceptEvent(e);
         return e;
     }
@@ -411,7 +405,7 @@ public class ModLoader {
             LOGGER.error("Cowardly refusing to send event {} to a broken mod state", e.getClass().getName());
             return;
         }
-        for (var mod : ModList.get().getLoadedMods()) {
+        for (var mod : ModList.getLoadedMods()) {
             pre.accept(mod, e);
             mod.acceptEvent(e);
             post.accept(mod, e);
@@ -419,7 +413,7 @@ public class ModLoader {
     }
 
     public List<ModLoadingWarning> getWarnings() {
-        return ImmutableList.copyOf(this.loadingWarnings);
+        return List.copyOf(this.loadingWarnings);
     }
 
     public void addWarning(ModLoadingWarning warning) {

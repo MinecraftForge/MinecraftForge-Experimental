@@ -99,7 +99,7 @@ public class DatagenModLoader {
                 mods.add(pattern);
 
             var m = Pattern.compile('^' + pattern + '$');
-            ModList.get().forEachModInOrder(mc -> {
+            ModList.forEachModInOrder(mc -> {
                 var id = mc.getModId();
                 if (!"forge".equals(id) && !"minecraft".equals(id) && m.matcher(id).matches())
                     mods.add(id);

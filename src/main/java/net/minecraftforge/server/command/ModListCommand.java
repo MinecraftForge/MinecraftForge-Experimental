@@ -21,7 +21,7 @@ class ModListCommand {
                 .requires(Commands.hasPermission(Commands.LEVEL_ALL))
                 .executes(ctx -> {
                             ctx.getSource().sendSuccess(() -> Component.translatable("commands.forge.mods.list",
-                                    ModList.get().applyForEachModFile(modFile ->
+                                    ModList.applyForEachModFile(modFile ->
                                             // locator - filename : firstmod (version) - numberofmods\n
                                             String.format(Locale.ROOT, "%s %s : %s (%s) - %d",
                                                     modFile.getProvider().name().replace(' ', '_'),

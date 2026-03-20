@@ -13,7 +13,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.jetbrains.annotations.Nullable;
 
-public class ForgeVersion {
+public final class ForgeVersion {
     private static final Logger LOGGER = LogManager.getLogger();
     // This is Forge's Mod Id, used for the ForgeMod and resource locations
     public static final String MOD_ID = "forge";
@@ -42,12 +42,12 @@ public class ForgeVersion {
     }
 
     public static VersionChecker.Status getStatus() {
-        return VersionChecker.getResult(ModList.get().getModFileById(MOD_ID).getMods().getFirst()).status();
+        return VersionChecker.getResult(ModList.getModFileById(MOD_ID).getMods().getFirst()).status();
     }
 
     @Nullable
     public static String getTarget() {
-        VersionChecker.CheckResult res = VersionChecker.getResult(ModList.get().getModFileById(MOD_ID).getMods().getFirst());
+        VersionChecker.CheckResult res = VersionChecker.getResult(ModList.getModFileById(MOD_ID).getMods().getFirst());
         return res.target() == null ? "" : res.target().toString();
     }
 

@@ -85,7 +85,7 @@ public class ClientModLoader {
     }
 
     public static VersionChecker.Status checkForUpdates() {
-        boolean anyOutdated = ModList.get().getMods().stream()
+        boolean anyOutdated = ModList.getMods().stream()
                 .map(VersionChecker::getResult)
                 .map(VersionChecker.CheckResult::status)
                 .anyMatch(VersionChecker.Status::isOutdated);

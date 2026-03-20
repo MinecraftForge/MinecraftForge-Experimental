@@ -39,7 +39,7 @@ public class ConfigScreenHandler
 
     public static Optional<BiFunction<Minecraft, Screen, Screen>> getScreenFactoryFor(IModInfo selectedMod)
     {
-        return ModList.get().getModContainerById(selectedMod.getModId()).
+        return ModList.getModContainerById(selectedMod.getModId()).
                 flatMap(mc -> mc.getCustomExtension(ConfigScreenFactory.class).map(ConfigScreenFactory::screenFunction));
     }
 }
