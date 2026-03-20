@@ -633,7 +633,7 @@ public class Tags {
         public static final TagKey<Item> NATURAL_LOGS_OVERWORLD = cTag("natural_logs/overworld");
         public static final TagKey<Item> NATURAL_WOODS = cTag("natural_woods");
         public static final TagKey<Item> NETHER_STARS = cTag("nether_stars");
-        public static final TagKey<Item> NETHERRACKS = forgeTag("netherracks");
+        public static final TagKey<Item> NETHERRACKS = cTag("netherracks");
         public static final TagKey<Item> NUGGETS = cTag("nuggets");
         public static final TagKey<Item> NUGGETS_COPPER = cTag("nuggets/copper");
         public static final TagKey<Item> NUGGETS_GOLD = cTag("nuggets/gold");

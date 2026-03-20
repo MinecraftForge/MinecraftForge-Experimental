@@ -279,10 +279,20 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                         Items.IRON_NAUTILUS_ARMOR,
                         Items.NETHERITE_NAUTILUS_ARMOR
                 );
-        tag(Tags.Items.ARMORS_WOLF);
+        tag(Tags.Items.ARMORS_HUMANOID)
+                .add(Items.CHAINMAIL_BOOTS, Items.CHAINMAIL_CHESTPLATE, Items.CHAINMAIL_HELMET, Items.CHAINMAIL_LEGGINGS,
+                        Items.COPPER_BOOTS, Items.COPPER_CHESTPLATE, Items.COPPER_HELMET, Items.COPPER_LEGGINGS,
+                        Items.DIAMOND_BOOTS, Items.DIAMOND_CHESTPLATE, Items.DIAMOND_HELMET, Items.DIAMOND_LEGGINGS,
+                        Items.GOLDEN_BOOTS, Items.GOLDEN_CHESTPLATE, Items.GOLDEN_HELMET, Items.GOLDEN_LEGGINGS,
+                        Items.IRON_BOOTS, Items.IRON_CHESTPLATE, Items.IRON_HELMET, Items.IRON_LEGGINGS,
+                        Items.LEATHER_BOOTS, Items.LEATHER_CHESTPLATE, Items.LEATHER_HELMET, Items.LEATHER_LEGGINGS,
+                        Items.NETHERITE_BOOTS, Items.NETHERITE_CHESTPLATE, Items.NETHERITE_HELMET, Items.NETHERITE_LEGGINGS,
+                        Items.TURTLE_HELMET);
+        tag(Tags.Items.ARMORS_WOLF)
+                .add(Items.WOLF_ARMOR);
         tag(Tags.Items.ARMORS)
                 .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR,
-                        Tags.Items.ARMORS_HORSE, Tags.Items.ARMORS_NAUTILUS, Tags.Items.ARMORS_WOLF);
+                        Tags.Items.ARMORS_HORSE, Tags.Items.ARMORS_NAUTILUS, Tags.Items.ARMORS_WOLF, Tags.Items.ARMORS_HUMANOID);
         tag(Tags.Items.ENCHANTABLES)
             .addTags(
                 ItemTags.ARMOR_ENCHANTABLE,
@@ -309,7 +319,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.SEEDS_PUMPKIN).add(Items.PUMPKIN_SEEDS);
         tag(Tags.Items.SEEDS_WHEAT).add(Items.WHEAT_SEEDS);
         tag(Tags.Items.SEEDS_PITCHER_PLANT).add(Items.PITCHER_POD);
-        tag(Tags.Items.SEEDS_TORCHFLOWER).add(Items.TORCHFLOWER);
+        tag(Tags.Items.SEEDS_TORCHFLOWER).add(Items.TORCHFLOWER_SEEDS);
 
         tag(Tags.Items.BONES).add(Items.BONE);
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
