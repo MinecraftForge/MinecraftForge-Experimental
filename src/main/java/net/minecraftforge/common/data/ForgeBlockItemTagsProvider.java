@@ -26,14 +26,11 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
     @SuppressWarnings({ "unchecked", "removal" })
     protected void run() {
         tag(Tags.Blocks.BARRELS, Tags.Items.BARRELS)
-            .addTag(Tags.Blocks.BARRELS_WOODEN)
-            .addOptionalTag(Legacy.Blocks.BARRELS);
-        tag(Tags.Blocks.BARRELS_WOODEN, Tags.Items.BARRELS_WOODEN, Legacy.Blocks.BARRELS_WOODEN, Legacy.Items.BARRELS_WOODEN)
-            .add(Blocks.BARREL)
-            .addOptionalTag(Legacy.Blocks.BARRELS_WOODEN);
-        tag(Tags.Blocks.BOOKSHELVES, Tags.Items.BOOKSHELVES, Legacy.Blocks.BOOKSHELVES, Legacy.Items.BOOKSHELVES)
-            .add(Blocks.BOOKSHELF)
-            .addOptionalTag(Legacy.Blocks.BOOKSHELVES);
+            .addTag(Tags.Blocks.BARRELS_WOODEN);
+        tag(Tags.Blocks.BARRELS_WOODEN, Tags.Items.BARRELS_WOODEN)
+            .add(Blocks.BARREL);
+        tag(Tags.Blocks.BOOKSHELVES, Tags.Items.BOOKSHELVES)
+            .add(Blocks.BOOKSHELF);
         tag(Tags.Blocks.BUDDING_BLOCKS, Tags.Items.BUDDING_BLOCKS)
             .add(Blocks.BUDDING_AMETHYST);
         tag(Tags.Blocks.BUDS, Tags.Items.BUDS)
@@ -43,47 +40,35 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
         tag(Tags.Blocks.CHAINS, Tags.Items.CHAINS)
             .add(Blocks.IRON_CHAIN)
             .addAll(Blocks.COPPER_CHAIN.asList());
+        tag(Tags.Blocks.CHESTS_ENDER, Tags.Items.CHESTS_ENDER)
+            .add(Blocks.ENDER_CHEST);
+        tag(Tags.Blocks.CHESTS_TRAPPED, Tags.Items.CHESTS_TRAPPED)
+            .add(Blocks.TRAPPED_CHEST);
+        tag(Tags.Blocks.CHESTS_WOODEN, Tags.Items.CHESTS_WOODEN)
+            .add(Blocks.CHEST, Blocks.TRAPPED_CHEST);
         tag(Tags.Blocks.CHESTS, Tags.Items.CHESTS)
             .addTags(
                 Tags.Blocks.CHESTS_ENDER,
                 Tags.Blocks.CHESTS_TRAPPED,
                 Tags.Blocks.CHESTS_WOODEN
-            )
-            .addOptionalTag(Legacy.Blocks.CHESTS);
-        //copy(forgeBlockTagKey("chests/ender"), forgeItemTagKey("chests/ender"));
-        tag(Tags.Blocks.CHESTS_ENDER, Tags.Items.CHESTS_ENDER)
-            .add(Blocks.ENDER_CHEST); // forge:chests/ender
-        //copy(forgeBlockTagKey("chests/trapped"), forgeItemTagKey("chests/trapped")));
-        tag(Tags.Blocks.CHESTS_TRAPPED, Tags.Items.CHESTS_TRAPPED)
-            .add(Blocks.TRAPPED_CHEST); // forge:chests/trapped
-        tag(Tags.Blocks.CHESTS_WOODEN, Tags.Items.CHESTS_WOODEN, Legacy.Blocks.CHESTS_WOODEN, Legacy.Items.CHESTS_WOODEN)
-            .add(
-                Blocks.CHEST,
-                Blocks.TRAPPED_CHEST
-            )
-            .addOptionalTag(Legacy.Blocks.CHESTS_WOODEN);
+            );
         tag(Tags.Blocks.CLUSTERS, Tags.Items.CLUSTERS)
             .add(Blocks.AMETHYST_CLUSTER);
-        tag(Tags.Blocks.COBBLESTONES, Tags.Items.COBBLESTONES, Legacy.Blocks.COBBLESTONE, Legacy.Items.COBBLESTONE)
+        tag(Tags.Blocks.COBBLESTONE_NORMAL, Tags.Items.COBBLESTONE_NORMAL)
+            .add(Blocks.COBBLESTONE);
+        tag(Tags.Blocks.COBBLESTONE_INFESTED, Tags.Items.COBBLESTONE_INFESTED)
+            .add(Blocks.INFESTED_COBBLESTONE);
+        tag(Tags.Blocks.COBBLESTONE_MOSSY, Tags.Items.COBBLESTONE_MOSSY)
+            .add(Blocks.MOSSY_COBBLESTONE);
+        tag(Tags.Blocks.COBBLESTONE_DEEPSLATE, Tags.Items.COBBLESTONE_DEEPSLATE)
+            .add(Blocks.COBBLED_DEEPSLATE);
+        tag(Tags.Blocks.COBBLESTONES, Tags.Items.COBBLESTONES)
             .addTags(
                 Tags.Blocks.COBBLESTONE_NORMAL,
                 Tags.Blocks.COBBLESTONE_INFESTED,
                 Tags.Blocks.COBBLESTONE_MOSSY,
                 Tags.Blocks.COBBLESTONE_DEEPSLATE
-            )
-            .addOptionalTag(Legacy.Blocks.COBBLESTONE);
-        //copy(forgeBlockTagKey("cobblestone/normal"), forgeItemTagKey("cobblestone/normal"));
-        tag(Tags.Blocks.COBBLESTONE_NORMAL, Tags.Items.COBBLESTONE_NORMAL)
-            .add(Blocks.COBBLESTONE); // forge:cobblestone/normal
-        //copy(forgeBlockTagKey("cobblestone/infested"), forgeItemTagKey("cobblestone/infested"));
-        tag(Tags.Blocks.COBBLESTONE_INFESTED, Tags.Items.COBBLESTONE_INFESTED)
-            .add(Blocks.INFESTED_COBBLESTONE); // forge:cobblestone/infested
-        //copy(forgeBlockTagKey("cobblestone/mossy"), forgeItemTagKey("cobblestone/mossy"));
-        tag(Tags.Blocks.COBBLESTONE_MOSSY, Tags.Items.COBBLESTONE_MOSSY)
-            .add(Blocks.MOSSY_COBBLESTONE); // forge:cobblestone/mossy
-        //copy(forgeBlockTagKey("cobblestone/deepslate"), forgeItemTagKey("cobblestone/deepslate"));
-        tag(Tags.Blocks.COBBLESTONE_DEEPSLATE, Tags.Items.COBBLESTONE_DEEPSLATE)
-            .add(Blocks.COBBLED_DEEPSLATE); // forge:cobblestone/deepslate
+            );
         tag(Tags.Blocks.CONCRETES, Tags.Items.CONCRETES)
             .add(
                 Blocks.WHITE_CONCRETE,
@@ -103,13 +88,10 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.RED_CONCRETE,
                 Blocks.BLACK_CONCRETE
             );
-        //copy(forgeBlockTagKey("end_stones"), forgeItemTagKey("end_stones"));
         tag(Tags.Blocks.END_STONES, Tags.Items.END_STONES)
-            .add(Blocks.END_STONE); // forge:end_stones
-        //copy(forgeBlockTagKey("fence_gates"), forgeItemTagKey("fence_gates"));
+            .add(Blocks.END_STONE);
         tag(Tags.Blocks.FENCE_GATES, Tags.Items.FENCE_GATES)
-            .addTags(Tags.Blocks.FENCE_GATES_WOODEN); // forge:fence_gates
-        //copy(forgeBlockTagKey("fence_gates/wooden"), forgeItemTagKey("fence_gates/wooden"));
+            .addTags(Tags.Blocks.FENCE_GATES_WOODEN);
         tag(Tags.Blocks.FENCE_GATES_WOODEN, Tags.Items.FENCE_GATES_WOODEN)
             .add(
                 Blocks.OAK_FENCE_GATE,
@@ -124,18 +106,15 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.BAMBOO_FENCE_GATE,
                 Blocks.CHERRY_FENCE_GATE
             );
-        //copy(forgeBlockTagKey("fences"), forgeItemTagKey("fences"));
+        tag(Tags.Blocks.FENCES_NETHER_BRICK, Tags.Items.FENCES_NETHER_BRICK)
+            .add(Blocks.NETHER_BRICK_FENCE);
+        tag(Tags.Blocks.FENCES_WOODEN, Tags.Items.FENCES_WOODEN)
+            .addTag(BlockTags.WOODEN_FENCES);
         tag(Tags.Blocks.FENCES, Tags.Items.FENCES)
             .addTags(
                 Tags.Blocks.FENCES_NETHER_BRICK,
                 Tags.Blocks.FENCES_WOODEN
-            ); // forge:fences
-        //copy(forgeBlockTagKey("fences/nether_brick"), forgeItemTagKey("fences/nether_brick"));
-        tag(Tags.Blocks.FENCES_NETHER_BRICK, Tags.Items.FENCES_NETHER_BRICK)
-            .add(Blocks.NETHER_BRICK_FENCE); // forge:fences/nether_brick
-        //copy(forgeBlockTagKey("fences/wooden"), forgeItemTagKey("fences/wooden"));
-        tag(Tags.Blocks.FENCES_WOODEN, Tags.Items.FENCES_WOODEN)
-            .addTag(BlockTags.WOODEN_FENCES); // forge:fences/wooden
+            );
         tag(Tags.Blocks.FLOWERS_SMALL, Tags.Items.FLOWERS_SMALL)
             .add(
                 Blocks.DANDELION,
@@ -163,8 +142,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.PEONY,
                 Blocks.ROSE_BUSH,
                 Blocks.PITCHER_PLANT
-            )
-            .addOptionalTag(tagKey("tall_flowers")); //This is old vanilla tag, should it be removed?
+            );
         tag(Tags.Blocks.FLOWERS, Tags.Items.FLOWERS)
             .add(
                 Blocks.FLOWERING_AZALEA_LEAVES,
@@ -190,10 +168,9 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(Blocks.GLASS)
             .addOptionalTag(Tags.Blocks.GLASS_BLOCKS_COLORLESS);
         tag(Tags.Blocks.GLASS_BLOCKS_TINTED, Tags.Items.GLASS_BLOCKS_TINTED)
-            .add(Blocks.TINTED_GLASS)
-            .addOptionalTag(Legacy.Blocks.GLASS_TINTED);
+            .add(Blocks.TINTED_GLASS);
 
-        tag(Tags.Blocks.GLASS_BLOCKS_CHEAP, Tags.Items.GLASS_BLOCKS_CHEAP, Legacy.Blocks.GLASS_SILICA, Legacy.Items.GLASS_SILICA)
+        tag(Tags.Blocks.GLASS_BLOCKS_CHEAP, Tags.Items.GLASS_BLOCKS_CHEAP)
             .add(
                 Blocks.GLASS,
                 Blocks.WHITE_STAINED_GLASS,
@@ -212,8 +189,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.GREEN_STAINED_GLASS,
                 Blocks.RED_STAINED_GLASS,
                 Blocks.BLACK_STAINED_GLASS
-            )
-            .addOptionalTag(Legacy.Blocks.GLASS_SILICA);
+            );
         tag(Tags.Blocks.GLASS_PANES, Tags.Items.GLASS_PANES)
             .addTags(Tags.Blocks.GLASS_PANES_COLORLESS)
             .add(
@@ -233,11 +209,9 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.GREEN_STAINED_GLASS_PANE,
                 Blocks.RED_STAINED_GLASS_PANE,
                 Blocks.BLACK_STAINED_GLASS_PANE
-            )
-            .addOptionalTag(Legacy.Blocks.GLASS_PANES);
+            );
         tag(Tags.Blocks.GLASS_PANES_COLORLESS, Tags.Items.GLASS_PANES_COLORLESS)
-            .add(Blocks.GLASS_PANE)
-            .addOptionalTag(forgeTagKey("glass_panes/colorless"));
+            .add(Blocks.GLASS_PANE);
         tag(Tags.Blocks.GLAZED_TERRACOTTAS, Tags.Items.GLAZED_TERRACOTTAS)
             .add(
                 Blocks.WHITE_GLAZED_TERRACOTTA,
@@ -257,28 +231,55 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.RED_GLAZED_TERRACOTTA,
                 Blocks.BLACK_GLAZED_TERRACOTTA
             );
-        //copy(forgeBlockTagKey("gravel"), forgeItemTagKey("gravel"));
         tag(Tags.Blocks.GRAVELS, Tags.Items.GRAVELS)
-            .add(Blocks.GRAVEL); // forge:gravel
-        //copy(forgeBlockTagKey("netherrack"), forgeItemTagKey("netherrack"));
+            .add(Blocks.GRAVEL);
+        tag(Tags.Blocks.NATURAL_LOGS_NETHER, Tags.Items.NATURAL_LOGS_NETHER)
+            .add(Blocks.CRIMSON_STEM, Blocks.WARPED_STEM);
+        tag(Tags.Blocks.NATURAL_LOGS_OVERWORLD, Tags.Items.NATURAL_LOGS_OVERWORLD)
+            .add(
+                Blocks.ACACIA_LOG,
+                Blocks.BIRCH_LOG,
+                Blocks.CHERRY_LOG,
+                Blocks.DARK_OAK_LOG,
+                Blocks.JUNGLE_LOG,
+                Blocks.MANGROVE_LOG,
+                Blocks.OAK_LOG,
+                Blocks.PALE_OAK_LOG,
+                Blocks.SPRUCE_LOG
+            );
+        tag(Tags.Blocks.NATURAL_LOGS, Tags.Items.NATURAL_LOGS)
+            .addTags(Tags.Blocks.NATURAL_LOGS_NETHER, Tags.Blocks.NATURAL_LOGS_OVERWORLD);
+        tag(Tags.Blocks.NATURAL_WOODS, Tags.Items.NATURAL_WOODS)
+            .add(
+                Blocks.ACACIA_WOOD,
+                Blocks.BIRCH_WOOD,
+                Blocks.CHERRY_WOOD,
+                Blocks.CRIMSON_HYPHAE,
+                Blocks.DARK_OAK_WOOD,
+                Blocks.JUNGLE_WOOD,
+                Blocks.MANGROVE_WOOD,
+                Blocks.OAK_WOOD,
+                Blocks.PALE_OAK_WOOD,
+                Blocks.SPRUCE_WOOD,
+                Blocks.WARPED_HYPHAE
+            );
         tag(Tags.Blocks.NETHERRACKS, Tags.Items.NETHERRACKS)
-            .add(Blocks.NETHERRACK); // forge:netherrack
+            .add(Blocks.NETHERRACK);
         tag(Tags.Blocks.OBSIDIANS, Tags.Items.OBSIDIANS)
             .addTags(
                 Tags.Blocks.OBSIDIANS_NORMAL,
                 Tags.Blocks.OBSIDIANS_CRYING
-            )
-            .addOptionalTag(Legacy.Blocks.OBSIDIAN);
+            );
         tag(Tags.Blocks.OBSIDIANS_NORMAL, Tags.Items.OBSIDIANS_NORMAL)
             .add(Blocks.OBSIDIAN);
         tag(Tags.Blocks.OBSIDIANS_CRYING, Tags.Items.OBSIDIANS_CRYING)
             .add(Blocks.CRYING_OBSIDIAN);
         tag(Tags.Blocks.ORE_BEARING_GROUND_DEEPSLATE, Tags.Items.ORE_BEARING_GROUND_DEEPSLATE)
-            .add(Blocks.DEEPSLATE); // forge:ore_bearing_ground/deepslate
+            .add(Blocks.DEEPSLATE);
         tag(Tags.Blocks.ORE_BEARING_GROUND_NETHERRACK, Tags.Items.ORE_BEARING_GROUND_NETHERRACK)
-            .add(Blocks.NETHERRACK); // forge:ore_bearing_ground/netherrack
+            .add(Blocks.NETHERRACK);
         tag(Tags.Blocks.ORE_BEARING_GROUND_STONE, Tags.Items.ORE_BEARING_GROUND_STONE)
-            .add(Blocks.STONE); // forge:ore_bearing_ground/stone
+            .add(Blocks.STONE);
         tag(Tags.Blocks.ORE_RATES_DENSE, Tags.Items.ORE_RATES_DENSE)
             .add(
                 Blocks.COPPER_ORE,
@@ -305,6 +306,26 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             );
         tag(Tags.Blocks.ORE_RATES_SPARSE, Tags.Items.ORE_RATES_SPARSE)
             .add(Blocks.NETHER_GOLD_ORE);
+        tag(Tags.Blocks.ORES_COAL, Tags.Items.ORES_COAL)
+            .addTag(BlockTags.COAL_ORES);
+        tag(Tags.Blocks.ORES_COPPER, Tags.Items.ORES_COPPER)
+            .addTag(BlockTags.COPPER_ORES);
+        tag(Tags.Blocks.ORES_DIAMOND, Tags.Items.ORES_DIAMOND)
+            .addTag(BlockTags.DIAMOND_ORES);
+        tag(Tags.Blocks.ORES_EMERALD, Tags.Items.ORES_EMERALD)
+            .addTag(BlockTags.EMERALD_ORES);
+        tag(Tags.Blocks.ORES_GOLD, Tags.Items.ORES_GOLD)
+            .addTag(BlockTags.GOLD_ORES);
+        tag(Tags.Blocks.ORES_IRON, Tags.Items.ORES_IRON)
+            .addTag(BlockTags.IRON_ORES);
+        tag(Tags.Blocks.ORES_LAPIS, Tags.Items.ORES_LAPIS)
+            .addTag(BlockTags.LAPIS_ORES);
+        tag(Tags.Blocks.ORES_QUARTZ, Tags.Items.ORES_QUARTZ)
+            .add(Blocks.NETHER_QUARTZ_ORE);
+        tag(Tags.Blocks.ORES_REDSTONE, Tags.Items.ORES_REDSTONE)
+            .addTag(BlockTags.REDSTONE_ORES);
+        tag(Tags.Blocks.ORES_NETHERITE_SCRAP, Tags.Items.ORES_NETHERITE_SCRAP)
+            .add(Blocks.ANCIENT_DEBRIS);
         tag(Tags.Blocks.ORES, Tags.Items.ORES)
             .addTags(
                 Tags.Blocks.ORES_COAL,
@@ -317,30 +338,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Tags.Blocks.ORES_NETHERITE_SCRAP,
                 Tags.Blocks.ORES_REDSTONE,
                 Tags.Blocks.ORES_QUARTZ
-            )
-            .addOptionalTag(Legacy.Blocks.ORES);
-        tag(Tags.Blocks.ORES_COAL, Tags.Items.ORES_COAL)
-            .addTag(BlockTags.COAL_ORES); // forge:ores/coal
-        tag(Tags.Blocks.ORES_COPPER, Tags.Items.ORES_COPPER)
-            .addTag(BlockTags.COPPER_ORES); // forge:ores/copper
-        tag(Tags.Blocks.ORES_DIAMOND, Tags.Items.ORES_DIAMOND)
-            .addTag(BlockTags.DIAMOND_ORES); // forge:ores/diamond
-        tag(Tags.Blocks.ORES_EMERALD, Tags.Items.ORES_EMERALD)
-            .addTag(BlockTags.EMERALD_ORES); // forge:ores/emerald
-        tag(Tags.Blocks.ORES_GOLD, Tags.Items.ORES_GOLD)
-            .addTag(BlockTags.GOLD_ORES); // forge:ores/gold
-        tag(Tags.Blocks.ORES_IRON, Tags.Items.ORES_IRON)
-            .addTag(BlockTags.IRON_ORES); // forge:ores/iron
-        tag(Tags.Blocks.ORES_LAPIS, Tags.Items.ORES_LAPIS)
-            .addTag(BlockTags.LAPIS_ORES); // forge:ores/lapis
-        tag(Tags.Blocks.ORES_QUARTZ, Tags.Items.ORES_QUARTZ, Legacy.Blocks.ORES_QUARTZ, Legacy.Items.QUARTZ_ORES)
-            .add(Blocks.NETHER_QUARTZ_ORE)
-            .addOptionalTag(Legacy.Blocks.ORES_QUARTZ);
-        tag(Tags.Blocks.ORES_REDSTONE, Tags.Items.ORES_REDSTONE)
-            .addTag(BlockTags.REDSTONE_ORES); // forge:ores/redstone
-        tag(Tags.Blocks.ORES_NETHERITE_SCRAP, Tags.Items.ORES_NETHERITE_SCRAP, Legacy.Blocks.ORES_NETHERITE_SCRAP, Legacy.Items.ORES_NEHTERITE_SCRAP)
-            .add(Blocks.ANCIENT_DEBRIS)
-            .addOptionalTag(Legacy.Blocks.ORES_NETHERITE_SCRAP);
+            );
         tag(Tags.Blocks.ORES_IN_GROUND_DEEPSLATE, Tags.Items.ORES_IN_GROUND_DEEPSLATE)
             .add(
                 Blocks.DEEPSLATE_COAL_ORE,
@@ -398,8 +396,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .addTags(
                 Tags.Blocks.SANDSTONE_RED_BLOCKS,
                 Tags.Blocks.SANDSTONE_UNCOLORED_BLOCKS
-            )
-            .addOptionalTag(Legacy.Blocks.SANDSTONE);
+            );
         tag(Tags.Blocks.SANDSTONE_SLABS, Tags.Items.SANDSTONE_SLABS)
             .addTags(
                 Tags.Blocks.SANDSTONE_RED_SLABS,
@@ -455,7 +452,6 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.DEEPSLATE,
                 Blocks.TUFF
             );
-            //.addOptionalTag(forgeTagKey("stone")); // can't add this because it would include infested/polished variants which aren't contained in Fabric's `c:stones`
         tag(Tags.Blocks.STORAGE_BLOCKS, Tags.Items.STORAGE_BLOCKS)
             .addTags(
                 Tags.Blocks.STORAGE_BLOCKS_BONE_MEAL,
@@ -474,66 +470,41 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Tags.Blocks.STORAGE_BLOCKS_REDSTONE,
                 Tags.Blocks.STORAGE_BLOCKS_SLIME,
                 Tags.Blocks.STORAGE_BLOCKS_WHEAT
-            )
-            //.addOptionalTag(forgeTagKey("storage_blocks")); // can't add this because it would include contents from the non-common forge:storage_blocks/amethyst and forge:storage_blocks/quartz, which are not in the c namespace
-            .addOptionalTags(
-                Legacy.Blocks.STORAGE_BLOCKS_COAL,
-                Legacy.Blocks.STORAGE_BLOCKS_COPPER,
-                Legacy.Blocks.STORAGE_BLOCKS_DIAMOND,
-                Legacy.Blocks.STORAGE_BLOCKS_EMERALD,
-                Legacy.Blocks.STORAGE_BLOCKS_GOLD,
-                Legacy.Blocks.STORAGE_BLOCKS_IRON,
-                Legacy.Blocks.STORAGE_BLOCKS_LAPIS,
-                Legacy.Blocks.STORAGE_BLOCKS_NETHERITE,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_COPPER,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_GOLD,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_IRON,
-                Legacy.Blocks.STORAGE_BLOCKS_REDSTONE
             );
         tag(Tags.Blocks.STORAGE_BLOCKS_AMETHYST, Tags.Items.STORAGE_BLOCKS_AMETHYST)
             .add(Blocks.AMETHYST_BLOCK);
         tag(Tags.Blocks.STORAGE_BLOCKS_BONE_MEAL, Tags.Items.STORAGE_BLOCKS_BONE_MEAL)
             .add(Blocks.BONE_BLOCK);
-        tag(Tags.Blocks.STORAGE_BLOCKS_COAL, Tags.Items.STORAGE_BLOCKS_COAL, Legacy.Blocks.STORAGE_BLOCKS_COAL, Legacy.Items.STORAGE_BLOCKS_COAL)
-            .add(Blocks.COAL_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_COAL);
-        tag(Tags.Blocks.STORAGE_BLOCKS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER, Legacy.Blocks.STORAGE_BLOCKS_COPPER, Legacy.Items.STORAGE_BLOCKS_COPPER)
-            .add(Blocks.COPPER_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_COPPER);
-        tag(Tags.Blocks.STORAGE_BLOCKS_DIAMOND, Tags.Items.STORAGE_BLOCKS_DIAMOND, Legacy.Blocks.STORAGE_BLOCKS_DIAMOND, Legacy.Items.STORAGE_BLOCKS_DIAMOND)
-            .add(Blocks.DIAMOND_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_DIAMOND);
+        tag(Tags.Blocks.STORAGE_BLOCKS_COAL, Tags.Items.STORAGE_BLOCKS_COAL)
+            .add(Blocks.COAL_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_COPPER, Tags.Items.STORAGE_BLOCKS_COPPER)
+            .add(Blocks.COPPER_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_DIAMOND, Tags.Items.STORAGE_BLOCKS_DIAMOND)
+            .add(Blocks.DIAMOND_BLOCK);
         tag(Tags.Blocks.STORAGE_BLOCKS_DRIED_KELP, Tags.Items.STORAGE_BLOCKS_DRIED_KELP)
             .add(Blocks.DRIED_KELP_BLOCK);
-        tag(Tags.Blocks.STORAGE_BLOCKS_EMERALD, Tags.Items.STORAGE_BLOCKS_EMERALD, Legacy.Blocks.STORAGE_BLOCKS_EMERALD, Legacy.Items.STORAGE_BLOCKS_EMERALD)
-            .add(Blocks.EMERALD_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_EMERALD);
-        tag(Tags.Blocks.STORAGE_BLOCKS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD, Legacy.Blocks.STORAGE_BLOCKS_GOLD, Legacy.Items.STORAGE_BLOCKS_GOLD)
-            .add(Blocks.GOLD_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_GOLD);
-        tag(Tags.Blocks.STORAGE_BLOCKS_IRON, Tags.Items.STORAGE_BLOCKS_IRON, Legacy.Blocks.STORAGE_BLOCKS_IRON, Legacy.Items.STORAGE_BLOCKS_IRON)
-            .add(Blocks.IRON_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_IRON);
-        tag(Tags.Blocks.STORAGE_BLOCKS_LAPIS, Tags.Items.STORAGE_BLOCKS_LAPIS, Legacy.Blocks.STORAGE_BLOCKS_LAPIS, Legacy.Items.STORAGE_BLOCKS_LAPIS)
-            .add(Blocks.LAPIS_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_LAPIS);
-        tag(Tags.Blocks.STORAGE_BLOCKS_NETHERITE, Tags.Items.STORAGE_BLOCKS_NETHERITE, Legacy.Blocks.STORAGE_BLOCKS_NETHERITE, Legacy.Items.STORAGE_BLOCKS_NETHERITE)
-            .add(Blocks.NETHERITE_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_NETHERITE);
+        tag(Tags.Blocks.STORAGE_BLOCKS_EMERALD, Tags.Items.STORAGE_BLOCKS_EMERALD)
+            .add(Blocks.EMERALD_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_GOLD, Tags.Items.STORAGE_BLOCKS_GOLD)
+            .add(Blocks.GOLD_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_IRON, Tags.Items.STORAGE_BLOCKS_IRON)
+            .add(Blocks.IRON_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_LAPIS, Tags.Items.STORAGE_BLOCKS_LAPIS)
+            .add(Blocks.LAPIS_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_NETHERITE, Tags.Items.STORAGE_BLOCKS_NETHERITE)
+            .add(Blocks.NETHERITE_BLOCK);
         tag(Tags.Blocks.STORAGE_BLOCKS_QUARTZ, Tags.Items.STORAGE_BLOCKS_QUARTZ)
             .add(Blocks.QUARTZ_BLOCK);
-        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER, Legacy.Blocks.STORAGE_BLOCKS_RAW_COPPER, Legacy.Items.STORAGE_BLOCKS_RAW_COPPER)
-            .add(Blocks.RAW_COPPER_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_RAW_COPPER);
-        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD, Legacy.Blocks.STORAGE_BLOCKS_RAW_GOLD, Legacy.Items.STORAGE_BLOCKS_RAW_GOLD)
-            .add(Blocks.RAW_GOLD_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_RAW_GOLD);
-        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON, Legacy.Blocks.STORAGE_BLOCKS_RAW_IRON, Legacy.Items.STORAGE_BLOCKS_RAW_IRON)
-            .add(Blocks.RAW_IRON_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_RAW_IRON);
-        tag(Tags.Blocks.STORAGE_BLOCKS_REDSTONE, Tags.Items.STORAGE_BLOCKS_REDSTONE, Legacy.Blocks.STORAGE_BLOCKS_REDSTONE, Legacy.Items.STORAGE_BLOCKS_REDSTONE)
-            .add(Blocks.REDSTONE_BLOCK)
-            .addOptionalTag(Legacy.Blocks.STORAGE_BLOCKS_REDSTONE);
+        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_COPPER, Tags.Items.STORAGE_BLOCKS_RAW_COPPER)
+            .add(Blocks.RAW_COPPER_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_GOLD, Tags.Items.STORAGE_BLOCKS_RAW_GOLD)
+            .add(Blocks.RAW_GOLD_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_RAW_IRON, Tags.Items.STORAGE_BLOCKS_RAW_IRON)
+            .add(Blocks.RAW_IRON_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_RESIN, Tags.Items.STORAGE_BLOCKS_RESIN)
+            .add(Blocks.RESIN_BLOCK);
+        tag(Tags.Blocks.STORAGE_BLOCKS_REDSTONE, Tags.Items.STORAGE_BLOCKS_REDSTONE)
+            .add(Blocks.REDSTONE_BLOCK);
         tag(Tags.Blocks.STORAGE_BLOCKS_SLIME, Tags.Items.STORAGE_BLOCKS_SLIME)
             .add(Blocks.SLIME_BLOCK);
         tag(Tags.Blocks.STORAGE_BLOCKS_WHEAT, Tags.Items.STORAGE_BLOCKS_WHEAT)
@@ -544,117 +515,28 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.STRIPPED_BAMBOO_BLOCK,
                 Blocks.STRIPPED_BIRCH_LOG,
                 Blocks.STRIPPED_CHERRY_LOG,
+                Blocks.STRIPPED_CRIMSON_STEM,
                 Blocks.STRIPPED_DARK_OAK_LOG,
                 Blocks.STRIPPED_JUNGLE_LOG,
                 Blocks.STRIPPED_MANGROVE_LOG,
                 Blocks.STRIPPED_OAK_LOG,
-                Blocks.STRIPPED_SPRUCE_LOG
+                Blocks.STRIPPED_PALE_OAK_LOG,
+                Blocks.STRIPPED_SPRUCE_LOG,
+                Blocks.STRIPPED_WARPED_STEM
             );
         tag(Tags.Blocks.STRIPPED_WOODS, Tags.Items.STRIPPED_WOODS)
             .add(
                 Blocks.STRIPPED_ACACIA_WOOD,
                 Blocks.STRIPPED_BIRCH_WOOD,
                 Blocks.STRIPPED_CHERRY_WOOD,
+                Blocks.STRIPPED_CRIMSON_HYPHAE,
                 Blocks.STRIPPED_DARK_OAK_WOOD,
                 Blocks.STRIPPED_JUNGLE_WOOD,
                 Blocks.STRIPPED_MANGROVE_WOOD,
                 Blocks.STRIPPED_OAK_WOOD,
-                Blocks.STRIPPED_SPRUCE_WOOD
-            );
-
-        // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
-        // TODO: [Forge][Tags][Old] Remove backwards compat tag entries in 1.22
-        tag(Legacy.Blocks.BARRELS, Legacy.Items.BARRELS)
-            .addTag(Legacy.Blocks.BARRELS_WOODEN);
-
-        tag(Legacy.Blocks.CHESTS, Legacy.Items.CHESTS)
-            .addTags(
-                Tags.Blocks.CHESTS_ENDER,
-                Tags.Blocks.CHESTS_TRAPPED,
-                Legacy.Blocks.CHESTS_WOODEN
-            );
-
-        //copy(forgeBlockTagKey("glass/tinted"), forgeItemTagKey("glass/tinted"));
-        // todo
-//        addColored(tag(Tags.Blocks.STAINED_GLASS, Tags.Items.STAINED_GLASS)::add, Tags.Blocks.GLASS, "{color}_stained_glass");
-//        addColored(tag(Tags.Blocks.STAINED_GLASS_PANES, Tags.Items.STAINED_GLASS_PANES)::add, Tags.Blocks.GLASS_PANES, "{color}_stained_glass_pane");
-
-        // tag(Tags.Blocks.GLASS, Tags.Items.GLASS, forgeBlockTagKey("glass"), forgeItemTagKey("glass")) // these are the same thing
-        // todo
-//        tag(Tags.Blocks.GLASS, Tags.Items.GLASS)
-//            .addTags(
-//                Tags.Blocks.GLASS_COLORLESS,
-//                Tags.Blocks.STAINED_GLASS,
-//                Legacy.Blocks.GLASS_TINTED
-//            );
-        tag(Tags.Blocks.GLASS_BLOCKS_COLORLESS, Tags.Items.GLASS_BLOCKS_COLORLESS)
-            .add(Blocks.GLASS);
-        tag(Legacy.Blocks.GLASS_PANES, Legacy.Items.GLASS_PANES)
-            .addTags(
-                Legacy.Blocks.GLASS_PANES_COLORLESS
-            );
-        tag(Legacy.Blocks.GLASS_PANES_COLORLESS, Legacy.Items.GLASS_PANES_COLORLESS)
-            .add(Blocks.GLASS_PANE);
-        tag(Legacy.Blocks.GLASS_TINTED, Legacy.Items.GLASS_TINTED)
-            .add(Blocks.TINTED_GLASS);
-        tag(Legacy.Blocks.OBSIDIAN, Legacy.Items.OBSIDIAN)
-            .add(Blocks.OBSIDIAN);
-        tag(Legacy.Blocks.ORES, Legacy.Items.ORES)
-            .addTags(
-                Tags.Blocks.ORES_COAL,
-                Tags.Blocks.ORES_COPPER,
-                Tags.Blocks.ORES_DIAMOND,
-                Tags.Blocks.ORES_EMERALD,
-                Tags.Blocks.ORES_GOLD,
-                Tags.Blocks.ORES_IRON,
-                Tags.Blocks.ORES_LAPIS,
-                Tags.Blocks.ORES_REDSTONE,
-                Legacy.Blocks.ORES_QUARTZ,
-                Legacy.Blocks.ORES_NETHERITE_SCRAP
-            );
-        tag(Legacy.Blocks.SANDSTONE, Legacy.Items.SANDSTONE)
-            .add(
-                Blocks.SANDSTONE,
-                Blocks.CUT_SANDSTONE,
-                Blocks.CHISELED_SANDSTONE,
-                Blocks.SMOOTH_SANDSTONE,
-                Blocks.RED_SANDSTONE,
-                Blocks.CUT_RED_SANDSTONE,
-                Blocks.CHISELED_RED_SANDSTONE,
-                Blocks.SMOOTH_RED_SANDSTONE
-            );
-        tag(Legacy.Blocks.STONE, Legacy.Items.STONE)
-            .add(
-                Blocks.ANDESITE,
-                Blocks.DIORITE,
-                Blocks.GRANITE,
-                Blocks.INFESTED_STONE,
-                Blocks.STONE,
-                Blocks.POLISHED_ANDESITE,
-                Blocks.POLISHED_DIORITE,
-                Blocks.POLISHED_GRANITE,
-                Blocks.DEEPSLATE,
-                Blocks.POLISHED_DEEPSLATE,
-                Blocks.INFESTED_DEEPSLATE,
-                Blocks.TUFF
-            );
-
-        tag(Legacy.Blocks.STORAGE_BLOCKS, Legacy.Items.STORAGE_BLOCKS)
-            .addTags(
-                Tags.Blocks.STORAGE_BLOCKS_AMETHYST,
-                Legacy.Blocks.STORAGE_BLOCKS_COAL,
-                Legacy.Blocks.STORAGE_BLOCKS_COPPER,
-                Legacy.Blocks.STORAGE_BLOCKS_DIAMOND,
-                Legacy.Blocks.STORAGE_BLOCKS_EMERALD,
-                Legacy.Blocks.STORAGE_BLOCKS_GOLD,
-                Legacy.Blocks.STORAGE_BLOCKS_IRON,
-                Legacy.Blocks.STORAGE_BLOCKS_LAPIS,
-                Tags.Blocks.STORAGE_BLOCKS_QUARTZ,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_COPPER,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_GOLD,
-                Legacy.Blocks.STORAGE_BLOCKS_RAW_IRON,
-                Legacy.Blocks.STORAGE_BLOCKS_REDSTONE,
-                Legacy.Blocks.STORAGE_BLOCKS_NETHERITE
+                Blocks.STRIPPED_PALE_OAK_WOOD,
+                Blocks.STRIPPED_SPRUCE_WOOD,
+                Blocks.STRIPPED_WARPED_HYPHAE
             );
     }
 
@@ -764,81 +646,5 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 return tag.getSourceName();
             }
         };
-    }
-
-    private static class Legacy {
-        @Deprecated
-        private static class Blocks {
-            private static TagKey<Block> tag(String path) {
-                return BlockTags.create(forgeRl(path));
-            }
-
-            public static final TagKey<Block> BARRELS = tag("barrels");
-            public static final TagKey<Block> BARRELS_WOODEN = tag("barrels/wooden");
-            public static final TagKey<Block> BOOKSHELVES = tag("bookshelves");
-            public static final TagKey<Block> CHESTS = tag("chests");
-            public static final TagKey<Block> CHESTS_WOODEN = tag("chests/wooden");
-            public static final TagKey<Block> COBBLESTONE = tag("cobblestone");
-            public static final TagKey<Block> GLASS_PANES = tag("glass_panes");
-            public static final TagKey<Block> GLASS_PANES_COLORLESS = tag("glass_panes/colorless");
-            public static final TagKey<Block> GLASS_SILICA = tag("glass/silica");
-            public static final TagKey<Block> GLASS_TINTED = tag("glass/tinted");
-            public static final TagKey<Block> OBSIDIAN = tag("obsidian");
-            public static final TagKey<Block> ORES = tag("ores");
-            public static final TagKey<Block> ORES_QUARTZ = tag("ores/quartz");
-            public static final TagKey<Block> ORES_NETHERITE_SCRAP = tag("ores/netherite_scrap");
-            public static final TagKey<Block> SANDSTONE = tag("sandstone");
-            public static final TagKey<Block> STONE = tag("stone");
-            public static final TagKey<Block> STORAGE_BLOCKS = tag("storage_blocks");
-            public static final TagKey<Block> STORAGE_BLOCKS_COAL = tag("storage_blocks/coal");
-            public static final TagKey<Block> STORAGE_BLOCKS_COPPER = tag("storage_blocks/copper");
-            public static final TagKey<Block> STORAGE_BLOCKS_DIAMOND = tag("storage_blocks/diamond");
-            public static final TagKey<Block> STORAGE_BLOCKS_EMERALD = tag("storage_blocks/emerald");
-            public static final TagKey<Block> STORAGE_BLOCKS_GOLD = tag("storage_blocks/gold");
-            public static final TagKey<Block> STORAGE_BLOCKS_IRON = tag("storage_blocks/iron");
-            public static final TagKey<Block> STORAGE_BLOCKS_LAPIS = tag("storage_blocks/lapis");
-            public static final TagKey<Block> STORAGE_BLOCKS_NETHERITE = tag("storage_blocks/netherite");
-            public static final TagKey<Block> STORAGE_BLOCKS_RAW_COPPER = tag("storage_blocks/raw_copper");
-            public static final TagKey<Block> STORAGE_BLOCKS_RAW_GOLD = tag("storage_blocks/raw_gold");
-            public static final TagKey<Block> STORAGE_BLOCKS_RAW_IRON = tag("storage_blocks/raw_iron");
-            public static final TagKey<Block> STORAGE_BLOCKS_REDSTONE = tag("storage_blocks/redstone");
-        }
-
-        @Deprecated
-        private static class Items {
-            private static TagKey<Item> tag(String path) {
-                return ItemTags.create(forgeRl(path));
-            }
-
-            public static final TagKey<Item> BARRELS = tag("barrels");
-            public static final TagKey<Item> BARRELS_WOODEN = tag("barrels/wooden");
-            public static final TagKey<Item> BOOKSHELVES = tag("bookshelves");
-            public static final TagKey<Item> CHESTS = tag("chests");
-            public static final TagKey<Item> CHESTS_WOODEN = tag("chests/wooden");
-            public static final TagKey<Item> COBBLESTONE = tag("cobblestone");
-            public static final TagKey<Item> GLASS_PANES = tag("glass_panes");
-            public static final TagKey<Item> GLASS_PANES_COLORLESS = tag("glass_panes/colorless");
-            public static final TagKey<Item> GLASS_SILICA = tag("glass/silica");
-            public static final TagKey<Item> GLASS_TINTED = tag("glass/tinted");
-            public static final TagKey<Item> OBSIDIAN = tag("obsidian");
-            public static final TagKey<Item> ORES = tag("ores");
-            public static final TagKey<Item> QUARTZ_ORES = tag("ores/quartz");
-            public static final TagKey<Item> ORES_NEHTERITE_SCRAP = tag("ores/netherite_scrap");
-            public static final TagKey<Item> SANDSTONE = tag("sandstone");
-            public static final TagKey<Item> STONE = tag("stone");
-            public static final TagKey<Item> STORAGE_BLOCKS = tag("storage_blocks");
-            public static final TagKey<Item> STORAGE_BLOCKS_COAL = tag("storage_blocks/coal");
-            public static final TagKey<Item> STORAGE_BLOCKS_COPPER = tag("storage_blocks/copper");
-            public static final TagKey<Item> STORAGE_BLOCKS_DIAMOND = tag("storage_blocks/diamond");
-            public static final TagKey<Item> STORAGE_BLOCKS_EMERALD = tag("storage_blocks/emerald");
-            public static final TagKey<Item> STORAGE_BLOCKS_GOLD = tag("storage_blocks/gold");
-            public static final TagKey<Item> STORAGE_BLOCKS_IRON = tag("storage_blocks/iron");
-            public static final TagKey<Item> STORAGE_BLOCKS_LAPIS = tag("storage_blocks/lapis");
-            public static final TagKey<Item> STORAGE_BLOCKS_NETHERITE = tag("storage_blocks/netherite");
-            public static final TagKey<Item> STORAGE_BLOCKS_RAW_COPPER = tag("storage_blocks/raw_copper");
-            public static final TagKey<Item> STORAGE_BLOCKS_RAW_GOLD = tag("storage_blocks/raw_gold");
-            public static final TagKey<Item> STORAGE_BLOCKS_RAW_IRON = tag("storage_blocks/raw_iron");
-            public static final TagKey<Item> STORAGE_BLOCKS_REDSTONE = tag("storage_blocks/redstone");
-        }
     }
 }
