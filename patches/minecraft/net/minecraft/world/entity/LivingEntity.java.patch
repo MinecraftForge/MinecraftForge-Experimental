@@ -482,7 +482,7 @@
              if (this.isInLava()) {
                  d3 = this.getFluidHeight(FluidTags.LAVA);
              } else {
-@@ -3018,15 +_,22 @@
+@@ -3018,15 +_,19 @@
              double d4 = this.getFluidJumpThreshold();
              if (!flag || this.onGround() && !(d3 > d4)) {
                  if (!this.isInLava() || this.onGround() && !(d3 > d4)) {
@@ -496,10 +496,7 @@
 +                    }
                  } else {
 -                    this.jumpInLiquid(FluidTags.LAVA);
-+                    var old = this.getDeltaMovement();
 +                    this.jumpInFluid(net.minecraftforge.common.ForgeMod.LAVA_TYPE.get());
-+                    if (this instanceof Player)
-+                        System.out.println(old + " " + this.getDeltaMovement());
                  }
              } else {
 -                this.jumpInLiquid(FluidTags.WATER);

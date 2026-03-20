@@ -131,7 +131,7 @@
      public boolean isInFluid(final TagKey<Fluid> fluid) {
          return this.getFluidHeight(fluid) > 0.0;
      }
-@@ -148,6 +_,43 @@
+@@ -148,6 +_,45 @@
      public boolean isEyeInFluid(final TagKey<Fluid> fluid) {
          EntityFluidInteraction.Tracker entityfluidinteraction$tracker = this.trackerByFluid.get(fluid);
          return entityfluidinteraction$tracker != null && entityfluidinteraction$tracker.eyesInside;
@@ -164,14 +164,16 @@
 +    }
 +
 +    public final boolean isInFluid(java.util.function.BiPredicate<net.minecraftforge.fluids.FluidType, Double> predicate, boolean forAllTypes) {
++        boolean match = false;
 +        for (var entry : this.trackerByFluidType.entrySet()) {
 +            if (predicate.test(entry.getKey(), entry.getValue().height)) {
++                match = true;
 +                if (!forAllTypes)
 +                    return true;
 +            } else if (forAllTypes)
 +                return false;
 +        }
-+        return true;
++        return match;
      }
  
      private static class Tracker {
