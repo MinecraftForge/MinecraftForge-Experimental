@@ -81,7 +81,6 @@ public class ExistingFileHelper {
     }
 
     private final MultiPackResourceManager clientResources, serverData;
-    private final boolean enable;
     private final Multimap<PackType, Identifier> generated = HashMultimap.create();
 
     /**
@@ -93,11 +92,10 @@ public class ExistingFileHelper {
      * other generated files.
      * @param existingPacks a collection of paths to existing packs
      * @param existingMods a set of mod IDs for existing mods
-     * @param enable {@code true} if validation is enabled
      * @param assetIndex the identifier for the asset index, generally Minecraft's current major version
      * @param assetsDir the directory in which to find vanilla assets and indexes
      */
-    public ExistingFileHelper(Collection<Path> existingPacks, final Set<String> existingMods, boolean enable, @Nullable final String assetIndex, @Nullable final File assetsDir) {
+    public ExistingFileHelper(Collection<Path> existingPacks, final Set<String> existingMods, @Nullable final String assetIndex, @Nullable final File assetsDir) {
         List<PackResources> candidateClientResources = new ArrayList<>();
         List<PackResources> candidateServerResources = new ArrayList<>();
 
@@ -136,8 +134,6 @@ public class ExistingFileHelper {
 
         this.clientResources = new MultiPackResourceManager(PackType.CLIENT_RESOURCES, candidateClientResources);
         this.serverData = new MultiPackResourceManager(PackType.SERVER_DATA, candidateServerResources);
-
-        this.enable = enable;
     }
 
     private ResourceManager getManager(PackType packType) {
@@ -253,14 +249,5 @@ public class ExistingFileHelper {
     @VisibleForTesting
     public List<Resource> getResourceStack(Identifier loc, PackType packType) {
         return getManager(packType).getResourceStack(loc);
-    }
-
-    /**
-     * @return {@code true} if validation is enabled, {@code false} otherwise
-     * @deprecated  Validation is always enabled, check things as you deem fit.
-     */
-    @Deprecated(forRemoval = true, since = "1.21.5")
-    public boolean isEnabled() {
-        return enable;
     }
 }

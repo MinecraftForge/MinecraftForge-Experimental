@@ -55,8 +55,6 @@ public final class GatherDataEvent implements IModBusEvent {
     public boolean includeClient() { return this.config.client; }
     public boolean includeDev() { return this.config.dev; }
     public boolean includeReports() { return this.config.reports; }
-    @Deprecated(forRemoval = true, since = "1.21.5") // Validation is always enabled, check things as you deem fit.
-    public boolean validate() { return this.config.validate; }
 
     public static final class DataGeneratorConfig {
         private final Set<String> mods;
@@ -67,13 +65,11 @@ public final class GatherDataEvent implements IModBusEvent {
         private final boolean client;
         private final boolean dev;
         private final boolean reports;
-        @Deprecated(forRemoval = true, since = "1.21.5") // Validation is always enabled, check things as you deem fit.
-        private final boolean validate;
         private final boolean flat;
         private final List<DataGenerator> generators = new ArrayList<>();
 
         public DataGeneratorConfig(final Set<String> mods, final Path path, final Collection<Path> inputs, final CompletableFuture<HolderLookup.Provider> lookupProvider,
-                final boolean server, final boolean client, final boolean dev, final boolean reports, final boolean validate, final boolean flat) {
+                final boolean server, final boolean client, final boolean dev, final boolean reports, final boolean flat) {
             this.mods = mods;
             this.path = path;
             this.inputs = inputs;
@@ -82,7 +78,6 @@ public final class GatherDataEvent implements IModBusEvent {
             this.client = client;
             this.dev = dev;
             this.reports = reports;
-            this.validate = validate;
             this.flat = flat;
 
         }

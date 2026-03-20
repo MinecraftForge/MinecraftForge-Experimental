@@ -15,7 +15,7 @@
              boolean flag1 = flag || optionset.has(optionspec1);
              Bootstrap.bootStrap();
              ClientBootstrap.bootstrap();
-+            if (!loader.run(optionset, path, input, flag, flag1, flag, flag, true))
++            if (!loader.run(optionset, path, input, flag, flag1, flag, flag))
 +                return;
              DataGenerator datagenerator = new DataGenerator.Cached(path, SharedConstants.getCurrentVersion(), true);
              addClientProviders(datagenerator, flag1);

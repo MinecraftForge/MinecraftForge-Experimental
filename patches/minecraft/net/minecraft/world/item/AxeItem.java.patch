@@ -37,7 +37,7 @@
                      .map(b -> b.withPropertiesOf(oldState));
                  if (optional2.isPresent()) {
                      spawnSoundAndParticle(level, pos, player, oldState, SoundEvents.AXE_WAX_OFF, 3004);
-@@ -129,5 +_,21 @@
+@@ -129,5 +_,16 @@
      private Optional<BlockState> getStripped(final BlockState state) {
          return Optional.ofNullable(STRIPPABLES.get(state.getBlock()))
              .map(block -> block.defaultBlockState().setValue(RotatedPillarBlock.AXIS, state.getValue(RotatedPillarBlock.AXIS)));
@@ -52,10 +52,5 @@
 +    public static BlockState getAxeStrippingState(BlockState originalState) {
 +        Block block = STRIPPABLES.get(originalState.getBlock());
 +        return block != null ? block.defaultBlockState().setValue(RotatedPillarBlock.AXIS, originalState.getValue(RotatedPillarBlock.AXIS)) : null;
-+    }
-+
-+    @Override
-+    public boolean canDisableShield(ItemStack stack, ItemStack shield, net.minecraft.world.entity.LivingEntity entity, net.minecraft.world.entity.LivingEntity attacker) {
-+        return true;
      }
  }

@@ -191,7 +191,7 @@ import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.event.level.PistonEvent;
-import net.minecraftforge.event.level.SaplingGrowTreeEvent;
+import net.minecraftforge.event.level.BlockFeatureGrowEvent;
 import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.event.network.ChannelRegistrationChangeEvent;
 import net.minecraftforge.event.network.ConnectionStartEvent;
@@ -644,8 +644,8 @@ public final class ForgeEventFactory {
     }
 
     @SuppressWarnings("removal")
-    public static SaplingGrowTreeEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> holder) {
-        return SaplingGrowTreeEvent.BUS.fire(new SaplingGrowTreeEvent(level, randomSource, pos, holder));
+    public static BlockFeatureGrowEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> holder) {
+        return BlockFeatureGrowEvent.BUS.fire(new BlockFeatureGrowEvent(level, randomSource, pos, holder));
     }
 
     public static BlockState alterGround(LevelSimulatedReader level, RandomSource random, BlockPos pos, BlockState altered) {

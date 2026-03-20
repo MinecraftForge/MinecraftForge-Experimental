@@ -14,7 +14,7 @@
              boolean flag2 = flag || optionset.has(optionspec2);
              boolean flag3 = flag || optionset.has(optionspec3);
              Collection<Path> collection = optionset.valuesOf(optionspec6).stream().map(x$0 -> Paths.get(x$0)).toList();
-+            if (!loader.run(optionset, path, collection, flag1, flag, flag2, flag3, true))
++            if (!loader.run(optionset, path, collection, flag1, flag, flag2, flag3))
 +                return;
              DataGenerator datagenerator = new DataGenerator.Cached(path, SharedConstants.getCurrentVersion(), true);
              addServerDefinitionProviders(datagenerator, flag1, flag3);

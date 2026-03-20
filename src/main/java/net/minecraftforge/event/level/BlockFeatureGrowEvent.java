@@ -30,10 +30,8 @@ import org.jetbrains.annotations.Nullable;
  * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
  * only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.
  */
-// TODO: Rename to BlockFeatureGrowEvent in 1.20
-@Deprecated(forRemoval = true, since = "1.21.1") // Dont remove, rename
-public final class SaplingGrowTreeEvent implements LevelEvent, HasResult {
-    public static final EventBus<SaplingGrowTreeEvent> BUS = EventBus.create(SaplingGrowTreeEvent.class);
+public final class BlockFeatureGrowEvent implements LevelEvent, HasResult {
+    public static final EventBus<BlockFeatureGrowEvent> BUS = EventBus.create(BlockFeatureGrowEvent.class);
 
     private final LevelAccessor level;
     private final RandomSource randomSource;
@@ -42,7 +40,7 @@ public final class SaplingGrowTreeEvent implements LevelEvent, HasResult {
     private Holder<ConfiguredFeature<?, ?>> feature;
     private Result result = Result.DEFAULT;
 
-    public SaplingGrowTreeEvent(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> feature) {
+    public BlockFeatureGrowEvent(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> feature) {
         this.level = level;
         this.randomSource = randomSource;
         this.pos = pos;
