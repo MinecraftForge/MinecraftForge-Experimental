@@ -47,6 +47,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
         tag(Tags.Blocks.CHESTS_WOODEN, Tags.Items.CHESTS_WOODEN)
             .add(Blocks.CHEST, Blocks.TRAPPED_CHEST);
         tag(Tags.Blocks.CHESTS, Tags.Items.CHESTS)
+            .add(Blocks.COPPER_CHEST)
             .addTags(
                 Tags.Blocks.CHESTS_ENDER,
                 Tags.Blocks.CHESTS_TRAPPED,
@@ -469,7 +470,8 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Tags.Blocks.STORAGE_BLOCKS_RAW_IRON,
                 Tags.Blocks.STORAGE_BLOCKS_REDSTONE,
                 Tags.Blocks.STORAGE_BLOCKS_SLIME,
-                Tags.Blocks.STORAGE_BLOCKS_WHEAT
+                Tags.Blocks.STORAGE_BLOCKS_WHEAT,
+                Tags.Blocks.STORAGE_BLOCKS_RESIN
             );
         tag(Tags.Blocks.STORAGE_BLOCKS_AMETHYST, Tags.Items.STORAGE_BLOCKS_AMETHYST)
             .add(Blocks.AMETHYST_BLOCK);

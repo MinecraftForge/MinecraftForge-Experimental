@@ -41,9 +41,10 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
             }
         }).run();
         tag(Tags.Items.BONES).add(Items.BONE);
-        tag(Tags.Items.BRICKS).addTags(Tags.Items.BRICKS_NORMAL, Tags.Items.BRICKS_NETHER);
+        tag(Tags.Items.BRICKS).addTags(Tags.Items.BRICKS_NORMAL, Tags.Items.BRICKS_NETHER, Tags.Items.BRICKS_RESIN);
         tag(Tags.Items.BRICKS_NORMAL).add(Items.BRICK);
         tag(Tags.Items.BRICKS_NETHER).add(Items.NETHER_BRICK);
+        tag(Tags.Items.BRICKS_RESIN).add(Items.RESIN_BRICK);
         tag(Tags.Items.BUCKETS_EMPTY).add(Items.BUCKET);
         tag(Tags.Items.BUCKETS_WATER).add(Items.WATER_BUCKET);
         tag(Tags.Items.BUCKETS_LAVA).add(Items.LAVA_BUCKET);
@@ -51,6 +52,10 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.BUCKETS_POWDER_SNOW).add(Items.POWDER_SNOW_BUCKET);
         tag(Tags.Items.BUCKETS_ENTITY_WATER).add(Items.AXOLOTL_BUCKET, Items.COD_BUCKET, Items.PUFFERFISH_BUCKET, Items.TADPOLE_BUCKET, Items.TROPICAL_FISH_BUCKET, Items.SALMON_BUCKET);
         tag(Tags.Items.BUCKETS).addTags(Tags.Items.BUCKETS_EMPTY, Tags.Items.BUCKETS_WATER, Tags.Items.BUCKETS_LAVA, Tags.Items.BUCKETS_MILK, Tags.Items.BUCKETS_POWDER_SNOW, Tags.Items.BUCKETS_ENTITY_WATER);
+        tag(Tags.Items.CLUMPS)
+                .addTag(Tags.Items.CLUMPS_RESIN);
+        tag(Tags.Items.CLUMPS_RESIN)
+                .add(Items.RESIN_CLUMP);
         tag(Tags.Items.CONCRETE_POWDERS)
                 .add(Items.WHITE_CONCRETE_POWDER, Items.ORANGE_CONCRETE_POWDER, Items.MAGENTA_CONCRETE_POWDER,
                         Items.LIGHT_BLUE_CONCRETE_POWDER, Items.YELLOW_CONCRETE_POWDER, Items.LIME_CONCRETE_POWDER,
@@ -79,6 +84,21 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.CROPS_SUGAR_CANE).add(Items.SUGAR_CANE);
         tag(Tags.Items.CROPS_WHEAT)
                 .add(Items.WHEAT);
+        tag(Tags.Items.DRINKS)
+                .addTags(Tags.Items.DRINKS_HONEY, Tags.Items.DRINKS_JUICE, Tags.Items.DRINKS_MAGIC, Tags.Items.DRINKS_MILK,
+                        Tags.Items.DRINKS_OMINOUS, Tags.Items.DRINKS_WATER, Tags.Items.DRINKS_WATERY);
+        tag(Tags.Items.DRINKS_HONEY)
+                .add(Items.HONEY_BOTTLE);
+        tag(Tags.Items.DRINKS_JUICE);
+        tag(Tags.Items.DRINKS_MAGIC)
+                .add(Items.OMINOUS_BOTTLE, Items.POTION);
+        tag(Tags.Items.DRINKS_MILK)
+                .add(Items.MILK_BUCKET);
+        tag(Tags.Items.DRINKS_OMINOUS)
+                .add(Items.OMINOUS_BOTTLE);
+        tag(Tags.Items.DRINKS_WATER);
+        tag(Tags.Items.DRINKS_WATERY)
+                .add(Items.POTION);
         addColored(Tags.Items.DYED, "{color}_banner");
         addColored(Tags.Items.DYED, "{color}_bed");
         addColored(Tags.Items.DYED, "{color}_candle");
@@ -147,7 +167,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 .add(Items.PRISMARINE_CRYSTALS);
         tag(Tags.Items.GEMS_QUARTZ)
                 .add(Items.QUARTZ);
-        tag(Tags.Items.GUNPOWDER).add(Items.GUNPOWDER);
+        tag(Tags.Items.GUNPOWDERS).add(Items.GUNPOWDER);
         tag(Tags.Items.HIDDEN_FROM_RECIPE_VIEWERS);
         tag(Tags.Items.INGOTS)
                 .addTags(Tags.Items.INGOTS_COPPER, Tags.Items.INGOTS_GOLD, Tags.Items.INGOTS_IRON, Tags.Items.INGOTS_NETHERITE);
@@ -167,7 +187,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 Items.MUSIC_DISC_FAR, Items.MUSIC_DISC_MALL, Items.MUSIC_DISC_MELLOHI, Items.MUSIC_DISC_STAL, Items.MUSIC_DISC_STRAD,
                 Items.MUSIC_DISC_WARD, Items.MUSIC_DISC_11, Items.MUSIC_DISC_WAIT, Items.MUSIC_DISC_OTHERSIDE, Items.MUSIC_DISC_5,
                 Items.MUSIC_DISC_PIGSTEP, Items.MUSIC_DISC_RELIC, Items.MUSIC_DISC_CREATOR, Items.MUSIC_DISC_CREATOR_MUSIC_BOX,
-                Items.MUSIC_DISC_PRECIPICE);
+                Items.MUSIC_DISC_PRECIPICE, Items.MUSIC_DISC_LAVA_CHICKEN, Items.MUSIC_DISC_TEARS);
         tag(Tags.Items.NETHER_STARS)
                 .add(Items.NETHER_STAR);
         tag(Tags.Items.NUGGETS)
@@ -178,6 +198,8 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 .add(Items.IRON_NUGGET);
         tag(Tags.Items.NUGGETS_GOLD)
                 .add(Items.GOLD_NUGGET);
+        tag(Tags.Items.POTIONS_BOTTLE).add(Items.POTION, Items.SPLASH_POTION, Items.LINGERING_POTION);
+        tag(Tags.Items.POTIONS).addTags(Tags.Items.POTIONS_BOTTLE);
         tag(Tags.Items.RAW_MATERIALS)
                 .addTags(Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.RAW_MATERIALS_IRON);
         tag(Tags.Items.RAW_MATERIALS_COPPER)
@@ -229,18 +251,38 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.TOOLS_SPEAR).add(Items.TRIDENT);
         tag(Tags.Items.TOOLS_MACE).add(Items.MACE);
         tag(Tags.Items.TOOLS_IGNITER).add(Items.FLINT_AND_STEEL);
-        tag(Tags.Items.MINING_TOOL_TOOLS).add(Items.WOODEN_PICKAXE, Items.STONE_PICKAXE, Items.IRON_PICKAXE, Items.GOLDEN_PICKAXE, Items.DIAMOND_PICKAXE, Items.NETHERITE_PICKAXE);
+        tag(Tags.Items.MINING_TOOL_TOOLS).add(Items.WOODEN_PICKAXE, Items.STONE_PICKAXE, Items.COPPER_PICKAXE, Items.IRON_PICKAXE, Items.GOLDEN_PICKAXE, Items.DIAMOND_PICKAXE, Items.NETHERITE_PICKAXE);
         tag(Tags.Items.MELEE_WEAPON_TOOLS).add(
                 Items.MACE, Items.TRIDENT,
-                Items.WOODEN_SWORD, Items.STONE_SWORD, Items.GOLDEN_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD,
-                Items.WOODEN_AXE, Items.STONE_AXE, Items.GOLDEN_AXE, Items.IRON_AXE, Items.DIAMOND_AXE, Items.NETHERITE_AXE
+                Items.WOODEN_SWORD, Items.STONE_SWORD, Items.COPPER_SWORD, Items.GOLDEN_SWORD, Items.IRON_SWORD, Items.DIAMOND_SWORD, Items.NETHERITE_SWORD,
+                Items.WOODEN_AXE, Items.STONE_AXE, Items.COPPER_AXE, Items.GOLDEN_AXE, Items.IRON_AXE, Items.DIAMOND_AXE, Items.NETHERITE_AXE
         );
         tag(Tags.Items.RANGED_WEAPON_TOOLS).add(Items.BOW, Items.CROSSBOW, Items.TRIDENT);
+        tag(Tags.Items.TOOLS_WRENCH);
         tag(Tags.Items.TOOLS)
                 .addTags(ItemTags.AXES, ItemTags.HOES, ItemTags.PICKAXES, ItemTags.SHOVELS, ItemTags.SWORDS)
-                .addTags(Tags.Items.TOOLS_BOW, Tags.Items.TOOLS_BRUSH, Tags.Items.TOOLS_CROSSBOW, Tags.Items.TOOLS_FISHING_ROD, Tags.Items.TOOLS_SHEAR, Tags.Items.TOOLS_IGNITER, Tags.Items.TOOLS_SHIELD, Tags.Items.TOOLS_SPEAR, Tags.Items.TOOLS_MACE, Tags.Items.MINING_TOOL_TOOLS, Tags.Items.MELEE_WEAPON_TOOLS, Tags.Items.RANGED_WEAPON_TOOLS);
+                .addTags(Tags.Items.TOOLS_BOW, Tags.Items.TOOLS_BRUSH, Tags.Items.TOOLS_CROSSBOW, Tags.Items.TOOLS_FISHING_ROD, Tags.Items.TOOLS_SHEAR, Tags.Items.TOOLS_IGNITER, Tags.Items.TOOLS_SHIELD, Tags.Items.TOOLS_SPEAR, Tags.Items.TOOLS_MACE, Tags.Items.MINING_TOOL_TOOLS, Tags.Items.MELEE_WEAPON_TOOLS, Tags.Items.RANGED_WEAPON_TOOLS, Tags.Items.TOOLS_WRENCH);
+        tag(Tags.Items.ARMORS_HORSE)
+                .add(
+                        Items.COPPER_HORSE_ARMOR,
+                        Items.DIAMOND_HORSE_ARMOR,
+                        Items.GOLDEN_HORSE_ARMOR,
+                        Items.IRON_HORSE_ARMOR,
+                        Items.LEATHER_HORSE_ARMOR,
+                        Items.NETHERITE_HORSE_ARMOR
+                );
+        tag(Tags.Items.ARMORS_NAUTILUS)
+                .add(
+                        Items.COPPER_NAUTILUS_ARMOR,
+                        Items.DIAMOND_NAUTILUS_ARMOR,
+                        Items.GOLDEN_NAUTILUS_ARMOR,
+                        Items.IRON_NAUTILUS_ARMOR,
+                        Items.NETHERITE_NAUTILUS_ARMOR
+                );
+        tag(Tags.Items.ARMORS_WOLF);
         tag(Tags.Items.ARMORS)
-                .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR);
+                .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR,
+                        Tags.Items.ARMORS_HORSE, Tags.Items.ARMORS_NAUTILUS, Tags.Items.ARMORS_WOLF);
         tag(Tags.Items.ENCHANTABLES)
             .addTags(
                 ItemTags.ARMOR_ENCHANTABLE,
@@ -258,11 +300,16 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 ItemTags.DURABILITY_ENCHANTABLE,
                 ItemTags.VANISHING_ENCHANTABLE
             );
-        tag(Tags.Items.SEEDS).addTags(Tags.Items.SEEDS_BEETROOT, Tags.Items.SEEDS_MELON, Tags.Items.SEEDS_PUMPKIN, Tags.Items.SEEDS_WHEAT);
+        tag(Tags.Items.SEEDS)
+                .addTags(
+                        Tags.Items.SEEDS_BEETROOT, Tags.Items.SEEDS_MELON, Tags.Items.SEEDS_PUMPKIN,
+                        Tags.Items.SEEDS_WHEAT, Tags.Items.SEEDS_PITCHER_PLANT, Tags.Items.SEEDS_TORCHFLOWER);
         tag(Tags.Items.SEEDS_BEETROOT).add(Items.BEETROOT_SEEDS);
         tag(Tags.Items.SEEDS_MELON).add(Items.MELON_SEEDS);
         tag(Tags.Items.SEEDS_PUMPKIN).add(Items.PUMPKIN_SEEDS);
         tag(Tags.Items.SEEDS_WHEAT).add(Items.WHEAT_SEEDS);
+        tag(Tags.Items.SEEDS_PITCHER_PLANT).add(Items.PITCHER_POD);
+        tag(Tags.Items.SEEDS_TORCHFLOWER).add(Items.TORCHFLOWER);
 
         tag(Tags.Items.BONES).add(Items.BONE);
         // Backwards compat definitions for pre-1.21 legacy `forge:` tags.

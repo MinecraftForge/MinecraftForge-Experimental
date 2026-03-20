@@ -559,7 +559,7 @@ public class Tags {
         public static final TagKey<Item> GLAZED_TERRACOTTAS = cTag("glazed_terracottas");
 
         public static final TagKey<Item> GRAVELS = cTag("gravels");
-        public static final TagKey<Item> GUNPOWDER = cTag("gunpowder");
+        public static final TagKey<Item> GUNPOWDERS = cTag("gunpowders");
 
         /**
          * Tag that holds all items that recipe viewers should not show to users.
