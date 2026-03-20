@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "#": "#c:cobblestone/normal",
+    "#": "#c:cobblestones/normal",
     "R": "minecraft:redstone"
   },
   "pattern": [

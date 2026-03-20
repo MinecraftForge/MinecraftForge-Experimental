@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "#": "#c:gems/diamond",
-    "C": "#c:cobblestone/normal",
+    "C": "#c:cobblestones/normal",
     "S": "minecraft:sentry_armor_trim_smithing_template"
   },
   "pattern": [

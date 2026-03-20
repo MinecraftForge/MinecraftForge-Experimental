@@ -12,7 +12,6 @@ import net.minecraft.data.tags.BlockItemTagsProvider;
 import net.minecraft.data.tags.TagAppender;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -55,20 +54,20 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             );
         tag(Tags.Blocks.CLUSTERS, Tags.Items.CLUSTERS)
             .add(Blocks.AMETHYST_CLUSTER);
-        tag(Tags.Blocks.COBBLESTONE_NORMAL, Tags.Items.COBBLESTONE_NORMAL)
+        tag(Tags.Blocks.COBBLESTONES_NORMAL, Tags.Items.COBBLESTONES_NORMAL)
             .add(Blocks.COBBLESTONE);
-        tag(Tags.Blocks.COBBLESTONE_INFESTED, Tags.Items.COBBLESTONE_INFESTED)
+        tag(Tags.Blocks.COBBLESTONES_INFESTED, Tags.Items.COBBLESTONES_INFESTED)
             .add(Blocks.INFESTED_COBBLESTONE);
-        tag(Tags.Blocks.COBBLESTONE_MOSSY, Tags.Items.COBBLESTONE_MOSSY)
+        tag(Tags.Blocks.COBBLESTONES_MOSSY, Tags.Items.COBBLESTONES_MOSSY)
             .add(Blocks.MOSSY_COBBLESTONE);
-        tag(Tags.Blocks.COBBLESTONE_DEEPSLATE, Tags.Items.COBBLESTONE_DEEPSLATE)
+        tag(Tags.Blocks.COBBLESTONES_DEEPSLATE, Tags.Items.COBBLESTONES_DEEPSLATE)
             .add(Blocks.COBBLED_DEEPSLATE);
         tag(Tags.Blocks.COBBLESTONES, Tags.Items.COBBLESTONES)
             .addTags(
-                Tags.Blocks.COBBLESTONE_NORMAL,
-                Tags.Blocks.COBBLESTONE_INFESTED,
-                Tags.Blocks.COBBLESTONE_MOSSY,
-                Tags.Blocks.COBBLESTONE_DEEPSLATE
+                Tags.Blocks.COBBLESTONES_NORMAL,
+                Tags.Blocks.COBBLESTONES_INFESTED,
+                Tags.Blocks.COBBLESTONES_MOSSY,
+                Tags.Blocks.COBBLESTONES_DEEPSLATE
             );
         tag(Tags.Blocks.CONCRETES, Tags.Items.CONCRETES)
             .add(

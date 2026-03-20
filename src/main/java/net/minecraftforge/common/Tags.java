@@ -78,10 +78,10 @@ public class Tags {
          */
         public static final TagKey<Block> CLUSTERS = cTag("clusters");
         public static final TagKey<Block> COBBLESTONES = cTag("cobblestones");
-        public static final TagKey<Block> COBBLESTONE_DEEPSLATE = cTag("cobblestone/deepslate");
-        public static final TagKey<Block> COBBLESTONE_INFESTED = cTag("cobblestone/infested");
-        public static final TagKey<Block> COBBLESTONE_MOSSY = cTag("cobblestone/mossy");
-        public static final TagKey<Block> COBBLESTONE_NORMAL = cTag("cobblestone/normal");
+        public static final TagKey<Block> COBBLESTONES_DEEPSLATE = cTag("cobblestones/deepslate");
+        public static final TagKey<Block> COBBLESTONES_INFESTED = cTag("cobblestones/infested");
+        public static final TagKey<Block> COBBLESTONES_MOSSY = cTag("cobblestones/mossy");
+        public static final TagKey<Block> COBBLESTONES_NORMAL = cTag("cobblestones/normal");
         public static final TagKey<Block> CONCRETES = cTag("concretes");
 
         /**
@@ -374,10 +374,10 @@ public class Tags {
         public static final TagKey<Item> CHESTS_ENDER = cTag("chests/ender");
         public static final TagKey<Item> CHESTS_TRAPPED = cTag("chests/trapped");
         public static final TagKey<Item> COBBLESTONES = cTag("cobblestones");
-        public static final TagKey<Item> COBBLESTONE_NORMAL = cTag("cobblestone/normal");
-        public static final TagKey<Item> COBBLESTONE_INFESTED = cTag("cobblestone/infested");
-        public static final TagKey<Item> COBBLESTONE_MOSSY = cTag("cobblestone/mossy");
-        public static final TagKey<Item> COBBLESTONE_DEEPSLATE = cTag("cobblestone/deepslate");
+        public static final TagKey<Item> COBBLESTONES_NORMAL = cTag("cobblestones/normal");
+        public static final TagKey<Item> COBBLESTONES_INFESTED = cTag("cobblestones/infested");
+        public static final TagKey<Item> COBBLESTONES_MOSSY = cTag("cobblestones/mossy");
+        public static final TagKey<Item> COBBLESTONES_DEEPSLATE = cTag("cobblestones/deepslate");
         public static final TagKey<Item> CONCRETES = cTag("concretes");
         /**
          * Block tag equivalent is {@link BlockTags#CONCRETE_POWDER}

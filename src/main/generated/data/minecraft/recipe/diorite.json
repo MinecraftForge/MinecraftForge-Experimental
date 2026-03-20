@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "building",
   "key": {
-    "C": "#c:cobblestone/normal",
+    "C": "#c:cobblestones/normal",
     "Q": "minecraft:quartz"
   },
   "pattern": [
