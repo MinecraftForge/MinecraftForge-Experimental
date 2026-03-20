@@ -63,27 +63,22 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 Tags.Items.CROPS_COCOA_BEAN, Tags.Items.CROPS_MELON, Tags.Items.CROPS_NETHER_WART,
                 Tags.Items.CROPS_POTATO, Tags.Items.CROPS_PUMPKIN, Tags.Items.CROPS_SUGAR_CANE,
                 Tags.Items.CROPS_WHEAT
-        ).addOptionalTag(forgeItemTagKey("crops"));
+        );
         tag(Tags.Items.CROPS_BEETROOT)
-                .add(Items.BEETROOT)
-                .addOptionalTag(forgeItemTagKey("crops/beetroot"));
+                .add(Items.BEETROOT);
         tag(Tags.Items.CROPS_CACTUS).add(Items.CACTUS);
         tag(Tags.Items.CROPS_CARROT)
-                .add(Items.CARROT)
-                .addOptionalTag(forgeItemTagKey("crops/carrot"));
+                .add(Items.CARROT);
         tag(Tags.Items.CROPS_COCOA_BEAN).add(Items.COCOA_BEANS);
         tag(Tags.Items.CROPS_MELON).add(Items.MELON);
         tag(Tags.Items.CROPS_NETHER_WART)
-                .add(Items.NETHER_WART)
-                .addOptionalTag(forgeItemTagKey("crops/nether_wart"));
+                .add(Items.NETHER_WART);
         tag(Tags.Items.CROPS_POTATO)
-                .add(Items.POTATO)
-                .addOptionalTag(forgeItemTagKey("crops/potato"));
+                .add(Items.POTATO);
         tag(Tags.Items.CROPS_PUMPKIN).add(Items.PUMPKIN);
         tag(Tags.Items.CROPS_SUGAR_CANE).add(Items.SUGAR_CANE);
         tag(Tags.Items.CROPS_WHEAT)
-                .add(Items.WHEAT)
-                .addOptionalTag(forgeItemTagKey("crops/wheat"));
+                .add(Items.WHEAT);
         addColored(Tags.Items.DYED, "{color}_banner");
         addColored(Tags.Items.DYED, "{color}_bed");
         addColored(Tags.Items.DYED, "{color}_candle");
@@ -99,21 +94,17 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         addColoredTags(tag(Tags.Items.DYED)::addTags, Tags.Items.DYED);
         tag(Tags.Items.DUSTS).addTags(Tags.Items.DUSTS_GLOWSTONE, Tags.Items.DUSTS_REDSTONE);
         tag(Tags.Items.DUSTS_GLOWSTONE)
-                .add(Items.GLOWSTONE_DUST)
-                .addOptionalTag(forgeItemTagKey("dusts/glowstone"));
+                .add(Items.GLOWSTONE_DUST);
         tag(Tags.Items.DUSTS_REDSTONE)
-                .add(Items.REDSTONE)
-                .addOptionalTag(forgeItemTagKey("dusts/redstone"));
+                .add(Items.REDSTONE);
         addColored(Tags.Items.DYES, "{color}_dye");
         addColoredTags(tag(Tags.Items.DYES)::addTags, Tags.Items.DYES);
-        tag(Tags.Items.EGGS).add(Items.EGG); // forge:eggs
+        tag(Tags.Items.EGGS).add(Items.EGG, Items.BLUE_EGG, Items.BROWN_EGG);
         tag(Tags.Items.ENCHANTING_FUELS).addTag(Tags.Items.GEMS_LAPIS); // forge:enchanting_fuels
         tag(Tags.Items.ENDER_PEARLS)
-                .add(Items.ENDER_PEARL)
-                .addOptionalTag(forgeItemTagKey("ender_pearls"));
+                .add(Items.ENDER_PEARL);
         tag(Tags.Items.FEATHERS)
-                .add(Items.FEATHER)
-                .addOptionalTag(forgeItemTagKey("feathers"));
+                .add(Items.FEATHER);
         tag(Tags.Items.FERTILIZERS).add(Items.BONE_MEAL);
         tag(Tags.Items.FOODS_FRUIT).add(Items.APPLE, Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE, Items.CHORUS_FRUIT, Items.MELON_SLICE);
         tag(Tags.Items.FOODS_VEGETABLE).add(Items.CARROT, Items.GOLDEN_CARROT, Items.POTATO, Items.BEETROOT);
@@ -126,7 +117,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
         tag(Tags.Items.FOODS_COOKED_FISH).add(Items.COOKED_COD, Items.COOKED_SALMON);
         tag(Tags.Items.FOODS_SOUP).add(Items.BEETROOT_SOUP, Items.MUSHROOM_STEW, Items.RABBIT_STEW, Items.SUSPICIOUS_STEW);
         tag(Tags.Items.FOODS_CANDY);
-        tag(Tags.Items.FOODS_PIE).add(Items.PUMPKIN_PIE).addOptionalTag(forgeItemTagKey("foods/pie"));
+        tag(Tags.Items.FOODS_PIE).add(Items.PUMPKIN_PIE);
         tag(Tags.Items.FOODS_EDIBLE_WHEN_PLACED).add(Items.CAKE);
         tag(Tags.Items.FOODS_FOOD_POISONING).add(Items.POISONOUS_POTATO, Items.PUFFERFISH, Items.SPIDER_EYE, Items.CHICKEN, Items.ROTTEN_FLESH);
         tag(Tags.Items.FOODS_GOLDEN).add(Items.GOLDEN_APPLE, Items.ENCHANTED_GOLDEN_APPLE, Items.GOLDEN_CARROT);
@@ -143,98 +134,72 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                         ItemTags.PANDA_FOOD, ItemTags.PARROT_FOOD, ItemTags.PIG_FOOD, ItemTags.PIGLIN_FOOD, ItemTags.RABBIT_FOOD,
                         ItemTags.SHEEP_FOOD, ItemTags.SNIFFER_FOOD, ItemTags.STRIDER_FOOD, ItemTags.TURTLE_FOOD, ItemTags.WOLF_FOOD);
         tag(Tags.Items.GEMS)
-                .addTags(Tags.Items.GEMS_AMETHYST, Tags.Items.GEMS_DIAMOND, Tags.Items.GEMS_EMERALD, Tags.Items.GEMS_LAPIS, Tags.Items.GEMS_PRISMARINE, Tags.Items.GEMS_QUARTZ)
-                .addOptionalTag(forgeItemTagKey("gems"));
+                .addTags(Tags.Items.GEMS_AMETHYST, Tags.Items.GEMS_DIAMOND, Tags.Items.GEMS_EMERALD, Tags.Items.GEMS_LAPIS, Tags.Items.GEMS_PRISMARINE, Tags.Items.GEMS_QUARTZ);
         tag(Tags.Items.GEMS_AMETHYST)
-                .add(Items.AMETHYST_SHARD)
-                .addOptionalTag(forgeItemTagKey("gems/amethyst"));
+                .add(Items.AMETHYST_SHARD);
         tag(Tags.Items.GEMS_DIAMOND)
-                .add(Items.DIAMOND)
-                .addOptionalTag(forgeItemTagKey("gems/diamond"));
+                .add(Items.DIAMOND);
         tag(Tags.Items.GEMS_EMERALD)
-                .add(Items.EMERALD)
-                .addOptionalTag(forgeItemTagKey("gems/emerald"));
+                .add(Items.EMERALD);
         tag(Tags.Items.GEMS_LAPIS)
-                .add(Items.LAPIS_LAZULI)
-                .addOptionalTag(forgeItemTagKey("gems/lapis"));
+                .add(Items.LAPIS_LAZULI);
         tag(Tags.Items.GEMS_PRISMARINE)
-                .add(Items.PRISMARINE_CRYSTALS)
-                .addOptionalTag(forgeItemTagKey("gems/prismarine"));
+                .add(Items.PRISMARINE_CRYSTALS);
         tag(Tags.Items.GEMS_QUARTZ)
-                .add(Items.QUARTZ)
-                .addOptionalTag(forgeItemTagKey("gems/quartz"));
-        tag(Tags.Items.GUNPOWDER).add(Items.GUNPOWDER); // forge:gunpowder
+                .add(Items.QUARTZ);
+        tag(Tags.Items.GUNPOWDER).add(Items.GUNPOWDER);
         tag(Tags.Items.HIDDEN_FROM_RECIPE_VIEWERS);
         tag(Tags.Items.INGOTS)
                 .addTags(Tags.Items.INGOTS_COPPER, Tags.Items.INGOTS_GOLD, Tags.Items.INGOTS_IRON, Tags.Items.INGOTS_NETHERITE);
-                //.addOptionalTag(forgeItemTagKey("ingots")); // can't add because it would contain the contents of forge:ingots/brick and forge:ingots/nether_brick which are not in the c namespace
         tag(Tags.Items.INGOTS_COPPER)
-                .add(Items.COPPER_INGOT)
-                .addOptionalTag(forgeItemTagKey("ingots/copper"));
+                .add(Items.COPPER_INGOT);
         tag(Tags.Items.INGOTS_GOLD)
-                .add(Items.GOLD_INGOT)
-                .addOptionalTag(forgeItemTagKey("ingots/gold"));
+                .add(Items.GOLD_INGOT);
         tag(Tags.Items.INGOTS_IRON)
-                .add(Items.IRON_INGOT)
-                .addOptionalTag(forgeItemTagKey("ingots/iron"));
+                .add(Items.IRON_INGOT);
         tag(Tags.Items.INGOTS_NETHERITE)
-                .add(Items.NETHERITE_INGOT)
-                .addOptionalTag(forgeItemTagKey("ingots/netherite"));
+                .add(Items.NETHERITE_INGOT);
         tag(Tags.Items.LEATHERS)
-                .add(Items.LEATHER)
-                .addOptionalTag(forgeItemTagKey("leather"));
+                .add(Items.LEATHER);
         tag(Tags.Items.MUSHROOMS)
-                .add(Items.BROWN_MUSHROOM, Items.RED_MUSHROOM)
-                .addOptionalTag(forgeItemTagKey("mushrooms"));
+                .add(Items.BROWN_MUSHROOM, Items.RED_MUSHROOM);
         tag(Tags.Items.MUSIC_DISCS).add(Items.MUSIC_DISC_13, Items.MUSIC_DISC_CAT, Items.MUSIC_DISC_BLOCKS, Items.MUSIC_DISC_CHIRP,
                 Items.MUSIC_DISC_FAR, Items.MUSIC_DISC_MALL, Items.MUSIC_DISC_MELLOHI, Items.MUSIC_DISC_STAL, Items.MUSIC_DISC_STRAD,
                 Items.MUSIC_DISC_WARD, Items.MUSIC_DISC_11, Items.MUSIC_DISC_WAIT, Items.MUSIC_DISC_OTHERSIDE, Items.MUSIC_DISC_5,
                 Items.MUSIC_DISC_PIGSTEP, Items.MUSIC_DISC_RELIC, Items.MUSIC_DISC_CREATOR, Items.MUSIC_DISC_CREATOR_MUSIC_BOX,
                 Items.MUSIC_DISC_PRECIPICE);
         tag(Tags.Items.NETHER_STARS)
-                .add(Items.NETHER_STAR)
-                .addOptionalTag(forgeItemTagKey("nether_stars"));
+                .add(Items.NETHER_STAR);
         tag(Tags.Items.NUGGETS)
-                .addTags(Tags.Items.NUGGETS_GOLD, Tags.Items.NUGGETS_IRON, Tags.Items.NUGGETS_COPPER)
-                .addOptionalTag(forgeItemTagKey("nuggets"));
+                .addTags(Tags.Items.NUGGETS_GOLD, Tags.Items.NUGGETS_IRON, Tags.Items.NUGGETS_COPPER);
         tag(Tags.Items.NUGGETS_COPPER)
                 .add(Items.COPPER_NUGGET);
         tag(Tags.Items.NUGGETS_IRON)
-                .add(Items.IRON_NUGGET)
-                .addOptionalTag(forgeItemTagKey("nuggets/iron"));
+                .add(Items.IRON_NUGGET);
         tag(Tags.Items.NUGGETS_GOLD)
-                .add(Items.GOLD_NUGGET)
-                .addOptionalTag(forgeItemTagKey("nuggets/gold"));
+                .add(Items.GOLD_NUGGET);
         tag(Tags.Items.RAW_MATERIALS)
-                .addTags(Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.RAW_MATERIALS_IRON)
-                .addOptionalTag(forgeItemTagKey("raw_materials"));
+                .addTags(Tags.Items.RAW_MATERIALS_COPPER, Tags.Items.RAW_MATERIALS_GOLD, Tags.Items.RAW_MATERIALS_IRON);
         tag(Tags.Items.RAW_MATERIALS_COPPER)
-                .add(Items.RAW_COPPER)
-                .addOptionalTag(forgeItemTagKey("raw_materials/copper"));
+                .add(Items.RAW_COPPER);
         tag(Tags.Items.RAW_MATERIALS_GOLD)
-                .add(Items.RAW_GOLD)
-                .addOptionalTag(forgeItemTagKey("raw_materials/gold"));
+                .add(Items.RAW_GOLD);
         tag(Tags.Items.RAW_MATERIALS_IRON)
-                .add(Items.RAW_IRON)
-                .addOptionalTag(forgeItemTagKey("raw_materials/iron"));
+                .add(Items.RAW_IRON);
         tag(Tags.Items.RODS)
-                .addTags(Tags.Items.RODS_WOODEN, Tags.Items.RODS_BLAZE, Tags.Items.RODS_BREEZE)
-                .addOptionalTag(forgeItemTagKey("rods"));
+                .addTags(Tags.Items.RODS_WOODEN, Tags.Items.RODS_BLAZE, Tags.Items.RODS_BREEZE);
         tag(Tags.Items.RODS_BLAZE)
-                .add(Items.BLAZE_ROD)
-                .addOptionalTag(forgeItemTagKey("rods/blaze"));
+                .add(Items.BLAZE_ROD);
         tag(Tags.Items.RODS_BREEZE).add(Items.BREEZE_ROD);
         tag(Tags.Items.RODS_WOODEN)
-                .add(Items.STICK)
-                .addOptionalTag(forgeItemTagKey("rods/wooden"));
+                .add(Items.STICK);
         tag(Tags.Items.SEEDS).addTags(Tags.Items.SEEDS_BEETROOT, Tags.Items.SEEDS_MELON, Tags.Items.SEEDS_PUMPKIN, Tags.Items.SEEDS_WHEAT);
         tag(Tags.Items.SEEDS_BEETROOT).add(Items.BEETROOT_SEEDS);
         tag(Tags.Items.SEEDS_MELON).add(Items.MELON_SEEDS);
         tag(Tags.Items.SEEDS_PUMPKIN).add(Items.PUMPKIN_SEEDS);
         tag(Tags.Items.SEEDS_WHEAT).add(Items.WHEAT_SEEDS);
         tag(Tags.Items.SLIME_BALLS)
-                .add(Items.SLIME_BALL)
-                .addOptionalTag(forgeItemTagKey("slimeballs"));
+                .add(Items.SLIME_BALL);
         tag(Tags.Items.SHULKER_BOXES)
                 .add(Items.SHULKER_BOX, Items.WHITE_SHULKER_BOX, Items.ORANGE_SHULKER_BOX,
                         Items.MAGENTA_SHULKER_BOX, Items.LIGHT_BLUE_SHULKER_BOX, Items.YELLOW_SHULKER_BOX,
@@ -243,8 +208,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                         Items.BLUE_SHULKER_BOX, Items.BROWN_SHULKER_BOX, Items.GREEN_SHULKER_BOX,
                         Items.RED_SHULKER_BOX, Items.BLACK_SHULKER_BOX);
         tag(Tags.Items.STRINGS)
-                .add(Items.STRING)
-                .addOptionalTag(forgeItemTagKey("strings"));
+                .add(Items.STRING);
         tag(Tags.Items.VILLAGER_JOB_SITES).add(
                 Items.BARREL, Items.BLAST_FURNACE, Items.BREWING_STAND, Items.CARTOGRAPHY_TABLE,
                 Items.CAULDRON, Items.COMPOSTER, Items.FLETCHING_TABLE, Items.GRINDSTONE,
@@ -252,21 +216,16 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
 
         // Tools and Armors
         tag(Tags.Items.TOOLS_SHIELD)
-                .add(Items.SHIELD)
-                .addOptionalTag(forgeItemTagKey("tools/shields"));
+                .add(Items.SHIELD);
         tag(Tags.Items.TOOLS_BOW)
-                .add(Items.BOW)
-                .addOptionalTag(forgeItemTagKey("tools/bows"));
+                .add(Items.BOW);
         tag(Tags.Items.TOOLS_BRUSH).add(Items.BRUSH);
         tag(Tags.Items.TOOLS_CROSSBOW)
-                .add(Items.CROSSBOW)
-                .addOptionalTag(forgeItemTagKey("tools/crossbows"));
+                .add(Items.CROSSBOW);
         tag(Tags.Items.TOOLS_FISHING_ROD)
-                .add(Items.FISHING_ROD)
-                .addOptionalTag(forgeItemTagKey("tools/fishing_rods"));
+                .add(Items.FISHING_ROD);
         tag(Tags.Items.TOOLS_SHEAR)
-                .add(Items.SHEARS)
-                .addOptionalTag(forgeItemTagKey("tools/shears"));
+                .add(Items.SHEARS);
         tag(Tags.Items.TOOLS_SPEAR).add(Items.TRIDENT);
         tag(Tags.Items.TOOLS_MACE).add(Items.MACE);
         tag(Tags.Items.TOOLS_IGNITER).add(Items.FLINT_AND_STEEL);
@@ -281,8 +240,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
                 .addTags(ItemTags.AXES, ItemTags.HOES, ItemTags.PICKAXES, ItemTags.SHOVELS, ItemTags.SWORDS)
                 .addTags(Tags.Items.TOOLS_BOW, Tags.Items.TOOLS_BRUSH, Tags.Items.TOOLS_CROSSBOW, Tags.Items.TOOLS_FISHING_ROD, Tags.Items.TOOLS_SHEAR, Tags.Items.TOOLS_IGNITER, Tags.Items.TOOLS_SHIELD, Tags.Items.TOOLS_SPEAR, Tags.Items.TOOLS_MACE, Tags.Items.MINING_TOOL_TOOLS, Tags.Items.MELEE_WEAPON_TOOLS, Tags.Items.RANGED_WEAPON_TOOLS);
         tag(Tags.Items.ARMORS)
-                .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR)
-                .addOptionalTag(forgeItemTagKey("armors"));
+                .addTags(ItemTags.HEAD_ARMOR, ItemTags.CHEST_ARMOR, ItemTags.LEG_ARMOR, ItemTags.FOOT_ARMOR);
         tag(Tags.Items.ENCHANTABLES)
             .addTags(
                 ItemTags.ARMOR_ENCHANTABLE,
@@ -315,7 +273,7 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
     private void addColored(TagKey<Item> group, String pattern) {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (DyeColor color : DyeColor.values()) {
-            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
+            Identifier key = Identifier.withDefaultNamespace(pattern.replace("{color}", color.getName()));
             TagKey<Item> tag = getForgeItemTag(prefix + color.getName());
             Item item = BuiltInRegistries.ITEM.getValue(key);
             if (item == null || item == Items.AIR)
@@ -327,11 +285,11 @@ public final class ForgeItemTagsProvider extends VanillaItemTagsProvider {
     private void addColored(Consumer<TagKey<Item>> consumer, TagKey<Item> group, String pattern) {
         String prefix = group.location().getPath() + '/';
         for (DyeColor color  : DyeColor.values()) {
-            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
+            Identifier key = Identifier.withDefaultNamespace(pattern.replace("{color}",  color.getName()));
             TagKey<Item> tag = forgeItemTagKey(prefix + color.getName());
             Item item = ForgeRegistries.ITEMS.getValue(key);
             if (item == null || item  == Items.AIR)
-                throw new IllegalStateException("Unknown vanilla item: " + key.toString());
+                throw new IllegalStateException("Unknown vanilla item: " + key);
             tag(tag).add(item);
             consumer.accept(tag);
         }
