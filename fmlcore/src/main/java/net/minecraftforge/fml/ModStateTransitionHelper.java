@@ -80,19 +80,12 @@ final class ModStateTransitionHelper {
     }
 
     private static <T extends IModBusEvent> void addCompletableFutureTaskForModDispatch(
-        final IModStateTransition transition,
         final Executor executor,
         final List<CompletableFuture<Void>> completableFutures,
         final ProgressMeter progressBar,
         final EventGenerator<T> eventGenerator,
         final BiFunction<ModLoadingStage, Throwable, ModLoadingStage> nextState
      ) {
-
-        @SuppressWarnings("removal")
-        var preDispatchHook = getHook(transition.preDispatchHook(), executor, eventGenerator);
-        if (preDispatchHook != null)
-            completableFutures.add(preDispatchHook);
-
         var modFutures = new LinkedHashMap<String, CompletableFuture<Void>>();
         for (var mod : ModList.getLoadedMods()) {
 
@@ -131,11 +124,6 @@ final class ModStateTransitionHelper {
 
         var dispatch = gather(modFutures.values()).thenComposeAsync(ModStateTransitionHelper::completableFutureFromExceptionList, executor);
         completableFutures.add(dispatch);
-
-        @SuppressWarnings("removal")
-        var postDispatchHook = getHook(transition.preDispatchHook(), executor, eventGenerator);
-        if (postDispatchHook != null)
-            completableFutures.add(postDispatchHook);
     }
 
     private static <T extends IModBusEvent> CompletableFuture<Void> getHook(BiFunction<Executor, ? extends EventGenerator<?>, CompletableFuture<Void>> hook, Executor executor, EventGenerator<T> eventGenerator) {
@@ -164,7 +152,7 @@ final class ModStateTransitionHelper {
             BiFunction<ModLoadingStage, Throwable, ModLoadingStage> state = x == events.size() - 1
                 ? transition.nextModLoadingStage()
                 : ModLoadingStage::currentState;
-            addCompletableFutureTaskForModDispatch(transition, executor, futures, progressBar, gen, state);
+            addCompletableFutureTaskForModDispatch(executor, futures, progressBar, gen, state);
         }
 
         final CompletableFuture<Void> preSyncTaskCF = preSyncTask.apply(syncExecutor);

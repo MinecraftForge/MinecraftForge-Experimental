@@ -238,10 +238,10 @@ public final class ModLoader {
         progressBar.label(progressBar.name() + " working");
         syncExecutor.drive(ticker);
 
-        var inlineRunnable = state.inlineRunnable().orElse(null);
+        var inlineRunnable = state.inlineRunnable();
         if (inlineRunnable != null) handleInlineTransition(inlineRunnable, state, syncExecutor, ticker);
 
-        var transition = state.buildTransition(syncExecutor, parallelExecutor, progressBar).orElse(null);
+        var transition = state.buildTransition(syncExecutor, parallelExecutor, progressBar);
         if (transition != null) waitForTransition(state, syncExecutor, ticker, transition);
 
         COMPLETED_STATES.add(state);

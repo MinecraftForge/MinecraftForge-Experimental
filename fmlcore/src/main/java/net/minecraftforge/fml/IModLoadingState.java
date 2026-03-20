@@ -6,8 +6,9 @@
 package net.minecraftforge.fml;
 
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
@@ -20,6 +21,7 @@ import java.util.function.Supplier;
  *
  * @see IModStateProvider
  */
+@NullMarked
 public interface IModLoadingState {
     /**
      * {@return the name of this state}
@@ -56,7 +58,7 @@ public interface IModLoadingState {
      * {@return an optional runnable, which runs before starting the transition from this state to the next}
      * @see #buildTransition(Executor, Executor, ProgressMeter, Function, Function)
      */
-    Optional<Runnable> inlineRunnable();
+    @Nullable Runnable inlineRunnable();
 
     /**
      * Builds the transition task for this state with a blank pre-sync and post-sync task.
@@ -67,14 +69,14 @@ public interface IModLoadingState {
      * @return a transition task for this state
      * @see #buildTransition(Executor, Executor, ProgressMeter, Function, Function)
      */
-    default Optional<CompletableFuture<Void>> buildTransition(
+    default @Nullable CompletableFuture<Void> buildTransition(
         final Executor syncExecutor,
         final Executor parallelExecutor,
         final ProgressMeter progressBar
     ) {
         return buildTransition(syncExecutor, parallelExecutor, progressBar,
-            e -> CompletableFuture.completedFuture(null),
-            e -> CompletableFuture.completedFuture(null)
+            _ -> CompletableFuture.completedFuture(null),
+            _ -> CompletableFuture.completedFuture(null)
         );
     }
 
@@ -89,7 +91,7 @@ public interface IModLoadingState {
      * @param postSyncTask     a function which returns a task to run after event post-dispatch hook
      * @return a transition task for this state
      */
-    Optional<CompletableFuture<Void>> buildTransition(final Executor syncExecutor,
+    @Nullable CompletableFuture<Void> buildTransition(final Executor syncExecutor,
                                                       final Executor parallelExecutor,
                                                       final ProgressMeter progressBar,
                                                       final Function<Executor, CompletableFuture<Void>> preSyncTask,

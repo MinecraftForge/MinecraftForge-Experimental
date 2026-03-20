@@ -6,9 +6,10 @@
 package net.minecraftforge.fml;
 
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 import java.util.function.Function;
@@ -25,27 +26,26 @@ import java.util.function.Supplier;
  * @param inlineRunnable an optional runnable, which runs before starting the transition from this state to the next
  * @param transition     optional state transition information
  */
+@NullMarked
 public record ModLoadingState(
     String name,
     String previous,
     Supplier<String> message,
     IntSupplier size,
     ModLoadingPhase phase,
-    Optional<Runnable> inlineRunnable,
-    Optional<IModStateTransition> transition
+    @Nullable Runnable inlineRunnable,
+    @Nullable IModStateTransition transition
 ) implements IModLoadingState {
     @Override
-    public Optional<CompletableFuture<Void>> buildTransition(
+    public @Nullable CompletableFuture<Void> buildTransition(
         final Executor syncExecutor,
         final Executor parallelExecutor,
         final ProgressMeter progressBar,
         final Function<Executor, CompletableFuture<Void>> preSyncTask,
         final Function<Executor, CompletableFuture<Void>> postSyncTask
     ) {
-        var transition = this.transition.orElse(null);
-        return transition == null
-                ? Optional.empty()
-                : Optional.ofNullable(transition.build(name, syncExecutor, parallelExecutor, progressBar, preSyncTask, postSyncTask));
+        if (transition == null) return null;
+        return transition.build(name, syncExecutor, parallelExecutor, progressBar, preSyncTask, postSyncTask);
     }
 
     /**
@@ -60,7 +60,7 @@ public record ModLoadingState(
      */
     @Deprecated(since = "1.21.3", forRemoval = true)
     public static ModLoadingState empty(final String name, final String previous, final ModLoadingPhase phase) {
-        return new ModLoadingState(name, previous, () -> "", () -> 0, phase, Optional.empty(), Optional.empty());
+        return new ModLoadingState(name, previous, () -> "", () -> 0, phase, null, null);
     }
 
     /**
@@ -126,23 +126,23 @@ public record ModLoadingState(
         return o instanceof ModLoadingState that
                 && this.phase == that.phase
                 && this.name.equals(that.name)
-                && Objects.equals(this.previous, that.previous);
+                && this.previous.equals(that.previous);
     }
 
     @Override
     public int hashCode() {
         int result = phase.hashCode();
         result = 31 * result + name.hashCode();
-        result = 31 * result + Objects.hashCode(previous);
+        result = 31 * result + previous.hashCode();
         return result;
     }
 
     public static final class Builder {
         private final String name;
         private final ModLoadingPhase phase;
-        private String after;
-        private Supplier<String> message = null;
-        private IntSupplier size = null;
+        private String after = "";
+        private @Nullable Supplier<String> message = null;
+        private @Nullable IntSupplier size = null;
 
         private Builder(final String name, final ModLoadingPhase phase) {
             this.name = name;
@@ -168,15 +168,15 @@ public record ModLoadingState(
         }
 
         public ModLoadingState empty() {
-            return new ModLoadingState(name, after, message != null ? message : () -> "", size != null ? size : () -> 0, phase, Optional.empty(), Optional.empty());
+            return new ModLoadingState(name, after, message != null ? message : () -> "", size != null ? size : () -> 0, phase, null, null);
         }
 
         public ModLoadingState withTransition(final IModStateTransition transition) {
-            return new ModLoadingState(name, after, message != null ? message : () -> "Processing transition " + name, size != null ? size : ModList::size, phase, Optional.empty(), Optional.of(transition));
+            return new ModLoadingState(name, after, message != null ? message : () -> "Processing transition " + name, size != null ? size : ModList::size, phase, null, transition);
         }
 
         public ModLoadingState withInline(final Runnable inline) {
-            return new ModLoadingState(name, after, message != null ? message : () -> "Processing work " + name, size != null ? size : () -> 0, phase, Optional.of(inline), Optional.empty());
+            return new ModLoadingState(name, after, message != null ? message : () -> "Processing work " + name, size != null ? size : () -> 0, phase, inline, null);
         }
     }
 }
