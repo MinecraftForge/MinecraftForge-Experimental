@@ -119,6 +119,7 @@ public class Tags {
         /**
          * Contains living ground-based flowers that are 1 block tall such as Dandelions or Poppy.
          * Equivalent to the {@code minecraft:small_flowers} block tag.
+         * This is NOT aliased with {@link BlockTags#SMALL_FLOWERS} because the vanilla tag is used to make the block weak to swords.
          */
         public static final TagKey<Block> FLOWERS_SMALL = cTag("flowers/small");
         /**
@@ -129,6 +130,7 @@ public class Tags {
         /**
          * Contains any living plant block that contains flowers or is a flower itself.
          * Equivalent to the {@code minecraft:flowers} block tag.
+         * Aliased with {@link BlockTags#FLOWERS}.
          */
         public static final TagKey<Block> FLOWERS = cTag("flowers");
 
@@ -480,6 +482,7 @@ public class Tags {
         /**
          * Contains living ground-based flowers that are 1 block tall such as Dandelions or Poppy.
          * Equivalent to the {@code minecraft:small_flowers} item tag.
+         * Aliased with {@link ItemTags#SMALL_FLOWERS}.
          */
         public static final TagKey<Item> FLOWERS_SMALL = cTag("flowers/small");
         /**

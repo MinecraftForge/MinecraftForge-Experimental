@@ -133,8 +133,7 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Blocks.TORCHFLOWER,
                 Blocks.OPEN_EYEBLOSSOM,
                 Blocks.CLOSED_EYEBLOSSOM
-            )
-            .addOptionalTag(BlockTags.SMALL_FLOWERS);
+            );
         tag(Tags.Blocks.FLOWERS_TALL, Tags.Items.FLOWERS_TALL)
             .add(
                 Blocks.SUNFLOWER,
