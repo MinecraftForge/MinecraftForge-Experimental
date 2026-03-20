@@ -163,11 +163,9 @@ public abstract class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 Tags.Blocks.GLASS_BLOCKS_COLORLESS,
                 Tags.Blocks.GLASS_BLOCKS_CHEAP,
                 Tags.Blocks.GLASS_BLOCKS_TINTED
-            )
-            .addOptionalTag(Tags.Blocks.GLASS_BLOCKS);
+            );
         tag(Tags.Blocks.GLASS_BLOCKS_COLORLESS, Tags.Items.GLASS_BLOCKS_COLORLESS)
-            .add(Blocks.GLASS)
-            .addOptionalTag(Tags.Blocks.GLASS_BLOCKS_COLORLESS);
+            .add(Blocks.GLASS);
         tag(Tags.Blocks.GLASS_BLOCKS_TINTED, Tags.Items.GLASS_BLOCKS_TINTED)
             .add(Blocks.TINTED_GLASS);
 
