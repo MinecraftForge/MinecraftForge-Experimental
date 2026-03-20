@@ -13,6 +13,7 @@ import net.minecraft.tags.FluidTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
@@ -300,6 +301,10 @@ public class Tags {
         public static final TagKey<EntityType<?>> BOSSES = cTag("bosses");
         public static final TagKey<EntityType<?>> MINECARTS = cTag("minecarts");
         public static final TagKey<EntityType<?>> BOATS = cTag("boats");
+
+        /// Tag containing entity types, generally extending {@link ItemFrame},
+        /// that can be placed on the surfaces of blocks to display an item.
+        public static final TagKey<EntityType<?>> ITEM_FRAMES = cTag("item_frames");
 
         /**
          * Entities should be included in this tag if they are not allowed to be picked up by items or grabbed in a way

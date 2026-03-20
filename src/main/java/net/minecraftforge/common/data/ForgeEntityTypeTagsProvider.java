@@ -59,6 +59,7 @@ public final class ForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
             EntityType.SPRUCE_BOAT,
             EntityType.SPRUCE_CHEST_BOAT
         );
+        tag(ITEM_FRAMES).add(EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME);
         tag(CAPTURING_NOT_SUPPORTED);
         tag(TELEPORTING_NOT_SUPPORTED);
     }
