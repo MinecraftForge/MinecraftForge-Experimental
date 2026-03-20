@@ -4,22 +4,15 @@
   "key": {
     "X": {
       "type": "forge:nbt",
-      "stack": {
-        "components": {
-          "minecraft:custom_data": {
-            "display_name": "{\"text\":\"Test Item\"}"
-          }
-        },
-        "count": 1,
-        "id": "minecraft:diamond_pickaxe"
-      }
+      "items": "minecraft:diamond_pickaxe",
+      "nbt": "{display_name:'{\"text\":\"Test Item\"}'}",
+      "strict": true
     }
   },
   "pattern": [
     "XXX"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:dirt"
   }
 }

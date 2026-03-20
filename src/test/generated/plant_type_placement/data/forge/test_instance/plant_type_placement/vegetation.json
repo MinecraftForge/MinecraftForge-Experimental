@@ -1,7 +1,7 @@
 {
   "type": "minecraft:function",
   "environment": "minecraft:default",
-  "function": "forge:plant_type_placement/vegitation",
+  "function": "forge:plant_type_placement/vegetation",
   "max_ticks": 100,
-  "structure": "forge:empty11x3x30"
+  "structure": "forge:empty11x3x33"
 }

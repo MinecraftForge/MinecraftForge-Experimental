@@ -9,7 +9,6 @@
         "type": "minecraft:stonecutting",
         "ingredient": "minecraft:redstone_ore",
         "result": {
-          "count": 1,
           "id": "minecraft:diamond_block"
         }
       }

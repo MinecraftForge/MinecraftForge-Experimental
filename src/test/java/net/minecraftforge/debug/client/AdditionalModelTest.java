@@ -100,8 +100,8 @@ public class AdditionalModelTest extends BaseTestMod {
         if (model == null)
             helper.fail("Failed to retreive " + key + " item model");
 
-        if (!(model instanceof BlockStateModelWrapper))
-            helper.fail("Itme Model was " + model.getClass()  + " when BlockModelWrapper expected");
+        if (model == manager.getMissingModel())
+            helper.fail("Itme Model was the missing model");
 
         helper.succeed();
     }

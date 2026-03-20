@@ -16,12 +16,16 @@
  
      public ModelManager(final BlockColors blockColors, final AtlasManager atlasManager, final PlayerSkinRenderCache playerSkinRenderCache) {
          this.blockColors = blockColors;
-@@ -89,6 +_,14 @@
+@@ -89,6 +_,18 @@
          return this.bakedItemStackModels.getOrDefault(id, this.missingModels.item());
      }
  
 +    public Map<Identifier, ItemModel> getItemModels() {
 +        return this.bakedItemStackModelsView;
++    }
++
++    public ItemModel getMissingModel() {
++        return this.missingModels.item();
 +    }
 +
 +    public ModelBakery getModelBakery() {

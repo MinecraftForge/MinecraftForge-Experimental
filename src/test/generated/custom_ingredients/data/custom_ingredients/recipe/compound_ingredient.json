@@ -7,27 +7,15 @@
       "children": [
         {
           "type": "forge:nbt",
-          "stack": {
-            "components": {
-              "minecraft:custom_data": {
-                "display_name": "{\"text\":\"Test Item\"}"
-              }
-            },
-            "count": 1,
-            "id": "minecraft:dirt"
-          }
+          "items": "minecraft:dirt",
+          "nbt": "{display_name:'{\"text\":\"Test Item\"}'}",
+          "strict": true
         },
         {
           "type": "forge:nbt",
-          "stack": {
-            "components": {
-              "minecraft:custom_data": {
-                "display_name": "{\"text\":\"Test Item\"}"
-              }
-            },
-            "count": 1,
-            "id": "minecraft:oak_log"
-          }
+          "items": "minecraft:oak_log",
+          "nbt": "{display_name:'{\"text\":\"Test Item\"}'}",
+          "strict": true
         }
       ]
     }
@@ -37,7 +25,6 @@
     " X "
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:dirt"
   }
 }

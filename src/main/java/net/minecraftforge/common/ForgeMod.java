@@ -7,8 +7,6 @@ package net.minecraftforge.common;
 
 import net.minecraft.DetectedVersion;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BiomeColors;
-import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
@@ -63,7 +61,6 @@ import net.minecraftforge.common.world.NoneBiomeModifier;
 import net.minecraftforge.common.world.NoneStructureModifier;
 import net.minecraftforge.common.world.StructureModifier;
 import net.minecraftforge.event.network.GatherLoginConfigurationTasksEvent;
-import net.minecraftforge.event.server.ServerAboutToStartEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
@@ -110,16 +107,12 @@ import net.minecraftforge.common.crafting.ingredients.CompoundIngredient;
 import net.minecraftforge.common.crafting.ingredients.DifferenceIngredient;
 import net.minecraftforge.common.crafting.ingredients.IIngredientSerializer;
 import net.minecraftforge.common.crafting.ingredients.IntersectionIngredient;
-import net.minecraftforge.common.crafting.ingredients.PartialNBTIngredient;
-import net.minecraftforge.common.crafting.ingredients.StrictNBTIngredient;
+import net.minecraftforge.common.crafting.ingredients.NBTIngredient;
 import net.minecraftforge.fml.common.Mod;
 import org.apache.logging.log4j.Marker;
 import org.apache.logging.log4j.MarkerManager;
-
 import com.mojang.serialization.MapCodec;
-
 import org.jetbrains.annotations.Nullable;
-
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
@@ -336,8 +329,7 @@ public class ForgeMod {
     private static final DeferredRegister<IIngredientSerializer<?>> INGREDIENT_SERIALIZERS = deferred(ForgeRegistries.Keys.INGREDIENT_SERIALIZERS);
     static {
         INGREDIENT_SERIALIZERS.register("compound", () -> CompoundIngredient.SERIALIZER);
-        INGREDIENT_SERIALIZERS.register("nbt", () -> StrictNBTIngredient.SERIALIZER);
-        INGREDIENT_SERIALIZERS.register("partial_nbt", () -> PartialNBTIngredient.SERIALIZER);
+        INGREDIENT_SERIALIZERS.register("nbt", () -> NBTIngredient.SERIALIZER);
         INGREDIENT_SERIALIZERS.register("difference", () -> DifferenceIngredient.SERIALIZER);
         INGREDIENT_SERIALIZERS.register("intersection", () -> IntersectionIngredient.SERIALIZER);
     }

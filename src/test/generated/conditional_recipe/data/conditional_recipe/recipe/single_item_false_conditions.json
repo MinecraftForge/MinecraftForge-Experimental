@@ -9,7 +9,6 @@
         "type": "minecraft:stonecutting",
         "ingredient": "minecraft:dirt",
         "result": {
-          "count": 1,
           "id": "minecraft:diamond_block"
         }
       }

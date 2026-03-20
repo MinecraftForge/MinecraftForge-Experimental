@@ -17,7 +17,6 @@
   "display": {
     "description": "Fish wins!",
     "icon": {
-      "count": 1,
       "id": "minecraft:cod"
     },
     "title": "Fish vs Glass"

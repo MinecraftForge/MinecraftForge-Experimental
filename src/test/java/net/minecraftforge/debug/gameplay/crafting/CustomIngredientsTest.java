@@ -272,7 +272,7 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
                 .pattern("XXX")
                 .pattern("XXX")
                 .define('X',
-                    partialNbt()
+                    nbtIngredient()
                         .nbt(damaged())
                         .items(Items.WOODEN_PICKAXE, Items.STONE_PICKAXE, Items.IRON_PICKAXE)
                         .build()
@@ -284,7 +284,7 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
             shaped()
                 .pattern("XXX")
                 .define('X',
-                    partialNbt()
+                    nbtIngredient()
                         .nbt(named())
                         .items(Items.WOODEN_PICKAXE, Items.STONE_PICKAXE, Items.IRON_PICKAXE)
                         .build()
@@ -297,8 +297,16 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
                .pattern("XXX")
                .pattern(" X ")
                .define('X', compound(
-                   strictNbt(named(Items.DIRT)),
-                   strictNbt(named(Items.OAK_LOG))
+                   nbtIngredient()
+                       .strict()
+                       .nbt(named())
+                       .item(Items.DIRT)
+                       .build(),
+                   nbtIngredient()
+                       .strict()
+                       .nbt(named())
+                       .item(Items.OAK_LOG)
+                       .build()
                ))
                .unlockedBy(hasName, has)
                .save(this.output, rk("compound_ingredient"));
@@ -306,7 +314,13 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
             // strict NBT match - should match an unnamed pickaxe that lost 3 durability
             shaped()
                 .pattern("XXX")
-                .define('X', strictNbt(named(Items.DIAMOND_PICKAXE)))
+                .define('X',
+                    nbtIngredient()
+                        .strict()
+                        .nbt(named())
+                        .item(Items.DIAMOND_PICKAXE)
+                        .build()
+                )
                 .unlockedBy(hasName, has)
                 .save(this.output, rk("strict_nbt_ingredient"));
 
