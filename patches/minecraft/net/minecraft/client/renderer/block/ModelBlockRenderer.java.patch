@@ -5,7 +5,7 @@
      }
  
 +
-+    /** @deprecated Use ModelData and Layer variant */
++    /** @deprecated Use ModelData variant */
 +    public void tesselateBlock(final BlockQuadOutput output, final float x, final float y, final float z, final BlockAndTintGetter level, final BlockPos pos, final BlockState blockState, final BlockStateModel model, final long seed) {
 +        tesselateBlock(output, x, y, z, level, pos, blockState, model, seed, net.minecraftforge.client.model.data.ModelData.EMPTY);
 +    }

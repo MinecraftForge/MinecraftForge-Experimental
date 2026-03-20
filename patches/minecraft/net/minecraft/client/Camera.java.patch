@@ -6,14 +6,14 @@
              float f = this.minecraft.options.fov().get().intValue() * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier);
 -            return this.modifyFovBasedOnDeathOrFluid(partialTicks, f);
 +            var ret = this.modifyFovBasedOnDeathOrFluid(partialTicks, f);
-+            return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this.minecraft.gameRenderer, this, partialTicks, fov, true).getFOV();
++            return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this.minecraft.gameRenderer, this, partialTicks, ret, true).getFOV();
          }
      }
  
      private float calculateHudFov(final float partialTicks) {
 -        return this.modifyFovBasedOnDeathOrFluid(partialTicks, 70.0F);
 +        var ret = this.modifyFovBasedOnDeathOrFluid(partialTicks, 70.0F);
-+        return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this.minecraft.gameRenderer, this, partialTicks, fov, false).getFOV();
++        return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this.minecraft.gameRenderer, this, partialTicks, ret, false).getFOV();
      }
  
      private float modifyFovBasedOnDeathOrFluid(final float partialTicks, float fov) {
