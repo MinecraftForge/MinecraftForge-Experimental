@@ -45,7 +45,7 @@ public class ClientModLoader {
         ClientModLoader.mc = minecraft;
         LogicalSidedProvider.setClient(()->minecraft);
         LanguageHook.loadForgeAndMCLangs();
-        createRunnableWithCatch(()->ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ImmediateWindowHandler::renderTick)).run();
+        createRunnableWithCatch(() -> ModLoader.gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ImmediateWindowHandler::renderTick)).run();
         if (error == null) {
             ResourcePackLoader.loadResourcePacks(defaultResourcePacks, true);
             net.minecraftforge.event.AddPackFindersEvent.BUS.post(new AddPackFindersEvent(PackType.CLIENT_RESOURCES, defaultResourcePacks::addPackFinder));
@@ -73,11 +73,11 @@ public class ClientModLoader {
     }
 
     private static void startModLoading(ModWorkManager.DrivenExecutor syncExecutor, Executor parallelExecutor) {
-        createRunnableWithCatch(() -> ModLoader.get().loadMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
+        createRunnableWithCatch(() -> ModLoader.loadMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
     }
 
     private static void finishModLoading(ModWorkManager.DrivenExecutor syncExecutor, Executor parallelExecutor) {
-        createRunnableWithCatch(() -> ModLoader.get().finishMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
+        createRunnableWithCatch(() -> ModLoader.finishMods(syncExecutor, parallelExecutor, ImmediateWindowHandler::renderTick)).run();
         loading = false;
         loadingComplete = true;
         // reload game settings on main thread
@@ -93,7 +93,7 @@ public class ClientModLoader {
     }
 
     public static boolean completeModLoading() {
-        var warnings = ModLoader.get().getWarnings();
+        var warnings = ModLoader.getWarnings();
         boolean showWarnings = ForgeConfig.CLIENT.showLoadWarnings();
 
         if (!showWarnings) {

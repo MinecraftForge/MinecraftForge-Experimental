@@ -90,7 +90,7 @@ public class DatagenModLoader {
         Bootstrap.bootStrap();
         if (genClient)
             ClientBootstrap.bootstrap();
-        ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
+        ModLoader.gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
         var lookupProvider = CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor());
 
         var mods = new HashSet<String>();

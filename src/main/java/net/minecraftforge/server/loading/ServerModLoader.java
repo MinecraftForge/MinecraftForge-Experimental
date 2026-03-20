@@ -27,9 +27,9 @@ public class ServerModLoader
         });
         LanguageHook.loadForgeAndMCLangs();
         try {
-            ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
-            ModLoader.get().loadMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
-            ModLoader.get().finishMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
+            ModLoader.gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
+            ModLoader.loadMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
+            ModLoader.finishMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
         } catch (LoadingFailedException error) {
             ServerModLoader.hasErrors = true;
             // In case its not loaded properly
@@ -37,7 +37,7 @@ public class ServerModLoader
             CrashReportExtender.dumpModLoadingCrashReport(LOGGER, error, new File("."));
             throw error;
         }
-        List<ModLoadingWarning> warnings = ModLoader.get().getWarnings();
+        List<ModLoadingWarning> warnings = ModLoader.getWarnings();
         if (!warnings.isEmpty()) {
             LOGGER.warn(Logging.LOADING, "Mods loaded with {} warnings", warnings.size());
             warnings.forEach(warning -> LOGGER.warn(Logging.LOADING, warning.formatToString()));

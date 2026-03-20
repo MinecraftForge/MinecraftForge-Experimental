@@ -103,7 +103,7 @@ public class ResourcePackLoader {
 
             if (pack == null) {
                 // Vanilla only logs an error, instead of propagating, so handle null and warn that something went wrong
-                ModLoader.get().addWarning(new ModLoadingWarning(modinfo, ModLoadingStage.ERROR, "fml.modloading.brokenresources", file));
+                ModLoader.addWarning(new ModLoadingWarning(modinfo, ModLoadingStage.ERROR, "fml.modloading.brokenresources", file));
                 continue;
             }
 
