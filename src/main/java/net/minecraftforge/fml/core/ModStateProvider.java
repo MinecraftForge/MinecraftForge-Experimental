@@ -64,8 +64,8 @@ public class ModStateProvider implements IModStateProvider {
      */
     public static final ModLoadingState CONFIG_LOAD = ModLoadingState.of("CONFIG_LOAD", ModLoadingPhase.LOAD)
         .withInline(() -> {
-            if (FMLEnvironment.dist.isClient()) ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
-            ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
+            if (FMLEnvironment.dist.isClient()) ConfigTracker.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
+            ConfigTracker.loadConfigs(ModConfig.Type.COMMON, FMLPaths.CONFIGDIR.get());
         });
 
     /**

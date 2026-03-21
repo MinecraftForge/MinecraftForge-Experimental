@@ -146,7 +146,7 @@
              Util.shutdownExecutors();
              RenderSystem.getSamplerCache().close();
              RenderSystem.getDevice().close();
-+            net.minecraftforge.fml.config.ConfigTracker.INSTANCE.forceUnload();
++            net.minecraftforge.fml.config.ConfigTracker.forceUnload();
          } catch (Throwable throwable) {
              LOGGER.error("Shutdown failure!", throwable);
              throw throwable;

@@ -13,6 +13,7 @@ import java.util.function.Function;
 import org.jetbrains.annotations.Nullable;
 
 public interface IConfigEvent {
+    // TODO: [FML] Get rid of this indirection somehow
     record ConfigConfig(Function<ModConfig, IConfigEvent> loading, Function<ModConfig, IConfigEvent> reloading, @Nullable Function<ModConfig, IConfigEvent> unloading) {}
 
     ConfigConfig CONFIGCONFIG = Bindings.getConfigConfiguration().get();

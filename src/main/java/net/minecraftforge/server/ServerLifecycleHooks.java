@@ -71,7 +71,7 @@ public class ServerLifecycleHooks {
         currentServer = server;
         // on the dedi server we need to force the stuff to setup properly
         LogicalSidedProvider.setServer(()->server);
-        ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
+        ConfigTracker.loadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
         runModifiers(server);
         return !ServerAboutToStartEvent.BUS.post(new ServerAboutToStartEvent(server));
     }
@@ -98,7 +98,7 @@ public class ServerLifecycleHooks {
             latch.countDown();
             exitLatch = null;
         }
-        ConfigTracker.INSTANCE.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
+        ConfigTracker.unloadConfigs(ModConfig.Type.SERVER, getServerConfigPath(server));
     }
 
     public static MinecraftServer getCurrentServer() {

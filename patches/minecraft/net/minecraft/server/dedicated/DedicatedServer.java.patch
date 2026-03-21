@@ -54,7 +54,7 @@
 +            this.dediLanPinger = null;
 +        }
 +
-+        net.minecraftforge.fml.config.ConfigTracker.INSTANCE.forceUnload();
++        net.minecraftforge.fml.config.ConfigTracker.forceUnload();
      }
  
      @Override

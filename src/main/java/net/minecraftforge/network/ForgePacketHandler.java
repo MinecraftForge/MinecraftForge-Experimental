@@ -253,7 +253,7 @@ public class ForgePacketHandler {
         LOGGER.debug(MARKER, "Received config sync from server for {}", msg.name());
 
         if (!ctx.getConnection().isMemoryConnection()) {
-            var cfg = ConfigTracker.INSTANCE.fileMap().get(msg.name());
+            var cfg = ConfigTracker.fileMap().get(msg.name());
             if (cfg != null)
                 cfg.acceptSyncedConfig(msg.data());
         }

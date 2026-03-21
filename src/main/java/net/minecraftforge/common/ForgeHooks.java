@@ -1138,7 +1138,7 @@ public final class ForgeHooks {
     public static void handleClientConfigurationComplete(Connection connection) {
         if (NetworkContext.get(connection).getType() == ConnectionType.VANILLA) {
             LOGGER.info("Connected to a vanilla server. Catching up missing behaviour.");
-            ConfigTracker.INSTANCE.loadDefaultServerConfigs();
+            ConfigTracker.loadDefaultServerConfigs();
         } else
             LOGGER.info("Connected to a modded server.");
     }

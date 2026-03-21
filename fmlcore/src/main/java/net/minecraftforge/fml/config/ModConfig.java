@@ -31,7 +31,7 @@ public class ModConfig
         this.fileName = fileName;
         this.container = container;
         this.configHandler = ConfigFileTypeHandler.get(type);
-        ConfigTracker.INSTANCE.trackConfig(this);
+        ConfigTracker.trackConfig(this);
     }
 
     public ModConfig(final Type type, final IConfigSpec<?> spec, final ModContainer activeContainer) {

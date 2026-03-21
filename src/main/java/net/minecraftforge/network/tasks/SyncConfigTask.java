@@ -32,7 +32,7 @@ class SyncConfigTask extends SimpleConfigurationTask {
     }
 
     private static void run(ConfigurationTaskContext ctx) {
-        for (var cfg : ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.SERVER)) {
+        for (var cfg : ConfigTracker.configSets().get(ModConfig.Type.SERVER)) {
             try {
                 var pkt = new ConfigData(cfg.getFileName(), Files.readAllBytes(cfg.getFullPath()));
                 NetworkInitialization.CONFIG.send(pkt, ctx.getConnection());
