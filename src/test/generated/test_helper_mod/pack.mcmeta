@@ -2,6 +2,9 @@
   "pack": {
     "description": "Forge tests resource pack",
     "max_format": 101,
-    "min_format": 101
+    "min_format": [
+      101,
+      1
+    ]
   }
 }

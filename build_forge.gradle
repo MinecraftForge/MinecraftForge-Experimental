@@ -263,7 +263,7 @@ afterEvaluate {
         }
         userdevJar {
             onlyIf = { t -> true }
-        } 
+        }
     }
 }
 
@@ -403,6 +403,7 @@ tasks.register('extractInheritance', ExtractInheritance) {
     }
 }
 tasks.register("findFinalizeSpawnTargets", BytecodePredicateFinder) {
+	dependsOn downloadClientRaw
     jar = downloadClientRaw.dest
     output = rootProject.file('forge-transformers/src/main/resources/coremods/finalize_spawn_targets.json')
     predicate = {
@@ -476,7 +477,7 @@ tasks.register('createServerShimConfig') {
     doLast {
         var cfg = new CleanProperties()
         cfg['Main-Class'] = 'net.minecraftforge.bootstrap.ForgeBootstrap'
-        cfg['Java-Version'] = '21'
+        cfg['Java-Version'] = '25'
         cfg['Arguments'] = '--launchTarget forge_server'
         cfg.store(output)
     }
@@ -895,7 +896,7 @@ license {
 }
 
 tasks.register('genAllData') {
-    dependsOn 'forge_data', 'forge_test_data'
+    dependsOn 'forge_data', 'forge_data_test', 'forge_client_data_test'
 }
 
 if (project.hasProperty('UPDATE_MAPPINGS')) {

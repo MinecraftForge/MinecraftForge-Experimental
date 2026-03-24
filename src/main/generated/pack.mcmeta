@@ -4,6 +4,9 @@
       "translate": "pack.forge.description"
     },
     "max_format": 101,
-    "min_format": 101
+    "min_format": [
+      101,
+      1
+    ]
   }
 }

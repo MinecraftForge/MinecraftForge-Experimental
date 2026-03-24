@@ -100,7 +100,7 @@
     {
         "class": "net/minecraft/world/entity/npc/villager/Villager",
         "methods": [
-            "getBreedOffspring(Lnet/minecraft/server/level/ServerLevel;Lnet/minecraft/world/entity/AgeableMob;)Lnet/minecraft/world/entity/npc/villager/Villager;"
+            
         ]
     },
     {
