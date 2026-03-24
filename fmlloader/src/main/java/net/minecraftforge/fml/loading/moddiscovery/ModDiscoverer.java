@@ -41,9 +41,10 @@ public final class ModDiscoverer {
 
     @SuppressWarnings("removal")
     public static ModValidator discoverMods(Map<String, ?> arguments) {
-        Launcher.INSTANCE.environment().computePropertyIfAbsent(Environment.Keys.MODDIRECTORYFACTORY.get(), v->ModsFolderLocator::new);
-        Launcher.INSTANCE.environment().computePropertyIfAbsent(Environment.Keys.PROGRESSMESSAGE.get(), v-> StartupNotificationManager.locatorConsumer().orElseGet(()-> s->{}));
-        final var moduleLayerManager = Launcher.INSTANCE.environment().findModuleLayerManager().orElseThrow();
+        var env = Launcher.INSTANCE.environment();
+        env.computePropertyIfAbsent(Environment.Keys.MODDIRECTORYFACTORY.get(), _ -> ModsFolderLocator::new);
+        env.computePropertyIfAbsent(Environment.Keys.PROGRESSMESSAGE.get(), _ -> StartupNotificationManager.locatorConsumer().orElse(_ -> {}));
+        final var moduleLayerManager = env.findModuleLayerManager().orElseThrow();
         ServiceLoader<IModLocator> modLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IModLocator.class);
         ServiceLoader<IDependencyLocator> dependencyLocators = ServiceLoader.load(moduleLayerManager.getLayer(IModuleLayerManager.Layer.SERVICE).orElseThrow(), IDependencyLocator.class);
         List<IModLocator> modLocatorList = ServiceLoaderUtils.streamWithErrorHandling(modLocators, sce -> LOGGER.error("Failed to load mod locator list", sce)).toList();

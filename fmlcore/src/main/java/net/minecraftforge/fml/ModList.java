@@ -89,6 +89,12 @@ public final class ModList {
         indexedMods = modContainers.stream().collect(Collectors.toUnmodifiableMap(ModContainer::getModId, Function.identity()));
     }
 
+    static void clearLoadedMods() {
+        mods = List.of();
+        indexedMods = Map.of();
+        sortedContainers = List.of();
+    }
+
     @SuppressWarnings("unchecked")
     public static <T> Optional<T> getModObjectById(String modId) {
         return getModContainerById(modId).map(ModContainer::getMod).map(o -> (T) o);

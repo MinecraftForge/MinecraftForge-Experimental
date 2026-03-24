@@ -115,19 +115,22 @@ public final class UniqueModListBuilder {
     }
 
     private static ArtifactVersion getVersion(final ModFile mf) {
-        if (mf.getModFileInfo() == null || mf.getModInfos() == null || mf.getModInfos().isEmpty()) {
+        List<IModInfo> modInfos;
+        if (mf.getModFileInfo() == null || (modInfos = mf.getModInfos()) == null || modInfos.isEmpty()) {
             return mf.getJarVersion();
         }
 
-        return mf.getModInfos().getFirst().getVersion();
+        return modInfos.getFirst().getVersion();
     }
 
     private static String getModId(ModFile modFile) {
-        if (modFile.getModFileInfo() == null || modFile.getModFileInfo().getMods().isEmpty()) {
+        var modFileInfo = modFile.getModFileInfo();
+        List<IModInfo> mods;
+        if (modFileInfo == null || (mods = modFileInfo.getMods()).isEmpty()) {
             return modFile.getSecureJar().name();
         }
 
-        return modFile.getModFileInfo().getMods().getFirst().getModId();
+        return mods.getFirst().getModId();
     }
 
     public record UniqueModListData(List<ModFile> modFiles, Map<String, List<ModFile>> modFilesByFirstId) {}

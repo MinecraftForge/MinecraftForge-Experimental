@@ -7,10 +7,7 @@ package net.minecraftforge.fml;
 
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.fml.event.IModBusEvent;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fml.loading.FMLLoader;
-import net.minecraftforge.fml.loading.ImmediateWindowHandler;
-import net.minecraftforge.fml.loading.LoadingModList;
+import net.minecraftforge.fml.loading.*;
 import net.minecraftforge.fml.loading.moddiscovery.InvalidModIdentifier;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
@@ -73,14 +70,14 @@ public final class ModLoader {
     private ModLoader() {}
 
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final List<ModLoadingException> LOADING_EXCEPTIONS = new ArrayList<>();
-    private static final List<ModLoadingWarning> LOADING_WARNINGS = new ArrayList<>();
+    private static final ArrayList<ModLoadingException> LOADING_EXCEPTIONS = new ArrayList<>();
+    private static final ArrayList<ModLoadingWarning> LOADING_WARNINGS = new ArrayList<>();
     private static final Consumer<String> STATUS_CONSUMER = StartupNotificationManager.modLoaderConsumer().orElse(_ -> {});
     private static final HashSet<IModLoadingState> COMPLETED_STATES = new HashSet<>();
     private static boolean loadingStateValid;
 
     private static String computeLanguageList() {
-        return "\n" + FMLLoader.getLanguageLoadingProvider()
+        return "\n" + LanguageLoadingProvider
                 .applyForEach(lp -> lp.name() + '@' + lp.getClass().getPackage().getImplementationVersion())
                 .collect(Collectors.joining("\n\t\t", "\t\t", ""));
     }
@@ -133,7 +130,7 @@ public final class ModLoader {
         if (!LOADING_EXCEPTIONS.isEmpty()) {
             LOGGER.fatal(CORE, "Error during pre-loading phase", LOADING_EXCEPTIONS.getFirst());
             STATUS_CONSUMER.accept("ERROR DURING MOD LOADING");
-            ModList.setLoadedMods(Collections.emptyList());
+            ModList.clearLoadedMods();
             loadingStateValid = false;
             throw new LoadingFailedException(LOADING_EXCEPTIONS);
         }
@@ -148,7 +145,7 @@ public final class ModLoader {
         if (!failedBounds.isEmpty()) {
             LOGGER.fatal(CORE, "Failed to validate feature bounds for mods: {}", failedBounds);
             STATUS_CONSUMER.accept("ERROR DURING MOD LOADING");
-            ModList.setLoadedMods(Collections.emptyList());
+            ModList.clearLoadedMods();
             loadingStateValid = false;
             throw new LoadingFailedException(failedBounds.stream()
                     .map(fb -> new ModLoadingException(fb.modInfo(), ModLoadingStage.CONSTRUCT, "fml.modloading.feature.missing", null, fb, ForgeFeature.featureValue(fb)))
@@ -165,7 +162,7 @@ public final class ModLoader {
         if (!LOADING_EXCEPTIONS.isEmpty()) {
             LOGGER.fatal(CORE, "Failed to initialize mod containers", LOADING_EXCEPTIONS.getFirst());
             STATUS_CONSUMER.accept("ERROR DURING MOD LOADING");
-            ModList.setLoadedMods(Collections.emptyList());
+            ModList.clearLoadedMods();
             loadingStateValid = false;
             throw new LoadingFailedException(LOADING_EXCEPTIONS);
         }

@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableMap;
 import com.mojang.logging.LogUtils;
 import cpw.mods.jarhandling.SecureJar;
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.LanguageLoadingProvider;
 import net.minecraftforge.fml.loading.LogMarkers;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -48,8 +49,7 @@ public class ModFile implements IModFile {
     private final IModFileInfo modFileInfo;
     private ModFileScanData fileModFileScanData;
     private CompletableFuture<ModFileScanData> futureScanResult;
-    private Path accessTransformer;
-    private List<Path> accessTransformers = Collections.emptyList();
+    private List<Path> accessTransformers = List.of();
 
     static final Attributes.Name TYPE = new Attributes.Name("FMLModType");
     private SecureJar.Status securityStatus;
@@ -92,11 +92,6 @@ public class ModFile implements IModFile {
         return modFileInfo.getMods();
     }
 
-    @Deprecated(forRemoval = true, since = "1.21.11")
-    public Optional<Path> getAccessTransformer() {
-        return Optional.ofNullable(accessTransformer);
-    }
-
     public List<Path> getAccessTransformers() {
         return this.accessTransformers;
     }
@@ -111,7 +106,6 @@ public class ModFile implements IModFile {
         if (cfg == null) {
             var path = findResource("META-INF", "accesstransformer.cfg");
             if (Files.exists(path)) {
-                this.accessTransformer = path;
                 this.accessTransformers = List.of(path);
             }
         } else if (!cfg.isEmpty()) {
@@ -181,9 +175,8 @@ public class ModFile implements IModFile {
 
     public void identifyLanguage() {
         var lst = new ArrayList<IModLanguageProvider>(this.modFileInfo.requiredLanguageLoaders().size());
-        var services = FMLLoader.getLanguageLoadingProvider();
         for (var spec : this.modFileInfo.requiredLanguageLoaders()) {
-            var service = services.findLanguage(this, spec.languageName(), spec.acceptedVersions());
+            var service = LanguageLoadingProvider.findLanguage(this, spec.languageName(), spec.acceptedVersions());
             lst.add(service);
         }
         this.loaders = List.copyOf(lst);
