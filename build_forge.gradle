@@ -330,7 +330,7 @@ for (def run in patcher.runs + tasks.userdevConfig.runs) {
     if (run.parents) continue // We already added this to the parent run config
     //run.property 'bsl.debug', 'true'
     run.args '--gameDir', '.'
-    run.jvmArgs '-Djava.net.preferIPv6Addresses=system'
+    run.jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders'
     run.client run.name.contains('client')
     run.main 'net.minecraftforge.bootstrap.ForgeBootstrap'
 }
@@ -597,7 +597,8 @@ tasks.register('launcherJson', LauncherJson).configure {
                 '--launchTarget', 'forge_client'
             ],
             jvm: [
-                '-Djava.net.preferIPv6Addresses=system'
+                '-Djava.net.preferIPv6Addresses=system',
+                '-XX:+UseCompactObjectHeaders'
             ]
         ]
     ] as LinkedHashMap)
