@@ -31,7 +31,7 @@ public final class InterModComms {
     public static boolean sendTo(final String modId, final String method, final Supplier<?> thing) {
         if (!ModList.isLoaded(modId)) return false;
         containerQueues.computeIfAbsent(modId, _ -> new ConcurrentLinkedQueue<>())
-                .add(new IMCMessage(ModLoadingContext.get().getActiveContainer().getModId(), modId, method, thing));
+                .add(new IMCMessage(ModLoadingContext.get().getContainer().getModId(), modId, method, thing));
         return true;
     }
 

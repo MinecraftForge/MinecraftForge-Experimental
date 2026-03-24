@@ -106,7 +106,7 @@ public final class ModMismatchEvent implements IModBusEvent {
      * Marks the mod version mismatch as having been resolved safely by the current mod.
      */
     public void markResolved(String modId) {
-        final var resolvedBy = ModLoadingContext.get().getActiveContainer();
+        final var resolvedBy = ModLoadingContext.get().getContainer();
         resolved.putIfAbsent(modId, resolvedBy);
     }
 

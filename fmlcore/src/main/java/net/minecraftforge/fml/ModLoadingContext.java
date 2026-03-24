@@ -38,15 +38,6 @@ public class ModLoadingContext {
     }
 
     /**
-     * Going to be moved to ForgeHooks for Internal use.
-     * @deprecated Override/Use {@link ModLoadingContext#getContainer()}
-     */
-    @Deprecated(forRemoval = true, since="1.21.1")
-    public ModContainer getActiveContainer() {
-        return activeContainer == null ? ModList.getModContainerById("minecraft").orElseThrow(()->new RuntimeException("Where is minecraft???!")) : activeContainer;
-    }
-
-    /**
      * @deprecated Going to be moved to ForgeHooks for Internal use.
      */
     @Deprecated(forRemoval = true, since="1.21.1")
@@ -54,11 +45,10 @@ public class ModLoadingContext {
         return activeContainer == null ? "minecraft" : activeContainer.getNamespace();
     }
 
-    /**
-     * @return {@link ModLoadingContext#getActiveContainer()} by default.
-     */
     public ModContainer getContainer() {
-        return getActiveContainer();
+        return activeContainer == null
+                ? ModList.getModContainerById("minecraft").orElseThrow(()->new RuntimeException("Where is minecraft???!"))
+                : activeContainer;
     }
 
     /**
@@ -110,8 +100,7 @@ public class ModLoadingContext {
     }
 
     public void registerConfig(ModConfig.Type type, IConfigSpec<?> spec) {
-        if (spec.isEmpty())
-        {
+        if (spec.isEmpty()) {
             // This handles the case where a mod tries to register a config, without any options configured inside it.
             LOGGER.debug("Attempted to register an empty config for type {} on mod {}", type, getContainer().getModId());
             return;
@@ -121,8 +110,7 @@ public class ModLoadingContext {
     }
 
     public void registerConfig(ModConfig.Type type, IConfigSpec<?> spec, String fileName) {
-        if (spec.isEmpty())
-        {
+        if (spec.isEmpty()) {
             // This handles the case where a mod tries to register a config, without any options configured inside it.
             LOGGER.debug("Attempted to register an empty config for type {} on mod {} using file name {}", type, getContainer().getModId(), fileName);
             return;
@@ -130,7 +118,6 @@ public class ModLoadingContext {
 
         getContainer().addConfig(new ModConfig(type, spec, getContainer(), fileName));
     }
-
 
     @SuppressWarnings("unchecked")
     public <T> T extension() {
