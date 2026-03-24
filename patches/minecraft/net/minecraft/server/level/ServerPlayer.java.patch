@@ -109,7 +109,7 @@
          if (!this.gameMode.changeGameModeForPlayer(mode)) {
              return false;
          } else {
-@@ -1927,6 +_,9 @@
+@@ -1931,6 +_,9 @@
      public void setCamera(final @Nullable Entity newCamera) {
          Entity entity = this.getCamera();
          this.camera = (Entity)(newCamera == null ? this : newCamera);
@@ -119,7 +119,7 @@
          if (entity != this.camera) {
              if (this.camera.level() instanceof ServerLevel serverlevel) {
                  this.teleportTo(serverlevel, this.camera.getX(), this.camera.getY(), this.camera.getZ(), Set.of(), this.getYRot(), this.getXRot(), false);
-@@ -1953,7 +_,11 @@
+@@ -1957,7 +_,11 @@
      }
  
      public @Nullable Component getTabListDisplayName() {
@@ -132,7 +132,7 @@
      }
  
      public int getTabListOrder() {
-@@ -1987,6 +_,7 @@
+@@ -1991,6 +_,7 @@
      }
  
      public void setRespawnPosition(final ServerPlayer.@Nullable RespawnConfig respawnConfig, final boolean showMessage) {
@@ -140,7 +140,7 @@
          if (showMessage && respawnConfig != null && !respawnConfig.isSamePosition(this.respawnConfig)) {
              this.sendSystemMessage(SPAWN_SET_MESSAGE);
          }
-@@ -2074,6 +_,9 @@
+@@ -2078,6 +_,9 @@
  
      public void drop(final boolean all) {
          Inventory inventory = this.getInventory();
@@ -150,7 +150,7 @@
          ItemStack itemstack = inventory.removeFromSelected(all);
          this.containerMenu
              .findSlot(inventory, inventory.getSelectedSlot())
-@@ -2082,7 +_,7 @@
+@@ -2086,7 +_,7 @@
              this.stopUsingItem();
          }
  
@@ -159,7 +159,7 @@
      }
  
      @Override
-@@ -2184,6 +_,75 @@
+@@ -2188,6 +_,75 @@
  
      public @Nullable BlockPos getRaidOmenPosition() {
          return this.raidOmenPosition;

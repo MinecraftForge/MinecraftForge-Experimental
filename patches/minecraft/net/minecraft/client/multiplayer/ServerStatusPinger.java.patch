@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ServerStatusPinger.java
 +++ b/net/minecraft/client/multiplayer/ServerStatusPinger.java
-@@ -138,6 +_,7 @@
+@@ -124,6 +_,7 @@
                                  onPersistentDataChange.run();
                              }
                          });
@@ -8,7 +8,7 @@
                          this.pingStart = Util.getMillis();
                          connection.send(new ServerboundPingRequestPacket(this.pingStart));
                          this.success = true;
-@@ -194,7 +_,7 @@
+@@ -180,7 +_,7 @@
      private void pingLegacyServer(
          final InetSocketAddress resolvedAddress, final ServerAddress rawAddress, final ServerData data, final EventLoopGroupHolder eventLoopGroupHolder
      ) {

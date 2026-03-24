@@ -18,6 +18,7 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.RegistrationInfo;
 import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponentLookup;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -321,6 +322,7 @@ class NamespacedWrapper<T> extends MappedRegistry<T> implements ILockableRegistr
             this.bindAllUnboundTagsToEmpty();
         }
 
+        this.componentLookup = new DataComponentLookup<>(this.holdersById);
         this.frozenTags = MappedRegistry.TagSet.fromMap(this.tags);
         this.delegate.onBindTags(this.tags);
         this.refreshTagsInHoldersForge();

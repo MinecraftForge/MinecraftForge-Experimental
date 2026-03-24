@@ -91,7 +91,7 @@
      public static class Properties {
          private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = id -> Util.makeDescriptionId("block", id.identifier());
          private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = id -> Util.makeDescriptionId("item", id.identifier());
-@@ -712,6 +_,11 @@
+@@ -721,6 +_,11 @@
  
          boolean isPeaceful();
  
@@ -103,7 +103,7 @@
          static Item.TooltipContext of(final @Nullable Level level) {
              return level == null ? EMPTY : new Item.TooltipContext() {
                  @Override
-@@ -732,6 +_,11 @@
+@@ -741,6 +_,11 @@
                  @Override
                  public boolean isPeaceful() {
                      return level.getDifficulty() == Difficulty.PEACEFUL;

@@ -96,7 +96,7 @@
          return groupData;
      }
  
-@@ -1386,15 +_,25 @@
+@@ -1382,15 +_,25 @@
          return flag;
      }
  
@@ -123,7 +123,7 @@
      @VisibleForTesting
      public void removeFreeWill() {
          this.removeAllGoals(goal -> true);
-@@ -1420,6 +_,41 @@
+@@ -1416,6 +_,41 @@
      @Override
      public @Nullable ItemStack getPickResult() {
          return SpawnEggItem.byId(this.getType()).map(ItemStack::new).orElse(null);

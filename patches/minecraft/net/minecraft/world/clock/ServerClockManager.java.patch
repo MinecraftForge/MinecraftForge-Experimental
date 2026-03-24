@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/clock/ServerClockManager.java
 +++ b/net/minecraft/world/clock/ServerClockManager.java
-@@ -96,6 +_,12 @@
+@@ -97,6 +_,12 @@
          return mutableboolean.booleanValue();
      }
  

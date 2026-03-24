@@ -16,7 +16,7 @@
                      }
  
                      this.save(chunkaccess);
-@@ -772,6 +_,7 @@
+@@ -775,6 +_,7 @@
                  this.activeChunkWrites.incrementAndGet();
                  SerializableChunkData serializablechunkdata = SerializableChunkData.copyOf(this.level, chunk);
                  CompletableFuture<CompoundTag> completablefuture = CompletableFuture.supplyAsync(serializablechunkdata::write, Util.backgroundExecutor());
@@ -24,7 +24,7 @@
                  this.write(chunkpos, completablefuture::join).handle((ignored, throwable) -> {
                      if (throwable != null) {
                          this.level.getServer().reportChunkSaveFailure(throwable, this.storageInfo(), chunkpos);
-@@ -1150,7 +_,7 @@
+@@ -1153,7 +_,7 @@
      }
  
      protected void addEntity(final Entity entity) {

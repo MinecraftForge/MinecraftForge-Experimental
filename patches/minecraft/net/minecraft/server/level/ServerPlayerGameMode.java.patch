@@ -11,7 +11,7 @@
          if (!this.player.isWithinBlockInteractionRange(pos, 1.0)) {
              this.debugLogging(pos, false, sequence, "too far");
          } else if (pos.getY() > maxY) {
-@@ -179,6 +_,7 @@
+@@ -185,6 +_,7 @@
                  float f = 1.0F;
                  BlockState blockstate = this.level.getBlockState(pos);
                  if (!blockstate.isAir()) {
@@ -19,7 +19,7 @@
                      EnchantmentHelper.onHitBlock(
                          this.level,
                          this.player.getMainHandItem(),
-@@ -190,6 +_,7 @@
+@@ -196,6 +_,7 @@
                          item -> this.player.onEquippedItemBroken(item, EquipmentSlot.MAINHAND)
                      );
                      blockstate.attack(this.level, pos, this.player);
@@ -27,7 +27,7 @@
                      f = blockstate.getDestroyProgress(this.player, this.player.level(), pos);
                  }
  
-@@ -256,7 +_,8 @@
+@@ -262,7 +_,8 @@
  
      public boolean destroyBlock(final BlockPos pos) {
          BlockState blockstate1 = this.level.getBlockState(pos);
@@ -37,7 +37,7 @@
              return false;
          } else {
              BlockEntity blockentity = this.level.getBlockEntity(pos);
-@@ -264,34 +_,50 @@
+@@ -270,34 +_,50 @@
              if (block instanceof GameMasterBlock && !this.player.canUseGameMasterBlocks()) {
                  this.level.sendBlockUpdated(pos, blockstate1, blockstate1, 3);
                  return false;
@@ -99,7 +99,7 @@
      }
  
      public InteractionResult useItem(final ServerPlayer player, final Level level, final ItemStack itemStack, final InteractionHand hand) {
-@@ -300,6 +_,8 @@
+@@ -306,6 +_,8 @@
          } else if (player.getCooldowns().isOnCooldown(itemStack)) {
              return InteractionResult.PASS;
          } else {
@@ -108,7 +108,7 @@
              int i = itemStack.getCount();
              int j = itemStack.getDamageValue();
              InteractionResult interactionresult = itemStack.use(level, player, hand);
-@@ -340,6 +_,11 @@
+@@ -346,6 +_,11 @@
          if (!blockstate.getBlock().isEnabled(level.enabledFeatures())) {
              return InteractionResult.FAIL;
          } else if (this.gameModeForPlayer == GameType.SPECTATOR) {
@@ -120,7 +120,7 @@
              MenuProvider menuprovider = blockstate.getMenuProvider(level, blockpos);
              if (menuprovider != null) {
                  player.openMenu(menuprovider);
-@@ -348,10 +_,16 @@
+@@ -354,10 +_,16 @@
                  return InteractionResult.PASS;
              }
          } else {
@@ -138,7 +138,7 @@
                  InteractionResult interactionresult = blockstate.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
                  if (interactionresult.consumesAction()) {
                      CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockpos, itemstack);
-@@ -367,8 +_,8 @@
+@@ -373,8 +_,8 @@
                  }
              }
  

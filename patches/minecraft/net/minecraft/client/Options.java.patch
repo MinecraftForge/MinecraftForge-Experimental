@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Options.java
 +++ b/net/minecraft/client/Options.java
-@@ -902,6 +_,7 @@
+@@ -921,6 +_,7 @@
      );
      public boolean syncWrites;
      public boolean startedCleanly = true;
@@ -8,7 +8,7 @@
  
      public static boolean isSoundDeviceDefault(final String deviceName) {
          return deviceName.equals("");
-@@ -1373,6 +_,7 @@
+@@ -1396,6 +_,7 @@
      }
  
      public Options(final Minecraft minecraft, final File workingDirectory) {
@@ -16,7 +16,7 @@
          this.minecraft = minecraft;
          this.optionsFile = new File(workingDirectory, "options.txt");
          boolean flag = Runtime.getRuntime().maxMemory() >= 1000000000L;
-@@ -1523,15 +_,28 @@
+@@ -1548,15 +_,28 @@
          this.startedCleanly = access.process("startedCleanly", this.startedCleanly);
          access.process("musicToast", this.musicToast);
          access.process("musicFrequency", this.musicFrequency);
@@ -46,7 +46,7 @@
          for (SoundSource soundsource : SoundSource.values()) {
              access.process("soundCategory_" + soundsource.getName(), this.soundSourceVolumes.get(soundsource));
          }
-@@ -1546,6 +_,10 @@
+@@ -1571,6 +_,10 @@
      }
  
      public void load() {
@@ -57,7 +57,7 @@
          try {
              if (!this.optionsFile.exists()) {
                  return;
-@@ -1565,7 +_,8 @@
+@@ -1590,7 +_,8 @@
              }
  
              final CompoundTag compoundtag1 = this.dataFix(compoundtag);
@@ -67,7 +67,7 @@
                  new Options.FieldAccess() {
                      {
                          Objects.requireNonNull(Options.this);
-@@ -1647,6 +_,17 @@
+@@ -1672,6 +_,17 @@
              );
              compoundtag1.getString("fullscreenResolution").ifPresent(fullscreenResolution -> this.fullscreenVideoModeString = fullscreenResolution);
              KeyMapping.resetMapping();
@@ -85,7 +85,7 @@
          } catch (Exception exception) {
              LOGGER.error("Failed to load options", (Throwable)exception);
          }
-@@ -1674,6 +_,7 @@
+@@ -1699,6 +_,7 @@
      public void save() {
          try (final PrintWriter printwriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8))) {
              printwriter.println("version:" + SharedConstants.getCurrentVersion().dataVersion().version());
@@ -93,7 +93,7 @@
              this.processOptions(
                  new Options.FieldAccess() {
                      {
-@@ -1681,6 +_,7 @@
+@@ -1706,6 +_,7 @@
                      }
  
                      public void writePrefix(final String name) {
@@ -101,7 +101,7 @@
                          printwriter.print(name);
                          printwriter.print(':');
                      }
-@@ -1736,6 +_,12 @@
+@@ -1761,6 +_,12 @@
              if (s != null) {
                  printwriter.println("fullscreenResolution:" + s);
              }
@@ -114,7 +114,7 @@
          } catch (Exception exception) {
              LOGGER.error("Failed to save options", (Throwable)exception);
          }
-@@ -1773,6 +_,7 @@
+@@ -1798,6 +_,7 @@
      }
  
      public void broadcastOptions() {
@@ -122,7 +122,7 @@
          if (this.minecraft.player != null) {
              this.minecraft.player.connection.broadcastClientInformation(this.buildPlayerInformation());
          }
-@@ -1890,6 +_,23 @@
+@@ -1915,6 +_,23 @@
  
      public static Component genericValueLabel(final Component caption, final int value) {
          return genericValueLabel(caption, Component.literal(Integer.toString(value)));

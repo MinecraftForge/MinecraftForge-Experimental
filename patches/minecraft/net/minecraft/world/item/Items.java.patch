@@ -27,7 +27,7 @@
  
          for (Block blockx : alternatives) {
              Item.BY_BLOCK.put(blockx, item);
-@@ -2398,10 +_,6 @@
+@@ -2402,10 +_,6 @@
  
      private static Item registerItem(final ResourceKey<Item> key, final Function<Item.Properties, Item> itemFactory, final Item.Properties properties) {
          Item item = itemFactory.apply(properties.setId(key));

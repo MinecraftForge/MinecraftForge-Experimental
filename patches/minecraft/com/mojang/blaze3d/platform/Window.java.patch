@@ -1,9 +1,9 @@
 --- a/com/mojang/blaze3d/platform/Window.java
 +++ b/com/mojang/blaze3d/platform/Window.java
-@@ -96,8 +_,9 @@
+@@ -97,8 +_,9 @@
          Monitor monitor = this.screenManager.getMonitor(GLFW.glfwGetPrimaryMonitor());
-         this.windowedWidth = this.width = Math.max(displayData.width(), 1);
-         this.windowedHeight = this.height = Math.max(displayData.height(), 1);
+         this.windowedWidth = this.width = allowedWindowMinSize(displayData.width());
+         this.windowedHeight = this.height = allowedWindowMinSize(displayData.height());
 -        this.handle = this.createWindow(backend, this.width, this.height, title, this.fullscreen && monitor != null ? monitor.getMonitor() : 0L);
 +        this.handle = net.minecraftforge.fml.loading.ImmediateWindowHandler.setupMinecraftWindow(this.width, this.height, title, this.fullscreen && monitor != null ? monitor.getMonitor() : 0L, () -> backend);
          this.backend = backend;
@@ -11,7 +11,7 @@
          if (monitor != null) {
              VideoMode videomode = monitor.getPreferredVidMode(this.fullscreen ? this.preferredFullscreenVideoMode : Optional.empty());
              this.windowedX = this.x = monitor.getX() + videomode.getWidth() / 2 - this.width / 2;
-@@ -109,6 +_,7 @@
+@@ -110,6 +_,7 @@
              this.windowedX = this.x = aint1[0];
              this.windowedY = this.y = aint[0];
          }
@@ -19,7 +19,7 @@
  
          this.setMode();
          this.refreshFramebufferSize();
-@@ -299,6 +_,9 @@
+@@ -300,6 +_,9 @@
          GLFW.glfwGetFramebufferSize(this.handle, aint, aint1);
          this.framebufferWidth = aint[0] > 0 ? aint[0] : 1;
          this.framebufferHeight = aint1[0] > 0 ? aint1[0] : 1;

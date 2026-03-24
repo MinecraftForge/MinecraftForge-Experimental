@@ -64,7 +64,7 @@
              if (this.dragonDeathTime == 1 && !this.isSilent()) {
 @@ -555,7 +_,8 @@
  
-         if (this.dragonDeathTime == 200 && this.level() instanceof ServerLevel serverlevel1) {
+         if (this.dragonDeathTime >= 200 && this.level() instanceof ServerLevel serverlevel1) {
              if (serverlevel1.getGameRules().get(GameRules.MOB_DROPS)) {
 -                ExperienceOrb.award(serverlevel1, this.position(), Mth.floor(i * 0.2F));
 +                int award = net.minecraftforge.event.ForgeEventFactory.getExperienceDrop(this, this.getUnlimitedLastHurtByPlayer(), Mth.floor((float)i * 0.2F));

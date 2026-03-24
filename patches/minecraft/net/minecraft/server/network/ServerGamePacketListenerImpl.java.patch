@@ -14,7 +14,7 @@
                          this.player.stopUsingItem();
                      }
  
-@@ -1501,8 +_,9 @@
+@@ -1503,8 +_,9 @@
                  }
  
                  CompletableFuture<FilteredText> completablefuture = this.filterTextPacket(playerchatmessage.signedContent());
@@ -25,7 +25,7 @@
                      PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(filtered.mask());
                      this.broadcastChatMessage(playerchatmessage1);
                  });
-@@ -2184,6 +_,7 @@
+@@ -2186,6 +_,7 @@
  
      @Override
      public void handleCustomPayload(final ServerboundCustomPayloadPacket packet) {
