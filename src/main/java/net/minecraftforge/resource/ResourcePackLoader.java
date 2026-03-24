@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
@@ -81,7 +80,7 @@ public class ResourcePackLoader {
 
     private static void findPacks(Consumer<Pack> packAcceptor, boolean client) {
         var type = client ? PackType.CLIENT_RESOURCES : PackType.SERVER_DATA;
-        var version = DetectedVersion.BUILT_IN.packVersion(PackType.CLIENT_RESOURCES);
+        var version = DetectedVersion.BUILT_IN.packVersion(type);
         var hiddenPacks = new ArrayList<PackResources>();
 
         for (var mod : ModList.getModFiles()) {
