@@ -29,7 +29,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-public class DatagenModLoader {
+public final class DatagenModLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static ExistingFileHelper existingFileHelper;
     private static boolean runningDataGen;

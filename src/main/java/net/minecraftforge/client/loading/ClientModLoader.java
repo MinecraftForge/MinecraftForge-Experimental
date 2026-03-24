@@ -30,7 +30,7 @@ import net.minecraftforge.client.gui.LoadingErrorScreen;
 import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.LanguageHook;
 
-public class ClientModLoader {
+public final class ClientModLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static boolean loading;
     private static Minecraft mc;

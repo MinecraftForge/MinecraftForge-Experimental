@@ -16,8 +16,7 @@ import org.apache.logging.log4j.Logger;
 import java.io.File;
 import java.util.List;
 
-public class ServerModLoader
-{
+public final class ServerModLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static boolean hasErrors = false;
 
