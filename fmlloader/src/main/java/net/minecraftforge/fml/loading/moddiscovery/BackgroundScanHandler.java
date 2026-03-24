@@ -17,8 +17,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.concurrent.*;
 
-public class BackgroundScanHandler
-{
+public final class BackgroundScanHandler {
     private enum ScanStatus {
         NOT_STARTED,
         RUNNING,
@@ -33,7 +32,6 @@ public class BackgroundScanHandler
     private final ExecutorService modContentScanner;
     private final List<ModFile> modFiles;
     private ScanStatus status;
-    private LoadingModList loadingModList;
 
     public BackgroundScanHandler(final List<ModFile> modFiles) {
         this.modFiles = modFiles;
@@ -67,16 +65,6 @@ public class BackgroundScanHandler
             status = ScanStatus.ERRORED;
             LOGGER.error(LogMarkers.SCAN, "An error occurred scanning file {}", file, throwable);
         }
-    }
-
-    public void setLoadingModList(LoadingModList loadingModList)
-    {
-        this.loadingModList = loadingModList;
-    }
-
-    public LoadingModList getLoadingModList()
-    {
-        return loadingModList;
     }
 
     public void waitForScanToComplete(final Runnable ticker) {

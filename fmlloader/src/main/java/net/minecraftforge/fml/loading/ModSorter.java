@@ -33,10 +33,10 @@ import java.util.stream.Stream;
 
 import static net.minecraftforge.fml.loading.LogMarkers.LOADING;
 
-public class ModSorter {
+public final class ModSorter {
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    private record State(List<ModFile> files, List<ModInfo> mods) {}
+    record State(List<ModFile> files, List<ModInfo> mods) {}
 
     private ModSorter() {}
 
@@ -52,7 +52,7 @@ public class ModSorter {
             // Note this will never actually throw an error because the duplicate checks are done in ModDiscovererer before we get to this phase
             // So all this is really doing is wasting time.
             // But i'm leaving it here until I rewrite all of cpw's mod loading code because its such a clusterfuck.
-            return LoadingModList.of(systemMods.files(), systemMods.mods(), e);
+            return LoadingModListImpl.init(systemMods, e);
         }
 
         var named = new HashMap<String, ModInfo>();
@@ -66,15 +66,15 @@ public class ModSorter {
 
         // if we miss one or the other, we abort now
         if (!failedList.isEmpty()) {
-            return LoadingModList.of(systemMods.files(), systemMods.mods(), new EarlyLoadingException("failure to validate mod list", null, failedList));
+            return LoadingModListImpl.init(systemMods, new EarlyLoadingException("failure to validate mod list", null, failedList));
         } else {
             // Otherwise, lets try and sort the modlist and proceed
             try {
                 var sorted = sort(modFiles, named);
-                return LoadingModList.of(sorted.files(), sorted.mods(), null);
+                return LoadingModListImpl.init(sorted, null);
             } catch (EarlyLoadingException e) {
                 // The only exception that can happen here is a cyclic exception, but fall back to system mods so we can display the nice screen.
-                return LoadingModList.of(systemMods.files(), systemMods.mods(), e);
+                return LoadingModListImpl.init(systemMods, e);
             }
         }
     }

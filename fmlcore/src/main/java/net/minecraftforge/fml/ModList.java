@@ -6,6 +6,7 @@
 package net.minecraftforge.fml;
 
 import net.minecraftforge.fml.loading.FMLLoader;
+import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.language.ModFileScanData;
@@ -41,9 +42,8 @@ public final class ModList {
     private static List<ModContainer> sortedContainers;
 
     static {
-        var loadingModList = FMLLoader.getLoadingModList();
-        var loadingModFiles = loadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList();
-        var loadingSortedList = loadingModList.getMods();
+        var loadingModFiles = LoadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList();
+        var loadingSortedList = LoadingModList.getMods();
 
         var modFileInfos = MOD_FILES = loadingModFiles.stream().map(ModFile::getModFileInfo).toList();
         SORTED_LIST = loadingSortedList.stream().map(IModInfo.class::cast).toList();

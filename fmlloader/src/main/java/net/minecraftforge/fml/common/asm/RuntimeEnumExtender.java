@@ -49,7 +49,7 @@ public class RuntimeEnumExtender implements ILaunchPluginService {
 
     private static final class LazyInit {
         private LazyInit() {}
-        private static final boolean ANY_MODS = LoadingModList.get().getMods().size() > 2; // 2: forge, minecraft
+        private static final boolean ANY_MODS = LoadingModList.getMods().size() > 2; // 2: forge, minecraft
     }
 
     @Override

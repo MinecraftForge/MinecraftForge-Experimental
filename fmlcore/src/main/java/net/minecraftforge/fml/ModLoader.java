@@ -10,6 +10,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.loading.FMLLoader;
 import net.minecraftforge.fml.loading.ImmediateWindowHandler;
+import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.fml.loading.moddiscovery.InvalidModIdentifier;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
@@ -100,12 +101,11 @@ public final class ModLoader {
      * @param periodicTask Optional periodic task to perform on the main thread while other activities run
      */
     public static void gatherAndInitializeMods(final ModWorkManager.DrivenExecutor syncExecutor, final Executor parallelExecutor, final Runnable periodicTask) {
-        var loadingModList = FMLLoader.getLoadingModList();
-        var loadingExceptions = loadingModList.getErrors().stream()
+        var loadingExceptions = LoadingModList.getErrors().stream()
                 .flatMap(ModLoadingException::fromEarlyException)
                 .toList();
         ModLoader.LOADING_EXCEPTIONS.addAll(loadingExceptions);
-        LOADING_WARNINGS.addAll(loadingModList.getBrokenFiles().stream()
+        LOADING_WARNINGS.addAll(LoadingModList.getBrokenFiles().stream()
                 .map(file -> new ModLoadingWarning(null, ModLoadingStage.VALIDATE, InvalidModIdentifier.identifyJarProblem(file.getFilePath()).orElse("fml.modloading.brokenfile"), file.getFileName()))
                 .toList());
         Set<IModInfo> erroredModInfos;
@@ -115,7 +115,7 @@ public final class ModLoader {
             erroredModInfos = Collections.newSetFromMap(new IdentityHashMap<>());
             erroredModInfos.addAll(loadingExceptions.stream().map(ModLoadingException::getModInfo).toList());
         }
-        loadingModList.getModFiles().stream()
+        LoadingModList.getModFiles().stream()
                 .filter(ModFileInfo::missingLicense)
                 .filter(modFileInfo -> modFileInfo.getMods().stream().noneMatch(erroredModInfos::contains)) //Ignore files where any other mod already encountered an error
                 .map(modFileInfo -> new ModLoadingException(null, ModLoadingStage.VALIDATE, "fml.modloading.missinglicense", null, modFileInfo.getFile()))
@@ -138,7 +138,7 @@ public final class ModLoader {
             throw new LoadingFailedException(LOADING_EXCEPTIONS);
         }
         var failedBounds = new ArrayList<ForgeFeature.Bound>();
-        for (var mod : loadingModList.getMods()) {
+        for (var mod : LoadingModList.getMods()) {
             for (var feature : mod.getForgeFeatures()) {
                 if (!ForgeFeature.testFeature(FMLEnvironment.dist, feature))
                     failedBounds.add(feature);
@@ -156,7 +156,7 @@ public final class ModLoader {
         }
 
         final var modContainers = new HashMap<String, ModContainer>();
-        for (var file : loadingModList.getModFiles()) {
+        for (var file : LoadingModList.getModFiles()) {
             var containers = buildMods(file.getFile());
             for (var container : containers)
                 modContainers.put(container.getModId(), container);

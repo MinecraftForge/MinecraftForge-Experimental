@@ -31,7 +31,6 @@ public class ModValidator {
     private final List<ModFile> candidatePlugins;
     private final List<ModFile> candidateMods;
     private final List<ModFile> gameLibraries;
-    private LoadingModList loadingModList;
     private final List<IModFile> brokenFiles = new ArrayList<>();
     private final List<EarlyLoadingException.ExceptionData> discoveryErrorData;
 
@@ -87,7 +86,7 @@ public class ModValidator {
         // If any detectable error happens during the sorting process {missing deps, duplicates,
         // This helps prevent coremods/mixins from screwing up us displaying the error screens that the sorting/validation is trying to display.
         // This won't fix them all as they are still loaded and will still apply but it might help
-        for (var info : this.loadingModList.getModFiles())
+        for (var info : LoadingModList.getModFiles())
             mods.add(info.getFile().getSecureJar());
 
         // Add any game libraries, this *may* be duplicates, depending on the state of the sorting. But until I get around to re-writing
@@ -124,11 +123,12 @@ public class ModValidator {
         var allErrors = new ArrayList<>(errors);
         allErrors.addAll(this.discoveryErrorData);
 
-        loadingModList = ModSorter.sort(candidateMods, allErrors);
-        loadingModList.addAccessTransformers();
-        loadingModList.setBrokenFiles(brokenFiles);
-        BackgroundScanHandler backgroundScanHandler = new BackgroundScanHandler(candidateMods);
-        loadingModList.addForScanning(backgroundScanHandler);
+        ModSorter.sort(candidateMods, allErrors);
+        LoadingModList.getBrokenFiles().addAll(brokenFiles);
+        var backgroundScanHandler = new BackgroundScanHandler(candidateMods);
+        LoadingModList.getModFiles().stream()
+                .map(ModFileInfo::getFile)
+                .forEach(backgroundScanHandler::submitForScanning);
         return backgroundScanHandler;
     }
 }
