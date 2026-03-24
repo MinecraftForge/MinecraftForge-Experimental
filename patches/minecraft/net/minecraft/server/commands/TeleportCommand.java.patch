@@ -1,12 +1,23 @@
 --- a/net/minecraft/server/commands/TeleportCommand.java
 +++ b/net/minecraft/server/commands/TeleportCommand.java
-@@ -248,6 +_,9 @@
-         float p_139023_,
-         @Nullable LookAt p_365991_
+@@ -237,14 +_,17 @@
+         final CommandSourceStack source,
+         final Entity victim,
+         final ServerLevel level,
+-        final double x,
+-        final double y,
+-        final double z,
++        double x,
++        double y,
++        double z,
+         final Set<Relative> relatives,
+         final float yRot,
+         final float xRot,
+         final @Nullable LookAt lookAt
      ) throws CommandSyntaxException {
-+        var event = net.minecraftforge.event.ForgeEventFactory.onEntityTeleportCommand(p_139016_, p_139018_, p_139019_, p_139020_);
++        var event = net.minecraftforge.event.ForgeEventFactory.onEntityTeleportCommand(victim, x, y, z);
 +        if (event == null) return;
-+        p_139018_ = event.getTargetX(); p_139019_ = event.getTargetY(); p_139020_ = event.getTargetZ();
-         BlockPos blockpos = BlockPos.containing(p_139018_, p_139019_, p_139020_);
++        x = event.getTargetX(); y = event.getTargetY(); z = event.getTargetZ();
+         BlockPos blockpos = BlockPos.containing(x, y, z);
          if (!Level.isInSpawnableBounds(blockpos)) {
              throw INVALID_POSITION.create();

@@ -1,45 +1,45 @@
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -64,14 +_,16 @@
+@@ -77,14 +_,16 @@
  
      @Override
-     protected boolean mayPlaceOn(BlockState p_57053_, BlockGetter p_57054_, BlockPos p_57055_) {
--        return p_57053_.is(Blocks.FARMLAND);
-+        return p_57053_.getBlock() instanceof net.minecraft.world.level.block.FarmBlock;
+     protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
+-        return state.is(this.stemSupportBlocks);
++        return state.is(this.stemSupportBlocks) || state.getBlock() instanceof FarmlandBlock;
      }
  
      @Override
-     protected void randomTick(BlockState p_222538_, ServerLevel p_222539_, BlockPos p_222540_, RandomSource p_222541_) {
-+        if (!p_222539_.isAreaLoaded(p_222540_, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
-         if (p_222539_.getRawBrightness(p_222540_, 0) >= 9) {
-             float f = CropBlock.getGrowthSpeed(this, p_222539_, p_222540_);
--            if (p_222541_.nextInt((int)(25.0F / f) + 1) == 0) {
-+            var vanilla = p_222541_.nextInt((int)(25.0F / f) + 1) == 0;
-+            if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(p_222539_, p_222540_, p_222538_, vanilla)) {
-                 int i = p_222538_.getValue(AGE);
+     protected void randomTick(BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
++        if (!level.isAreaLoaded(pos, 1)) return; // Forge: prevent loading unloaded chunks when checking neighbor's light
+         if (level.getRawBrightness(pos, 0) >= 9) {
+             float f = CropBlock.getGrowthSpeed(this, level, pos);
+-            if (random.nextInt((int)(25.0F / f) + 1) == 0) {
++            var vanilla = random.nextInt((int)(25.0F / f) + 1) == 0;
++            if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, vanilla)) {
+                 int i = state.getValue(AGE);
                  if (i < 7) {
-                     p_222538_ = p_222538_.setValue(AGE, i + 1);
-@@ -80,7 +_,7 @@
-                     Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(p_222541_);
-                     BlockPos blockpos = p_222540_.relative(direction);
-                     BlockState blockstate = p_222539_.getBlockState(blockpos.below());
--                    if (p_222539_.getBlockState(blockpos).isAir() && (blockstate.is(Blocks.FARMLAND) || blockstate.is(BlockTags.DIRT))) {
-+                    if (p_222539_.getBlockState(blockpos).isAir() && (blockstate.getBlock() instanceof net.minecraft.world.level.block.FarmBlock || blockstate.is(BlockTags.DIRT))) {
-                         Registry<Block> registry = p_222539_.registryAccess().lookupOrThrow(Registries.BLOCK);
+                     state = state.setValue(AGE, i + 1);
+@@ -93,7 +_,7 @@
+                     Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
+                     BlockPos blockpos = pos.relative(direction);
+                     BlockState blockstate = level.getBlockState(blockpos.below());
+-                    if (level.getBlockState(blockpos).isAir() && blockstate.is(this.fruitSupportBlocks)) {
++                    if (level.getBlockState(blockpos).isAir() && (blockstate.is(this.fruitSupportBlocks) || blockstate.getBlock() instanceof FarmlandBlock)) {
+                         Registry<Block> registry = level.registryAccess().lookupOrThrow(Registries.BLOCK);
                          Optional<Block> optional = registry.getOptional(this.fruit);
                          Optional<Block> optional1 = registry.getOptional(this.attachedStem);
-@@ -90,6 +_,7 @@
+@@ -103,6 +_,7 @@
                          }
                      }
                  }
-+                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(p_222539_, p_222540_, p_222538_);
++                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
              }
          }
      }
-@@ -122,5 +_,10 @@
+@@ -135,5 +_,10 @@
      @Override
-     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> p_57040_) {
-         p_57040_.add(AGE);
+     protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {
+         builder.add(AGE);
 +    }
 +
 +    @Override

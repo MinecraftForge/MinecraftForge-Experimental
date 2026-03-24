@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/biome/BiomeSpecialEffects.java
 +++ b/net/minecraft/world/level/biome/BiomeSpecialEffects.java
-@@ -24,6 +_,10 @@
-             .apply(p_449881_, BiomeSpecialEffects::new)
+@@ -29,6 +_,10 @@
+             .apply(i, BiomeSpecialEffects::new)
      );
  
 +    public net.minecraftforge.common.world.BiomeSpecialEffectsBuilder copy() {
@@ -11,7 +11,7 @@
      public static class Builder {
          protected OptionalInt waterColor = OptionalInt.empty();
          protected Optional<Integer> foliageColorOverride = Optional.empty();
-@@ -31,6 +_,10 @@
+@@ -36,6 +_,10 @@
          protected Optional<Integer> grassColorOverride = Optional.empty();
          protected BiomeSpecialEffects.GrassColorModifier grassColorModifier = BiomeSpecialEffects.GrassColorModifier.NONE;
  
@@ -19,10 +19,10 @@
 +            return net.minecraftforge.common.world.BiomeSpecialEffectsBuilder.create();
 +        }
 +
-         public BiomeSpecialEffects.Builder waterColor(int p_48035_) {
-             this.waterColor = OptionalInt.of(p_48035_);
+         public BiomeSpecialEffects.Builder waterColor(final int waterColor) {
+             this.waterColor = OptionalInt.of(waterColor);
              return this;
-@@ -67,7 +_,7 @@
+@@ -72,7 +_,7 @@
          }
      }
  
@@ -30,28 +30,27 @@
 +    public static enum GrassColorModifier implements StringRepresentable, net.minecraftforge.common.IExtensibleEnum {
          NONE("none") {
              @Override
-             public int modifyColor(double p_48081_, double p_48082_, int p_48083_) {
-@@ -89,11 +_,16 @@
+             public int modifyColor(final double x, final double z, final int baseColor) {
+@@ -94,9 +_,16 @@
          };
  
          private final String name;
--        public static final Codec<BiomeSpecialEffects.GrassColorModifier> CODEC = StringRepresentable.fromEnum(
--            BiomeSpecialEffects.GrassColorModifier::values
+-        public static final Codec<BiomeSpecialEffects.GrassColorModifier> CODEC = StringRepresentable.fromEnum(BiomeSpecialEffects.GrassColorModifier::values);
 +        public static final Codec<BiomeSpecialEffects.GrassColorModifier> CODEC = net.minecraftforge.common.IExtensibleEnum.createCodecForExtensibleEnum(
 +            BiomeSpecialEffects.GrassColorModifier::values,
 +            BiomeSpecialEffects.GrassColorModifier::byName
-         );
++        );
 +        private static final java.util.Map<String, GrassColorModifier> BY_NAME = java.util.Arrays.stream(values()).collect(java.util.stream.Collectors.toMap(BiomeSpecialEffects.GrassColorModifier::getName, grassColorModifier -> grassColorModifier));
 +        private ColorModifier delegate;
  
--        public abstract int modifyColor(double p_48065_, double p_48066_, int p_48067_);
-+        public int modifyColor(double p_48065_, double p_48066_, int p_48067_) {
-+            return delegate.modifyGrassColor(p_48065_, p_48066_, p_48067_);
+-        public abstract int modifyColor(final double x, final double z, final int baseColor);
++        public int modifyColor(final double x, final double z, final int baseColor) {
++            return delegate.modifyGrassColor(x, z, baseColor);
 +        }
  
-         GrassColorModifier(final String p_48058_) {
-             this.name = p_48058_;
-@@ -106,6 +_,30 @@
+         private GrassColorModifier(final String name) {
+             this.name = name;
+@@ -109,6 +_,30 @@
          @Override
          public String getSerializedName() {
              return this.name;

@@ -1,32 +1,33 @@
 --- a/net/minecraft/world/item/crafting/RecipeManager.java
 +++ b/net/minecraft/world/item/crafting/RecipeManager.java
-@@ -63,14 +_,21 @@
+@@ -63,15 +_,22 @@
      private SelectableRecipe.SingleInputSet<StonecutterRecipe> stonecutterRecipes = SelectableRecipe.SingleInputSet.empty();
      private List<RecipeManager.ServerDisplayInfo> allDisplays = List.of();
      private Map<ResourceKey<Recipe<?>>, List<RecipeManager.ServerDisplayInfo>> recipeToDisplay = Map.of();
 +    private final net.minecraftforge.common.crafting.conditions.ICondition.IContext context; //Forge: add context
  
 +    /** @deprecated Forge: use {@linkplain RecipeManager#RecipeManager(net.minecraftforge.common.crafting.conditions.ICondition.IContext) constructor with context}. */
-     public RecipeManager(HolderLookup.Provider p_330459_) {
-+        this(p_330459_, net.minecraftforge.common.crafting.conditions.ICondition.IContext.EMPTY);
+     public RecipeManager(final HolderLookup.Provider registries) {
++        this(registries, net.minecraftforge.common.crafting.conditions.ICondition.IContext.EMPTY);
 +    }
 +
-+    public RecipeManager(HolderLookup.Provider p_330459_, net.minecraftforge.common.crafting.conditions.ICondition.IContext context) {
-         this.registries = p_330459_;
++    public RecipeManager(HolderLookup.Provider registries, net.minecraftforge.common.crafting.conditions.ICondition.IContext context) {
+         this.registries = registries;
 +        this.context = context;
      }
  
-     protected RecipeMap prepare(ResourceManager p_368640_, ProfilerFiller p_361102_) {
+     protected RecipeMap prepare(final ResourceManager manager, final ProfilerFiller profiler) {
          SortedMap<Identifier, Recipe<?>> sortedmap = new TreeMap<>();
--        SimpleJsonResourceReloadListener.scanDirectory(p_368640_, RECIPE_LISTER, this.registries.createSerializationContext(JsonOps.INSTANCE), Recipe.CODEC, sortedmap);
-+        SimpleJsonResourceReloadListener.scanDirectory(p_368640_, RECIPE_LISTER, this.context.wrap(this.registries.createSerializationContext(JsonOps.INSTANCE)), Recipe.CODEC, sortedmap);
+         SimpleJsonResourceReloadListener.scanDirectory(
+-            manager, RECIPE_LISTER, this.registries.createSerializationContext(JsonOps.INSTANCE), Recipe.CODEC, sortedmap
++            manager, RECIPE_LISTER, this.context.wrap(this.registries.createSerializationContext(JsonOps.INSTANCE)), Recipe.CODEC, sortedmap
+         );
          List<RecipeHolder<?>> list = new ArrayList<>(sortedmap.size());
-         sortedmap.forEach((p_449831_, p_449832_) -> {
-             ResourceKey<Recipe<?>> resourcekey = ResourceKey.create(Registries.RECIPE, p_449831_);
-@@ -86,6 +_,7 @@
+         sortedmap.forEach((id, recipe) -> {
+@@ -88,6 +_,7 @@
      }
  
-     public void finalizeRecipeLoading(FeatureFlagSet p_360842_) {
+     public void finalizeRecipeLoading(final FeatureFlagSet enabledFlags) {
 +        //net.minecraftforge.event.ForgeEventFactory.onTagsUpdated(this.registries, false, false);
          List<SelectableRecipe.SingleInputEntry<StonecutterRecipe>> list = new ArrayList<>();
          List<RecipeManager.IngredientCollector> list1 = RECIPE_PROPERTY_SETS.entrySet()

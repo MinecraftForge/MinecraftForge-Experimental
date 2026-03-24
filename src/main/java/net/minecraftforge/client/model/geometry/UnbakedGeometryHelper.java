@@ -7,21 +7,16 @@ package net.minecraftforge.client.model.geometry;
 
 import com.mojang.math.Quadrant;
 import com.mojang.math.Transformation;
-import net.minecraft.util.Util;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.BlockElement;
-import net.minecraft.client.renderer.block.model.BlockElementFace;
-import net.minecraft.client.renderer.block.model.FaceBakery;
-import net.minecraft.client.renderer.block.model.ItemModelGenerator;
-import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
-import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.cuboid.FaceBakery;
+import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.model.SimpleModelState;
@@ -31,8 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import java.util.BitSet;
-import java.util.List;
-import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -85,25 +78,20 @@ public class UnbakedGeometryHelper {
     }
 
     /**
-     * Creates a list of {@linkplain BlockElement block elements} in the shape of the specified sprite contents.
-     * These can later be baked using the same, or another texture.
-     * <p>
-     * The {@link Direction#NORTH} and {@link Direction#SOUTH} faces take up the whole surface.
+     * Builds the model who's {@link Direction#NORTH} and {@link Direction#SOUTH} faces take up only the pixels the texture uses.
+     *
+     * This is basically ItemModelGenrator#bakeExtrudedSprite except for the front faces are not spread across the entire side
+     *
+     * Takes in a template MaterialInfo for the geometry, and a separate one to actually apply the texture from
      */
-    public static List<BlockElement> createUnbakedItemElements(int layerIndex, SpriteContents spriteContents) {
-        return ItemModelGenerator.processFrames(layerIndex, "layer" + layerIndex, spriteContents);
-    }
-
-    /**
-     * Creates a list of {@linkplain BlockElement block elements} in the shape of the specified sprite contents.
-     * These can later be baked using the same, or another texture.
-     * <p>
-     * The {@link Direction#NORTH} and {@link Direction#SOUTH} faces take up only the pixels the texture uses.
-     */
-    public static List<BlockElement> createUnbakedItemMaskElements(int layerIndex, SpriteContents spriteContents) {
-        var elements = createUnbakedItemElements(layerIndex, spriteContents);
-        elements.remove(0); // Remove north and south faces
-
+    public static void bakeMaskedSprite(
+        final QuadCollection.Builder builder,
+        final ModelBaker.Interner interner,
+        final ModelState state,
+        final BakedQuad.MaterialInfo texture,
+        final BakedQuad.MaterialInfo template
+    ) {
+        var spriteContents = template.sprite().contents();
         int width = spriteContents.width(), height = spriteContents.height();
         var bits = new BitSet(width * height);
 
@@ -140,56 +128,26 @@ public class UnbakedGeometryHelper {
                         for (int j = y; j < yEnd; j++)
                             bits.clear(i + j * width);
 
+                    var from = new Vector3f(16 * xStart / (float) width, 16 - 16 * yEnd / (float) height, 7.5F);
+                    var to = new Vector3f(16 * x / (float) width, 16 - 16 * y / (float) height, 8.5F);
+
                     // Create element
-                    elements.add(new BlockElement(
-                        new Vector3f(16 * xStart / (float) width, 16 - 16 * yEnd / (float) height, 7.5F),
-                        new Vector3f(16 * x / (float) width, 16 - 16 * y / (float) height, 8.5F),
-                        Util.makeEnumMap(Direction.class, dir -> new BlockElementFace(dir, layerIndex, "layer" + layerIndex, new BlockElementFace.UVs(0F, 0F, 16F, 16F), Quadrant.R0))
-                    ));
+                    builder.addUnculledFace(FaceBakery.bakeQuad(interner, from, to, ItemModelGenerator.SOUTH_FACE_UVS, Quadrant.R0, texture, Direction.SOUTH, state, null));
+                    builder.addUnculledFace(FaceBakery.bakeQuad(interner, from, to, ItemModelGenerator.NORTH_FACE_UVS, Quadrant.R0, texture, Direction.NORTH, state, null));
 
                     // Reset xStart
                     xStart = -1;
                 }
             }
         }
-        return elements;
-    }
 
-    /**
-     * Bakes a list of {@linkplain BlockElement block elements} and returns a {@link QuadCollection}.
-     */
-    public static QuadCollection bakeElements(ModelBaker.PartCache cache, List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState) {
-        var builder = new QuadCollection.Builder();
-        bakeElements(cache, elements, spriteGetter, modelState, builder);
-        return builder.build();
-    }
-
-    /**
-     * Adds a list of {@linkplain BlockElement block elements} int a {@link QuadCollection.Builder}.
-     */
-    public static void bakeElements(ModelBaker.PartCache cache, List<BlockElement> elements, Function<Material, TextureAtlasSprite> spriteGetter, ModelState modelState, QuadCollection.Builder builder) {
-        for (var element : elements) {
-            element.faces().forEach((side, face) -> {
-                var sprite = spriteGetter.apply(getMaterial(face.texture()));
-                var quad = bakeElementFace(cache, element, face, sprite, side, modelState, element.lightEmission());
-                if (face.cullForDirection() == null)
-                    builder.addUnculledFace(quad);
-                else
-                    builder.addCulledFace(Direction.rotate(modelState.transformation().getMatrix(), face.cullForDirection()), quad);
-            });
-        }
+        // Re-use vanilla code to create the side geometry
+        ItemModelGenerator.bakeSideFaces(builder, interner, state, texture, template);
     }
 
     @SuppressWarnings("deprecation")
     private static Material getMaterial(String texture) {
-        return new Material(TextureAtlas.LOCATION_BLOCKS, Identifier.parse(texture));
-    }
-
-    /**
-     * Turns a single {@link BlockElementFace} into a {@link BakedQuad}.
-     */
-    public static BakedQuad bakeElementFace(ModelBaker.PartCache cache, BlockElement element, BlockElementFace face, TextureAtlasSprite sprite, Direction direction, ModelState state, int lightEmission) {
-        return FaceBakery.bakeQuad(cache, element.from(), element.to(), face, sprite, direction, state, element.rotation(), element.shade(), lightEmission);
+        return new Material(Identifier.parse(texture));
     }
 
     /**

@@ -51,6 +51,7 @@ import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
 import net.minecraft.network.FriendlyByteBuf;
@@ -191,6 +192,7 @@ import net.minecraft.world.level.block.state.pattern.BlockInWorld;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+import net.minecraft.world.level.levelgen.structure.templatesystem.loader.TemplateSource;
 
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
@@ -226,13 +228,14 @@ public final class ForgeHooks {
         return player.hasCorrectToolForDrops(state);
     }
 
-    public static Brain<?> onLivingMakeBrain(LivingEntity entity, Brain<?> originalBrain, Dynamic<?> dynamic) {
+    public static Brain<?> onLivingMakeBrain(final LivingEntity entity, final Brain<?> originalBrain, final Brain.Packed packedBrain) {
         if (!LivingMakeBrainEvent.BUS.hasListeners())
             return originalBrain;
 
-        BrainBuilder<?> brainBuilder = originalBrain.createBuilder();
+        @SuppressWarnings("unchecked")
+        var brainBuilder = (BrainBuilder<LivingEntity>)originalBrain.createBuilder();
         LivingMakeBrainEvent.BUS.post(new LivingMakeBrainEvent(entity, brainBuilder));
-        return brainBuilder.makeBrain(dynamic);
+        return brainBuilder.makeBrain(entity, packedBrain);
     }
 
     public static boolean onLivingAttack(LivingEntity entity, DamageSource src, float amount) {
@@ -255,13 +258,6 @@ public final class ForgeHooks {
     public static float onLivingDamage(LivingEntity entity, DamageSource src, float amount) {
         LivingDamageEvent event = new LivingDamageEvent(entity, src, amount);
         return LivingDamageEvent.BUS.post(event) ? 0 : event.getAmount();
-    }
-
-    public static InteractionResult onInteractEntityAt(Entity entity, Player player, Vec3 vec3d, InteractionHand hand) {
-        var ret = new PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, vec3d);
-        if (PlayerInteractEvent.EntityInteractSpecific.BUS.post(ret))
-            return ret.getCancellationResult();
-        return entity.interactAt(player, vec3d, hand);
     }
 
     public static int getLootingLevel(Entity target, @Nullable Entity killer, @Nullable DamageSource cause) {
@@ -412,7 +408,7 @@ public final class ForgeHooks {
         var lookup = level.holderLookup(Registries.ENCHANTMENT);
         int fortuneLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.FORTUNE), stack);
         int silkTouchLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.SILK_TOUCH), stack);
-        int exp = state.getExpDrop(level, level.random, pos, fortuneLevel, silkTouchLevel);
+        int exp = state.getExpDrop(level, level.getRandom(), pos, fortuneLevel, silkTouchLevel);
         if (exp > 0)
             state.getBlock().popExperience(level, pos, exp);
     }
@@ -563,8 +559,8 @@ public final class ForgeHooks {
     @NotNull
     public static ItemStack getCraftingRemainingItem(@NotNull ItemStack stack) {
         var remainder = stack.getCraftingRemainder();
-        if (!remainder.isEmpty()) {
-            stack = remainder;
+        if (remainder != null) {
+            stack = remainder.create();
             if (!stack.isEmpty() && stack.isDamageableItem() && stack.getDamageValue() > stack.getMaxDamage()) {
                 ForgeEventFactory.onPlayerDestroyItem(CRAFTING_PLAYER.get(), stack, (EquipmentSlot)null);
                 return ItemStack.EMPTY;
@@ -809,7 +805,7 @@ public final class ForgeHooks {
     public static void writeAdditionalLevelSaveData(WorldData worldData, CompoundTag levelTag) {
         CompoundTag fmlData = new CompoundTag();
         ListTag modList = new ListTag();
-        ModList.get().getMods().forEach(mi -> {
+        ModList.getMods().forEach(mi -> {
             final CompoundTag mod = new CompoundTag();
             mod.putString("ModId", mi.getModId());
             mod.putString("ModVersion", MavenVersionStringHelper.artifactVersionToString(mi.getVersion()));
@@ -854,7 +850,7 @@ public final class ForgeHooks {
 
                 String modVersion = mod.getStringOr("ModVersion", null);
                 final var previousVersion = new DefaultArtifactVersion(modVersion);
-                ModList.get().getModContainerById(modId).ifPresentOrElse(container -> {
+                ModList.getModContainerById(modId).ifPresentOrElse(container -> {
                     final var loadingVersion = container.getModInfo().getVersion();
                     if (!loadingVersion.equals(previousVersion)) {
                         // Enqueue mismatched versions for bulk event
@@ -1019,9 +1015,10 @@ public final class ForgeHooks {
     @SuppressWarnings("deprecation")
     public static void onLivingBreathe(LivingEntity entity, int consumeAirAmount, int refillAirAmount) {
         // Check things that vanilla considers to be air - these will cause the air supply to be increased.
-        boolean isAir = entity.getEyeInFluidType().isAir() || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
+        var eyeFluid = entity.getEyeInFluidType();
+        boolean isAir = eyeFluid == null || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
         // The following effects cause the entity to not drown, but do not cause the air supply to be increased.
-        boolean canBreathe = !entity.canDrownInFluidType(entity.getEyeInFluidType()) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
+        boolean canBreathe = !entity.canDrownInFluidType(eyeFluid) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
         var breatheEvent = ForgeEventFactory.onLivingBreathe(entity, isAir || canBreathe, consumeAirAmount, refillAirAmount, isAir);
         if (breatheEvent.canBreathe()) {
             if (breatheEvent.canRefillAir()) {
@@ -1054,7 +1051,12 @@ public final class ForgeHooks {
         }
     }
 
-    public static void onCreativeModeTabBuildContents(CreativeModeTab tab, ResourceKey<CreativeModeTab> tabKey, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+    public static void onCreativeModeTabBuildContents(CreativeModeTab tab, CreativeModeTab.DisplayItemsGenerator originalGenerator, CreativeModeTab.ItemDisplayParameters params, CreativeModeTab.Output output) {
+        if (!BuildCreativeModeTabContentsEvent.BUS.hasListeners()) {
+            originalGenerator.accept(params, output);
+            return;
+        }
+
         final var entries = new MutableHashedLinkedMap<ItemStack, CreativeModeTab.TabVisibility>(ItemStackLinkedSet.TYPE_AND_TAG,
             (key, left, right) -> {
                 //throw new IllegalStateException("Accidentally adding the same item stack twice " + key.getDisplayName().getString() + " to a Creative Mode Tab: " + tab.getDisplayName().getString());
@@ -1070,7 +1072,11 @@ public final class ForgeHooks {
             entries.put(stack, vis);
         });
 
-        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, tabKey, params, entries));
+        var key = BuiltInRegistries.CREATIVE_MODE_TAB
+                .getResourceKey(tab)
+                .orElseThrow(() -> new IllegalStateException("Unregistered creative tab: " + tab));
+
+        BuildCreativeModeTabContentsEvent.BUS.post(new BuildCreativeModeTabContentsEvent(tab, key, params, entries));
 
         for (var entry : entries)
             output.accept(entry.getKey(), entry.getValue());
@@ -1132,7 +1138,7 @@ public final class ForgeHooks {
     public static void handleClientConfigurationComplete(Connection connection) {
         if (NetworkContext.get(connection).getType() == ConnectionType.VANILLA) {
             LOGGER.info("Connected to a vanilla server. Catching up missing behaviour.");
-            ConfigTracker.INSTANCE.loadDefaultServerConfigs();
+            ConfigTracker.loadDefaultServerConfigs();
         } else
             LOGGER.info("Connected to a modded server.");
     }
@@ -1236,8 +1242,9 @@ public final class ForgeHooks {
 
     @Nullable
     public static DyeColor getDyeColorFromItemStack(ItemStack stack) {
-        if (stack.getItem() instanceof DyeItem dye)
-            return dye.getDyeColor();
+        var comp = stack.getComponents().get(DataComponents.DYE);
+        if (comp != null)
+            return comp;
 
         for (int x = 0; x < DyeColor.BLACK.getId(); x++) {
             var color = DyeColor.byId(x);
@@ -1271,8 +1278,22 @@ public final class ForgeHooks {
      *
      *  This is useful for game tests that need a structure, but want to create the contents in code.
      */
-    public static Optional<StructureTemplate> createEmptyStructure(Identifier name) {
-        if (name== null || !"forge".equals(name.getNamespace()))
+    public static TemplateSource emptyStructureSource() {
+        return new TemplateSource(null, null) {
+            @Override
+            public Optional<StructureTemplate> load(Identifier id) {
+                return createEmptyStructure(id);
+            }
+
+            @Override
+            public Stream<Identifier> list() {
+                return Stream.empty();
+            }
+        };
+    }
+
+    private static Optional<StructureTemplate> createEmptyStructure(Identifier name) {
+        if (name == null || !"forge".equals(name.getNamespace()))
             return Optional.empty();
 
         var match = EMPTY_SIZE_PATTERN.matcher(name.getPath());

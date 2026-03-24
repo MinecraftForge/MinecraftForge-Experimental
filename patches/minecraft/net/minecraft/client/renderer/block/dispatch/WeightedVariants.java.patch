@@ -1,0 +1,40 @@
+--- a/net/minecraft/client/renderer/block/dispatch/WeightedVariants.java
++++ b/net/minecraft/client/renderer/block/dispatch/WeightedVariants.java
+@@ -17,11 +_,13 @@
+     private final Material.Baked particleMaterial;
+     @BakedQuad.MaterialFlags
+     private final int materialFlags;
++    private final BlockStateModel first;
+ 
+     public WeightedVariants(final WeightedList<BlockStateModel> list) {
+         this.list = list;
+         BlockStateModel blockstatemodel = list.unwrap().getFirst().value();
+         this.particleMaterial = blockstatemodel.particleMaterial();
++        this.first = blockstatemodel;
+         this.materialFlags = computeMaterialFlags(list);
+     }
+ 
+@@ -41,6 +_,11 @@
+         return this.particleMaterial;
+     }
+ 
++    @Override
++    public Material.Baked particleMaterial(net.minecraftforge.client.model.data.ModelData data) {
++        return this.first.particleMaterial(data);
++    }
++
+     @BakedQuad.MaterialFlags
+     @Override
+     public int materialFlags() {
+@@ -50,6 +_,11 @@
+     @Override
+     public void collectParts(final RandomSource random, final List<BlockStateModelPart> output) {
+         this.list.getRandomOrThrow(random).collectParts(random, output);
++    }
++
++    @Override
++    public void collectParts(final RandomSource random, final List<BlockStateModelPart> output, net.minecraftforge.client.model.data.ModelData data) {
++        this.list.getRandomOrThrow(random).collectParts(random, output, data);
+     }
+ 
+     @OnlyIn(Dist.CLIENT)

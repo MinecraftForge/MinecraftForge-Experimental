@@ -1,31 +1,31 @@
 --- a/net/minecraft/server/packs/repository/Pack.java
 +++ b/net/minecraft/server/packs/repository/Pack.java
-@@ -23,6 +_,7 @@
+@@ -24,6 +_,7 @@
      private final Pack.ResourcesSupplier resources;
      private final Pack.Metadata metadata;
      private final PackSelectionConfig selectionConfig;
 +    private final boolean hidden; // Forge: Allow packs to be hidden from the UI entirely
  
-     public static @Nullable Pack readMetaAndCreate(PackLocationInfo p_333251_, Pack.ResourcesSupplier p_252210_, PackType p_250595_, PackSelectionConfig p_334202_) {
-         PackFormat packformat = SharedConstants.getCurrentVersion().packVersion(p_250595_);
-@@ -35,6 +_,7 @@
-         this.resources = p_249377_;
-         this.metadata = p_330761_;
-         this.selectionConfig = p_334769_;
-+        this.hidden = p_330761_.isHidden();
+     public static @Nullable Pack readMetaAndCreate(
+         final PackLocationInfo location, final Pack.ResourcesSupplier resources, final PackType packType, final PackSelectionConfig selectionConfig
+@@ -40,6 +_,7 @@
+         this.resources = resources;
+         this.metadata = metadata;
+         this.selectionConfig = selectionConfig;
++        this.hidden = metadata.isHidden();
      }
  
-     public static Pack.@Nullable Metadata readPackMetadata(PackLocationInfo p_330799_, Pack.ResourcesSupplier p_331172_, PackFormat p_425340_, PackType p_426910_) {
-@@ -56,7 +_,7 @@
-                 PackCompatibility packcompatibility = PackCompatibility.forVersion(packmetadatasection.supportedFormats(), p_425340_);
-                 OverlayMetadataSection overlaymetadatasection = packresources.getMetadataSection(OverlayMetadataSection.forPackType(p_426910_));
-                 List<String> list = overlaymetadatasection != null ? overlaymetadatasection.overlaysForVersion(p_425340_) : List.of();
+     public static Pack.@Nullable Metadata readPackMetadata(
+@@ -66,7 +_,7 @@
+                 PackCompatibility packcompatibility = PackCompatibility.forVersion(packmetadatasection.supportedFormats(), currentPackVersion);
+                 OverlayMetadataSection overlaymetadatasection = packresources.getMetadataSection(OverlayMetadataSection.forPackType(type));
+                 List<String> list = overlaymetadatasection != null ? overlaymetadatasection.overlaysForVersion(currentPackVersion) : List.of();
 -                pack$metadata = new Pack.Metadata(packmetadatasection.description(), packcompatibility, featureflagset, list);
 +                pack$metadata = new Pack.Metadata(packmetadatasection.description(), packcompatibility, featureflagset, list, packresources.isHidden());
              }
  
              return pack$metadata;
-@@ -118,6 +_,10 @@
+@@ -128,6 +_,10 @@
          return this.location.source();
      }
  
@@ -34,14 +34,14 @@
 +    }
 +
      @Override
-     public boolean equals(Object p_10448_) {
-         if (this == p_10448_) {
-@@ -132,7 +_,10 @@
+     public boolean equals(final Object o) {
+         if (this == o) {
+@@ -142,7 +_,10 @@
          return this.location.hashCode();
      }
  
 -    public record Metadata(Component description, PackCompatibility compatibility, FeatureFlagSet requestedFeatures, List<String> overlays) {
-+    public static record Metadata(Component description, PackCompatibility compatibility, FeatureFlagSet requestedFeatures, List<String> overlays, boolean isHidden) {
++    public record Metadata(Component description, PackCompatibility compatibility, FeatureFlagSet requestedFeatures, List<String> overlays, boolean isHidden) {
 +        public Metadata(Component description, PackCompatibility compatibility, FeatureFlagSet requestedFeatures, List<String> overlays) {
 +            this(description, compatibility, requestedFeatures, overlays, false);
 +        }

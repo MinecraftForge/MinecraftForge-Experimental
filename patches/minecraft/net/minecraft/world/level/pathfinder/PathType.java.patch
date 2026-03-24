@@ -8,18 +8,10 @@
      BLOCKED(-1.0F),
      OPEN(0.0F),
      WALKABLE(0.0F),
-@@ -36,5 +_,17 @@
+@@ -37,5 +_,9 @@
  
      public float getMalus() {
          return this.malus;
-+    }
-+
-+    @org.jetbrains.annotations.Nullable
-+    public PathType getDanger() {
-+      return (this == DAMAGE_FIRE   || this == DANGER_FIRE  ) ? DANGER_FIRE   :
-+             (this == DAMAGE_OTHER  || this == DANGER_OTHER ) ? DANGER_OTHER  :
-+             (this == LAVA) ? DAMAGE_FIRE :
-+             null;
 +    }
 +
 +    public static PathType create(String name, float malus) {

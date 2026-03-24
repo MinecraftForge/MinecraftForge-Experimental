@@ -22,6 +22,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.stats.Stats;
 import net.minecraft.world.InteractionResult;
@@ -49,9 +50,9 @@ public interface IForgeItemStack {
      * ItemStack sensitive version of {@link Item#getCraftingRemainder()}.
      * Returns a full ItemStack instance of the result.
      *
-     * @return The resulting ItemStack
+     * @return The resulting ItemStackTemplate
      */
-    default ItemStack getCraftingRemainder() {
+    default ItemStackTemplate getCraftingRemainder() {
         return self().getItem().getCraftingRemainder(self());
     }
 
@@ -128,25 +129,6 @@ public interface IForgeItemStack {
      *
      * @param enchantment the enchantment to be applied
      * @return true if the enchantment can be applied to this item
-     *
-     * @deprecated Use {@link #canApplyAtEnchantingTable(Holder)}
-     */
-    @Deprecated(forRemoval = true, since = "1.21.3")
-    default boolean canApplyAtEnchantingTable(Enchantment enchantment) {
-        return self().getItem().canApplyAtEnchantingTable(self(), enchantment);
-    }
-
-    /**
-     * Checks whether an item can be enchanted with a certain enchantment. This
-     * applies specifically to enchanting an item in the enchanting table and is
-     * called when retrieving the list of possible enchantments for an item.
-     * Enchantments may additionally (or exclusively) be doing their own checks in
-     * {@link Enchantment#canApplyAtEnchantingTable(ItemStack)};
-     * check the individual implementation for reference. By default this will check
-     * if the enchantment type is valid for this item type.
-     *
-     * @param enchantment the enchantment to be applied
-     * @return true if the enchantment can be applied to this item
      */
     default boolean canApplyAtEnchantingTable(Holder<Enchantment> enchantment) {
         return self().getItem().canApplyAtEnchantingTable(self(), enchantment);
@@ -165,18 +147,6 @@ public interface IForgeItemStack {
     @Nullable
     default EquipmentSlot getEquipmentSlot() {
         return self().getItem().getEquipmentSlot(self());
-    }
-
-    /**
-     * Can this Item disable a shield
-     *
-     * @param shield   The shield in question
-     * @param entity   The LivingEntity holding the shield
-     * @param attacker The LivingEntity holding the ItemStack
-     * @return True if this ItemStack can disable the shield in question.
-     */
-    default boolean canDisableShield(ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return self().getItem().canDisableShield(self(), shield, entity, attacker);
     }
 
     /**

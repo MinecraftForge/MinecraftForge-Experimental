@@ -7,10 +7,11 @@ package net.minecraftforge.debug.gameplay.level;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.attribute.EnvironmentAttribute;
-import net.minecraft.world.attribute.EnvironmentAttributes;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.clock.ClockTimeMarker;
+import net.minecraft.world.clock.ClockTimeMarkers;
+import net.minecraft.world.clock.WorldClocks;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.monster.Slime;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.BedBlock;
@@ -26,8 +27,6 @@ import net.minecraftforge.test.BaseTestMod;
 @Mod(TrySleepTest.MOD_ID)
 public class TrySleepTest extends BaseTestMod {
     static final String MOD_ID = "try_sleep";
-    static final long NIGHT = 13000;
-    static final long DAY = 0;
 
     public TrySleepTest(FMLJavaModLoadingContext context) {
         super(context, false, false);
@@ -39,14 +38,14 @@ public class TrySleepTest extends BaseTestMod {
 
         var bed = putBed(helper);
         helper.setAndAssertBlock(bed.above(), Blocks.STONE);
-        setTimeAndTest(helper, NIGHT, bed, player, false, "Player was able to sleep in an obstructed bed.");
+        setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, false, "Player was able to sleep in an obstructed bed.");
     }
 
     @GameTest
     public static void sleep_daytime(GameTestHelper helper) {
         var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var bed = putBed(helper);
-        setTimeAndTest(helper, DAY, bed, player, false, "Player was able to sleep during daytime.");
+        setTimeAndTest(helper, ClockTimeMarkers.DAY, bed, player, false, "Player was able to sleep during daytime.");
     }
 
     @GameTest
@@ -54,14 +53,14 @@ public class TrySleepTest extends BaseTestMod {
         var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var bed = putBed(helper);
         helper.spawn(EntityType.ZOMBIE, bed.east());
-        setTimeAndTest(helper, NIGHT, bed, player, false, "Player was able to sleep in an unsafe bed.");
+        setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, false, "Player was able to sleep in an unsafe bed.");
     }
 
     @GameTest
     public static void sleep_normally(GameTestHelper helper) {
         var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var bed = putBed(helper);
-        setTimeAndTest(helper, NIGHT, bed, player, true, "Player was not able to sleep. There might be a slime or something causing this to fail.");
+        setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, true, "Player was not able to sleep. There might be a slime or something causing this to fail.");
     }
 
     private static BlockPos putBed(GameTestHelper helper) {
@@ -72,14 +71,17 @@ public class TrySleepTest extends BaseTestMod {
         return mid;
     }
 
-    private static void setTimeAndTest(GameTestHelper helper, long time, BlockPos bed, Player player, boolean shouldBeSleeping, String err) {
-        var origTime = helper.getLevel().getDayTime();
+    private static void setTimeAndTest(GameTestHelper helper, ResourceKey<ClockTimeMarker> time, BlockPos bed, Player player, boolean shouldBeSleeping, String err) {
+        var manager = helper.getLevel().clockManager();
+        var overworld = helper.getLevel().registryAccess().getOrThrow(WorldClocks.OVERWORLD);
+        var origTime = manager.getTotalTicks(overworld);
+
         player.setPos(helper.absolutePos(bed).getCenter());
-        helper.getLevel().setDayTime(time);
+        manager.moveToTimeMarker(overworld, time);
         helper.getLevel().tick(() -> true);
         helper.useBlock(bed, player);
         var sleep = player.isSleeping();
-        helper.getLevel().setDayTime(origTime);
+        manager.setTotalTicks(overworld, origTime);
         helper.assertTrue(sleep == shouldBeSleeping, err);
         helper.succeed();
     }

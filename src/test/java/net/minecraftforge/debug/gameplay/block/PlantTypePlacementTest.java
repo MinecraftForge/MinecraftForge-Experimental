@@ -24,6 +24,7 @@ import net.minecraftforge.test.BaseTestMod;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,9 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import com.google.common.collect.Streams;
 import static net.minecraft.world.level.block.Blocks.*;
 
 @GameTestNamespace("forge")
@@ -42,11 +40,14 @@ public class PlantTypePlacementTest extends BaseTestMod {
     static final String MOD_ID = "plant_type_placement";
 
     private static final Map<TagKey<Block>, List<Block>> TAGS = Util.make(new HashMap<>(), map -> {
-        map.put(BlockTags.DIRT,       List.of(DIRT, GRASS_BLOCK, PODZOL, COARSE_DIRT, MYCELIUM, ROOTED_DIRT, MOSS_BLOCK, PALE_MOSS_BLOCK, MUD, MUDDY_MANGROVE_ROOTS));
+        map.put(BlockTags.DIRT,       List.of(DIRT, COARSE_DIRT, ROOTED_DIRT));
+        map.put(BlockTags.MUD,        List.of(MUD, MUDDY_MANGROVE_ROOTS));
+        map.put(BlockTags.MOSS_BLOCKS,  List.of(MOSS_BLOCK, PALE_MOSS_BLOCK));
+        map.put(BlockTags.GRASS_BLOCKS, List.of(GRASS_BLOCK, PODZOL, MYCELIUM));
         map.put(BlockTags.SAND,       List.of(SAND, RED_SAND, SUSPICIOUS_SAND));
         map.put(BlockTags.TERRACOTTA, List.of(TERRACOTTA, WHITE_TERRACOTTA, ORANGE_TERRACOTTA, MAGENTA_TERRACOTTA, LIGHT_BLUE_TERRACOTTA, YELLOW_TERRACOTTA, LIME_TERRACOTTA, PINK_TERRACOTTA, GRAY_TERRACOTTA, LIGHT_GRAY_TERRACOTTA, CYAN_TERRACOTTA, PURPLE_TERRACOTTA, BLUE_TERRACOTTA, BROWN_TERRACOTTA, GREEN_TERRACOTTA, RED_TERRACOTTA, BLACK_TERRACOTTA));
         map.put(BlockTags.NYLIUM,     List.of(CRIMSON_NYLIUM, WARPED_NYLIUM));
-        map.put(BlockTags.MUSHROOM_GROW_BLOCK, List.of(MYCELIUM, PODZOL, CRIMSON_NYLIUM, WARPED_NYLIUM));
+        map.put(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT, List.of(MYCELIUM, PODZOL, CRIMSON_NYLIUM, WARPED_NYLIUM));
     });
 
     private record Info(Consumer<GameTestHelper> handler, List<Block> blocks) {}
@@ -61,8 +62,8 @@ public class PlantTypePlacementTest extends BaseTestMod {
 
         // VegitationBlock has no direct creations
         map.put(AttachedStemBlock.class, of(this::farmland, ATTACHED_MELON_STEM, ATTACHED_PUMPKIN_STEM));
-        map.put(AzaleaBlock.class,       of(this::vegitation_and_clay, AZALEA, FLOWERING_AZALEA));
-        map.put(BushBlock.class,         of(this::vegitation, BUSH));
+        map.put(AzaleaBlock.class,       of(this::simple, AZALEA, FLOWERING_AZALEA));
+        map.put(BushBlock.class,         of(this::vegetation, BUSH));
         map.put(CactusFlowerBlock.class, of(this::cactus_flower, CACTUS_FLOWER));
 
         map.put(CropBlock.class,         of(this::farmland, WHEAT));
@@ -81,29 +82,29 @@ public class PlantTypePlacementTest extends BaseTestMod {
         map.put(ShortDryGrassBlock.class, of(this::dry_vegitation, SHORT_DRY_GRASS));
         map.put(TallDryGrassBlock.class,  of(this::dry_vegitation, TALL_DRY_GRASS));
 
-        map.put(FireflyBushBlock.class,   of(this::vegitation, FIREFLY_BUSH));
-        map.put(FlowerBedBlock.class,     of(this::vegitation, PINK_PETALS, WILDFLOWERS));
+        map.put(FireflyBushBlock.class,   of(this::vegetation, FIREFLY_BUSH));
+        map.put(FlowerBedBlock.class,     of(this::vegetation, PINK_PETALS, WILDFLOWERS));
 
-        map.put(FlowerBlock.class,     of(this::vegitation, ALLIUM, AZURE_BLUET, BLUE_ORCHID, CORNFLOWER, DANDELION, LILY_OF_THE_VALLEY, ORANGE_TULIP, OXEYE_DAISY, PINK_TULIP, POPPY, RED_TULIP, TORCHFLOWER, WHITE_TULIP));
-        map.put(EyeblossomBlock.class, of(this::vegitation, CLOSED_EYEBLOSSOM, OPEN_EYEBLOSSOM));
-        map.put(WitherRoseBlock.class, of(this::withrose, WITHER_ROSE));
+        map.put(FlowerBlock.class,     of(this::vegetation, ALLIUM, AZURE_BLUET, BLUE_ORCHID, CORNFLOWER, DANDELION, GOLDEN_DANDELION, LILY_OF_THE_VALLEY, ORANGE_TULIP, OXEYE_DAISY, PINK_TULIP, POPPY, RED_TULIP, TORCHFLOWER, WHITE_TULIP));
+        map.put(EyeblossomBlock.class, of(this::vegetation, CLOSED_EYEBLOSSOM, OPEN_EYEBLOSSOM));
+        map.put(WitherRoseBlock.class, of(this::simple, WITHER_ROSE));
 
-        map.put(FungusBlock.class,        of(this::nether_fungus, CRIMSON_FUNGUS, WARPED_FUNGUS));
+        map.put(NetherFungusBlock.class,  of(this::simple, CRIMSON_FUNGUS, WARPED_FUNGUS));
         map.put(LeafLitterBlock.class,    of(this::todo, LEAF_LITTER));
         map.put(MushroomBlock.class,      of(this::mushroom, BROWN_MUSHROOM, RED_MUSHROOM));
-        map.put(NetherSproutsBlock.class, of(this::nether_vegitation, NETHER_SPROUTS));
-        map.put(NetherWartBlock.class,    of(this::netherwart, NETHER_WART));
-        map.put(RootsBlock.class,         of(this::nether_vegitation, CRIMSON_ROOTS, WARPED_ROOTS));
+        map.put(NetherSproutsBlock.class, of(this::simple, NETHER_SPROUTS));
+        map.put(NetherWartBlock.class,    of(this::simple, NETHER_WART));
+        map.put(NetherRootsBlock.class,   of(this::simple, CRIMSON_ROOTS, WARPED_ROOTS));
 
-        map.put(SaplingBlock.class,           of(this::vegitation, ACACIA_SAPLING, BIRCH_SAPLING, CHERRY_SAPLING, DARK_OAK_SAPLING, JUNGLE_SAPLING, OAK_SAPLING, PALE_OAK_SAPLING, SPRUCE_SAPLING));
-        map.put(MangrovePropaguleBlock.class, of(this::vegitation_and_clay, MANGROVE_PROPAGULE));
+        map.put(SaplingBlock.class,           of(this::vegetation, ACACIA_SAPLING, BIRCH_SAPLING, CHERRY_SAPLING, DARK_OAK_SAPLING, JUNGLE_SAPLING, OAK_SAPLING, PALE_OAK_SAPLING, SPRUCE_SAPLING));
+        map.put(MangrovePropaguleBlock.class, of(this::vegetation, MANGROVE_PROPAGULE));
 
         map.put(SeagrassBlock.class,       of(this::todo, SEAGRASS));
         map.put(SeaPickleBlock.class,      of(this::todo, SEA_PICKLE));
         map.put(StemBlock.class,           of(this::farmland, MELON_STEM, PUMPKIN_STEM));
-        map.put(SweetBerryBushBlock.class, of(this::vegitation, SWEET_BERRY_BUSH));
-        map.put(TallGrassBlock.class,      of(this::vegitation, FERN, SHORT_GRASS));
-        map.put(WaterlilyBlock.class,      of(this::todo, LILY_PAD));
+        map.put(SweetBerryBushBlock.class, of(this::vegetation, SWEET_BERRY_BUSH));
+        map.put(TallGrassBlock.class,      of(this::vegetation, FERN, SHORT_GRASS));
+        map.put(LilyPadBlock.class,        of(this::todo, LILY_PAD));
     });
 
     @SafeVarargs
@@ -152,15 +153,14 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty5x4x4") // sand(3) + dirt(10) + extra(4) = 17
+    @GameTest(structure = "forge:empty5x4x4") // SUPPORTS_BAMBOO = sand(3) + substrate() + extra(4) = 17
     public void bamboo(GameTestHelper helper) {
-        // BambooStalkBlock = Tag.BAMBOO_PLANTABLE_ON
         var plants = plants(BambooStalkBlock.class);
-        var soils = new ArrayList<>(sandAndDirt(helper, BAMBOO, BAMBOO_SAPLING, GRAVEL, SUSPICIOUS_GRAVEL));
+        var soils = join(sand(helper), substrate(helper), List.of(BAMBOO, BAMBOO_SAPLING, GRAVEL, SUSPICIOUS_GRAVEL));
         // these need special case
         var special = List.of(BAMBOO, BAMBOO_SAPLING);
 
-        testTag(helper, BlockTags.BAMBOO_PLANTABLE_ON, soils);
+        testTag(helper, BlockTags.SUPPORTS_BAMBOO, soils);
         soils.removeAll(special);
 
         var pos = iterate(helper, plants, soils);
@@ -217,7 +217,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.makeFloor(SAND, 1);
 
         var pos = BlockPos.ZERO.above();
-        //     CactusFlowerBlock = CACTUS, FARMLAND, SturdyCenter Up
+        //     CactusFlowerBlock = SUPPORT_OVERRIDE_CACTUS_FLOWER(CACTUS, FARMLAND), SturdyCenter Up
         for (var plant : plants(CactusFlowerBlock.class)) {
             helper.setAndAssertBlock(pos, FARMLAND);
             canSurvive(helper, pos.above(), plant);
@@ -233,11 +233,11 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty13x3x9") // (sand(3) + dirt(10)) * (water(2) + FROSTED_ICE)
+    @GameTest(structure = "forge:empty13x3x9") // SUPPORTS_SUGAR_CANE(substrate() + sand(3)) * (water(2) + FROSTED_ICE)
     public void sugarcane(GameTestHelper helper) {
         // SugarCaneBlock = DIRT || SAND && Horizontal (Fluid == WATER || FROSTED_ICE)
         var plants = plants(SugarCaneBlock.class);
-        var soils = sandAndDirt(helper);
+        var soils = join(substrate(helper), sand(helper));
 
         var start = BlockPos.ZERO;
         for (var plant : plants) {
@@ -268,75 +268,35 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty11x3x30") // (dirt(10) + FARMLAND) * 30 plants
-    public void vegitation(GameTestHelper helper) {
+    @GameTest(structure = "forge:empty11x3x33") // vegetation(11) * 32 plants
+    public void vegetation(GameTestHelper helper) {
         var plants = plants(
             BushBlock.class,           // 1
             FireflyBushBlock.class,    // 1
             FlowerBedBlock.class,      // 2
-            FlowerBlock.class,         // 13
+            FlowerBlock.class,         // 14
             EyeblossomBlock.class,     // 2
             SaplingBlock.class,        // 8
             SweetBerryBushBlock.class, // 1
+            MangrovePropaguleBlock.class, // 1
             TallGrassBlock.class       // 2
         );
-        var soils = vegitationSoils(helper);
+        var soils = supportsVegetation(helper);
 
         iterate(helper, plants, soils);
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty12x3x3") // (dirt(10) + FARMLAND + CLAY) * 2 plants
-    public void vegitation_and_clay(GameTestHelper helper) {
-        var plants = plants(
-            MangrovePropaguleBlock.class, // 1
-            AzaleaBlock.class             // 2
-        );
-        var soils = vegitationSoils(helper, CLAY);
-
-        iterate(helper, plants, soils);
-        helper.succeed();
-    }
-
-    @GameTest(structure = "forge:empty4x3x4") // (dirt(10) + FARMLAND + 3 extra) * 1 plant = 14
-    public void withrose(GameTestHelper helper) {
-        //WitherRoseBlock = VEGITATION || NETHERRACK, SOUL_SAND, SOUL_SOIL
-        var plants = plants(WitherRoseBlock.class);
-        iterate(helper, plants, vegitationSoils(helper, NETHERRACK, SOUL_SAND, SOUL_SOIL));
-        helper.succeed();
-    }
-
-    @GameTest
-    public void netherwart(GameTestHelper helper) {
-        // NetherWartBlock = SOUL_SAND
-        var plants = plants(NetherWartBlock.class);
-        iterate(helper, plants, List.of(SOUL_SAND));
-        helper.succeed();
-    }
-
-    @GameTest(structure = "forge:empty14x3x3") // (dirt(10) + FARMLAND + nylium(2) + SOUL_SOIL) * 3 plants
-    public void nether_vegitation(GameTestHelper helper) {
-        // NetherSproutsBlock = VEGITATION || Tags.NYLIUM, SOUL_SOIL
-        // RootsBlock         = VEGITATION || Tags.NYLIUM, SOUL_SOIL
-        var plants = plants(
-            NetherSproutsBlock.class, // 1
-            RootsBlock.class          // 2
-        );
-        var nylium = testTag(helper, BlockTags.NYLIUM, TAGS.get(BlockTags.NYLIUM));
-        var soils = Stream.concat(nylium.stream(), vegitationSoils(helper, SOUL_SOIL).stream()).distinct().toList();
-
-        iterate(helper, plants, soils);
-        helper.succeed();
-    }
-
-    @GameTest(structure = "forge:empty15x3x2") // (dirt(10) + FARMLAND + nylium(2) + SOUL_SOIL + MYCELIUM) * 2 plants
-    public void nether_fungus(GameTestHelper helper) {
-        // FungusBlock = VEGITATION || Tags.NYLIUM, MYCELIUM, SOUL_SOIL
-        var plants = plants(FungusBlock.class);
-        var nylium = testTag(helper, BlockTags.NYLIUM, TAGS.get(BlockTags.NYLIUM));
-        var soils = Stream.concat(nylium.stream(), vegitationSoils(helper, MYCELIUM, SOUL_SOIL).stream()).distinct().toList();
-
-        iterate(helper, plants, soils);
+    @GameTest(structure = "forge:empty16x3x8")
+    public void simple(GameTestHelper helper) {
+        var pos = iterate(helper, BlockPos.ZERO, plants(AzaleaBlock.class), supportsAzalea(helper)); // 12
+        pos = iterate(helper, pos, plants(WitherRoseBlock.class), supportsWitherRose(helper)); // 14
+        pos = iterate(helper, pos, plants(NetherWartBlock.class), supportsNetherWart(helper)); // 1
+        pos = iterate(helper, pos, plants(NetherSproutsBlock.class), supportsNetherSprouts(helper)); // 14
+        pos = iterate(helper, pos, List.of(Blocks.WARPED_ROOTS), supportsWarpedRoots(helper)); // 14
+        pos = iterate(helper, pos, List.of(Blocks.CRIMSON_ROOTS), supportsCrimsonRoots(helper)); // 14
+        pos = iterate(helper, pos, List.of(Blocks.WARPED_FUNGUS), supportsWarpedFungus(helper)); // 15
+        pos = iterate(helper, pos, List.of(Blocks.CRIMSON_FUNGUS), supportsCrimsonFungus(helper)); // 15
         helper.succeed();
     }
 
@@ -356,14 +316,10 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty31x3x3") // 3 plants (sand(3) + dirt(10) + terracotta(17) + FARMLAND) * plants(3)
+    @GameTest(structure = "forge:empty32x3x3") // 32 * plants(3)
     public void dry_vegitation(GameTestHelper helper) {
-        // DryVegetationBlock = Tag.DRY_VEGETATION_MAY_PLACE_ON
         var plants = plants(DryVegetationBlock.class, ShortDryGrassBlock.class, TallDryGrassBlock.class);
-        var terracotta = testTag(helper, BlockTags.TERRACOTTA, TAGS.get(BlockTags.TERRACOTTA));
-        var soils = Streams.concat(sandAndDirt(helper, FARMLAND).stream(), terracotta.stream()).toList();
-        testTag(helper, BlockTags.DRY_VEGETATION_MAY_PLACE_ON, soils);
-        iterate(helper, plants, soils);
+        iterate(helper, plants, supportsDryVegetation(helper));
         helper.succeed();
     }
 
@@ -397,7 +353,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         // I would rather make a enclosed box, but lighting doesn't propagate for some reason.
 
 
-        var soil = testTag(helper, BlockTags.MUSHROOM_GROW_BLOCK, TAGS.get(BlockTags.MUSHROOM_GROW_BLOCK));
+        var soil = testTag(helper, BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT, TAGS.get(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT));
         iterate(helper, plants, soil);
 
         // delay a handful of ticks to propagate lighting
@@ -428,11 +384,11 @@ public class PlantTypePlacementTest extends BaseTestMod {
     //===================================================
     //                HELPERS
     //===================================================
-    private static BlockPos iterate(GameTestHelper helper, List<Block> plants, List<Block> soils) {
+    private static BlockPos iterate(GameTestHelper helper, Collection<Block> plants, Collection<Block> soils) {
         return iterate(helper, BlockPos.ZERO.west(), plants, soils);
     }
 
-    private static BlockPos iterate(GameTestHelper helper, BlockPos pos, List<Block> plants, List<Block> soils) {
+    private static BlockPos iterate(GameTestHelper helper, BlockPos pos, Collection<Block> plants, Collection<Block> soils) {
         for (var plant : plants) {
             for (var soil : soils) {
                 pos = offset(helper, pos);
@@ -447,25 +403,73 @@ public class PlantTypePlacementTest extends BaseTestMod {
         return pos;
     }
 
-    private static List<Block> dirt(GameTestHelper helper) {
-       return testTag(helper, BlockTags.DIRT, TAGS.get(BlockTags.DIRT));
+    private static Collection<Block> known(GameTestHelper helper, TagKey<Block> tag) {
+        var expected = TAGS.get(tag);
+        if (expected == null)
+            helper.fail("Failed to find known values for: " + tag);
+        return testTag(helper, tag, expected);
     }
 
-    private static List<Block> dirt(GameTestHelper helper, Block... extra) {
-        return Streams.concat(dirt(helper).stream(), Stream.of(extra)).distinct().toList();
+    @SafeVarargs
+    private static Collection<Block> join(GameTestHelper helper, @SuppressWarnings("unchecked") TagKey<Block>... tags) {
+        var ret = new HashSet<Block>();
+        for (var tag : tags)
+            ret.addAll(known(helper, tag));
+        return ret;
     }
 
-    private static List<Block> sand(GameTestHelper helper) {
-        return testTag(helper, BlockTags.SAND, TAGS.get(BlockTags.SAND));
+    @SafeVarargs
+    private static Collection<Block> join(Collection<Block>... lists) {
+        var ret = new HashSet<Block>();
+        for (var list : lists)
+            ret.addAll(list);
+        return ret;
     }
 
-    private static List<Block> sandAndDirt(GameTestHelper helper, Block... extra) {
-        return Streams.concat(sand(helper).stream(), dirt(helper).stream(), Stream.of(extra)).distinct().toList();
+    private static Collection<Block> dirt(GameTestHelper helper) { // 3
+        return known(helper, BlockTags.DIRT);
     }
-
-    // See VegitationBlock.mayPlaceOn
-    private static List<Block> vegitationSoils(GameTestHelper helper, Block... extra) {
-        return Streams.concat(dirt(helper, FARMLAND).stream(), Stream.of(extra)).distinct().toList();
+    private static Collection<Block> sand(GameTestHelper helper) { // 3
+        return known(helper, BlockTags.SAND);
+    }
+    private static Collection<Block> terracotta(GameTestHelper helper) { // 18
+        return known(helper, BlockTags.TERRACOTTA);
+    }
+    private static Collection<Block> nylium(GameTestHelper helper) { // 2
+        return known(helper, BlockTags.NYLIUM);
+    }
+    private static Collection<Block> substrate(GameTestHelper helper) { // 10 = dirt(3), mud(2), moss_blocks(2), grass_blocks(3)
+        return testTag(helper, BlockTags.SUBSTRATE_OVERWORLD, join(helper, BlockTags.DIRT, BlockTags.MUD, BlockTags.MOSS_BLOCKS, BlockTags.GRASS_BLOCKS));
+    }
+    private static Collection<Block> supportsVegetation(GameTestHelper helper) { // 11 = (substrate(10) + FARMLAND)
+        return testTag(helper, BlockTags.SUPPORTS_VEGETATION, join(substrate(helper), List.of(FARMLAND)));
+    }
+    private static Collection<Block> supportsAzalea(GameTestHelper helper) { // 12 = (vegetation(11) + CLAY)
+        return testTag(helper, BlockTags.SUPPORTS_AZALEA, join(supportsVegetation(helper), List.of(CLAY)));
+    }
+    private static Collection<Block> supportsWitherRose(GameTestHelper helper) { // 14 = (vegetation(11) + NETHERRACK + SOUL_SAND + SOUL_SOIL)
+        return testTag(helper, BlockTags.SUPPORTS_WITHER_ROSE, join(supportsVegetation(helper), List.of(NETHERRACK, SOUL_SAND, SOUL_SOIL)));
+    }
+    private static Collection<Block> supportsNetherWart(GameTestHelper helper) { // 1
+        return testTag(helper, BlockTags.SUPPORTS_NETHER_WART, List.of(SOUL_SAND));
+    }
+    private static Collection<Block> supportsNetherSprouts(GameTestHelper helper) { // 14 = (vegetation(11) + nylium(2) + SOUL_SOIL)
+        return testTag(helper, BlockTags.SUPPORTS_NETHER_SPROUTS, join(supportsVegetation(helper), nylium(helper), List.of(SOUL_SOIL)));
+    }
+    private static Collection<Block> supportsWarpedRoots(GameTestHelper helper) { // 14 = (vegetation(11) + nylium(2) + SOUL_SOIL)
+        return testTag(helper, BlockTags.SUPPORTS_WARPED_ROOTS, join(supportsVegetation(helper), nylium(helper), List.of(SOUL_SOIL)));
+    }
+    private static Collection<Block> supportsCrimsonRoots(GameTestHelper helper) { // 14 = (warpedRoots(14))
+        return testTag(helper, BlockTags.SUPPORTS_CRIMSON_ROOTS, supportsWarpedRoots(helper));
+    }
+    private static Collection<Block> supportsWarpedFungus(GameTestHelper helper) { // 15 = (vegetation(11) + nylium(2) + MYCELIUM + SOUL_SOIL)
+        return testTag(helper, BlockTags.SUPPORTS_WARPED_FUNGUS, join(supportsVegetation(helper), nylium(helper), List.of(MYCELIUM, SOUL_SOIL)));
+    }
+    private static Collection<Block> supportsCrimsonFungus(GameTestHelper helper) { // 15 = (warpedFungus(15))
+        return testTag(helper, BlockTags.SUPPORTS_CRIMSON_FUNGUS, supportsWarpedFungus(helper));
+    }
+    private static Collection<Block> supportsDryVegetation(GameTestHelper helper) { // 32 = (sand(3) + terracotta(18) + vegetation(11)
+        return testTag(helper, BlockTags.SUPPORTS_DRY_VEGETATION, join(sand(helper), terracotta(helper), supportsVegetation(helper)));
     }
 
     private static BlockPos offset(GameTestHelper helper, BlockPos pos) {
@@ -477,7 +481,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         return pos;
     }
 
-    private static List<Block> sort(List<Block> blocks) {
+    private static Collection<Block> sort(Collection<Block> blocks) {
         var sorted = new ArrayList<>(blocks);
         Collections.sort(sorted, (a, b) -> name(a).compareTo(name(b)));
         return sorted;
@@ -498,7 +502,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.assertTrue(state.canSurvive(helper.getLevel(), helper.absolutePos(pos)), () -> name(state) + " can not survive on " + name(soil));
     }
 
-    private static List<Block> testTag(GameTestHelper helper, TagKey<Block> tag, List<Block> expected) {
+    private static Collection<Block> testTag(GameTestHelper helper, TagKey<Block> tag, Collection<Block> expected) {
         var lookup = helper.registryLookup(Registries.BLOCK);
         var values = lookup.getOrThrow(tag).stream()
             .filter(h -> h.unwrapKey().orElseThrow().identifier().getNamespace().equals("minecraft")) // Only vanilla entries

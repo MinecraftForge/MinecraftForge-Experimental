@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.ServiceConfigurationError;
 import java.util.ServiceLoader;
 import java.util.function.Consumer;
@@ -28,43 +27,36 @@ import java.util.stream.Stream;
 import static net.minecraftforge.fml.loading.LogMarkers.CORE;
 import static net.minecraftforge.fml.loading.LogMarkers.LOADING;
 
-public class LanguageLoadingProvider {
-    public void forEach(Consumer<IModLanguageProvider> consumer) {
+public final class LanguageLoadingProvider {
+    public static void forEach(Consumer<IModLanguageProvider> consumer) {
         providers.forEach(consumer);
     }
 
-    public <T> Stream<T> applyForEach(Function<IModLanguageProvider, T> function) {
+    public static <T> Stream<T> applyForEach(Function<IModLanguageProvider, T> function) {
         return providers.stream().map(function);
     }
 
-    public void reload() {
+    public static void reload() {
         loadLanguageProviders();
     }
 
-    /** This doesn't actually do anything with the argument, so just call reload(). Not sure when cpw broke that. */
-    @Deprecated(forRemoval = true, since = "1.20.2")
-    public void addAdditionalLanguages(List<ModFile> modFiles) {
-        reload();
-    }
-
     /*==========================================================================*
-     *                        INTERNAL SHIT                                     *
+     *                        INTERNAL                                          *
      *==========================================================================*/
     private static final Logger LOGGER = LogUtils.getLogger();
-    private final ServiceLoader<IModLanguageProvider> serviceLoader;
-    private final List<IModLanguageProvider> providers = new ArrayList<>();
-    private final Map<String, Wrapper> providersByName = new HashMap<>();
+    private static final ServiceLoader<IModLanguageProvider> serviceLoader;
+    private static final ArrayList<IModLanguageProvider> providers = new ArrayList<>();
+    private static final HashMap<String, Wrapper> providersByName = new HashMap<>();
     private static final DefaultArtifactVersion IN_DEV = new DefaultArtifactVersion("0.0-dev");
 
     private record Wrapper(ArtifactVersion version, IModLanguageProvider service) {}
 
-    LanguageLoadingProvider() {
+    static {
         var sl = Launcher.INSTANCE.environment().findModuleLayerManager().flatMap(lm -> lm.getLayer(Layer.PLUGIN)).orElseThrow();
         serviceLoader = ServiceLoader.load(sl, IModLanguageProvider.class);
-        loadLanguageProviders();
     }
 
-    private void loadLanguageProviders() {
+    private static void loadLanguageProviders() {
         providers.clear();
         providersByName.clear();
 
@@ -97,7 +89,7 @@ public class LanguageLoadingProvider {
         }
     }
 
-    public IModLanguageProvider findLanguage(ModFile mod, String language, VersionRange versionRange) {
+    public static IModLanguageProvider findLanguage(ModFile mod, String language, VersionRange versionRange) {
         var consumer = mod.getFileName();
         var wrapper = providersByName.get(language);
 

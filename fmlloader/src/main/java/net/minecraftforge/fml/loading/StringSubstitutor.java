@@ -12,6 +12,7 @@ import java.util.Map;
 import org.apache.commons.lang3.text.StrLookup;
 import org.apache.commons.lang3.text.StrSubstitutor;
 
+// TODO: [FML] Remove this
 @SuppressWarnings("deprecation")
 public class StringSubstitutor {
     private static final Map<String, String> GLOBALS = Map.of(

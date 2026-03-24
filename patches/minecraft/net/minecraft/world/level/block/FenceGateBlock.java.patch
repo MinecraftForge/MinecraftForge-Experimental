@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/block/FenceGateBlock.java
 +++ b/net/minecraft/world/level/block/FenceGateBlock.java
-@@ -59,6 +_,8 @@
-         Util.mapValues(SHAPE_OCCLUSION, p_390935_ -> p_390935_.move(0.0, -0.1875, 0.0).optimize())
+@@ -58,6 +_,8 @@
+         Util.mapValues(SHAPE_OCCLUSION, v -> v.move(0.0, -0.1875, 0.0).optimize())
      );
      private final WoodType type;
 +    private final net.minecraft.sounds.SoundEvent openSound;
@@ -9,46 +9,46 @@
  
      @Override
      public MapCodec<FenceGateBlock> codec() {
-@@ -66,8 +_,14 @@
+@@ -65,8 +_,14 @@
      }
  
-     public FenceGateBlock(WoodType p_273340_, BlockBehaviour.Properties p_273352_) {
--        super(p_273352_.sound(p_273340_.soundType()));
-+        this(p_273340_, p_273352_, p_273340_.fenceGateOpen(), p_273340_.fenceGateClose());
+     public FenceGateBlock(final WoodType type, final BlockBehaviour.Properties properties) {
+-        super(properties.sound(type.soundType()));
++        this(type, properties, type.fenceGateOpen(), type.fenceGateClose());
 +    }
 +
-+    public FenceGateBlock(WoodType p_273340_, BlockBehaviour.Properties p_273352_, net.minecraft.sounds.SoundEvent openSound, net.minecraft.sounds.SoundEvent closeSound) {
-+        super(p_273352_);
-         this.type = p_273340_;
++    public FenceGateBlock(final WoodType type, final BlockBehaviour.Properties properties, final net.minecraft.sounds.SoundEvent openSound, final net.minecraft.sounds.SoundEvent closeSound) {
++        super(properties);
+         this.type = type;
 +        this.openSound = openSound;
 +        this.closeSound = closeSound;
          this.registerDefaultState(this.stateDefinition.any().setValue(OPEN, false).setValue(POWERED, false).setValue(IN_WALL, false));
      }
  
-@@ -165,7 +_,7 @@
-         p_53366_.playSound(
-             p_53368_,
-             p_53367_,
--            flag ? this.type.fenceGateOpen() : this.type.fenceGateClose(),
-+            flag ? this.openSound : this.closeSound,
-             SoundSource.BLOCKS,
-             1.0F,
-             p_53366_.getRandom().nextFloat() * 0.1F + 0.9F
-@@ -182,7 +_,7 @@
-             p_368190_.playSound(
-                 null,
-                 p_311232_,
--                flag ? this.type.fenceGateClose() : this.type.fenceGateOpen(),
-+                flag ? this.closeSound : this.openSound,
-                 SoundSource.BLOCKS,
-                 1.0F,
-                 p_368190_.getRandom().nextFloat() * 0.1F + 0.9F
-@@ -203,7 +_,7 @@
-                     p_53373_.playSound(
+@@ -162,7 +_,7 @@
+ 
+         boolean flag = state.getValue(OPEN);
+         level.playSound(
+-            player, pos, flag ? this.type.fenceGateOpen() : this.type.fenceGateClose(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
++            player, pos, flag ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
+         );
+         level.gameEvent(player, flag ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
+         return InteractionResult.SUCCESS;
+@@ -176,7 +_,7 @@
+             boolean flag = state.getValue(OPEN);
+             level.setBlockAndUpdate(pos, state.setValue(OPEN, !flag));
+             level.playSound(
+-                null, pos, flag ? this.type.fenceGateClose() : this.type.fenceGateOpen(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
++                null, pos, flag ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
+             );
+             level.gameEvent(flag ? GameEvent.BLOCK_CLOSE : GameEvent.BLOCK_OPEN, pos, GameEvent.Context.of(state));
+         }
+@@ -196,7 +_,7 @@
+                     level.playSound(
                          null,
-                         p_53374_,
+                         pos,
 -                        flag ? this.type.fenceGateOpen() : this.type.fenceGateClose(),
 +                        flag ? this.openSound : this.closeSound,
                          SoundSource.BLOCKS,
                          1.0F,
-                         p_53373_.getRandom().nextFloat() * 0.1F + 0.9F
+                         level.getRandom().nextFloat() * 0.1F + 0.9F

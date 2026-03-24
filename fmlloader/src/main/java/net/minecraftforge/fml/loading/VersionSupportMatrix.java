@@ -32,15 +32,6 @@ public class VersionSupportMatrix {
         }
     }
 
-    /**
-     * @deprecated Use {@link #testVersionSupportMatrix(VersionRange, String, String)} instead, unwrapping your BiPredicate.
-     */
-    @Deprecated(forRemoval = true, since = "1.21.1")
-    public static boolean testVersionSupportMatrix(VersionRange declaredRange, String lookupId, String type, BiPredicate<String, VersionRange> standardLookup) {
-        if (standardLookup.test(lookupId, declaredRange)) return true;
-        return testVersionSupportMatrix(declaredRange, lookupId, type);
-    }
-
     public static boolean testVersionSupportMatrix(VersionRange declaredRange, String lookupId, String type) {
         if (OVERRIDE_VERSIONS.isEmpty()) return false;
         List<ArtifactVersion> custom = OVERRIDE_VERSIONS.get(type + "." + lookupId);

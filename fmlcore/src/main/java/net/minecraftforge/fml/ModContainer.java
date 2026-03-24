@@ -19,7 +19,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.BiPredicate;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 /**
@@ -41,11 +40,6 @@ public abstract class ModContainer {
     protected final Map<Class<? extends IExtensionPoint<?>>, Supplier<?>> extensionPoints = new IdentityHashMap<>();
     protected final EnumMap<ModConfig.Type, ModConfig> configs = new EnumMap<>(ModConfig.Type.class);
     final Set<ModContainer> dependencies = new HashSet<>();
-    /**
-     * If you want to handle the event, override {@link #dispatchConfigEvent(IConfigEvent)}
-     */
-    @Deprecated(since = "1.21.3", forRemoval = true)
-    protected Optional<Consumer<IConfigEvent>> configHandler = Optional.empty();
 
     public ModContainer(IModInfo info) {
         this.modId = info.getModId();
@@ -138,12 +132,7 @@ public abstract class ModContainer {
        configs.put(modConfig.getType(), modConfig);
     }
 
-    public void dispatchConfigEvent(IConfigEvent event) {
-        var handler = configHandler.orElse(null);
-        if (handler != null) {
-            handler.accept(event);
-        }
-    }
+    public void dispatchConfigEvent(IConfigEvent event) {}
 
     /**
      * Does this mod match the supplied mod?

@@ -2,40 +2,40 @@
 +++ b/net/minecraft/world/entity/animal/sheep/Sheep.java
 @@ -137,7 +_,7 @@
      @Override
-     public InteractionResult mobInteract(Player p_397056_, InteractionHand p_391211_) {
-         ItemStack itemstack = p_397056_.getItemInHand(p_391211_);
+     public InteractionResult mobInteract(final Player player, final InteractionHand hand) {
+         ItemStack itemstack = player.getItemInHand(hand);
 -        if (itemstack.is(Items.SHEARS)) {
 +        if (false && itemstack.is(Items.SHEARS)) { // Forge: Moved to onSheared
              if (this.level() instanceof ServerLevel serverlevel && this.readyForShearing()) {
                  this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
-                 this.gameEvent(GameEvent.SHEAR, p_397056_);
+                 this.gameEvent(GameEvent.SHEAR, player);
 @@ -153,12 +_,27 @@
  
      @Override
-     public void shear(ServerLevel p_397708_, SoundSource p_395553_, ItemStack p_396000_) {
-+        dropItems(p_397708_, shearInternal(p_397708_, p_395553_, p_396000_));
+     public void shear(final ServerLevel level, final SoundSource soundSource, final ItemStack tool) {
++        dropItems(level, shearInternal(level, soundSource, tool));
 +    }
 +
-+    private java.util.List<ItemStack> shearInternal(ServerLevel p_397708_, SoundSource p_395553_, ItemStack p_396000_) {
++    private java.util.List<ItemStack> shearInternal(ServerLevel level, SoundSource soundSource, ItemStack tool) {
 +        var ret = new java.util.ArrayList<ItemStack>();
-         p_397708_.playSound(null, this, SoundEvents.SHEEP_SHEAR, p_395553_, 1.0F, 1.0F);
+         level.playSound(null, this, SoundEvents.SHEEP_SHEAR, soundSource, 1.0F, 1.0F);
          this.dropFromShearingLootTable(
-             p_397708_,
+             level,
              BuiltInLootTables.SHEAR_SHEEP,
-             p_396000_,
-             (p_397779_, p_393350_) -> {
-+                ret.add(p_393350_);
+             tool,
+             (l, drop) -> {
++                ret.add(drop);
 +            }
 +        );
 +        this.setSheared(true);
 +        return ret;
 +    }
 +
-+    private void dropItems(ServerLevel p_397779_, java.util.Collection<ItemStack> items) {
++    private void dropItems(ServerLevel l, java.util.Collection<ItemStack> items) {
 +            // double indented to make the patch look nicer
-+            for (var p_393350_ : items) {
-                 for (int i = 0; i < p_393350_.getCount(); i++) {
-                     ItemEntity itementity = this.spawnAtLocation(p_397779_, p_393350_.copyWithCount(1), 1.0F);
++            for (var drop : items) {
+                 for (int i = 0; i < drop.getCount(); i++) {
+                     ItemEntity itementity = this.spawnAtLocation(l, drop.copyWithCount(1), 1.0F);
                      if (itementity != null) {
 @@ -173,8 +_,14 @@
                      }

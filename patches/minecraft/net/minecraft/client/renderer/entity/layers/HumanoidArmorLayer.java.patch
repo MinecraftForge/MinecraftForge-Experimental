@@ -1,26 +1,26 @@
 --- a/net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer.java
 +++ b/net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer.java
-@@ -51,6 +_,7 @@
-         Equippable equippable = p_366444_.get(DataComponents.EQUIPPABLE);
-         if (equippable != null && shouldRender(equippable, p_117122_)) {
-             A a = this.getArmorModel(p_423438_, p_117122_);
-+            var model = this.getArmorModel(p_423438_, p_117122_, p_366444_, a);
-             EquipmentClientInfo.LayerType equipmentclientinfo$layertype = this.usesInnerModel(p_117122_)
-                 ? EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS
-                 : EquipmentClientInfo.LayerType.HUMANOID;
-@@ -58,7 +_,7 @@
+@@ -66,6 +_,7 @@
+         Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
+         if (equippable != null && shouldRender(equippable, slot)) {
+             A a = this.getArmorModel(state, slot);
++            var model = this.getArmorModel(state, slot, itemStack, a);
+             EquipmentClientInfo.LayerType equipmentclientinfo$layertype = state.isBaby && state.entityType != EntityType.ARMOR_STAND
+                 ? EquipmentClientInfo.LayerType.HUMANOID_BABY
+                 : (this.usesInnerModel(slot) ? EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID);
+@@ -73,7 +_,7 @@
                  .renderLayers(
                      equipmentclientinfo$layertype,
                      equippable.assetId().orElseThrow(),
 -                    a,
 +                    model,
-                     p_423438_,
-                     p_366444_,
-                     p_117119_,
-@@ -75,5 +_,12 @@
+                     state,
+                     itemStack,
+                     poseStack,
+@@ -90,5 +_,12 @@
  
-     private boolean usesInnerModel(EquipmentSlot p_117129_) {
-         return p_117129_ == EquipmentSlot.LEGS;
+     private boolean usesInnerModel(final EquipmentSlot slot) {
+         return slot == EquipmentSlot.LEGS;
 +    }
 +
 +    /**

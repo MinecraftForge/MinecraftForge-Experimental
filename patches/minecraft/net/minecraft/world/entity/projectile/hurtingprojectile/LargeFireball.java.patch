@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/entity/projectile/hurtingprojectile/LargeFireball.java
 +++ b/net/minecraft/world/entity/projectile/hurtingprojectile/LargeFireball.java
 @@ -31,7 +_,7 @@
-     protected void onHit(HitResult p_451111_) {
-         super.onHit(p_451111_);
+     protected void onHit(final HitResult hitResult) {
+         super.onHit(hitResult);
          if (this.level() instanceof ServerLevel serverlevel) {
 -            boolean flag = serverlevel.getGameRules().get(GameRules.MOB_GRIEFING);
 +            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, this.getOwner());

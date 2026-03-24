@@ -1,0 +1,15 @@
+--- a/net/minecraft/client/resources/model/geometry/QuadCollection.java
++++ b/net/minecraft/client/resources/model/geometry/QuadCollection.java
+@@ -71,6 +_,12 @@
+         return this.all;
+     }
+ 
++    public QuadCollection transform(net.minecraftforge.client.model.IQuadTransformer transformer) {
++        return new QuadCollection(transformer.process(this.all), transformer.process(this.unculled),
++            transformer.process(this.north), transformer.process(this.south), transformer.process(this.east),
++            transformer.process(this.west), transformer.process(this.up), transformer.process(this.down));
++    }
++
+     @BakedQuad.MaterialFlags
+     public int materialFlags() {
+         if (this.materialFlags == -1) {

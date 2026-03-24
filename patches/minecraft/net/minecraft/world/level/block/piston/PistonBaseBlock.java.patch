@@ -1,33 +1,33 @@
 --- a/net/minecraft/world/level/block/piston/PistonBaseBlock.java
 +++ b/net/minecraft/world/level/block/piston/PistonBaseBlock.java
-@@ -166,6 +_,7 @@
-         }
+@@ -169,6 +_,7 @@
  
-         if (p_60195_ == 0) {
-+            if (net.minecraftforge.event.ForgeEventFactory.onPistonMovePre(p_60193_, p_60194_, direction, true)) return false;
-             if (!this.moveBlocks(p_60193_, p_60194_, direction, true)) {
+         RandomSource randomsource = level.getRandom();
+         if (b0 == 0) {
++            if (net.minecraftforge.event.ForgeEventFactory.onPistonMovePre(level, pos, direction, true)) return false;
+             if (!this.moveBlocks(level, pos, direction, true)) {
                  return false;
              }
-@@ -174,6 +_,7 @@
-             p_60193_.playSound(null, p_60194_, SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 0.5F, p_60193_.random.nextFloat() * 0.25F + 0.6F);
-             p_60193_.gameEvent(GameEvent.BLOCK_ACTIVATE, p_60194_, GameEvent.Context.of(blockstate));
-         } else if (p_60195_ == 1 || p_60195_ == 2) {
-+            if (net.minecraftforge.event.ForgeEventFactory.onPistonMovePre(p_60193_, p_60194_, direction, false)) return false;
-             BlockEntity blockentity = p_60193_.getBlockEntity(p_60194_.relative(direction));
+@@ -177,6 +_,7 @@
+             level.playSound(null, pos, SoundEvents.PISTON_EXTEND, SoundSource.BLOCKS, 0.5F, randomsource.nextFloat() * 0.25F + 0.6F);
+             level.gameEvent(GameEvent.BLOCK_ACTIVATE, pos, GameEvent.Context.of(blockstate));
+         } else if (b0 == 1 || b0 == 2) {
++            if (net.minecraftforge.event.ForgeEventFactory.onPistonMovePre(level, pos, direction, false)) return false;
+             BlockEntity blockentity = level.getBlockEntity(pos.relative(direction));
              if (blockentity instanceof PistonMovingBlockEntity) {
                  ((PistonMovingBlockEntity)blockentity).finalTick();
-@@ -221,6 +_,7 @@
-             p_60193_.gameEvent(GameEvent.BLOCK_DEACTIVATE, p_60194_, GameEvent.Context.of(blockstate1));
+@@ -226,6 +_,7 @@
+             level.gameEvent(GameEvent.BLOCK_DEACTIVATE, pos, GameEvent.Context.of(blockstate1));
          }
  
-+        net.minecraftforge.event.ForgeEventFactory.onPistonMovePost(p_60193_, p_60194_, direction, (p_60195_ == 0));
++        net.minecraftforge.event.ForgeEventFactory.onPistonMovePost(level, pos, direction, (b0 == 0));
          return true;
      }
  
-@@ -365,6 +_,11 @@
+@@ -377,6 +_,11 @@
      @Override
-     protected BlockState rotate(BlockState p_60215_, Rotation p_60216_) {
-         return p_60215_.setValue(FACING, p_60216_.rotate(p_60215_.getValue(FACING)));
+     protected BlockState rotate(final BlockState state, final Rotation rotation) {
+         return state.setValue(FACING, rotation.rotate(state.getValue(FACING)));
 +    }
 +
 +    @Override

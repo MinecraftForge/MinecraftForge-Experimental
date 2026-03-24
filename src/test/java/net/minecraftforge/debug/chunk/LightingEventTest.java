@@ -51,7 +51,7 @@ public class LightingEventTest extends BaseTestMod {
             chunk = level.getChunk(origin.offset(x, 0, z));
 
             // If the chunk is already ticking, we can't force it
-            chunk = chunkSource.isPositionTicking(chunk.getPos().toLong()) ? null : chunk;
+            chunk = chunkSource.isPositionTicking(chunk.getPos().pack()) ? null : chunk;
         }
 
         if (chunk == null) {

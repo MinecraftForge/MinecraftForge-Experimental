@@ -3,13 +3,14 @@
   "category": "misc",
   "key": {
     "X": {
-      "type": "forge:partial_nbt",
+      "type": "forge:nbt",
       "items": [
         "minecraft:wooden_pickaxe",
         "minecraft:stone_pickaxe",
         "minecraft:iron_pickaxe"
       ],
-      "nbt": "{damage:3}"
+      "nbt": "{damage:3}",
+      "strict": false
     }
   },
   "pattern": [
@@ -17,7 +18,6 @@
     "XXX"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:dirt"
   }
 }

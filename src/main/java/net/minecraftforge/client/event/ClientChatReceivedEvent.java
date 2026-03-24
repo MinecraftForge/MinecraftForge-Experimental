@@ -5,7 +5,6 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.util.Util;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
@@ -76,17 +75,6 @@ public sealed class ClientChatReceivedEvent extends MutableEvent implements Canc
     }
 
     /**
-     * {@return {@code true} if the message was sent by the system, {@code false} otherwise}
-     *
-     * @deprecated Mojang made ChatType a registry, which isn't always accessible when the System messages are sent.
-     * So moved to it's own event. {@link SystemMessageReceivedEvent}
-     */
-    @Deprecated(forRemoval = true, since = "1.21.1")
-    public boolean isSystem() {
-        return this.sender.equals(Util.NIL_UUID);
-    }
-
-    /**
      * Fired when a player chat message is received on the client.
      *
      * <p>This event is {@linkplain Cancellable cancellable}.
@@ -114,32 +102,6 @@ public sealed class ClientChatReceivedEvent extends MutableEvent implements Canc
          */
         public PlayerChatMessage getPlayerChatMessage() {
             return this.playerChatMessage;
-        }
-    }
-
-    /**
-     * Fired when a system message is received on the client.
-     *
-     * @deprecated Mojang made ChatType a registry, which isn't always accessible when the System messages are sent.
-     * So moved to its own event. {@link SystemMessageReceivedEvent}
-     */
-    @Deprecated(forRemoval = true, since = "1.21.1")
-    public static final class System extends ClientChatReceivedEvent {
-        public static final CancellableEventBus<System> BUS = CancellableEventBus.create(System.class);
-
-        private final boolean overlay;
-
-        @ApiStatus.Internal
-        public System(ChatType.Bound boundChatType, Component message, boolean overlay) {
-            super(boundChatType, message, Util.NIL_UUID);
-            this.overlay = overlay;
-        }
-
-        /**
-         * {@return whether the message goes to the overlay}
-         */
-        public boolean isOverlay() {
-            return this.overlay;
         }
     }
 }

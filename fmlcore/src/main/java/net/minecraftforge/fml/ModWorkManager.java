@@ -14,25 +14,12 @@ import java.util.concurrent.locks.LockSupport;
 
 import static net.minecraftforge.fml.Logging.LOADING;
 
-public class ModWorkManager {
+public final class ModWorkManager {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final long PARK_TIME = TimeUnit.MILLISECONDS.toNanos(1);
 
-    public interface DrivenExecutor extends Executor {
-        boolean selfDriven();
-        boolean driveOne();
-
-        default void drive(Runnable ticker) {
-            if (!selfDriven()) {
-                ticker.run();
-                while (true) {
-                    if (!driveOne()) break;
-                }
-            } else {
-                // park for a bit so other threads can schedule
-                LockSupport.parkNanos(PARK_TIME);
-            }
-        }
+    public sealed interface DrivenExecutor extends Executor {
+        void drive(Runnable ticker);
     }
 
     private record SyncExecutor(ConcurrentLinkedDeque<Runnable> tasks) implements DrivenExecutor {
@@ -40,8 +27,7 @@ public class ModWorkManager {
             this(new ConcurrentLinkedDeque<>());
         }
 
-        @Override
-        public boolean driveOne() {
+        private boolean driveOne() {
             final Runnable task = tasks.pollFirst();
             if (task != null) {
                 task.run();
@@ -50,30 +36,29 @@ public class ModWorkManager {
         }
 
         @Override
-        public boolean selfDriven() {
-            return false;
+        public void execute(final Runnable command) {
+            tasks.addLast(command);
         }
 
         @Override
-        public void execute(final Runnable command) {
-            tasks.addLast(command);
+        public void drive(Runnable ticker) {
+            ticker.run();
+            while (true) {
+                if (!driveOne()) break;
+            }
         }
     }
 
     private record WrappingExecutor(Executor wrapped) implements DrivenExecutor {
         @Override
-        public boolean selfDriven() {
-            return true;
-        }
-
-        @Override
-        public boolean driveOne() {
-            return false;
-        }
-
-        @Override
         public void execute(final Runnable command) {
             wrapped.execute(command);
+        }
+
+        @Override
+        public void drive(Runnable ticker) {
+            // Park for a bit so other threads can schedule
+            LockSupport.parkNanos(PARK_TIME);
         }
     }
 

@@ -30,4 +30,5 @@ public @interface GameTest {
     int maxAttempts() default 1;
     int requiredSuccesses() default 1;
     boolean skyAccess() default false;
+    int padding() default 0;
 }

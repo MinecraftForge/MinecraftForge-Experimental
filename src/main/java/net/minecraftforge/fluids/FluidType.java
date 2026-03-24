@@ -24,7 +24,6 @@ import net.minecraft.world.entity.vehicle.boat.AbstractBoat;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Rarity;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -499,7 +498,7 @@ public class FluidType {
      * @param pos the position of the fluid
      * @return the light level emitted by the fluid
      */
-    public int getLightLevel(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+    public int getLightLevel(FluidState state, LevelReader getter, BlockPos pos) {
         return this.getLightLevel();
     }
 
@@ -515,7 +514,7 @@ public class FluidType {
      * @param pos the position of the fluid
      * @return the density of the fluid
      */
-    public int getDensity(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+    public int getDensity(FluidState state, LevelReader getter, BlockPos pos) {
         return this.getDensity();
     }
 
@@ -531,7 +530,7 @@ public class FluidType {
      * @param pos the position of the fluid
      * @return the temperature of the fluid
      */
-    public int getTemperature(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+    public int getTemperature(FluidState state, LevelReader getter, BlockPos pos) {
         return this.getTemperature();
     }
 
@@ -548,7 +547,7 @@ public class FluidType {
      * @param pos the position of the fluid
      * @return the viscosity of the fluid
      */
-    public int getViscosity(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
+    public int getViscosity(FluidState state, LevelReader getter, BlockPos pos) {
         return this.getViscosity();
     }
 
@@ -717,7 +716,7 @@ public class FluidType {
      * @param state the state of the fluid
      * @return the {@link BlockState} of a fluid
      */
-    public BlockState getBlockForFluidState(BlockAndTintGetter getter, BlockPos pos, FluidState state) {
+    public BlockState getBlockForFluidState(LevelReader getter, BlockPos pos, FluidState state) {
         return state.createLegacyBlock();
     }
 
@@ -730,7 +729,7 @@ public class FluidType {
      * @param stack the stack holding the fluid
      * @return the {@link FluidState} being placed
      */
-    public FluidState getStateForPlacement(BlockAndTintGetter getter, BlockPos pos, FluidStack stack) {
+    public FluidState getStateForPlacement(LevelReader getter, BlockPos pos, FluidStack stack) {
         return stack.getFluid().defaultFluidState();
     }
 
@@ -742,7 +741,7 @@ public class FluidType {
      * @param state the state of the fluid being placed
      * @return {@code true} if the fluid can be placed, {@code false} otherwise
      */
-    public final boolean canBePlacedInLevel(BlockAndTintGetter getter, BlockPos pos, FluidState state) {
+    public final boolean canBePlacedInLevel(LevelReader getter, BlockPos pos, FluidState state) {
         return !this.getBlockForFluidState(getter, pos, state).isAir();
     }
 
@@ -754,7 +753,7 @@ public class FluidType {
      * @param stack the stack holding the fluid
      * @return {@code true} if the fluid can be placed, {@code false} otherwise
      */
-    public final boolean canBePlacedInLevel(BlockAndTintGetter getter, BlockPos pos, FluidStack stack) {
+    public final boolean canBePlacedInLevel(LevelReader getter, BlockPos pos, FluidStack stack) {
         return this.canBePlacedInLevel(getter, pos, this.getStateForPlacement(getter, pos, stack));
     }
 
@@ -807,7 +806,7 @@ public class FluidType {
      */
     public void onVaporize(@Nullable LivingEntity entity, Level level, BlockPos pos, FluidStack stack) {
         SoundEvent sound = this.getSound(entity, level, pos, SoundActions.FLUID_VAPORIZE);
-        level.playSound(entity, pos, sound != null ? sound : SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (level.random.nextFloat() - level.random.nextFloat()) * 0.8F);
+        level.playSound(entity, pos, sound != null ? sound : SoundEvents.FIRE_EXTINGUISH, SoundSource.BLOCKS, 0.5F, 2.6F + (level.getRandom().nextFloat() - level.getRandom().nextFloat()) * 0.8F);
 
         for (int l = 0; l < 8; ++l)
             level.addAlwaysVisibleParticle(ParticleTypes.LARGE_SMOKE, (double) pos.getX() + Math.random(), (double) pos.getY() + Math.random(), (double) pos.getZ() + Math.random(), 0.0D, 0.0D, 0.0D);

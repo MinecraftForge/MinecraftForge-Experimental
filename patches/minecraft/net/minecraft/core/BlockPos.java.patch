@@ -8,4 +8,4 @@
 +public class BlockPos extends Vec3i implements net.minecraftforge.common.extensions.IForgeBlockPos {
      public static final Codec<BlockPos> CODEC = Codec.INT_STREAM
          .<BlockPos>comapFlatMap(
-             p_448556_ -> Util.fixedSize(p_448556_, 3).map(p_175270_ -> new BlockPos(p_175270_[0], p_175270_[1], p_175270_[2])),
+             input -> Util.fixedSize(input, 3).map(ints -> new BlockPos(ints[0], ints[1], ints[2])), pos -> IntStream.of(pos.getX(), pos.getY(), pos.getZ())

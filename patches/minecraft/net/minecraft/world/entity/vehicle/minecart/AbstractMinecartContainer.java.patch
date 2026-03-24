@@ -3,10 +3,10 @@
 @@ -94,6 +_,8 @@
  
      @Override
-     public InteractionResult interact(Player p_452542_, InteractionHand p_458127_) {
-+        var ret = super.interact(p_452542_, p_458127_);
+     public InteractionResult interact(final Player player, final InteractionHand hand, final Vec3 location) {
++        var ret = super.interact(player, hand, location);
 +        if (ret.consumesAction()) return ret;
-         return this.interactWithContainerVehicle(p_452542_);
+         return this.interactWithContainerVehicle(player);
      }
  
 @@ -162,5 +_,27 @@

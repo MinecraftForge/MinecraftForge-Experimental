@@ -42,8 +42,6 @@ public final class NamedRenderTypeManager {
     private static void preRegisterVanillaRenderTypes(Map<Identifier, RenderTypeGroup> blockRenderTypes) {
         blockRenderTypes.put(rl("solid"), new RenderTypeGroup(ChunkSectionLayer.SOLID, ForgeRenderTypes.ITEM_LAYERED_SOLID.get()));
         blockRenderTypes.put(rl("cutout"), new RenderTypeGroup(ChunkSectionLayer.CUTOUT, ForgeRenderTypes.ITEM_LAYERED_CUTOUT.get()));
-        blockRenderTypes.put(rl("translucent_moving_block"), new RenderTypeGroup(ChunkSectionLayer.TRANSLUCENT, ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
-        blockRenderTypes.put(rl("tripwire"), new RenderTypeGroup(ChunkSectionLayer.TRIPWIRE, ForgeRenderTypes.ITEM_LAYERED_TRANSLUCENT.get()));
     }
 
     private static Identifier rl(String path) {

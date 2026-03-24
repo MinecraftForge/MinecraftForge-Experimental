@@ -7,10 +7,8 @@ package net.minecraftforge.debug.client;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
-import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -23,23 +21,33 @@ import net.minecraftforge.test.BaseTestMod;
 
 import java.util.Random;
 
+import org.jspecify.annotations.Nullable;
+
 @GameTestNamespace("forge")
 @Mod(RenderTooltipTest.MODID)
 public class RenderTooltipTest extends BaseTestMod {
     public static final String MODID = "render_tooltip_test";
     private static boolean testMode = false;
     private static int shouldOpen = 0;
-    // Need some randomness so this test isn't asinine.
-    private static Object[] possibleChoices = BuiltInRegistries.ITEM.listElements().map(Holder::get).map(Item::getDefaultInstance).toArray();
-    private static int itemStack = 0;
     private static ItemStack lastItemstackSeenInEvent = null;
+    private static @Nullable ItemStack itemStack;
+
     public RenderTooltipTest(FMLJavaModLoadingContext context) {
         super(context, false, false);
         AddGuiOverlayLayersEvent.BUS.addListener(event -> {
             event.getLayeredDraw().addWithCondition(rl("render_tooltip_test"), (gg, dt) -> {
-                gg.setTooltipForNextFrame(Minecraft.getInstance().font, (ItemStack) possibleChoices[itemStack], 50, 50);
+                if (itemStack != null)
+                    gg.setTooltipForNextFrame(Minecraft.getInstance().font, itemStack, 50, 50);
             }, () -> testMode) ;
         });
+    }
+
+    // Need some randomness so this test isn't asinine.
+    private static void pickRandomItem() {
+        var keys = BuiltInRegistries.ITEM.keySet();
+        var idx = new Random().nextInt(keys.size());
+        var item = BuiltInRegistries.ITEM.listElements().skip(idx).findFirst().get();
+        itemStack = item.get().getDefaultInstance();
     }
 
     @SuppressWarnings("all")
@@ -60,13 +68,15 @@ public class RenderTooltipTest extends BaseTestMod {
                 shouldOpen = 0;
             }
         });
-        itemStack = new Random().nextInt(possibleChoices.length);
+
+        pickRandomItem();
+
         helper.runAfterDelay(10, () -> {
             testMode = false;
             var copyOfLastSeen = lastItemstackSeenInEvent;
-            boolean testPassed = lastItemstackSeenInEvent == possibleChoices[itemStack];
+            boolean testPassed = lastItemstackSeenInEvent == itemStack;
             lastItemstackSeenInEvent = null;
-            helper.assertTrue(testPassed, "Itemstack from last tooltip was not correct. Was " + copyOfLastSeen + " expected " + possibleChoices[itemStack]);
+            helper.assertTrue(testPassed, "Itemstack from last tooltip was not correct. Was " + copyOfLastSeen + " expected " + itemStack);
             helper.succeed();
         });
     }

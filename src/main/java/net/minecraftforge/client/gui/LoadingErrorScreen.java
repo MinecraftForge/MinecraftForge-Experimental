@@ -8,7 +8,7 @@ package net.minecraftforge.client.gui;
 import com.google.common.base.Strings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.ErrorScreen;
 import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.util.FormattedCharSequence;
@@ -69,16 +69,16 @@ public class LoadingErrorScreen extends ErrorScreen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.renderBackground(guiGraphics, mouseX, mouseY, partialTick);
-        this.entryList.render(guiGraphics, mouseX, mouseY, partialTick);
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
+        this.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
+        this.entryList.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         drawMultiLineCenteredString(guiGraphics, font, this.modLoadErrors.isEmpty() ? warningHeader : errorHeader, this.width / 2, 10);
-        this.renderables.forEach(button -> button.render(guiGraphics, mouseX, mouseY, partialTick));
+        this.renderables.forEach(button -> button.extractRenderState(guiGraphics, mouseX, mouseY, partialTick));
     }
 
-    private void drawMultiLineCenteredString(GuiGraphics guiGraphics, Font fr, Component str, int x, int y) {
+    private void drawMultiLineCenteredString(GuiGraphicsExtractor guiGraphics, Font fr, Component str, int x, int y) {
         for (FormattedCharSequence s : fr.split(str, this.width)) {
-            guiGraphics.drawString(fr, s, x - fr.width(s) / 2, y, 0xFFFFFFFF);
+            guiGraphics.text(fr, s, x - fr.width(s) / 2, y, 0xFFFFFFFF);
             y += fr.lineHeight;
         }
     }
@@ -127,7 +127,7 @@ public class LoadingErrorScreen extends ErrorScreen {
             }
 
             @Override
-            public void renderContent(GuiGraphics guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
+            public void extractContent(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, boolean isMouseOver, float partialTick) {
                 int top = this.getContentY();
                 int left = this.getContentX();
                 var mc = Minecraft.getInstance();
@@ -136,9 +136,9 @@ public class LoadingErrorScreen extends ErrorScreen {
                 int y = top + 2;
                 for (var string : strings) {
                     if (center)
-                        guiGraphics.drawString(font, string, left + (width / 2) - (font.width(string) / 2), y, 0xFFFFFFFF, false);
+                        guiGraphics.text(font, string, left + (width / 2) - (font.width(string) / 2), y, 0xFFFFFFFF, false);
                     else
-                        guiGraphics.drawString(font, string, left + 5, y, 0xFFFFFFFF, false);
+                        guiGraphics.text(font, string, left + 5, y, 0xFFFFFFFF, false);
                     y += font.lineHeight;
                 }
             }

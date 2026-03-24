@@ -1,0 +1,7 @@
+{
+  "type": "minecraft:function",
+  "environment": "minecraft:default",
+  "function": "forge:tags_test/cobble_in_common",
+  "max_ticks": 100,
+  "structure": "forge:empty3x3x3"
+}

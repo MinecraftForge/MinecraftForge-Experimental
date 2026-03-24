@@ -1,24 +1,24 @@
 --- a/net/minecraft/client/model/HumanoidModel.java
 +++ b/net/minecraft/client/model/HumanoidModel.java
-@@ -308,6 +_,8 @@
+@@ -387,6 +_,8 @@
                  break;
              case SPEAR:
-                 SpearAnimations.thirdPersonHandUse(this.rightArm, this.head, true, p_362371_.getUseItemStackForArm(HumanoidArm.RIGHT), p_362371_);
+                 SpearAnimations.thirdPersonHandUse(this.rightArm, this.head, true, state.getUseItemStackForArm(HumanoidArm.RIGHT), state);
 +            default:
-+                p_362371_.rightArmPose.applyTransform(this, p_362371_, net.minecraft.world.entity.HumanoidArm.RIGHT);
++                state.rightArmPose.applyTransform(this, state, net.minecraft.world.entity.HumanoidArm.RIGHT);
          }
      }
  
-@@ -355,6 +_,8 @@
+@@ -432,6 +_,8 @@
                  break;
              case SPEAR:
-                 SpearAnimations.thirdPersonHandUse(this.leftArm, this.head, false, p_363560_.getUseItemStackForArm(HumanoidArm.LEFT), p_363560_);
+                 SpearAnimations.thirdPersonHandUse(this.leftArm, this.head, false, state.getUseItemStackForArm(HumanoidArm.LEFT), state);
 +            default:
-+                p_363560_.leftArmPose.applyTransform(this, p_363560_, net.minecraft.world.entity.HumanoidArm.LEFT);
++                state.leftArmPose.applyTransform(this, state, net.minecraft.world.entity.HumanoidArm.LEFT);
          }
      }
  
-@@ -427,7 +_,7 @@
+@@ -493,7 +_,7 @@
      }
  
      @OnlyIn(Dist.CLIENT)
@@ -27,10 +27,10 @@
          EMPTY(false, false),
          ITEM(false, false),
          BLOCK(false, false),
-@@ -453,10 +_,29 @@
-         ArmPose(final boolean p_102896_, final boolean p_456170_) {
-             this.twoHanded = p_102896_;
-             this.affectsOffhandPose = p_456170_;
+@@ -519,10 +_,29 @@
+         private ArmPose(final boolean twoHanded, final boolean affectsOffhandPose) {
+             this.twoHanded = twoHanded;
+             this.affectsOffhandPose = affectsOffhandPose;
 +            this.forgeArmPose = null;
          }
  

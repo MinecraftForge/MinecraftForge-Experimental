@@ -24,7 +24,7 @@ import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.fml.loading.progress.ProgressMeter;
 
 @ApiStatus.Internal
-class ModStateTransitionHelper {
+final class ModStateTransitionHelper {
     static final IModStateTransition NOOP = new NoopTransition();
     record NoopTransition() implements IModStateTransition {
         @Override
@@ -62,7 +62,30 @@ class ModStateTransitionHelper {
         }
     }
 
-    record FutureResult<V>(V value, Throwable exception){}
+    /// Same as [#completableFutureFromExceptionList(List)] but specialised for a single future
+    static <V> CompletionStage<Void> completableFutureFromException(FutureResult<V> t) {
+        if (t.exception() == null) {
+            return CompletableFuture.completedFuture(null);
+        } else {
+            var exception = t.exception();
+            CompletableFuture<Void> cf = new CompletableFuture<>();
+            RuntimeException accumulator = new RuntimeException();
+            cf.completeExceptionally(accumulator);
+            if (exception instanceof CompletionException) {
+                exception = exception.getCause();
+            }
+            if (exception.getSuppressed().length != 0) {
+                for (Throwable throwable : exception.getSuppressed()) {
+                    accumulator.addSuppressed(throwable);
+                }
+            } else {
+                accumulator.addSuppressed(exception);
+            }
+            return cf;
+        }
+    }
+
+    record FutureResult<V>(V value, Throwable exception) {}
 
     static <V> CompletableFuture<List<FutureResult<V>>> gather(Collection<? extends CompletableFuture<? extends V>> futures) {
         var list = new ArrayList<FutureResult<V>>(futures.size());
@@ -79,22 +102,14 @@ class ModStateTransitionHelper {
         return CompletableFuture.allOf(results).handle((r, th)->null).thenApply(res -> list);
     }
 
-    private static <T extends IModBusEvent> void addCompletableFutureTaskForModDispatch(
-        final IModStateTransition transition,
+    private static <T extends IModBusEvent> CompletableFuture<Void> addCompletableFutureTaskForModDispatch(
         final Executor executor,
-        final List<CompletableFuture<Void>> completableFutures,
         final ProgressMeter progressBar,
         final EventGenerator<T> eventGenerator,
         final BiFunction<ModLoadingStage, Throwable, ModLoadingStage> nextState
      ) {
-
-        @SuppressWarnings("removal")
-        var preDispatchHook = getHook(transition.preDispatchHook(), executor, eventGenerator);
-        if (preDispatchHook != null)
-            completableFutures.add(preDispatchHook);
-
         var modFutures = new LinkedHashMap<String, CompletableFuture<Void>>();
-        for (var mod : ModList.get().getLoadedMods()) {
+        for (var mod : ModList.getLoadedMods()) {
 
             CompletableFuture<Void> parent = null;
             if (mod.dependencies.isEmpty()) {
@@ -129,20 +144,7 @@ class ModStateTransitionHelper {
             modFutures.put(mod.getModId(), dispatch);
         }
 
-        var dispatch = gather(modFutures.values()).thenComposeAsync(ModStateTransitionHelper::completableFutureFromExceptionList, executor);
-        completableFutures.add(dispatch);
-
-        @SuppressWarnings("removal")
-        var postDispatchHook = getHook(transition.preDispatchHook(), executor, eventGenerator);
-        if (postDispatchHook != null)
-            completableFutures.add(postDispatchHook);
-    }
-
-    private static <T extends IModBusEvent> CompletableFuture<Void> getHook(BiFunction<Executor, ? extends EventGenerator<?>, CompletableFuture<Void>> hook, Executor executor, EventGenerator<T> eventGenerator) {
-        if (hook == null || hook == IModStateTransition.NULL_HOOK) return null;
-        @SuppressWarnings("unchecked")
-        var hookTyped = (BiFunction<Executor, EventGenerator<T>, CompletableFuture<Void>>)hook;
-        return hookTyped.apply(executor, eventGenerator);
+        return gather(modFutures.values()).thenComposeAsync(ModStateTransitionHelper::completableFutureFromExceptionList, executor);
     }
 
     static <T extends IModBusEvent> CompletableFuture<Void> build(
@@ -154,31 +156,25 @@ class ModStateTransitionHelper {
         final Function<Executor, CompletableFuture<Void>> preSyncTask,
         final Function<Executor, CompletableFuture<Void>> postSyncTask
     ) {
-        List<CompletableFuture<Void>> futures = new ArrayList<>();
+        CompletableFuture<Void> future;
         final var executor = transition.threadSelector().apply(syncExecutor, parallelExecutor);
 
-        @SuppressWarnings({ "removal", "unchecked" })
-        var events = transition.eventFunctionStream().get().map(f -> (EventGenerator<T>)f).toList();
-        for (int x = 0; x < events.size(); x++) {
-            var gen = events.get(x);
-            BiFunction<ModLoadingStage, Throwable, ModLoadingStage> state = x == events.size() - 1
-                ? transition.nextModLoadingStage()
-                : ModLoadingStage::currentState;
-            addCompletableFutureTaskForModDispatch(transition, executor, futures, progressBar, gen, state);
+        final CompletableFuture<Void> preSyncTaskCF = preSyncTask.apply(syncExecutor);
+        CompletableFuture<Void> postEventDispatchCF = preSyncTaskCF
+            .thenRunAsync(() -> progressBar.label(progressBar.name() + ": dispatching " + name), parallelExecutor);
+
+        var eventGenerator = transition.eventFunction();
+        if (eventGenerator != null) {
+            BiFunction<ModLoadingStage, Throwable, ModLoadingStage> state = transition.nextModLoadingStage();
+            future = addCompletableFutureTaskForModDispatch(executor, progressBar, eventGenerator, state);
+
+            final CompletableFuture<Void> eventDispatchCF = future.handle(FutureResult::new)
+                    .thenCompose(ModStateTransitionHelper::completableFutureFromException);
+            postEventDispatchCF = postEventDispatchCF.thenComposeAsync(_ -> eventDispatchCF, parallelExecutor);
         }
 
-        final CompletableFuture<Void> preSyncTaskCF = preSyncTask.apply(syncExecutor);
-        final CompletableFuture<Void> eventDispatchCF = gather(futures).thenCompose(ModStateTransitionHelper::completableFutureFromExceptionList);
-        final CompletableFuture<Void> postEventDispatchCF = preSyncTaskCF
-            .thenApplyAsync(n -> {
-                progressBar.label(progressBar.name() + ": dispatching " + name);
-                return null;
-            }, parallelExecutor)
-            .thenComposeAsync(n -> eventDispatchCF, parallelExecutor)
-            .thenApply(r -> {
-                postSyncTask.apply(syncExecutor);
-                return null;
-            });
+        postEventDispatchCF = postEventDispatchCF.thenRun(() -> postSyncTask.apply(syncExecutor));
+
         return transition.finalActivityGenerator().apply(syncExecutor, postEventDispatchCF);
     }
 }

@@ -5,7 +5,7 @@
                  clientactiveplayerstooltip$activeplayerstooltip
              );
 -            default -> throw new IllegalArgumentException("Unknown TooltipComponent");
-+            default -> net.minecraftforge.client.gui.ClientTooltipComponentManager.createClientTooltipComponent(p_169951_);
++            default -> net.minecraftforge.client.gui.ClientTooltipComponentManager.createClientTooltipComponent(component);
          });
      }
  

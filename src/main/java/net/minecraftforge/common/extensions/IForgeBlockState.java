@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
@@ -29,7 +30,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraftforge.common.IPlantable;
 
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -626,31 +626,6 @@ public interface IForgeBlockState {
      */
     default boolean canRedstoneConnectTo(BlockGetter level, BlockPos pos, @Nullable Direction direction) {
         return self().getBlock().canConnectRedstone(self(), level, pos, direction);
-    }
-
-    /**
-     * Whether this block hides the neighbors face pointed towards by the given direction.
-     * <p>
-     * This method should only be used for blocks you don't control, for your own blocks override
-     * {@link net.minecraft.world.level.block.Block#skipRendering(BlockState, BlockState, Direction)}
-     * on the respective block instead
-     *
-     * @param level The world
-     * @param pos The blocks position in the world
-     * @param neighborState The neighboring blocks {@link BlockState}
-     * @param dir The direction towards the neighboring block
-     */
-    default boolean hidesNeighborFace(BlockGetter level, BlockPos pos, BlockState neighborState, Direction dir) {
-        return self().getBlock().hidesNeighborFace(level, pos, self(), neighborState, dir);
-    }
-
-    /**
-     * Whether this block allows a neighboring block to hide the face of this block it touches.
-     * If this returns true, {@link IForgeBlockState#hidesNeighborFace(BlockGetter, BlockPos, BlockState, Direction)}
-     * will be called on the neighboring block.
-     */
-    default boolean supportsExternalFaceHiding() {
-        return self().getBlock().supportsExternalFaceHiding(self());
     }
 
     /**

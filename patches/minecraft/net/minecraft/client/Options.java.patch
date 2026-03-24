@@ -1,45 +1,35 @@
 --- a/net/minecraft/client/Options.java
 +++ b/net/minecraft/client/Options.java
-@@ -816,7 +_,8 @@
-         },
-         new OptionInstance.LazyEnum<>(
-             () -> Stream.concat(Stream.of(""), Minecraft.getInstance().getSoundManager().getAvailableSoundDevices().stream()).toList(),
--            p_232011_ -> Minecraft.getInstance().isRunning() && p_232011_ != "" && !Minecraft.getInstance().getSoundManager().getAvailableSoundDevices().contains(p_232011_)
-+            // FORGE: fix incorrect string comparison - PR #8767
-+            p_232011_ -> Minecraft.getInstance().isRunning() && (p_232011_ == null || !p_232011_.isEmpty()) && !Minecraft.getInstance().getSoundManager().getAvailableSoundDevices().contains(p_232011_)
-                 ? Optional.empty()
-                 : Optional.of(p_232011_),
-             Codec.STRING
-@@ -848,6 +_,7 @@
+@@ -921,6 +_,7 @@
      );
      public boolean syncWrites;
      public boolean startedCleanly = true;
 +    private final Map<String, String> unknownKeys = new java.util.HashMap<>();
  
-     private static void operateOnLevelRenderer(Consumer<LevelRenderer> p_457625_) {
-         LevelRenderer levelrenderer = Minecraft.getInstance().levelRenderer;
-@@ -1313,6 +_,7 @@
+     public static boolean isSoundDeviceDefault(final String deviceName) {
+         return deviceName.equals("");
+@@ -1396,6 +_,7 @@
      }
  
-     public Options(Minecraft p_92138_, File p_92139_) {
+     public Options(final Minecraft minecraft, final File workingDirectory) {
 +        setForgeKeybindProperties();
-         this.minecraft = p_92138_;
-         this.optionsFile = new File(p_92139_, "options.txt");
+         this.minecraft = minecraft;
+         this.optionsFile = new File(workingDirectory, "options.txt");
          boolean flag = Runtime.getRuntime().maxMemory() >= 1000000000L;
-@@ -1463,15 +_,28 @@
-         this.startedCleanly = p_168428_.process("startedCleanly", this.startedCleanly);
-         p_168428_.process("musicToast", this.musicToast);
-         p_168428_.process("musicFrequency", this.musicFrequency);
-+        processOptionsKeysOnly(p_168428_);
-+        processOptionsEnd(p_168428_);
+@@ -1548,15 +_,28 @@
+         this.startedCleanly = access.process("startedCleanly", this.startedCleanly);
+         access.process("musicToast", this.musicToast);
+         access.process("musicFrequency", this.musicFrequency);
++        processOptionsKeysOnly(access);
++        processOptionsEnd(access);
 +    }
  
 +    // FORGE: split off to allow reloading keys after mod loading is done
-+    private void processOptionsKeysOnly(Options.FieldAccess p_168428_) {
++    private void processOptionsKeysOnly(Options.FieldAccess access) {
          for (KeyMapping keymapping : this.keyMappings) {
 -            String s = keymapping.saveString();
 +            String s = keymapping.saveString() + (keymapping.getKeyModifier() != net.minecraftforge.client.settings.KeyModifier.NONE ? ":" + keymapping.getKeyModifier() : "");
-             String s1 = p_168428_.process("key_" + keymapping.getName(), s);
+             String s1 = access.process("key_" + keymapping.getName(), s);
              if (!s.equals(s1)) {
                  keymapping.setKey(InputConstants.getKey(s1));
 +                if (s1.indexOf(':') != -1) {
@@ -52,11 +42,11 @@
          }
 +    }
  
-+    private void processOptionsEnd(Options.FieldAccess p_168428_) {
++    private void processOptionsEnd(Options.FieldAccess access) {
          for (SoundSource soundsource : SoundSource.values()) {
-             p_168428_.process("soundCategory_" + soundsource.getName(), this.soundSourceVolumes.get(soundsource));
+             access.process("soundCategory_" + soundsource.getName(), this.soundSourceVolumes.get(soundsource));
          }
-@@ -1486,6 +_,10 @@
+@@ -1571,6 +_,10 @@
      }
  
      public void load() {
@@ -67,7 +57,7 @@
          try {
              if (!this.optionsFile.exists()) {
                  return;
-@@ -1505,7 +_,8 @@
+@@ -1590,7 +_,8 @@
              }
  
              final CompoundTag compoundtag1 = this.dataFix(compoundtag);
@@ -75,11 +65,11 @@
 +            java.util.function.Consumer<FieldAccess> processor = limited ? this::processOptionsKeysOnly : this::processOptions;
 +            processor.accept(
                  new Options.FieldAccess() {
-                     private @Nullable String getValue(String p_394210_) {
-                         Tag tag = compoundtag1.get(p_394210_);
-@@ -1585,6 +_,17 @@
+                     {
+                         Objects.requireNonNull(Options.this);
+@@ -1672,6 +_,17 @@
              );
-             compoundtag1.getString("fullscreenResolution").ifPresent(p_389133_ -> this.fullscreenVideoModeString = p_389133_);
+             compoundtag1.getString("fullscreenResolution").ifPresent(fullscreenResolution -> this.fullscreenVideoModeString = fullscreenResolution);
              KeyMapping.resetMapping();
 +
 +            if (limited) {
@@ -95,19 +85,23 @@
          } catch (Exception exception) {
              LOGGER.error("Failed to load options", (Throwable)exception);
          }
-@@ -1612,9 +_,11 @@
+@@ -1699,6 +_,7 @@
      public void save() {
          try (final PrintWriter printwriter = new PrintWriter(new OutputStreamWriter(new FileOutputStream(this.optionsFile), StandardCharsets.UTF_8))) {
              printwriter.println("version:" + SharedConstants.getCurrentVersion().dataVersion().version());
 +            var seen = new java.util.HashSet<String>();
              this.processOptions(
                  new Options.FieldAccess() {
-                     public void writePrefix(String p_168491_) {
-+                        seen.add(p_168491_);
-                         printwriter.print(p_168491_);
+                     {
+@@ -1706,6 +_,7 @@
+                     }
+ 
+                     public void writePrefix(final String name) {
++                        seen.add(name);
+                         printwriter.print(name);
                          printwriter.print(':');
                      }
-@@ -1670,6 +_,12 @@
+@@ -1761,6 +_,12 @@
              if (s != null) {
                  printwriter.println("fullscreenResolution:" + s);
              }
@@ -120,7 +114,7 @@
          } catch (Exception exception) {
              LOGGER.error("Failed to save options", (Throwable)exception);
          }
-@@ -1707,6 +_,7 @@
+@@ -1798,6 +_,7 @@
      }
  
      public void broadcastOptions() {
@@ -128,10 +122,10 @@
          if (this.minecraft.player != null) {
              this.minecraft.player.connection.broadcastClientInformation(this.buildPlayerInformation());
          }
-@@ -1820,6 +_,23 @@
+@@ -1915,6 +_,23 @@
  
-     public static Component genericValueLabel(Component p_231901_, int p_231902_) {
-         return genericValueLabel(p_231901_, Component.literal(Integer.toString(p_231902_)));
+     public static Component genericValueLabel(final Component caption, final int value) {
+         return genericValueLabel(caption, Component.literal(Integer.toString(value)));
 +    }
 +
 +    private void setForgeKeybindProperties() {
@@ -151,4 +145,4 @@
 +        keySmoothCamera.setKeyConflictContext(inGame);
      }
  
-     public static Component genericValueOrOffLabel(Component p_345288_, int p_344826_) {
+     public static Component genericValueOrOffLabel(final Component caption, final int value) {

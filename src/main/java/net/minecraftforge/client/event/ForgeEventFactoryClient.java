@@ -24,7 +24,7 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.MouseHandler;
 import net.minecraft.client.entity.ClientAvatarEntity;
 import net.minecraft.client.entity.ClientMannequin;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.toasts.Toast;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -50,7 +50,7 @@ import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.ItemFrameRenderState;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.network.Connection;
@@ -169,11 +169,11 @@ public final class ForgeEventFactoryClient {
         return InputEvent.InteractionKeyMappingTriggered.BUS.post(event);
     }
 
-    public static void onContainerRenderBackground(AbstractContainerScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY) {
+    public static void onContainerRenderBackground(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         ContainerScreenEvent.Render.Background.BUS.post(new ContainerScreenEvent.Render.Background(screen, graphics, mouseX, mouseY));
     }
 
-    public static void onContainerRenderForeground(AbstractContainerScreen<?> screen, GuiGraphics graphics, int mouseX, int mouseY) {
+    public static void onContainerRenderForeground(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {
         ContainerScreenEvent.Render.Foreground.BUS.post(new ContainerScreenEvent.Render.Foreground(screen, graphics, mouseX, mouseY));
     }
 
@@ -221,11 +221,11 @@ public final class ForgeEventFactoryClient {
         return RenderItemInFrameEvent.BUS.post(new RenderItemInFrameEvent(state, renderItemFrame, poseStack, nodeCollector, packedLight));
     }
 
-    public static RenderNameTagEvent fireRenderNameTagEvent(EntityRenderState state, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {
-        return RenderNameTagEvent.BUS.fire(new RenderNameTagEvent(state, content, entityRenderer, poseStack, nodeCollector, cameraState));
+    public static RenderNameTagEvent fireRenderNameTagEvent(EntityRenderState state, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {
+        return RenderNameTagEvent.BUS.fire(new RenderNameTagEvent(state, entityRenderer, poseStack, nodeCollector, cameraState));
     }
 
-    public static void onRenderScreenBackground(Screen screen, GuiGraphics guiGraphics) {
+    public static void onRenderScreenBackground(Screen screen, GuiGraphicsExtractor guiGraphics) {
         ScreenEvent.BackgroundRendered.BUS.post(new ScreenEvent.BackgroundRendered(screen, guiGraphics));
     }
 
@@ -252,10 +252,6 @@ public final class ForgeEventFactoryClient {
 
     public static ComputeFovModifierEvent fireFovModifierEvent(Player entity, float modifier, float scale) {
         return ComputeFovModifierEvent.BUS.fire(new ComputeFovModifierEvent(entity, modifier, scale));
-    }
-
-    public static void onCreateSpecialBlockRenderers(Map<Block, SpecialModelRenderer.Unbaked> map) {
-        CreateSpecialBlockRendererEvent.BUS.post(new CreateSpecialBlockRendererEvent(map));
     }
 
     public static Map<Type, Function<EntityModelSet, SkullModelBase>> onCreateSkullModels() {

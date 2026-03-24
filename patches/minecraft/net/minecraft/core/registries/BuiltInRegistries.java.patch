@@ -1,22 +1,27 @@
 --- a/net/minecraft/core/registries/BuiltInRegistries.java
 +++ b/net/minecraft/core/registries/BuiltInRegistries.java
-@@ -294,7 +_,9 @@
-     ) {
-         Bootstrap.checkBootstrapCalled(() -> "registry " + p_259230_.identifier());
-         Identifier identifier = p_259230_.identifier();
--        LOADERS.put(identifier, () -> p_259210_.run(p_260327_));
-+        var maybeWrapped = net.minecraftforge.registries.GameData.getWrapper(p_259230_, p_260327_);
-+        p_260327_ = maybeWrapped;
-+        LOADERS.put(identifier, () -> p_259210_.run(maybeWrapped));
-         WRITABLE_REGISTRY.register((ResourceKey)p_259230_, p_260327_, RegistrationInfo.BUILT_IN);
-         return p_260327_;
+@@ -385,11 +_,13 @@
      }
-@@ -330,7 +_,7 @@
  
-             if (p_448623_ instanceof DefaultedRegistry) {
-                 Identifier identifier = ((DefaultedRegistry)p_448623_).getDefaultKey();
--                Objects.requireNonNull(p_448623_.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + identifier);
-+                Objects.requireNonNull(p_448623_.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + p_448623_.key() + " - " + identifier);
+     private static <T, R extends WritableRegistry<T>> R internalRegister(
+-        final ResourceKey<? extends Registry<T>> name, final R registry, final BuiltInRegistries.RegistryBootstrap<T> loader
++        final ResourceKey<? extends Registry<T>> name, R registry, final BuiltInRegistries.RegistryBootstrap<T> loader
+     ) {
+         Bootstrap.checkBootstrapCalled(() -> "registry " + name.identifier());
+         Identifier identifier = name.identifier();
+-        LOADERS.put(identifier, () -> loader.run(registry));
++        var maybeWrapped = net.minecraftforge.registries.GameData.getWrapper(name, registry);
++        registry = maybeWrapped;
++        LOADERS.put(identifier, () -> loader.run(maybeWrapped));
+         WRITABLE_REGISTRY.register((ResourceKey)name, registry, RegistrationInfo.BUILT_IN);
+         return registry;
+     }
+@@ -425,7 +_,7 @@
+ 
+             if (r instanceof DefaultedRegistry) {
+                 Identifier identifier = ((DefaultedRegistry)r).getDefaultKey();
+-                Objects.requireNonNull(r.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + identifier);
++                Objects.requireNonNull(r.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + r.key() + " - " + identifier);
              }
          });
      }

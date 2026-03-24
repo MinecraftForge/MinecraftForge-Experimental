@@ -41,11 +41,12 @@ public final class AddReloadListenerEvent extends MutableEvent {
     * @param listener the listener to add to the ResourceManager on reload
     */
     public void addListener(PreparableReloadListener listener) {
-       listeners.add(new WrappedStateAwareListener(listener));
+        listeners.add(new WrappedStateAwareListener(listener));
     }
 
     public List<PreparableReloadListener> getListeners() {
-       return List.copyOf(listeners);
+        if (listeners.isEmpty()) return List.of();
+        return List.copyOf(listeners);
     }
 
     /**

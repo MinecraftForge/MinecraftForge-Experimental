@@ -22,7 +22,7 @@ public record ModVersions(Map<String, Info> mods) {
     private static final int MAX_LENGTH = 0x100;
 
     public static ModVersions create() {
-        return new ModVersions(ModList.get().getMods().stream().collect(Collectors.toMap(
+        return new ModVersions(ModList.getMods().stream().collect(Collectors.toMap(
             IModInfo::getModId,
             mod -> new Info(mod.getDisplayName(), mod.getVersion().toString())
         )));

@@ -6,8 +6,8 @@
 package net.minecraftforge.client.gui.overlay;
 
 import net.minecraft.client.DeltaTracker;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public interface ForgeLayer {
-    void render(GuiGraphics gg, DeltaTracker dt);
+    void extract(GuiGraphicsExtractor gg, DeltaTracker dt);
 }

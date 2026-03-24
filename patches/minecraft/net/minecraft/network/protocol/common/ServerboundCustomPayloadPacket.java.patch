@@ -4,8 +4,8 @@
  public record ServerboundCustomPayloadPacket(CustomPacketPayload payload) implements Packet<ServerCommonPacketListener> {
      private static final int MAX_PAYLOAD_SIZE = 32767;
      public static final StreamCodec<FriendlyByteBuf, ServerboundCustomPayloadPacket> STREAM_CODEC = CustomPacketPayload.<FriendlyByteBuf>codec(
--            p_448778_ -> DiscardedPayload.codec(p_448778_, 32767),
-+            p_448778_ -> net.minecraftforge.common.ForgeHooks.getCustomPayloadCodec(p_448778_, 32767),
-             Util.make(Lists.newArrayList(new CustomPacketPayload.TypeAndCodec<>(BrandPayload.TYPE, BrandPayload.STREAM_CODEC)), p_334419_ -> {})
+-            id -> DiscardedPayload.codec(id, 32767),
++            id -> net.minecraftforge.common.ForgeHooks.getCustomPayloadCodec(id, 32767),
+             Util.make(Lists.newArrayList(new CustomPacketPayload.TypeAndCodec<>(BrandPayload.TYPE, BrandPayload.STREAM_CODEC)), types -> {})
          )
          .map(ServerboundCustomPayloadPacket::new, ServerboundCustomPayloadPacket::payload);

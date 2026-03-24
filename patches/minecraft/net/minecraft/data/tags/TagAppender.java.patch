@@ -1,33 +1,33 @@
 --- a/net/minecraft/data/tags/TagAppender.java
 +++ b/net/minecraft/data/tags/TagAppender.java
-@@ -8,7 +_,7 @@
+@@ -9,7 +_,7 @@
  import net.minecraft.tags.TagBuilder;
  import net.minecraft.tags.TagKey;
  
 -public interface TagAppender<E, T> {
 +public interface TagAppender<E, T> extends net.minecraftforge.common.extensions.IForgeTagAppender<E, T> {
-     TagAppender<E, T> add(E p_406816_);
+     TagAppender<E, T> add(E element);
  
-     default TagAppender<E, T> add(E... p_406204_) {
-@@ -32,6 +_,10 @@
-     TagAppender<E, T> addOptionalTag(TagKey<T> p_406169_);
+     default TagAppender<E, T> add(final E... elements) {
+@@ -33,6 +_,10 @@
+     TagAppender<E, T> addOptionalTag(TagKey<T> tag);
  
-     static <T> TagAppender<ResourceKey<T>, T> forBuilder(final TagBuilder p_407840_) {
-+        return forBuilder(p_407840_, "unknown");
+     static <T> TagAppender<ResourceKey<T>, T> forBuilder(final TagBuilder builder) {
++        return forBuilder(builder, "unknown");
 +    }
 +
-+    static <T> TagAppender<ResourceKey<T>, T> forBuilder(final TagBuilder p_407840_, String source) {
++    static <T> TagAppender<ResourceKey<T>, T> forBuilder(final TagBuilder builder, String source) {
          return new TagAppender<ResourceKey<T>, T>() {
-             public TagAppender<ResourceKey<T>, T> add(ResourceKey<T> p_406023_) {
-                 p_407840_.addElement(p_406023_.identifier());
-@@ -54,6 +_,21 @@
-                 p_407840_.addOptionalTag(p_407223_.location());
+             public TagAppender<ResourceKey<T>, T> add(final ResourceKey<T> element) {
+                 builder.addElement(element.identifier());
+@@ -55,6 +_,21 @@
+                 builder.addOptionalTag(tag.location());
                  return this;
              }
 +
 +            @Override
 +            public TagBuilder getInternalBuilder() {
-+                return p_407840_;
++                return builder;
 +            }
 +
 +            @Override
@@ -42,10 +42,10 @@
          };
      }
  
-@@ -81,6 +_,22 @@
+@@ -86,6 +_,22 @@
              @Override
-             public TagAppender<U, T> addOptionalTag(TagKey<T> p_409695_) {
-                 tagappender.addOptionalTag(p_409695_);
+             public TagAppender<U, T> addOptionalTag(final TagKey<T> tag) {
+                 tagappender.addOptionalTag(tag);
 +                return this;
 +            }
 +
@@ -61,7 +61,7 @@
 +
 +            @Override
 +            public TagAppender<U, T> remove(U value) {
-+                tagappender.remove(p_409081_.apply(value));
++                tagappender.remove(converter.apply(value));
                  return this;
              }
          };

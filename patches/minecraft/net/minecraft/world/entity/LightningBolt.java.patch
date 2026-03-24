@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/entity/LightningBolt.java
 +++ b/net/minecraft/world/entity/LightningBolt.java
-@@ -38,6 +_,7 @@
+@@ -39,6 +_,7 @@
      private @Nullable ServerPlayer cause;
      private final Set<Entity> hitEntities = Sets.newHashSet();
      private int blocksSetOnFire;
 +    private float damage = 5.0F;
  
-     public LightningBolt(EntityType<? extends LightningBolt> p_20865_, Level p_20866_) {
-         super(p_20865_, p_20866_);
-@@ -63,6 +_,14 @@
-         this.cause = p_20880_;
+     public LightningBolt(final EntityType<? extends LightningBolt> type, final Level level) {
+         super(type, level);
+@@ -64,6 +_,14 @@
+         this.cause = cause;
      }
  
 +    public void setDamage(float damage) {
@@ -23,7 +23,7 @@
      private void powerLightningRod() {
          BlockPos blockpos = this.getStrikePosition();
          BlockState blockstate = this.level().getBlockState(blockpos);
-@@ -161,6 +_,7 @@
+@@ -150,6 +_,7 @@
                      );
  
                  for (Entity entity : list1) {

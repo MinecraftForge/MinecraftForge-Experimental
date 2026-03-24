@@ -1,11 +1,11 @@
 --- a/net/minecraft/client/gui/screens/packs/TransferableSelectionList.java
 +++ b/net/minecraft/client/gui/screens/packs/TransferableSelectionList.java
-@@ -65,7 +_,7 @@
+@@ -66,7 +_,7 @@
          Component component = Component.empty().append(this.title).withStyle(ChatFormatting.UNDERLINE, ChatFormatting.BOLD);
          this.addEntry(new TransferableSelectionList.HeaderEntry(this.minecraft.font, component), (int)(9.0F * 1.5F));
          this.setSelected(null);
--        p_429245_.forEach(p_430444_ -> {
-+        p_429245_.filter(PackSelectionModel.Entry::notHidden).forEach(p_430444_ -> {
-             TransferableSelectionList.PackEntry transferableselectionlist$packentry = new TransferableSelectionList.PackEntry(this.minecraft, this, p_430444_);
+-        entries.forEach(e -> {
++        entries.filter(PackSelectionModel.Entry::notHidden).forEach(e -> {
+             TransferableSelectionList.PackEntry transferableselectionlist$packentry = new TransferableSelectionList.PackEntry(this.minecraft, this, e);
              this.addEntry(transferableselectionlist$packentry);
-             if (p_430177_ != null && p_430177_.getId().equals(p_430444_.getId())) {
+             if (transferredEntry != null && transferredEntry.getId().equals(e.getId())) {

@@ -40,7 +40,7 @@ public class ConfigCommand {
         private static int showFile(final CommandContext<CommandSourceStack> context) {
             final String modId = context.getArgument("mod", String.class);
             final ModConfig.Type type = context.getArgument("type", ModConfig.Type.class);
-            final String configFileName = ConfigTracker.INSTANCE.getConfigFileName(modId, type);
+            final String configFileName = ConfigTracker.getConfigFileName(modId, type);
             if (configFileName != null) {
                 File f = new File(configFileName);
                 context.getSource().sendSuccess(() -> Component.translatable("commands.config.getwithtype",

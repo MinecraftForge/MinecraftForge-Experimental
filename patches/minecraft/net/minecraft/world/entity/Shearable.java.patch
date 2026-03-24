@@ -7,7 +7,7 @@
 -public interface Shearable {
 +public interface Shearable extends net.minecraftforge.common.IForgeShearable {
 +    /** @deprecated Use {@link net.minecraftforge.common.IForgeShearable#onSheared} */
-     void shear(ServerLevel p_368224_, SoundSource p_21749_, ItemStack p_362173_);
+     void shear(ServerLevel level, SoundSource soundSource, ItemStack tool);
  
 +    /** @deprecated Use {@link net.minecraftforge.common.IForgeShearable#isShearable} */
      boolean readyForShearing();

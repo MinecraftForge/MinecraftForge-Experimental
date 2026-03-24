@@ -1,26 +1,17 @@
 --- a/net/minecraft/data/DataGenerator.java
 +++ b/net/minecraft/data/DataGenerator.java
-@@ -21,6 +_,7 @@
-     final Map<String, DataProvider> providersToRun = new LinkedHashMap<>();
-     private final WorldVersion version;
-     private final boolean alwaysGenerate;
+@@ -19,6 +_,7 @@
+     protected final PackOutput vanillaPackOutput;
+     protected final Set<String> allProviderIds = new HashSet<>();
+     protected final Map<String, DataProvider> providersToRun = new LinkedHashMap<>();
 +    private final Map<String, DataProvider> providersView = java.util.Collections.unmodifiableMap(this.providersToRun);
  
-     public DataGenerator(Path p_251724_, WorldVersion p_250554_, boolean p_251323_) {
-         this.rootOutputFolder = p_251724_;
-@@ -38,6 +_,7 @@
-                 LOGGER.debug("Generator {} already run for version {}", p_254418_, this.version.name());
-             } else {
-                 LOGGER.info("Starting provider: {}", p_254418_);
-+                net.minecraftforge.fml.StartupMessageManager.addModMessage("Generating: " + p_254418_);
-                 stopwatch1.start();
-                 hashcache.applyUpdate(hashcache.generateUpdate(p_254418_, p_253750_::run).join());
-                 stopwatch1.stop();
-@@ -56,6 +_,35 @@
-     public DataGenerator.PackGenerator getBuiltinDatapack(boolean p_253826_, String p_254134_) {
-         Path path = this.vanillaPackOutput.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("minecraft").resolve("datapacks").resolve(p_254134_);
-         return new DataGenerator.PackGenerator(p_253826_, p_254134_, new PackOutput(path));
-+    }
+     public DataGenerator(final Path output) {
+         this.vanillaPackOutput = new PackOutput(output);
+@@ -34,6 +_,35 @@
+         Path path = this.vanillaPackOutput.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("minecraft").resolve("datapacks").resolve(packId);
+         return new DataGenerator.PackGenerator(toRun, packId, new PackOutput(path));
+     }
 +    public Map<String, DataProvider> getProvidersView() {
 +        return this.providersView;
 +    }
@@ -30,7 +21,7 @@
 +    }
 +
 +    public PackOutput getPackOutput(String path) {
-+        return new PackOutput(rootOutputFolder.resolve(path));
++        return new PackOutput(getPackOutput().getOutputFolder().resolve(path));
 +    }
 +
 +    public <T extends DataProvider> T addProvider(boolean run, DataProvider.Factory<T> factory) {
@@ -49,6 +40,23 @@
 +        }
 +
 +        return provider;
-     }
++    }
  
      static {
+         Bootstrap.bootStrap();
+@@ -61,6 +_,7 @@
+                     DataGenerator.LOGGER.debug("Generator {} already run for version {}", providerId, this.version.name());
+                 } else {
+                     DataGenerator.LOGGER.info("Starting provider: {}", providerId);
++                    net.minecraftforge.fml.StartupMessageManager.addModMessage("Generating: " + providerId);
+                     stopwatch1.start();
+                     hashcache.applyUpdate(hashcache.generateUpdate(providerId, provider::run).join());
+                     stopwatch1.stop();
+@@ -112,6 +_,7 @@
+             Stopwatch stopwatch1 = Stopwatch.createUnstarted();
+             this.providersToRun.forEach((providerId, provider) -> {
+                 DataGenerator.LOGGER.info("Starting uncached provider: {}", providerId);
++                net.minecraftforge.fml.StartupMessageManager.addModMessage("Generating: " + providerId);
+                 stopwatch1.start();
+                 provider.run(CachedOutput.NO_CACHE).join();
+                 stopwatch1.stop();

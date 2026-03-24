@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/ai/goal/RemoveBlockGoal.java
 +++ b/net/minecraft/world/entity/ai/goal/RemoveBlockGoal.java
-@@ -35,7 +_,7 @@
+@@ -34,7 +_,7 @@
  
      @Override
      public boolean canUse() {
@@ -9,13 +9,13 @@
              return false;
          } else if (this.nextStartTick > 0) {
              this.nextStartTick--;
-@@ -149,7 +_,8 @@
+@@ -142,7 +_,8 @@
          );
          return chunkaccess == null
              ? false
--            : chunkaccess.getBlockState(p_25851_).is(this.blockToRemove)
-+            : !chunkaccess.getBlockState(p_25851_).canEntityDestroy(p_25850_, p_25851_, this.removerMob) ? false
-+                : chunkaccess.getBlockState(p_25851_).is(this.blockToRemove)
-                 && chunkaccess.getBlockState(p_25851_.above()).isAir()
-                 && chunkaccess.getBlockState(p_25851_.above(2)).isAir();
+-            : chunkaccess.getBlockState(pos).is(this.blockToRemove)
++            : !chunkaccess.getBlockState(pos).canEntityDestroy(level, pos, this.removerMob) ? false
++                : chunkaccess.getBlockState(pos).is(this.blockToRemove)
+                 && chunkaccess.getBlockState(pos.above()).isAir()
+                 && chunkaccess.getBlockState(pos.above(2)).isAir();
      }

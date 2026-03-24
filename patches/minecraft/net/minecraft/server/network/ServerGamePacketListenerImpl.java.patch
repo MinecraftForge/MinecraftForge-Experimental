@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -1213,9 +_,10 @@
+@@ -1279,9 +_,10 @@
                      }
                  case SWAP_ITEM_WITH_OFFHAND:
                      if (!this.player.isSpectator()) {
@@ -14,31 +14,22 @@
                          this.player.stopUsingItem();
                      }
  
-@@ -1414,8 +_,9 @@
+@@ -1503,8 +_,9 @@
                  }
  
                  CompletableFuture<FilteredText> completablefuture = this.filterTextPacket(playerchatmessage.signedContent());
 -                Component component = this.server.getChatDecorator().decorate(this.player, playerchatmessage.decoratedContent());
 +                Component component = net.minecraftforge.common.ForgeHooks.onServerChatSubmittedEvent(this.player, playerchatmessage.decoratedContent());
-                 this.chatMessageChain.append(completablefuture, p_296589_ -> {
+                 this.chatMessageChain.append(completablefuture, filtered -> {
 +                    if (component == null) return;
-                     PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(p_296589_.mask());
+                     PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(filtered.mask());
                      this.broadcastChatMessage(playerchatmessage1);
                  });
-@@ -1745,7 +_,7 @@
- 
-                             @Override
-                             public void onInteraction(InteractionHand p_143682_, Vec3 p_143683_) {
--                                this.performInteraction(p_143682_, (p_143686_, p_143687_, p_143688_) -> p_143687_.interactAt(p_143686_, p_143683_, p_143688_));
-+                                this.performInteraction(p_143682_, (p_143686_, p_143687_, p_143688_) -> net.minecraftforge.common.ForgeHooks.onInteractEntityAt(p_143687_, p_143686_, p_143683_, p_143688_));
-                             }
- 
-                             @Override
-@@ -2063,6 +_,7 @@
+@@ -2186,6 +_,7 @@
  
      @Override
-     public void handleCustomPayload(ServerboundCustomPayloadPacket p_329963_) {
-+        net.minecraftforge.common.ForgeHooks.onCustomPayload(p_329963_.payload(), this.connection);
+     public void handleCustomPayload(final ServerboundCustomPayloadPacket packet) {
++        net.minecraftforge.common.ForgeHooks.onCustomPayload(packet.payload(), this.connection);
      }
  
      @Override

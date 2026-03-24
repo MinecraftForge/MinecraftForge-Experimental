@@ -23,11 +23,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
@@ -51,11 +50,18 @@ import net.minecraft.client.renderer.LevelRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
+import net.minecraft.client.renderer.block.FluidModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModel;
+import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.fog.FogData;
-import net.minecraft.client.renderer.state.LevelRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -64,11 +70,12 @@ import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.ResolvedModel;
-import net.minecraft.client.resources.model.SpriteGetter;
-import net.minecraft.client.resources.model.UnbakedGeometry;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
+import net.minecraft.client.resources.model.sprite.MaterialBaker;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.data.AtlasIds;
 import net.minecraft.locale.Language;
 import net.minecraft.network.Connection;
@@ -94,10 +101,10 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.tooltip.TooltipComponent;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.FogType;
 import net.minecraft.world.phys.BlockHitResult;
@@ -277,6 +284,7 @@ public class ForgeHooksClient {
         RegisterColorHandlersEvent.Block.BUS.post(new RegisterColorHandlersEvent.Block(blockColors));
     }
 
+    @SuppressWarnings("rawtypes")
     public static Model getArmorModel(HumanoidRenderState state, ItemStack itemStack, EquipmentSlot slot, HumanoidModel<?> _default) {
         return IClientItemExtensions.of(itemStack).getGenericArmorModel(state, itemStack, slot, _default);
     }
@@ -319,7 +327,7 @@ public class ForgeHooksClient {
         return PlaySoundEvent.BUS.fire(new PlaySoundEvent(manager, sound)).getSound();
     }
 
-    public static void drawScreen(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public static void drawScreen(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         guiGraphics.pose().pushMatrix();
         for (Screen layer : guiLayers) {
             // Prevent the background layers from thinking the mouse is over their controls and showing them as highlighted.
@@ -330,9 +338,9 @@ public class ForgeHooksClient {
         guiGraphics.pose().popMatrix();
     }
 
-    private static void drawScreenInternal(Screen screen, GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    private static void drawScreenInternal(Screen screen, GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (!ScreenEvent.Render.Pre.BUS.post(new ScreenEvent.Render.Pre(screen, guiGraphics, mouseX, mouseY, partialTick)))
-            screen.renderWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
+            screen.extractRenderStateWithTooltipAndSubtitles(guiGraphics, mouseX, mouseY, partialTick);
         ScreenEvent.Render.Post.BUS.post(new ScreenEvent.Render.Post(screen, guiGraphics, mouseX, mouseY, partialTick));
     }
 
@@ -367,15 +375,13 @@ public class ForgeHooksClient {
         ModelEvent.BakingCompleted.BUS.post(new ModelEvent.BakingCompleted(modelManager, modelBakery));
     }
 
-    public static TextureAtlasSprite[] getFluidSprites(BlockAndTintGetter level, BlockPos pos, FluidState fluidStateIn) {
-        IClientFluidTypeExtensions props = IClientFluidTypeExtensions.of(fluidStateIn);
-        Identifier overlayTexture = props.getOverlayTexture(fluidStateIn, level, pos);
-        var atlas = Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(AtlasIds.BLOCKS);
-        return new TextureAtlasSprite[] {
-            atlas.getSprite(props.getStillTexture(fluidStateIn, level, pos)),
-            atlas.getSprite(props.getFlowingTexture(fluidStateIn, level, pos)),
-            overlayTexture == null ? null : atlas.getSprite(overlayTexture),
-        };
+    public static Map<Fluid, FluidModel> onFluidModelBake(ModelBakery bakery, MaterialBaker materials, Map<Fluid, FluidModel> vanilla) {
+        var ret = new HashMap<Fluid, FluidModel>();
+        ModelEvent.BakeFluidModels.BUS.post(new ModelEvent.BakeFluidModels(bakery, materials, ret));
+        if (ret.isEmpty())
+            return vanilla;
+        ret.putAll(vanilla);
+        return Map.copyOf(ret);
     }
 
     private static int slotMainHand = 0;
@@ -395,24 +401,24 @@ public class ForgeHooksClient {
         return from.getItem().shouldCauseReequipAnimation(from, to, changed);
     }
 
-    public static @Nullable CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphics guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
+    public static @Nullable CustomizeGuiOverlayEvent.BossEventProgress onCustomizeBossEventProgress(GuiGraphicsExtractor guiGraphics, Window window, LerpingBossEvent bossInfo, int x, int y, int increment) {
         var evt = new CustomizeGuiOverlayEvent.BossEventProgress(window, guiGraphics,
                 Minecraft.getInstance().getDeltaTracker().getGameTimeDeltaPartialTick(false), bossInfo, x, y, increment);
         return CustomizeGuiOverlayEvent.BossEventProgress.BUS.post(evt) ? null : evt;
     }
 
-    public static void onCustomizeChatEvent(GuiGraphics guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount, Font font) {
+    public static void onCustomizeChatEvent(GuiGraphicsExtractor guiGraphics, ChatComponent chat, Window window, int mouseX, int mouseY, int tickCount, Font font) {
         var minecraft = Minecraft.getInstance();
         var evt = new CustomizeGuiOverlayEvent.Chat(window, guiGraphics, minecraft.getDeltaTracker().getRealtimeDeltaTicks(), 0, chat.getHeight() - 40);
         CustomizeGuiOverlayEvent.Chat.BUS.post(evt);
         guiGraphics.pose().pushMatrix();
         // We give the absolute Y position of the chat component in the event and account for the chat component's own offsetting here.
         guiGraphics.pose().translate(evt.getPosX(), (float) ((evt.getPosY() - chat.getHeight() + 40) / chat.getScale()));
-        chat.render(guiGraphics, font, tickCount, mouseX, mouseY, false, false);
+        chat.extractRenderState(guiGraphics, font, tickCount, mouseX, mouseY, ChatComponent.DisplayMode.BACKGROUND, false);
         guiGraphics.pose().popMatrix();
     }
 
-    public static void onCustomizeDebugEvent(GuiGraphics guiGraphics, Window window, float partialTick, List<String> text, boolean isLeft) {
+    public static void onCustomizeDebugEvent(GuiGraphicsExtractor guiGraphics, Window window, float partialTick, List<String> text, boolean isLeft) {
         var evt = new CustomizeGuiOverlayEvent.DebugText(window, guiGraphics, partialTick, text,
                 isLeft ? CustomizeGuiOverlayEvent.DebugText.Side.Left : CustomizeGuiOverlayEvent.DebugText.Side.Right);
         CustomizeGuiOverlayEvent.DebugText.BUS.post(evt);
@@ -483,13 +489,12 @@ public class ForgeHooksClient {
         return null;
     }
 
-    @Nullable
-    public static TextureAtlasSprite loadTextureAtlasSprite(Identifier atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int spriteX, int spriteY, int padding, int mipmapLevel) {
+    public static TextureAtlasSprite loadTextureAtlasSprite(Identifier atlasName, SpriteContents contents, int atlasWidth, int atlasHeight, int x, int y, int padding) {
+        TextureAtlasSprite ret = null;
         var forgeMeta = contents.getAdditionalMetadata(ForgeTextureMetadata.TYPE).orElse(null);
-        if (forgeMeta == null || forgeMeta.loader() == null)
-            return null;
-
-        return forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, spriteX, spriteY, padding, mipmapLevel);
+        if (forgeMeta != null && forgeMeta.loader() != null)
+            ret = forgeMeta.loader().makeSprite(atlasName, contents, atlasWidth, atlasHeight, x, y, padding, contents.getMipLevel());
+        return ret != null ? ret : new TextureAtlasSprite(atlasName, contents, atlasWidth, atlasHeight, x, y, padding);
     }
 
     private static final Map<ModelLayerLocation, Supplier<LayerDefinition>> layerDefinitions = new HashMap<>();
@@ -515,7 +520,7 @@ public class ForgeHooksClient {
             boolean channelsMatch = NetworkRegistry.checkListPingCompatibilityForClient(remoteChannels);
             AtomicBoolean result = new AtomicBoolean(true);
             final List<String> extraClientMods = new ArrayList<>();
-            ModList.get().forEachModContainer((modid, mc) ->
+            ModList.forEachModContainer((modid, mc) ->
                     mc.getCustomExtension(IExtensionPoint.DisplayTest.class).ifPresent(ext-> {
                         boolean foundModOnServer = ext.remoteVersionTest().test(mods.get(modid), true);
                         result.compareAndSet(true, foundModOnServer);
@@ -526,8 +531,8 @@ public class ForgeHooksClient {
             boolean modsMatch = result.get();
 
             final Map<String, String> extraServerMods = mods.entrySet().stream().
-                    filter(e -> !Objects.equals(IExtensionPoint.DisplayTest.IGNORESERVERONLY, e.getValue())).
-                    filter(e -> !ModList.get().isLoaded(e.getKey())).
+                    filter(e -> !IExtensionPoint.DisplayTest.IGNORESERVERONLY.equals(e.getValue())).
+                    filter(e -> !ModList.isLoaded(e.getKey())).
                     collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
 
             LOGGER.debug(CLIENTHOOKS, "Received FML ping data from server at {}: FMLNETVER={}, mod list is compatible : {}, channel list is compatible: {}, extra server mods: {}", target.ip, fmlver, modsMatch, channelsMatch, extraServerMods);
@@ -558,7 +563,7 @@ public class ForgeHooksClient {
     }
 
     private static final Identifier ICON_SHEET = Identifier.fromNamespaceAndPath(ForgeVersion.MOD_ID, "textures/gui/icons.png");
-    public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphics guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
+    public static void drawForgePingInfo(JoinMultiplayerScreen gui, ServerData target, GuiGraphicsExtractor guiGraphics, int x, int y, int width, int relativeMouseX, int relativeMouseY) {
         int idx;
         String tooltip;
         if (target.forgeData == null)
@@ -659,7 +664,7 @@ public class ForgeHooksClient {
         return stackFont == null ? fallbackFont : stackFont;
     }
 
-    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphics graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable Identifier background) {
+    public static @Nullable RenderTooltipEvent.Pre onRenderTooltipPre(@NotNull ItemStack stack, GuiGraphicsExtractor graphics, int x, int y, int screenWidth, int screenHeight, @NotNull List<ClientTooltipComponent> components, @NotNull Font fallbackFont, @NotNull ClientTooltipPositioner positioner, @Nullable Identifier background) {
         var preEvent = new RenderTooltipEvent.Pre(stack, graphics, x, y, screenWidth, screenHeight, getTooltipFont(stack, fallbackFont), components, positioner, background);
         return RenderTooltipEvent.Pre.BUS.post(preEvent) ? null : preEvent;
     }
@@ -728,11 +733,6 @@ public class ForgeHooksClient {
         if (text instanceof Component component && component.getString().isEmpty())
             return Stream.of(component.getVisualOrderText()).map(ClientTooltipComponent::create);
         return font.split(text, maxWidth).stream().map(ClientTooltipComponent::create);
-    }
-
-    public static boolean isBlockInSolidLayer(BlockState state) {
-        var model = Minecraft.getInstance().getBlockRenderer().getBlockModel(state);
-        return model.getRenderTypes(state, RandomSource.create(), ModelData.EMPTY).contains(ChunkSectionLayer.SOLID);
     }
 
     public static void createWorldConfirmationScreen(Runnable doConfirmedWorldLoad) {
@@ -853,55 +853,6 @@ public class ForgeHooksClient {
         }
 
         return new ForgeBlockModelData(transform, renderType, renderTypeFast, visibility);
-    }
-
-    /** This is a dirty fucking hack, but it needs to send in the top most render type. */
-    public static ModelBaker wrapRenderType(ModelBaker parent, RenderTypeGroup group) {
-        if (group == null || group == RenderTypeGroup.EMPTY || parent.renderType() != null)
-            return parent;
-        return new WrapedModelBaker(parent, group);
-    }
-
-    public static ModelBaker wrapRenderType(ModelBaker parent, RenderTypeGroup group, RenderTypeGroup groupFast) {
-        if (group == null || group == RenderTypeGroup.EMPTY || parent.renderType() != null)
-            return parent;
-        return new WrapedModelBaker(parent, group, groupFast);
-    }
-
-    // a record for performance reasons
-    private record WrapedModelBaker(ModelBaker parent, RenderTypeGroup group, RenderTypeGroup renderTypeFast) implements ModelBaker {
-        private WrapedModelBaker(ModelBaker parent, RenderTypeGroup group) {
-            this(parent, group, RenderTypeGroup.EMPTY);
-        }
-
-        @Override
-        public RenderTypeGroup renderType() {
-            return group;
-        }
-
-        @Override public ResolvedModel getModel(Identifier p_397309_) {
-            return parent.getModel(p_397309_);
-        }
-
-        @Override
-        public SpriteGetter sprites() {
-            return parent.sprites();
-        }
-
-        @Override
-        public <T> T compute(SharedOperationKey<T> p_395456_) {
-            return parent.compute(p_395456_);
-        }
-
-        @Override
-        public BlockModelPart missingBlockModelPart() {
-            return parent.missingBlockModelPart();
-        }
-
-        @Override
-        public PartCache parts() {
-            return parent.parts();
-        }
     }
 
     public static void addFramePass(Identifier rl, FramePassManager.PassDefinition definition) {

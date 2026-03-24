@@ -46,8 +46,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
@@ -70,7 +68,7 @@ import static org.lwjgl.opengl.GL32C.*;
  * Based on the prior ClientVisualization, with some personal touches.
  */
 public class DisplayWindow implements ImmediateWindowProvider {
-    private static final int[][] GL_VERSIONS = new int[][] {{4,6}, {4,5}, {4,4}, {4,3}, {4,2}, {4,1}, {4,0}, {3,3}, {3,2}};
+    private static final int[][] GL_VERSIONS = new int[][] {{4,6}, {4,5}, {4,4}, {4,3}, {4,2}, {4,1}, {4,0}, {3,3}};
     private static final Logger LOGGER = LoggerFactory.getLogger("EARLYDISPLAY");
     private final AtomicBoolean animationTimerTrigger = new AtomicBoolean(true);
 
@@ -314,17 +312,18 @@ public class DisplayWindow implements ImmediateWindowProvider {
         LOGGER.error("ERROR DISPLAY\n"+msgBuilder);
         // we show the display on a new dedicated thread
         Executors.newSingleThreadExecutor().submit(()-> {
-            var res = TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", msgBuilder.toString(), "yesno", "error", false);
-            if (res) {
+            var res = TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", msgBuilder.toString(), "yesno", "error", 0);
+            if (res != 0) {
                 try {
                     Desktop.getDesktop().browse(URI.create(ERROR_URL));
                 } catch (IOException ioe) {
-                    TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", "Sadly, we couldn't open your browser.\nVisit " + ERROR_URL, "ok", "error", false);
+                    TinyFileDialogs.tinyfd_messageBox("Minecraft: Forge", "Sadly, we couldn't open your browser.\nVisit " + ERROR_URL, "ok", "error", 0);
                 }
             }
             System.exit(1);
         });
     }
+
     /**
      * Called to initialize the window when preparing for the Render Thread.
      *
@@ -529,7 +528,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
      *
      * @return the Window we own.
      */
-    public long setupMinecraftWindow(final IntSupplier width, final IntSupplier height, final Supplier<String> title, final LongSupplier monitorSupplier) {
+    public long setupMinecraftWindow(final int width, final int height, final String title, final long monitorSupplier, final Supplier<Object> backend) {
         // wait for the window to actually be initialized
         try {
             this.initializationFuture.get(30, TimeUnit.SECONDS);
@@ -549,11 +548,11 @@ public class DisplayWindow implements ImmediateWindowProvider {
         var renderlockticket = false;
         do {
             try {
-                    renderlockticket = renderLock.tryAcquire(100, TimeUnit.MILLISECONDS);
-                    if (++tries > 9) {
-                        Thread.dumpStack();
-                        crashElegantly("We seem to be having trouble handing off the window, tried for 1 second");
-                    }
+                renderlockticket = renderLock.tryAcquire(100, TimeUnit.MILLISECONDS);
+                if (++tries > 9) {
+                    Thread.dumpStack();
+                    crashElegantly("We seem to be having trouble handing off the window, tried for 1 second");
+                }
             } catch (InterruptedException e) {
                 Thread.interrupted();
             }
@@ -563,7 +562,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
 
         glfwMakeContextCurrent(window);
         // Set the title to what the game wants
-        glfwSetWindowTitle(window, title.get());
+        glfwSetWindowTitle(window, title);
         glfwSwapInterval(0);
         // Clean up our hooks
         glfwSetFramebufferSizeCallback(window, null).free();

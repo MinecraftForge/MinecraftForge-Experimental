@@ -2,11 +2,11 @@
 +++ b/net/minecraft/world/level/block/SculkCatalystBlock.java
 @@ -59,8 +_,13 @@
      @Override
-     protected void spawnAfterBreak(BlockState p_222109_, ServerLevel p_222110_, BlockPos p_222111_, ItemStack p_222112_, boolean p_222113_) {
-         super.spawnAfterBreak(p_222109_, p_222110_, p_222111_, p_222112_, p_222113_);
--        if (p_222113_) {
-+        if (false && p_222113_) { // Forge Moved to getExpDrop
-             this.tryDropExperience(p_222110_, p_222111_, p_222112_, this.xpRange);
+     protected void spawnAfterBreak(final BlockState state, final ServerLevel level, final BlockPos pos, final ItemStack tool, final boolean dropExperience) {
+         super.spawnAfterBreak(state, level, pos, tool, dropExperience);
+-        if (dropExperience) {
++        if (false && dropExperience) { // Forge Moved to getExpDrop
+             this.tryDropExperience(level, pos, tool, this.xpRange);
          }
 +    }
 +

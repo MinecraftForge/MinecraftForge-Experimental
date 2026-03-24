@@ -3,7 +3,7 @@
   "category": "building",
   "ingredients": [
     "minecraft:diorite",
-    "#forge:cobblestone/normal"
+    "#c:cobblestones/normal"
   ],
   "result": {
     "count": 2,

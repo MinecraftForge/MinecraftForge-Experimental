@@ -1,42 +1,43 @@
 --- a/net/minecraft/world/item/crafting/ShapelessRecipe.java
 +++ b/net/minecraft/world/item/crafting/ShapelessRecipe.java
-@@ -23,12 +_,14 @@
-     final ItemStack result;
-     final List<Ingredient> ingredients;
-     private @Nullable PlacementInfo placementInfo;
+@@ -21,7 +_,7 @@
+                 Recipe.CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
+                 CraftingRecipe.CraftingBookInfo.MAP_CODEC.forGetter(o -> o.bookInfo),
+                 ItemStackTemplate.CODEC.fieldOf("result").forGetter(o -> o.result),
+-                Ingredient.CODEC.listOf(1, 9).fieldOf("ingredients").forGetter(o -> o.ingredients)
++                Ingredient.CODEC.listOf(/*1, 9 Forge: Make this usable for larger crafting windows*/).fieldOf("ingredients").forGetter(o -> o.ingredients)
+             )
+             .apply(i, ShapelessRecipe::new)
+     );
+@@ -39,6 +_,7 @@
+     public static final RecipeSerializer<ShapelessRecipe> SERIALIZER = new RecipeSerializer<>(MAP_CODEC, STREAM_CODEC);
+     private final ItemStackTemplate result;
+     private final List<Ingredient> ingredients;
 +    private final boolean isSimple;
  
-     public ShapelessRecipe(String p_249640_, CraftingBookCategory p_249390_, ItemStack p_252071_, List<Ingredient> p_365863_) {
-         this.group = p_249640_;
-         this.category = p_249390_;
-         this.result = p_252071_;
-         this.ingredients = p_365863_;
+     public ShapelessRecipe(
+         final Recipe.CommonInfo commonInfo, final CraftingRecipe.CraftingBookInfo bookInfo, final ItemStackTemplate result, final List<Ingredient> ingredients
+@@ -46,6 +_,7 @@
+         super(commonInfo, bookInfo);
+         this.result = result;
+         this.ingredients = ingredients;
 +        this.isSimple = this.ingredients.stream().allMatch(Ingredient::isSimple);
      }
  
      @Override
-@@ -58,10 +_,12 @@
-     public boolean matches(CraftingInput p_345423_, Level p_44263_) {
-         if (p_345423_.ingredientCount() != this.ingredients.size()) {
+@@ -61,10 +_,12 @@
+     public boolean matches(final CraftingInput input, final Level level) {
+         if (input.ingredientCount() != this.ingredients.size()) {
              return false;
-+        } else if (p_345423_.size() == 1 && this.ingredients.size() == 1) {
-+            return this.ingredients.getFirst().test(p_345423_.getItem(0));
++        } else if (input.size() == 1 && this.ingredients.size() == 1) {
++            return this.ingredients.getFirst().test(input.getItem(0));
 +        } else if (!isSimple) {
-+            return net.minecraftforge.common.util.RecipeMatcher.findMatches(p_345423_.items(),  this.ingredients) != null;
++            return net.minecraftforge.common.util.RecipeMatcher.findMatches(input.items(),  this.ingredients) != null;
          } else {
--            return p_345423_.size() == 1 && this.ingredients.size() == 1
--                ? this.ingredients.getFirst().test(p_345423_.getItem(0))
--                : p_345423_.stackedContents().canCraft(this, null);
-+            return p_345423_.stackedContents().canCraft(this, null);
+-            return input.size() == 1 && this.ingredients.size() == 1
+-                ? this.ingredients.getFirst().test(input.getItem(0))
+-                : input.stackedContents().canCraft(this, null);
++            return input.stackedContents().canCraft(this, null);
          }
      }
  
-@@ -86,7 +_,7 @@
-                     Codec.STRING.optionalFieldOf("group", "").forGetter(p_299460_ -> p_299460_.group),
-                     CraftingBookCategory.CODEC.fieldOf("category").orElse(CraftingBookCategory.MISC).forGetter(p_297437_ -> p_297437_.category),
-                     ItemStack.STRICT_CODEC.fieldOf("result").forGetter(p_300770_ -> p_300770_.result),
--                    Ingredient.CODEC.listOf(1, 9).fieldOf("ingredients").forGetter(p_359857_ -> p_359857_.ingredients)
-+                    Ingredient.CODEC.listOf(/*1, 9 Forge: Make this usable for larger crafting windows*/).fieldOf("ingredients").forGetter(p_359857_ -> p_359857_.ingredients)
-                 )
-                 .apply(p_359856_, ShapelessRecipe::new)
-         );

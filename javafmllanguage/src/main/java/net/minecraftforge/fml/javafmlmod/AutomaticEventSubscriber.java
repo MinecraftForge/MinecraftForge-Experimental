@@ -6,7 +6,6 @@
 package net.minecraftforge.fml.javafmlmod;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -52,7 +51,6 @@ public final class AutomaticEventSubscriber {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final Type AUTO_SUBSCRIBER = Type.getType(EventBusSubscriber.class);
     private static final Type MOD_TYPE = Type.getType(Mod.class);
-    private static final Type ONLY_IN_TYPE = Type.getType(OnlyIn.class);
     private static final List<EnumData> DEFAULT_SIDES = List.of(new EnumData(null, "CLIENT"), new EnumData(null, "DEDICATED_SERVER"));
     private static final EnumData DEFAULT_BUS = new EnumData(null, "BOTH");
 
@@ -64,20 +62,11 @@ public final class AutomaticEventSubscriber {
             .filter(data -> AUTO_SUBSCRIBER.equals(data.annotationType()))
             .toList();
 
-        var onlyIns = FMLEnvironment.production ? Collections.emptySet() : scanData.getAnnotations().stream()
-                .filter(data -> ONLY_IN_TYPE.equals(data.annotationType()))
-                .map(data -> data.clazz().getClassName())
-                .collect(Collectors.toSet());
-
         var modids = scanData.getAnnotations().stream()
             .filter(data -> MOD_TYPE.equals(data.annotationType()))
             .collect(Collectors.toMap(a -> a.clazz().getClassName(), a -> (String)a.annotationData().get("value")));
 
         for (var data : targets) {
-            if (!FMLEnvironment.production && onlyIns.contains(data.clazz().getClassName())) {
-                throw new RuntimeException("Found @OnlyIn on @EventBusSubscriber class " + data.clazz().getClassName() + " - this is not allowed as it causes crashes. Remove the OnlyIn and set value=Dist.CLIENT in the EventBusSubscriber annotation instead");
-            }
-
             var modId = modids.getOrDefault(data.clazz().getClassName(), mod.getModId());
             modId = value(data, "modid", modId);
 

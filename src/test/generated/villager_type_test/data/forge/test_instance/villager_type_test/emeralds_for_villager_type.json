@@ -1,7 +1,0 @@
-{
-  "type": "minecraft:function",
-  "environment": "minecraft:default",
-  "function": "forge:villager_type_test/emeralds_for_villager_type",
-  "max_ticks": 100,
-  "structure": "forge:empty3x3x3"
-}

@@ -3,14 +3,14 @@
 @@ -81,9 +_,17 @@
      private boolean handlingFault;
      private volatile @Nullable DisconnectionDetails delayedDisconnect;
-     @Nullable BandwidthDebugMonitor bandwidthDebugMonitor;
+     private @Nullable BandwidthDebugMonitor bandwidthDebugMonitor;
 +    private java.util.function.Consumer<Connection> activationHandler;
 +    private final net.minecraftforge.common.util.PacketLogger packetLogger = new net.minecraftforge.common.util.PacketLogger(this);
 +    private ProtocolInfo<?> outboundProtocol = null;
 +    private ProtocolInfo<?> inboundProtocol = null;
  
-     public Connection(PacketFlow p_129482_) {
-         this.receiving = p_129482_;
+     public Connection(final PacketFlow receiving) {
+         this.receiving = receiving;
 +        if (this.receiving == PacketFlow.SERVERBOUND)
 +            this.inboundProtocol = INITIAL_PROTOCOL;
 +        else
@@ -19,8 +19,8 @@
  
      @Override
 @@ -91,6 +_,7 @@
-         super.channelActive(p_129525_);
-         this.channel = p_129525_.channel();
+         super.channelActive(ctx);
+         this.channel = ctx.channel();
          this.address = this.channel.remoteAddress();
 +        if (activationHandler != null) activationHandler.accept(this);
          if (this.delayedDisconnect != null) {
@@ -28,84 +28,84 @@
          }
 @@ -151,6 +_,7 @@
              } else {
-                 if (packetlistener.shouldHandleMessage(p_129488_)) {
+                 if (packetlistener.shouldHandleMessage(packet)) {
                      try {
-+                        packetLogger.recv(p_129488_);
-                         genericsFtw(p_129488_, packetlistener);
++                        packetLogger.recv(packet);
+                         genericsFtw(packet, packetlistener);
                      } catch (RunningOnDifferentThreadException runningondifferentthreadexception) {
                      } catch (RejectedExecutionException rejectedexecutionexception) {
 @@ -200,6 +_,7 @@
-         if (p_333271_.flow() != this.getReceiving()) {
-             throw new IllegalStateException("Invalid inbound protocol: " + p_333271_.id());
+         if (protocol.flow() != this.getReceiving()) {
+             throw new IllegalStateException("Invalid inbound protocol: " + protocol.id());
          } else {
-+            this.inboundProtocol = p_333271_;
-             this.packetListener = p_330962_;
++            this.inboundProtocol = protocol;
+             this.packetListener = packetListener;
              this.disconnectListener = null;
              UnconfiguredPipelineHandler.InboundConfigurationTask unconfiguredpipelinehandler$inboundconfigurationtask = UnconfiguredPipelineHandler.setupInboundProtocol(
 @@ -223,6 +_,8 @@
          } else {
              UnconfiguredPipelineHandler.OutboundConfigurationTask unconfiguredpipelinehandler$outboundconfigurationtask = UnconfiguredPipelineHandler.setupOutboundProtocol(
-                 p_329145_
+                 protocol
 +            ).andThen(
-+                f -> this.outboundProtocol = p_329145_
++                f -> this.outboundProtocol = protocol
              );
-             BundlerInfo bundlerinfo = p_329145_.bundlerInfo();
+             BundlerInfo bundlerinfo = protocol.bundlerInfo();
              if (bundlerinfo != null) {
-@@ -272,7 +_,8 @@
-             this.disconnectListener = p_330656_;
-             this.runOnceConnected(p_405096_ -> {
-                 this.setupInboundProtocol(p_329827_, p_330656_);
--                p_405096_.sendPacket(new ClientIntentionPacket(SharedConstants.getCurrentVersion().protocolVersion(), p_300730_, p_300598_, p_297789_), null, true);
+@@ -274,7 +_,8 @@
+             this.disconnectListener = listener;
+             this.runOnceConnected(connection -> {
+                 this.setupInboundProtocol(inbound, listener);
+-                connection.sendPacket(new ClientIntentionPacket(SharedConstants.getCurrentVersion().protocolVersion(), hostName, port, intent), null, true);
 +                // TODO: Change this to be a immediately sent login custom payload packet?
-+                p_405096_.sendPacket(new ClientIntentionPacket(SharedConstants.getCurrentVersion().protocolVersion(), net.minecraftforge.network.NetworkContext.enhanceHostName(p_300730_), p_300598_, p_297789_), null, true);
-                 this.setupOutboundProtocol(p_328134_);
++                connection.sendPacket(new ClientIntentionPacket(SharedConstants.getCurrentVersion().protocolVersion(), net.minecraftforge.network.NetworkContext.enhanceHostName(hostName), port, intent), null, true);
+                 this.setupOutboundProtocol(outbound);
              });
          }
-@@ -317,10 +_,13 @@
-         if (p_405953_ != null) {
-             ChannelFuture channelfuture = p_299937_ ? this.channel.writeAndFlush(p_243260_) : this.channel.write(p_243260_);
-             channelfuture.addListener(p_405953_);
-+            channelfuture.addListener(f -> packetLogger.send(p_243260_));
-         } else if (p_299937_) {
-             this.channel.writeAndFlush(p_243260_, this.channel.voidPromise());
-+            packetLogger.send(p_243260_);
+@@ -319,10 +_,13 @@
+         if (listener != null) {
+             ChannelFuture channelfuture = flush ? this.channel.writeAndFlush(packet) : this.channel.write(packet);
+             channelfuture.addListener(listener);
++            channelfuture.addListener(f -> packetLogger.send(packet));
+         } else if (flush) {
+             this.channel.writeAndFlush(packet, this.channel.voidPromise());
++            packetLogger.send(packet);
          } else {
-             this.channel.write(p_243260_, this.channel.voidPromise());
-+            packetLogger.send(p_243260_);
+             this.channel.write(packet, this.channel.voidPromise());
++            packetLogger.send(packet);
          }
      }
  
-@@ -389,7 +_,7 @@
+@@ -391,7 +_,7 @@
          if (this.address == null) {
              return "local";
          } else {
--            return p_298740_ ? this.address.toString() : "IP hidden";
-+            return p_298740_ ? net.minecraftforge.network.DualStackUtils.getAddressString(this.address) : "IP hidden";
+-            return logIPs ? this.address.toString() : "IP hidden";
++            return logIPs ? net.minecraftforge.network.DualStackUtils.getAddressString(this.address) : "IP hidden";
          }
      }
  
-@@ -432,7 +_,9 @@
+@@ -436,7 +_,9 @@
      }
  
-     public static ChannelFuture connect(InetSocketAddress p_290034_, EventLoopGroupHolder p_450865_, final Connection p_290031_) {
--        return new Bootstrap().group(p_450865_.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
-+        net.minecraftforge.network.DualStackUtils.checkIPv6(p_290034_.getAddress());
-+        p_290031_.activationHandler = net.minecraftforge.network.NetworkRegistry::onConnectionStart;
-+        return new Bootstrap().group(p_450865_.eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
+     public static ChannelFuture connect(final InetSocketAddress address, final EventLoopGroupHolder eventLoopGroupHolder, final Connection connection) {
+-        return new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
++        net.minecraftforge.network.DualStackUtils.checkIPv6(address.getAddress());
++        connection.activationHandler = net.minecraftforge.network.NetworkRegistry::onConnectionStart;
++        return new Bootstrap().group(eventLoopGroupHolder.eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
              @Override
-             protected void initChannel(Channel p_129552_) {
+             protected void initChannel(final Channel channel) {
                  try {
-@@ -493,7 +_,8 @@
+@@ -503,7 +_,8 @@
  
-     public static Connection connectToLocalServer(SocketAddress p_129494_) {
+     public static Connection connectToLocalServer(final SocketAddress address) {
          final Connection connection = new Connection(PacketFlow.CLIENTBOUND);
 -        new Bootstrap().group(EventLoopGroupHolder.local().eventLoopGroup()).handler(new ChannelInitializer<Channel>() {
 +        connection.activationHandler = net.minecraftforge.network.NetworkRegistry::onConnectionStart;
 +        new Bootstrap().group(EventLoopGroupHolder.local().eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
              @Override
-             protected void initChannel(Channel p_332618_) {
-                 ChannelPipeline channelpipeline = p_332618_.pipeline();
-@@ -584,6 +_,22 @@
+             protected void initChannel(final Channel channel) {
+                 ChannelPipeline channelpipeline = channel.pipeline();
+@@ -594,6 +_,22 @@
  
      public float getAverageSentPackets() {
          return this.averageSentPackets;
@@ -127,4 +127,4 @@
 +        return this.outboundProtocol;
      }
  
-     public void setBandwidthLogger(LocalSampleLogger p_333554_) {
+     public void setBandwidthLogger(final LocalSampleLogger bandwidthLogger) {

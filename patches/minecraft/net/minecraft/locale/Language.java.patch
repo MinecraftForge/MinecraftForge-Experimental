@@ -9,7 +9,7 @@
 +        final Map<String, String> map1 = map;
          return new Language() {
              @Override
-             public String getOrDefault(String p_128127_, String p_265421_) {
+             public String getOrDefault(final String elementId, final String defaultValue) {
 @@ -63,6 +_,11 @@
                      )
                      .isPresent();
@@ -23,11 +23,11 @@
      }
  
 @@ -90,6 +_,8 @@
-     public static void inject(Language p_128115_) {
-         instance = p_128115_;
+     public static void inject(final Language language) {
+         instance = language;
      }
 +
 +    public Map<String, String> getLanguageData() { return Map.of(); }
  
-     public String getOrDefault(String p_128111_) {
-         return this.getOrDefault(p_128111_, p_128111_);
+     public String getOrDefault(final String elementId) {
+         return this.getOrDefault(elementId, elementId);

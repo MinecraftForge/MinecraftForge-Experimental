@@ -1,16 +1,26 @@
 --- a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
 +++ b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
-@@ -129,4 +_,13 @@
+@@ -26,7 +_,7 @@
+     private final float v1;
+     private final int padding;
+ 
+-    protected TextureAtlasSprite(
++    public TextureAtlasSprite(
+         final Identifier atlasLocation, final SpriteContents contents, final int atlasWidth, final int atlasHeight, final int x, final int y, final int padding
+     ) {
+         this.atlasLocation = atlasLocation;
+@@ -127,5 +_,14 @@
+     @Override
      public void close() {
          this.contents.close();
-     }
++    }
 +
 +    public int getPixelRGBA(int frameIndex, int x, int y) {
 +        if (this.contents.animatedTexture != null) {
-+            x += this.contents.animatedTexture.getFrameX(frameIndex) * this.contents.width;
-+            y += this.contents.animatedTexture.getFrameY(frameIndex) * this.contents.height;
++            x += this.contents.animatedTexture.getFrameX(frameIndex) * this.contents.width();
++            y += this.contents.animatedTexture.getFrameY(frameIndex) * this.contents.height();
 +        }
 +
 +        return this.contents.getOriginalImage().getPixel(x, y);
-+    }
+     }
  }

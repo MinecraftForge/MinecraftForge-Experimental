@@ -22,6 +22,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.CookingBookCategory;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeInput;
@@ -278,7 +279,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
             ConditionalRecipe.builder()
                 .condition(FALSE())
                 .recipe(
-                    SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
+                    SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, CookingBookCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
                         .unlockedBy(getHasName(Blocks.DIRT), has(Blocks.DIRT))
                         ::save
                 )
@@ -287,7 +288,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
             ConditionalRecipe.builder()
                 .condition(TRUE())
                 .recipe(
-                    SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.BEE_NEST), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
+                    SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.BEE_NEST), RecipeCategory.MISC, CookingBookCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
                         .unlockedBy(getHasName(Blocks.BEE_NEST), has(Blocks.BEE_NEST))
                         ::save
                 )
@@ -296,7 +297,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
             ConditionalRecipe.builder()
                 .condition(FALSE())
                 .recipe(
-                    SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
+                    SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 1)
                         .unlockedBy(getHasName(Blocks.DIRT), has(Blocks.DIRT))
                         ::save
                 )
@@ -305,7 +306,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
             ConditionalRecipe.builder()
                 .condition(TRUE())
                 .recipe(
-                    SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.REDSTONE_ORE), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
+                    SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.REDSTONE_ORE), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 1)
                     .unlockedBy(getHasName(Blocks.REDSTONE_ORE), has(Blocks.REDSTONE_ORE))
                     ::save
                 )

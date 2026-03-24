@@ -9,45 +9,45 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.state.CameraRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
+import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
+import org.jetbrains.annotations.Nullable;
 
 /**
  * Fired before an entity renderer renders the nameplate of an entity.
  *
- * <p>This event {@linkplain HasResult has a result}:</p>
- * <ul>
- *     <li>{@link Result#ALLOW} - the nameplate will be forcibly rendered.</li>
- *     <li>{@link Result#DEFAULT} - the vanilla logic will be used.</li>
- *     <li>{@link Result#DENY} - the nameplate will not be rendered.</li>
- * </ul>
- *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ *
+ * Setting any of the content to null will prevent that content from being rendered.
+ * If you wish to cancel both score and name tag, you can cancel the entire event.
  *
  * @see EntityRenderer
  */
-public final class RenderNameTagEvent extends MutableEvent implements HasResult {
-    public static final EventBus<RenderNameTagEvent> BUS = EventBus.create(RenderNameTagEvent.class);
+public final class RenderNameTagEvent extends MutableEvent implements Cancellable {
+    public static final EventBus<RenderNameTagEvent> BUS = CancellableEventBus.create(RenderNameTagEvent.class);
 
     private Component nameplateContent;
+    private Component scoreContent;
     private final EntityRenderState state;
     private final Component originalContent;
+    private final Component originalScoreContent;
     private final EntityRenderer<?, ?> entityRenderer;
     private final PoseStack poseStack;
     private final SubmitNodeCollector nodeCollector;
     private final CameraRenderState cameraState;
-    private Result result = Result.DEFAULT;
 
     @ApiStatus.Internal
-    public RenderNameTagEvent(EntityRenderState state, Component content, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {
+    public RenderNameTagEvent(EntityRenderState state, EntityRenderer<?, ?> entityRenderer, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraState) {
         this.state = state;
-        this.originalContent = content;
+        this.originalContent = this.nameplateContent = state.nameTag;
+        this.originalScoreContent = this.scoreContent = state.scoreText;
         this.setContent(this.originalContent);
         this.entityRenderer = entityRenderer;
         this.poseStack = poseStack;
@@ -65,23 +65,47 @@ public final class RenderNameTagEvent extends MutableEvent implements HasResult 
      *
      * @param contents the new text
      */
-    public void setContent(Component contents) {
+    public void setContent(@Nullable Component contents) {
         this.nameplateContent = contents;
     }
 
     /**
      * {@return the text on the nameplate that will be rendered, if the event is not {@link Result#DENY DENIED}}
      */
-    public Component getContent() {
+    public @Nullable Component getContent() {
         return this.nameplateContent;
+    }
+
+    /**
+     * Sets the new text for the score part of the nameplate.
+     *
+     * @param contents the new text
+     */
+    public void setScoreContent(@Nullable Component contents) {
+        this.scoreContent = contents;
+    }
+
+    /**
+     * {@return the text on the score part of the nameplate that will be rendered, if the event is not {@link Result#DENY DENIED}}
+     */
+    public @Nullable Component getScoreContent() {
+        return this.scoreContent;
     }
 
     /**
      * {@return the original text on the nameplate}
      */
-    public Component getOriginalContent() {
+    public @Nullable Component getOriginalContent() {
         return this.originalContent;
     }
+
+    /**
+     * {@return the original text of the score part of this nameplate}
+     */
+    public @Nullable Component getOriginalScore() {
+        return this.originalScoreContent;
+    }
+
 
     /**
      * {@return the entity renderer rendering the nameplate}
@@ -109,15 +133,5 @@ public final class RenderNameTagEvent extends MutableEvent implements HasResult 
      */
     public CameraRenderState getCameraState() {
         return this.cameraState;
-    }
-
-    @Override
-    public Result getResult() {
-        return this.result;
-    }
-
-    @Override
-    public void setResult(Result result) {
-        this.result = result;
     }
 }

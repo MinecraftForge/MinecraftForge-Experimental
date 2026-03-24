@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/item/ShearsItem.java
 +++ b/net/minecraft/world/item/ShearsItem.java
 @@ -83,4 +_,34 @@
-             return super.useOn(p_186371_);
+             return super.useOn(context);
          }
      }
 +

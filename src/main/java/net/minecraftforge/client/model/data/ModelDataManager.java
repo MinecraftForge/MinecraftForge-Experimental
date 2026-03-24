@@ -44,7 +44,7 @@ public class ModelDataManager {
 
     public void requestRefresh(@NotNull BlockEntity blockEntity) {
         Preconditions.checkNotNull(blockEntity, "Block entity must not be null");
-        needModelDataRefresh.computeIfAbsent(new ChunkPos(blockEntity.getBlockPos()), $ -> Collections.synchronizedSet(new HashSet<>()))
+        needModelDataRefresh.computeIfAbsent(ChunkPos.containing(blockEntity.getBlockPos()), $ -> Collections.synchronizedSet(new HashSet<>()))
                             .add(blockEntity.getBlockPos());
     }
 
@@ -64,7 +64,12 @@ public class ModelDataManager {
     }
 
     public @Nullable ModelData getAt(BlockPos pos) {
-        return getAt(new ChunkPos(pos)).get(pos);
+        return getAt(ChunkPos.containing(pos)).get(pos);
+    }
+
+    public ModelData getAtOrEmpty(double x, double y, double z) {
+        var ret = getAt(BlockPos.containing(x, y, z));
+        return ret == null ? ModelData.EMPTY : ret;
     }
 
     public ModelData getAtOrEmpty(BlockPos pos) {

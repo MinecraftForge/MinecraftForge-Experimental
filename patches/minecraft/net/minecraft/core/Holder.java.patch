@@ -1,6 +1,6 @@
 --- a/net/minecraft/core/Holder.java
 +++ b/net/minecraft/core/Holder.java
-@@ -11,7 +_,22 @@
+@@ -13,7 +_,22 @@
  import net.minecraft.tags.TagKey;
  import org.jspecify.annotations.Nullable;
  
@@ -24,7 +24,7 @@
      T value();
  
      boolean isBound();
-@@ -238,6 +_,10 @@
+@@ -258,6 +_,10 @@
          @Override
          public Stream<TagKey<T>> tags() {
              return this.boundTags().stream();

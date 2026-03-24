@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityType.java
 +++ b/net/minecraft/world/entity/EntityType.java
-@@ -979,6 +_,11 @@
+@@ -1225,6 +_,11 @@
      private final FeatureFlagSet requiredFeatures;
      private final boolean allowedInPeaceful;
  
@@ -9,23 +9,23 @@
 +    private final java.util.function.ToIntFunction<EntityType<?>> updateIntervalSupplier;
 +    private final java.util.function.BiFunction<net.minecraftforge.network.packets.SpawnEntity, Level, T> customClientFactory;
 +
-     private static <T extends Entity> EntityType<T> register(ResourceKey<EntityType<?>> p_368406_, EntityType.Builder<T> p_363129_) {
-         return Registry.register(BuiltInRegistries.ENTITY_TYPE, p_368406_, p_363129_.build(p_368406_));
+     private static <T extends Entity> EntityType<T> register(final ResourceKey<EntityType<?>> id, final EntityType.Builder<T> builder) {
+         return Registry.register(BuiltInRegistries.ENTITY_TYPE, id, builder.build(id));
      }
-@@ -1014,7 +_,8 @@
-         String p_367006_,
-         Optional<ResourceKey<LootTable>> p_364691_,
-         FeatureFlagSet p_273518_,
--        boolean p_430684_
-+        boolean p_430684_,
-+        Builder builder
+@@ -1260,7 +_,8 @@
+         final String descriptionId,
+         final Optional<ResourceKey<LootTable>> lootTable,
+         final FeatureFlagSet requiredFeatures,
+-        final boolean allowedInPeaceful
++        final boolean allowedInPeaceful,
++        final Builder builder
      ) {
-         this.factory = p_273268_;
-         this.category = p_272918_;
-@@ -1031,6 +_,10 @@
-         this.lootTable = p_364691_;
-         this.requiredFeatures = p_273518_;
-         this.allowedInPeaceful = p_430684_;
+         this.factory = factory;
+         this.category = category;
+@@ -1277,6 +_,10 @@
+         this.lootTable = lootTable;
+         this.requiredFeatures = requiredFeatures;
+         this.allowedInPeaceful = allowedInPeaceful;
 +        this.velocityUpdateSupplier = builder == null || builder.velocityUpdateSupplier == null ? EntityType::defaultVelocitySupplier : builder.velocityUpdateSupplier;
 +        this.trackingRangeSupplier = builder == null || builder.trackingRangeSupplier == null ? EntityType::defaultTrackingRangeSupplier : builder.trackingRangeSupplier;
 +        this.updateIntervalSupplier = builder == null || builder.updateIntervalSupplier == null ? EntityType::defaultUpdateIntervalSupplier : builder.updateIntervalSupplier;
@@ -33,7 +33,7 @@
      }
  
      public @Nullable T spawn(
-@@ -1325,14 +_,26 @@
+@@ -1580,14 +_,26 @@
      }
  
      public int clientTrackingRange() {
@@ -60,7 +60,7 @@
          return this != PLAYER
              && this != LLAMA_SPIT
              && this != WITHER
-@@ -1391,6 +_,12 @@
+@@ -1638,6 +_,15 @@
          return OP_ONLY_CUSTOM_DATA.contains(this);
      }
  
@@ -68,23 +68,26 @@
 +        if (customClientFactory == null) return this.create(world, EntitySpawnReason.LOAD);
 +        return customClientFactory.apply(packet, world);
 +    }
-+    public Stream<TagKey<EntityType<?>>> getTags() {return this.builtInRegistryHolder().tags();}
++
++    public Stream<net.minecraft.tags.TagKey<EntityType<?>>> getTags() {
++        return this.builtInRegistryHolder().tags();
++    }
 +
      public static class Builder<T extends Entity> {
          private final EntityType.EntityFactory<T> factory;
          private final MobCategory category;
-@@ -1410,6 +_,10 @@
+@@ -1657,6 +_,10 @@
          );
-         private final DependantName<EntityType<?>, String> descriptionId = p_449414_ -> Util.makeDescriptionId("entity", p_449414_.identifier());
+         private final DependantName<EntityType<?>, String> descriptionId = id -> Util.makeDescriptionId("entity", id.identifier());
          private boolean allowedInPeaceful = true;
 +        private java.util.function.Predicate<EntityType<?>> velocityUpdateSupplier = EntityType::defaultVelocitySupplier;
 +        private java.util.function.ToIntFunction<EntityType<?>> trackingRangeSupplier = EntityType::defaultTrackingRangeSupplier;
 +        private java.util.function.ToIntFunction<EntityType<?>> updateIntervalSupplier = EntityType::defaultUpdateIntervalSupplier;
 +        private java.util.function.BiFunction<net.minecraftforge.network.packets.SpawnEntity, Level, T> customClientFactory;
  
-         private Builder(EntityType.EntityFactory<T> p_20696_, MobCategory p_20697_) {
-             this.factory = p_20696_;
-@@ -1528,6 +_,30 @@
+         private Builder(final EntityType.EntityFactory<T> factory, final MobCategory category) {
+             this.factory = factory;
+@@ -1775,6 +_,30 @@
              return this;
          }
  
@@ -112,12 +115,12 @@
 +            return this;
 +        }
 +
-         public EntityType<T> build(ResourceKey<EntityType<?>> p_369693_) {
+         public EntityType<T> build(final ResourceKey<EntityType<?>> name) {
              if (this.serialize) {
-                 Util.fetchChoiceType(References.ENTITY_TREE, p_369693_.identifier().toString());
-@@ -1548,7 +_,8 @@
-                 this.descriptionId.get(p_369693_),
-                 this.lootTable.get(p_369693_),
+                 Util.fetchChoiceType(References.ENTITY_TREE, name.identifier().toString());
+@@ -1795,7 +_,8 @@
+                 this.descriptionId.get(name),
+                 this.lootTable.get(name),
                  this.requiredFeatures,
 -                this.allowedInPeaceful
 +                this.allowedInPeaceful,

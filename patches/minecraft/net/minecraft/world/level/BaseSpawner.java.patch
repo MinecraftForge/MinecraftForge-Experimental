@@ -1,25 +1,26 @@
 --- a/net/minecraft/world/level/BaseSpawner.java
 +++ b/net/minecraft/world/level/BaseSpawner.java
-@@ -154,13 +_,15 @@
+@@ -146,14 +_,15 @@
  
                              entity.snapTo(entity.getX(), entity.getY(), entity.getZ(), randomsource.nextFloat() * 360.0F, 0.0F);
                              if (entity instanceof Mob mob) {
--                                if (spawndata.getCustomSpawnRules().isEmpty() && !mob.checkSpawnRules(p_151312_, EntitySpawnReason.SPAWNER) || !mob.checkSpawnObstruction(p_151312_)) {
-+                                if (!net.minecraftforge.event.ForgeEventFactory.checkSpawnPositionSpawner(mob, p_151312_, EntitySpawnReason.SPAWNER, spawndata, this)) {
+-                                if (spawndata.getCustomSpawnRules().isEmpty() && !mob.checkSpawnRules(level, EntitySpawnReason.SPAWNER)
+-                                    || !mob.checkSpawnObstruction(level)) {
++                                if (!net.minecraftforge.event.ForgeEventFactory.checkSpawnPositionSpawner(mob, level, EntitySpawnReason.SPAWNER, spawndata, this)) {
                                      continue;
                                  }
  
                                  boolean flag1 = spawndata.getEntityToSpawn().size() == 1 && spawndata.getEntityToSpawn().getString("id").isPresent();
 -                                if (flag1) {
--                                    ((Mob)entity).finalizeSpawn(p_151312_, p_151312_.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.SPAWNER, null);
+-                                    ((Mob)entity).finalizeSpawn(level, level.getCurrentDifficultyAt(entity.blockPosition()), EntitySpawnReason.SPAWNER, null);
 +                                // Forge: Patch in FinalizeSpawn for spawners so it may be fired unconditionally, instead of only when vanilla normally would trigger it.
-+                                var event = net.minecraftforge.event.ForgeEventFactory.onFinalizeSpawnSpawner(mob, p_151312_, p_151312_.getCurrentDifficultyAt(entity.blockPosition()), null, valueinput, this);
++                                var event = net.minecraftforge.event.ForgeEventFactory.onFinalizeSpawnSpawner(mob, level, level.getCurrentDifficultyAt(entity.blockPosition()), null, valueinput, this);
 +                                if (event != null && flag1) {
-+                                    mob.finalizeSpawn(p_151312_, event.getDifficulty(), EntitySpawnReason.SPAWNER, null);
++                                    mob.finalizeSpawn(level, event.getDifficulty(), EntitySpawnReason.SPAWNER, null);
                                  }
  
                                  spawndata.getEquipment().ifPresent(mob::equip);
-@@ -277,5 +_,14 @@
+@@ -270,5 +_,14 @@
  
      public double getOSpin() {
          return this.oSpin;

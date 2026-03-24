@@ -31,7 +31,7 @@ public class ModConfig
         this.fileName = fileName;
         this.container = container;
         this.configHandler = ConfigFileTypeHandler.get(type);
-        ConfigTracker.INSTANCE.trackConfig(this);
+        ConfigTracker.trackConfig(this);
     }
 
     public ModConfig(final Type type, final IConfigSpec<?> spec, final ModContainer activeContainer) {
@@ -40,8 +40,9 @@ public class ModConfig
 
     private static String defaultConfigName(Type type, String modId) {
         // config file name would be "forge-client.toml" and "forge-server.toml"
-        return String.format(Locale.ROOT, "%s-%s.toml", modId, type.extension());
+        return modId + '-' + type.extension() + ".toml";
     }
+
     public Type getType() {
         return type;
     }

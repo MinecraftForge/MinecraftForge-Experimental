@@ -3,9 +3,9 @@
 @@ -18,7 +_,15 @@
      }
  
-     static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(String p_331650_) {
--        return new CustomPacketPayload.Type<>(Identifier.withDefaultNamespace(p_331650_));
-+        return new CustomPacketPayload.Type<>(Identifier.parse(p_331650_));
+     static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(final String id) {
+-        return new CustomPacketPayload.Type<>(Identifier.withDefaultNamespace(id));
++        return new CustomPacketPayload.Type<>(Identifier.parse(id));
 +    }
 +
 +    static <T extends CustomPacketPayload> CustomPacketPayload.Type<T> createType(String namespace, String path) {

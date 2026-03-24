@@ -30,13 +30,11 @@ import java.util.function.BiFunction;
 import static net.minecraftforge.fml.loading.LogMarkers.CORE;
 import static net.minecraftforge.fml.loading.LogMarkers.SCAN;
 
-public class FMLLoader {
+public final class FMLLoader {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static AccessTransformerService accessTransformer;
-    private static LanguageLoadingProvider languageLoadingProvider;
     private static Dist dist;
     private static String naming;
-    private static LoadingModList loadingModList;
     private static RuntimeDistCleaner runtimeDistCleaner;
     private static Path gamePath;
     private static final VersionInfo versionInfo = VersionInfo.detect();
@@ -151,14 +149,9 @@ public class FMLLoader {
 
     public static List<ITransformationService.Resource> completeScan(IModuleLayerManager layerManager) {
         moduleLayerManager = layerManager;
-        languageLoadingProvider = new LanguageLoadingProvider();
+        LanguageLoadingProvider.reload();
         backgroundScanHandler = modValidator.stage2Validation();
-        loadingModList = backgroundScanHandler.getLoadingModList();
         return List.of(modValidator.getModResources());
-    }
-
-    public static LanguageLoadingProvider getLanguageLoadingProvider() {
-        return languageLoadingProvider;
     }
 
     public static CommonLaunchHandler getLaunchHandler() {
@@ -178,10 +171,6 @@ public class FMLLoader {
         ImmediateWindowHandler.acceptGameLayer(gameLayer);
         ImmediateWindowHandler.updateProgress("Launching minecraft");
         progressWindowTick.run();
-    }
-
-    public static LoadingModList getLoadingModList() {
-        return loadingModList;
     }
 
     public static Path getGamePath() {

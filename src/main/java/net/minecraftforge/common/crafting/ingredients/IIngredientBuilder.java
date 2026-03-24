@@ -11,16 +11,11 @@ import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderSet;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 public interface IIngredientBuilder {
-    default PartialNBTIngredient.Builder partialNbt() {
-        return PartialNBTIngredient.builder();
-    }
-
-    default Ingredient strictNbt(ItemStack value) {
-        return StrictNBTIngredient.of(value);
+    default NBTIngredient.Builder nbtIngredient() {
+        return NBTIngredient.builder();
     }
 
     default Ingredient compound(Ingredient... values) {

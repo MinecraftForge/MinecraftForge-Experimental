@@ -216,7 +216,7 @@ public class ForgePacketHandler {
                 var missing = new HashSet<Identifier>();
                 for (var id : missingMods) {
                     var key = Identifier.fromNamespaceAndPath(id, "");
-                    var container = ModList.get().getModContainerById(id).orElse(null);
+                    var container = ModList.getModContainerById(id).orElse(null);
                     if (container != null)
                         mismatched.put(key, new NetworkMismatchData.Version(container.getModInfo().getVersion().toString(), ""));
                     else
@@ -253,7 +253,7 @@ public class ForgePacketHandler {
         LOGGER.debug(MARKER, "Received config sync from server for {}", msg.name());
 
         if (!ctx.getConnection().isMemoryConnection()) {
-            var cfg = ConfigTracker.INSTANCE.fileMap().get(msg.name());
+            var cfg = ConfigTracker.fileMap().get(msg.name());
             if (cfg != null)
                 cfg.acceptSyncedConfig(msg.data());
         }

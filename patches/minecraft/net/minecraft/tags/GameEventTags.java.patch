@@ -1,8 +1,8 @@
 --- a/net/minecraft/tags/GameEventTags.java
 +++ b/net/minecraft/tags/GameEventTags.java
 @@ -14,4 +_,12 @@
-     private static TagKey<GameEvent> create(String p_203853_) {
-         return TagKey.create(Registries.GAME_EVENT, Identifier.withDefaultNamespace(p_203853_));
+     private static TagKey<GameEvent> create(final String name) {
+         return TagKey.create(Registries.GAME_EVENT, Identifier.withDefaultNamespace(name));
      }
 +
 +    public static TagKey<GameEvent> create(String namepsace, String path) {

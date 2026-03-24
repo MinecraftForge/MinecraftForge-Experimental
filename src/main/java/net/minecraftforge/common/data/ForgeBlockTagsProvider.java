@@ -42,8 +42,6 @@ public final class ForgeBlockTagsProvider extends VanillaBlockTagsProvider {
                 return ForgeBlockTagsProvider.this.tag(p_406922_);
             }
         }).run();
-        tag(CHORUS_ADDITIONALLY_GROWS_ON)
-            .addTag(END_STONES);
         addColored(DYED, "{color}_banner");
         addColored(DYED, "{color}_bed");
         addColored(DYED, "{color}_candle");
@@ -73,7 +71,7 @@ public final class ForgeBlockTagsProvider extends VanillaBlockTagsProvider {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (var color : DyeColor.values()) {
             var key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}", color.getName()));
-            TagKey<Block> tag = getForgeTag(prefix + color.getName());
+            TagKey<Block> tag = getTag(prefix + color.getName());
             var block = ForgeRegistries.BLOCKS.getValue(key);
             if (block == null || block == Blocks.AIR)
                 throw new IllegalStateException("Unknown vanilla block: " + key);
@@ -84,13 +82,13 @@ public final class ForgeBlockTagsProvider extends VanillaBlockTagsProvider {
     private static void addColoredTags(Consumer<TagKey<Block>> consumer, TagKey<Block> group) {
         String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
         for (var color : DyeColor.values()) {
-            TagKey<Block> tag = getForgeTag(prefix + color.getName());
+            TagKey<Block> tag = getTag(prefix + color.getName());
             consumer.accept(tag);
         }
     }
 
     @SuppressWarnings("unchecked")
-    private static TagKey<Block> getForgeTag(String name) {
+    private static TagKey<Block> getTag(String name) {
         try {
             name = name.toUpperCase(Locale.ENGLISH);
             return (TagKey<Block>) Tags.Blocks.class.getDeclaredField(name).get(null);

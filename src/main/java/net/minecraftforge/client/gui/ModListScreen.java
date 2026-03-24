@@ -27,7 +27,7 @@ import org.apache.maven.artifact.versioning.ComparableVersion;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ActiveTextCollector;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.components.Button;
@@ -103,7 +103,7 @@ public class ModListScreen extends Screen {
     public ModListScreen(Screen parentScreen) {
         super(Component.translatable("fml.menu.mods.title"));
         this.parentScreen = parentScreen;
-        this.mods = ModList.get().getMods();
+        this.mods = ModList.getMods();
         this.unsortedMods = List.copyOf(this.mods);
     }
 
@@ -159,7 +159,7 @@ public class ModListScreen extends Screen {
         }
 
         @Override
-        protected void drawPanel(GuiGraphics guiGraphics, int entryRight, int relativeY, int mouseX, int mouseY) {
+        protected void drawPanel(GuiGraphicsExtractor guiGraphics, int entryRight, int relativeY, int mouseX, int mouseY) {
             if (logoPath != null) {
                 //RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
                 // Draw the logo image inscribed in a rectangle with width entryWidth (minus some padding) and height 50
@@ -168,7 +168,7 @@ public class ModListScreen extends Screen {
                 relativeY += headerHeight + PADDING;
             }
 
-            visitText(guiGraphics.textRenderer(GuiGraphics.HoveredTextEffects.TOOLTIP_AND_CURSOR), relativeY);
+            visitText(guiGraphics.textRenderer(GuiGraphicsExtractor.HoveredTextEffects.TOOLTIP_AND_CURSOR), relativeY);
         }
 
         private void visitText(ActiveTextCollector collector, int header) {
@@ -349,11 +349,11 @@ public class ModListScreen extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+    public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
         if (this.modInfo != null)
-            this.modInfo.render(guiGraphics, mouseX, mouseY, partialTick);
+            this.modInfo.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
 
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        super.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
     }
 
     public Minecraft getMinecraftInstance() {
@@ -391,7 +391,7 @@ public class ModListScreen extends Screen {
 
             try {
                 NativeImage logo = null;
-                var modfile = ModList.get().getModFileById(selectedMod.getModId());
+                var modfile = ModList.getModFileById(selectedMod.getModId());
                 if (modfile != null) {
                     var path = modfile.getFile().findResource(logoFile);
                     if (Files.exists(path))
@@ -423,7 +423,7 @@ public class ModListScreen extends Screen {
 
         lines.add(selectedMod.getDisplayName());
         lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.version", MavenVersionStringHelper.artifactVersionToString(selectedMod.getVersion())));
-        lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.idstate", selectedMod.getModId(), ModList.get().getModContainerById(selectedMod.getModId()).
+        lines.add(ForgeI18n.parseMessage("fml.menu.mods.info.idstate", selectedMod.getModId(), ModList.getModContainerById(selectedMod.getModId()).
                 map(ModContainer::getCurrentState).map(Object::toString).orElse("NONE")));
 
         selectedMod.getConfig().getConfigElement("credits").ifPresent(credits->

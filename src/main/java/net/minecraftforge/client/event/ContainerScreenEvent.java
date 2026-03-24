@@ -5,7 +5,7 @@
 
 package net.minecraftforge.client.event;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -43,7 +43,7 @@ public sealed interface ContainerScreenEvent {
         /**
          * {@return the gui graphics used for rendering}
          */
-        GuiGraphics getGuiGraphics();
+        GuiGraphicsExtractor getGuiGraphics();
 
         /**
          * {@return the X coordinate of the mouse pointer}
@@ -67,7 +67,7 @@ public sealed interface ContainerScreenEvent {
          */
         record Foreground(
                 AbstractContainerScreen<?> getContainerScreen,
-                GuiGraphics getGuiGraphics,
+                GuiGraphicsExtractor getGuiGraphics,
                 int getMouseX,
                 int getMouseY
         ) implements RecordEvent, Render {
@@ -86,7 +86,7 @@ public sealed interface ContainerScreenEvent {
          */
         record Background(
                 AbstractContainerScreen<?> getContainerScreen,
-                GuiGraphics getGuiGraphics,
+                GuiGraphicsExtractor getGuiGraphics,
                 int getMouseX,
                 int getMouseY
         ) implements RecordEvent, Render {

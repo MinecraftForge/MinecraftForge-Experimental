@@ -1,75 +1,78 @@
 --- a/net/minecraft/world/level/block/LiquidBlock.java
 +++ b/net/minecraft/world/level/block/LiquidBlock.java
 @@ -53,7 +_,8 @@
-         p_422116_ -> p_422116_.group(FLOWING_FLUID.fieldOf("fluid").forGetter(p_312827_ -> p_312827_.fluid), propertiesCodec()).apply(p_422116_, LiquidBlock::new)
+         i -> i.group(FLOWING_FLUID.fieldOf("fluid").forGetter(b -> b.fluid), propertiesCodec()).apply(i, LiquidBlock::new)
      );
      public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
 -    protected final FlowingFluid fluid;
 +    @Deprecated // Use getFluid
 +    private final FlowingFluid fluid;
      private final List<FluidState> stateCache;
-     public static final VoxelShape SHAPE_STABLE = Block.column(16.0, 0.0, 8.0);
-     public static final ImmutableList<Direction> POSSIBLE_FLOW_DIRECTIONS = ImmutableList.of(Direction.DOWN, Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST);
-@@ -63,6 +_,7 @@
+     public static final ImmutableList<Direction> POSSIBLE_FLOW_DIRECTIONS = ImmutableList.of(
+         Direction.DOWN, Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST
+@@ -65,6 +_,7 @@
          return CODEC;
      }
  
 +    @Deprecated  // Forge: Use the constructor that takes a supplier
-     public LiquidBlock(FlowingFluid p_54694_, BlockBehaviour.Properties p_54695_) {
-         super(p_54695_);
-         this.fluid = p_54694_;
-@@ -75,6 +_,19 @@
+     public LiquidBlock(final FlowingFluid fluid, final BlockBehaviour.Properties properties) {
+         super(properties);
+         this.fluid = fluid;
+@@ -77,6 +_,19 @@
  
-         this.stateCache.add(p_54694_.getFlowing(8, true));
+         this.stateCache.add(fluid.getFlowing(8, true));
          this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 0));
 +        fluidStateCacheInitialized = true;
-+        supplier = () -> p_54694_;
++        supplier = () -> fluid;
 +    }
 +
 +    /**
-+     * @param p_54694_ A fluid supplier such as {@link net.minecraftforge.registries.RegistryObject<FlowingFluid>}
++     * @param fluid A fluid supplier such as {@link net.minecraftforge.registries.RegistryObject<FlowingFluid>}
 +     */
-+    public LiquidBlock(java.util.function.Supplier<? extends FlowingFluid> p_54694_, BlockBehaviour.Properties p_54695_) {
-+        super(p_54695_);
++    public LiquidBlock(final java.util.function.Supplier<? extends FlowingFluid> fluid, final BlockBehaviour.Properties properties) {
++        super(properties);
 +        this.fluid = null;
 +        this.stateCache = Lists.newArrayList();
 +        this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, Integer.valueOf(0)));
-+        this.supplier = p_54694_;
++        this.supplier = fluid;
      }
  
      @Override
-@@ -113,6 +_,7 @@
+@@ -125,6 +_,7 @@
      @Override
-     protected FluidState getFluidState(BlockState p_54765_) {
-         int i = p_54765_.getValue(LEVEL);
+     protected FluidState getFluidState(final BlockState state) {
+         int i = state.getValue(LEVEL);
 +        if (!fluidStateCacheInitialized) initFluidStateCache();
          return this.stateCache.get(Math.min(i, 8));
      }
  
-@@ -138,7 +_,7 @@
+@@ -150,7 +_,7 @@
  
      @Override
-     protected void onPlace(BlockState p_54754_, Level p_54755_, BlockPos p_54756_, BlockState p_54757_, boolean p_54758_) {
--        if (this.shouldSpreadLiquid(p_54755_, p_54756_, p_54754_)) {
-+        if (!net.minecraftforge.fluids.FluidInteractionRegistry.canInteract(p_54755_, p_54756_)) {
-             p_54755_.scheduleTick(p_54756_, p_54754_.getFluidState().getType(), this.fluid.getTickDelay(p_54755_));
+     protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
+-        if (this.shouldSpreadLiquid(level, pos, state)) {
++        if (!net.minecraftforge.fluids.FluidInteractionRegistry.canInteract(level, pos)) {
+             level.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(level));
          }
-     }
-@@ -163,11 +_,12 @@
  
-     @Override
-     protected void neighborChanged(BlockState p_54709_, Level p_54710_, BlockPos p_54711_, Block p_54712_, @Nullable Orientation p_368724_, boolean p_54714_) {
--        if (this.shouldSpreadLiquid(p_54710_, p_54711_, p_54709_)) {
-+        if (!net.minecraftforge.fluids.FluidInteractionRegistry.canInteract(p_54710_, p_54711_)) {
-             p_54710_.scheduleTick(p_54711_, p_54709_.getFluidState().getType(), this.fluid.getTickDelay(p_54710_));
+@@ -198,7 +_,7 @@
+     protected void neighborChanged(
+         final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
+     ) {
+-        if (this.shouldSpreadLiquid(level, pos, state)) {
++        if (!net.minecraftforge.fluids.FluidInteractionRegistry.canInteract(level, pos)) {
+             level.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(level));
+         }
+ 
+@@ -214,6 +_,7 @@
          }
      }
  
 +    @Deprecated // FORGE: Use FluidInteractionRegistry#canInteract instead
-     private boolean shouldSpreadLiquid(Level p_54697_, BlockPos p_54698_, BlockState p_54699_) {
+     private boolean shouldSpreadLiquid(final Level level, final BlockPos pos, final BlockState state) {
          if (this.fluid.is(FluidTags.LAVA)) {
-             boolean flag = p_54697_.getBlockState(p_54698_.below()).is(Blocks.SOUL_SOIL);
-@@ -214,5 +_,24 @@
+             boolean flag = level.getBlockState(pos.below()).is(Blocks.SOUL_SOIL);
+@@ -260,5 +_,24 @@
      @Override
      public Optional<SoundEvent> getPickupSound() {
          return this.fluid.getPickupSound();

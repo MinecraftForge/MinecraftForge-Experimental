@@ -16,11 +16,11 @@
 +    }
 +
      @Override
-     public void write(FriendlyByteBuf p_299186_) {
+     public void write(final FriendlyByteBuf output) {
 +        if (this.data != null) {
-+            p_299186_.writeBytes(this.data.slice());
++            output.writeBytes(this.data.slice());
 +        } else {
-+            encoder.accept(p_299186_);
++            encoder.accept(output);
 +        }
      }
  }

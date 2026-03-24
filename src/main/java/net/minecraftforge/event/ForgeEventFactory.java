@@ -6,6 +6,7 @@
 package net.minecraftforge.event;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashSet;
@@ -21,15 +22,11 @@ import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.chunk.storage.SerializableChunkData;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.Result;
-import net.minecraftforge.fml.ModLoader;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
-import com.mojang.authlib.GameProfile;
 import com.mojang.brigadier.CommandDispatcher;
 
 import net.minecraft.advancements.AdvancementHolder;
@@ -76,7 +73,6 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.FishingHook;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
 import net.minecraft.world.flag.FeatureFlagSet;
@@ -107,11 +103,9 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.portal.PortalShape;
-import net.minecraft.world.level.storage.PlayerDataStorage;
 import net.minecraft.world.level.storage.ServerLevelData;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.ToolAction;
@@ -133,7 +127,6 @@ import net.minecraftforge.event.entity.EntityTravelToDimensionEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
 import net.minecraftforge.event.entity.item.ItemExpireEvent;
 import net.minecraftforge.event.entity.living.AnimalTameEvent;
-import net.minecraftforge.event.entity.living.BabyEntitySpawnEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingBreatheEvent;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
@@ -168,7 +161,6 @@ import net.minecraftforge.event.entity.player.ArrowNockEvent;
 import net.minecraftforge.event.entity.player.BonemealEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.FillBucketEvent;
-import net.minecraftforge.event.entity.player.ItemFishedEvent;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.event.entity.player.PermissionsChangedEvent;
 import net.minecraftforge.event.entity.player.PlayerContainerEvent;
@@ -199,7 +191,7 @@ import net.minecraftforge.event.level.ExplosionEvent;
 import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.event.level.PistonEvent;
-import net.minecraftforge.event.level.SaplingGrowTreeEvent;
+import net.minecraftforge.event.level.BlockFeatureGrowEvent;
 import net.minecraftforge.event.level.SleepFinishedTimeEvent;
 import net.minecraftforge.event.network.ChannelRegistrationChangeEvent;
 import net.minecraftforge.event.network.ConnectionStartEvent;
@@ -500,7 +492,7 @@ public final class ForgeEventFactory {
         PlayerWakeUpEvent.BUS.post(new PlayerWakeUpEvent(player, wakeImmediately, updateLevel));
     }
 
-    public static void onPlayerFall(Player player, float distance, float multiplier) {
+    public static void onPlayerFall(Player player, double distance, float multiplier) {
         PlayerFlyableFallEvent.BUS.post(new PlayerFlyableFallEvent(player, distance, multiplier));
     }
 
@@ -652,8 +644,8 @@ public final class ForgeEventFactory {
     }
 
     @SuppressWarnings("removal")
-    public static SaplingGrowTreeEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> holder) {
-        return SaplingGrowTreeEvent.BUS.fire(new SaplingGrowTreeEvent(level, randomSource, pos, holder));
+    public static BlockFeatureGrowEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> holder) {
+        return BlockFeatureGrowEvent.BUS.fire(new BlockFeatureGrowEvent(level, randomSource, pos, holder));
     }
 
     public static BlockState alterGround(LevelSimulatedReader level, RandomSource random, BlockPos pos, BlockState altered) {
@@ -685,8 +677,13 @@ public final class ForgeEventFactory {
         return SleepFinishedTimeEvent.BUS.fire(new SleepFinishedTimeEvent(level, newTime, minTime)).getNewTime();
     }
 
-    public static List<PreparableReloadListener> onResourceReload(ReloadableServerResources serverResources, HolderLookup.Provider lookupProvider) {
-        return AddReloadListenerEvent.BUS.fire(new AddReloadListenerEvent(serverResources, lookupProvider)).getListeners();
+    public static List<PreparableReloadListener> onResourceReload(ReloadableServerResources serverResources, HolderLookup.Provider lookupProvider, List<PreparableReloadListener> vanilla) {
+        var modded = AddReloadListenerEvent.BUS.fire(new AddReloadListenerEvent(serverResources, lookupProvider)).getListeners();
+        if (modded.isEmpty())
+            return vanilla;
+        var ret = new ArrayList<PreparableReloadListener>(vanilla);
+        ret.addAll(modded);
+        return ret;
     }
 
     public static void onCommandRegister(CommandDispatcher<CommandSourceStack> dispatcher, Commands.CommandSelection environment, CommandBuildContext context) {

@@ -3,13 +3,13 @@
 @@ -16,9 +_,10 @@
      void onCrossbowAttackPerformed();
  
-     default void performCrossbowAttack(LivingEntity p_32337_, float p_32338_) {
--        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(p_32337_, Items.CROSSBOW);
-+        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(p_32337_, item -> item instanceof CrossbowItem);
-         ItemStack itemstack = p_32337_.getItemInHand(interactionhand);
+     default void performCrossbowAttack(final LivingEntity body, final float crossbowPower) {
+-        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(body, Items.CROSSBOW);
++        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(body, item -> item instanceof CrossbowItem);
+         ItemStack itemstack = body.getItemInHand(interactionhand);
 -        if (itemstack.getItem() instanceof CrossbowItem crossbowitem) {
-+        if (p_32337_.isHolding(is -> is.getItem() instanceof CrossbowItem)) {
++        if (body.isHolding(is -> is.getItem() instanceof CrossbowItem)) {
 +            var crossbowitem = (CrossbowItem) itemstack.getItem();
              crossbowitem.performShooting(
-                 p_32337_.level(), p_32337_, interactionhand, itemstack, p_32338_, 14 - p_32337_.level().getDifficulty().getId() * 4, this.getTarget()
+                 body.level(), body, interactionhand, itemstack, crossbowPower, 14 - body.level().getDifficulty().getId() * 4, this.getTarget()
              );

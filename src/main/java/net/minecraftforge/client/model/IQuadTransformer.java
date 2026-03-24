@@ -5,8 +5,9 @@
 
 package net.minecraftforge.client.model;
 
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import java.util.List;
+
+import net.minecraft.client.resources.model.geometry.BakedQuad;
 
 /**
  * Transformer for {@link BakedQuad baked quads}.

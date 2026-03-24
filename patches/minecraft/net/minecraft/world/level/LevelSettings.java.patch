@@ -1,73 +1,67 @@
 --- a/net/minecraft/world/level/LevelSettings.java
 +++ b/net/minecraft/world/level/LevelSettings.java
-@@ -15,9 +_,16 @@
-     private final boolean allowCommands;
-     private final GameRules gameRules;
-     private final WorldDataConfiguration dataConfiguration;
--
--    public LevelSettings(
--        String p_250485_, GameType p_250207_, boolean p_251631_, Difficulty p_252122_, boolean p_248961_, GameRules p_457827_, WorldDataConfiguration p_249797_
-+    private final com.mojang.serialization.Lifecycle lifecycle;
-+
-+    public LevelSettings(
-+            String p_250485_, GameType p_250207_, boolean p_251631_, Difficulty p_252122_, boolean p_248961_, GameRules p_248536_, WorldDataConfiguration p_249797_
-+    ) {
-+        this(p_250485_, p_250207_, p_251631_, p_252122_, p_248961_, p_248536_, p_249797_, com.mojang.serialization.Lifecycle.stable());
+@@ -7,8 +_,12 @@
+ import net.minecraft.world.Difficulty;
+ 
+ public record LevelSettings(
+-    String levelName, GameType gameType, LevelSettings.DifficultySettings difficultySettings, boolean allowCommands, WorldDataConfiguration dataConfiguration
++    String levelName, GameType gameType, LevelSettings.DifficultySettings difficultySettings, boolean allowCommands, WorldDataConfiguration dataConfiguration, com.mojang.serialization.Lifecycle lifecycle
+ ) {
++    public LevelSettings(String levelName, GameType gameType, LevelSettings.DifficultySettings difficultySettings, boolean allowCommands, WorldDataConfiguration dataConfiguration) {
++       this(levelName, gameType, difficultySettings, allowCommands, dataConfiguration, com.mojang.serialization.Lifecycle.stable());
 +    }
 +
-+    public LevelSettings(
-+        String p_250485_, GameType p_250207_, boolean p_251631_, Difficulty p_252122_, boolean p_248961_, GameRules p_457827_, WorldDataConfiguration p_249797_, com.mojang.serialization.Lifecycle lifecycle
-     ) {
-         this.levelName = p_250485_;
-         this.gameType = p_250207_;
-@@ -26,6 +_,7 @@
-         this.allowCommands = p_248961_;
-         this.gameRules = p_457827_;
-         this.dataConfiguration = p_249797_;
-+        this.lifecycle = lifecycle;
-     }
- 
-     public static LevelSettings parse(Dynamic<?> p_46925_, WorldDataConfiguration p_251697_) {
-@@ -37,7 +_,8 @@
-             p_46925_.get("Difficulty").asNumber().map(p_46928_ -> Difficulty.byId(p_46928_.byteValue())).result().orElse(Difficulty.NORMAL),
-             p_46925_.get("allowCommands").asBoolean(gametype == GameType.CREATIVE),
-             GameRules.codec(p_251697_.enabledFeatures()).parse(p_46925_.get("game_rules").orElseEmptyMap()).resultOrPartial(LOGGER::warn).orElseThrow(),
--            p_251697_
-+            p_251697_,
-+            net.minecraftforge.common.ForgeHooks.parseLifecycle(p_46925_.get("forgeLifecycle").asString("stable"))
+     public static LevelSettings parse(final Dynamic<?> input, final WorldDataConfiguration loadConfig) {
+         GameType gametype = GameType.byId(input.get("GameType").asInt(0));
+         return new LevelSettings(
+@@ -16,12 +_,13 @@
+             gametype,
+             input.get("difficulty_settings").read(LevelSettings.DifficultySettings.CODEC).result().orElse(LevelSettings.DifficultySettings.DEFAULT),
+             input.get("allowCommands").asBoolean(gametype == GameType.CREATIVE),
+-            loadConfig
++            loadConfig,
++            net.minecraftforge.common.ForgeHooks.parseLifecycle(input.get("forgeLifecycle").asString("stable"))
          );
      }
  
-@@ -70,20 +_,28 @@
+     public LevelSettings withGameType(final GameType gameType) {
+-        return new LevelSettings(this.levelName, gameType, this.difficultySettings, this.allowCommands, this.dataConfiguration);
++        return new LevelSettings(this.levelName, gameType, this.difficultySettings, this.allowCommands, this.dataConfiguration, this.lifecycle);
      }
  
-     public LevelSettings withGameType(GameType p_46923_) {
--        return new LevelSettings(this.levelName, p_46923_, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, this.dataConfiguration);
-+        return new LevelSettings(this.levelName, p_46923_, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, this.dataConfiguration, this.lifecycle);
+     public LevelSettings withDifficulty(final Difficulty difficulty) {
+@@ -30,7 +_,8 @@
+             this.gameType,
+             new LevelSettings.DifficultySettings(difficulty, this.difficultySettings.hardcore(), this.difficultySettings.locked()),
+             this.allowCommands,
+-            this.dataConfiguration
++            this.dataConfiguration,
++            this.lifecycle
+         );
      }
  
-     public LevelSettings withDifficulty(Difficulty p_46919_) {
--        return new LevelSettings(this.levelName, this.gameType, this.hardcore, p_46919_, this.allowCommands, this.gameRules, this.dataConfiguration);
-+        return new LevelSettings(this.levelName, this.gameType, this.hardcore, p_46919_, this.allowCommands, this.gameRules, this.dataConfiguration, this.lifecycle);
+@@ -40,16 +_,21 @@
+             this.gameType,
+             new LevelSettings.DifficultySettings(this.difficultySettings.difficulty(), this.difficultySettings.hardcore(), locked),
+             this.allowCommands,
+-            this.dataConfiguration
++            this.dataConfiguration,
++            this.lifecycle
+         );
      }
  
-     public LevelSettings withDataConfiguration(WorldDataConfiguration p_250867_) {
--        return new LevelSettings(this.levelName, this.gameType, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, p_250867_);
-+        return new LevelSettings(this.levelName, this.gameType, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, p_250867_, this.lifecycle);
+     public LevelSettings withDataConfiguration(final WorldDataConfiguration dataConfiguration) {
+-        return new LevelSettings(this.levelName, this.gameType, this.difficultySettings, this.allowCommands, dataConfiguration);
++        return new LevelSettings(this.levelName, this.gameType, this.difficultySettings, this.allowCommands, dataConfiguration, this.lifecycle);
      }
  
      public LevelSettings copy() {
-         return new LevelSettings(
--            this.levelName, this.gameType, this.hardcore, this.difficulty, this.allowCommands, this.gameRules.copy(this.dataConfiguration.enabledFeatures()), this.dataConfiguration
-+            this.levelName, this.gameType, this.hardcore, this.difficulty, this.allowCommands, this.gameRules.copy(this.dataConfiguration.enabledFeatures()), this.dataConfiguration, this.lifecycle
-         );
+-        return new LevelSettings(this.levelName, this.gameType, this.difficultySettings, this.allowCommands, this.dataConfiguration);
++        return new LevelSettings(this.levelName, this.gameType, this.difficultySettings, this.allowCommands, this.dataConfiguration, this.lifecycle);
 +    }
 +
-+    public LevelSettings withLifecycle(com.mojang.serialization.Lifecycle lifecycle) {
-+        return new LevelSettings(this.levelName, this.gameType, this.hardcore, this.difficulty, this.allowCommands, this.gameRules, this.dataConfiguration, lifecycle);
-+    }
-+
-+    public com.mojang.serialization.Lifecycle getLifecycle() {
-+        return this.lifecycle;
++    public LevelSettings withLifecycle(final com.mojang.serialization.Lifecycle lifecycle) {
++        return new LevelSettings(this.levelName, this.gameType, this.difficultySettings, this.allowCommands, this.dataConfiguration, lifecycle);
      }
- }
+ 
+     public record DifficultySettings(Difficulty difficulty, boolean hardcore, boolean locked) {

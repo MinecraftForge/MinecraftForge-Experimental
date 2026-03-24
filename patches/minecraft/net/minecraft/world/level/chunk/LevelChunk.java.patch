@@ -1,65 +1,65 @@
 --- a/net/minecraft/world/level/chunk/LevelChunk.java
 +++ b/net/minecraft/world/level/chunk/LevelChunk.java
-@@ -63,7 +_,7 @@
+@@ -64,7 +_,7 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
 -public class LevelChunk extends ChunkAccess implements DebugValueSource {
 +public class LevelChunk extends ChunkAccess implements DebugValueSource, net.minecraftforge.common.capabilities.ICapabilityProviderImpl<LevelChunk> {
-     static final Logger LOGGER = LogUtils.getLogger();
+     private static final Logger LOGGER = LogUtils.getLogger();
      private static final TickingBlockEntity NULL_TICKER = new TickingBlockEntity() {
          @Override
-@@ -123,6 +_,7 @@
-         this.postLoad = p_196861_;
-         this.blockTicks = p_196857_;
-         this.fluidTicks = p_196858_;
+@@ -124,6 +_,7 @@
+         this.postLoad = postLoad;
+         this.blockTicks = blockTicks;
+         this.fluidTicks = fluidTicks;
 +        this.capProvider.initInternal();
      }
  
-     public LevelChunk(ServerLevel p_196850_, ProtoChunk p_196851_, LevelChunk.@Nullable PostLoadProcessor p_196852_) {
-@@ -319,7 +_,7 @@
+     public LevelChunk(final ServerLevel level, final ProtoChunk protoChunk, final LevelChunk.@Nullable PostLoadProcessor postLoad) {
+@@ -321,7 +_,7 @@
                  if (!levelchunksection.getBlockState(j, k, l).is(block)) {
                      return null;
                  } else {
--                    if (!this.level.isClientSide() && (p_393998_ & 512) == 0) {
-+                    if (!this.level.isClientSide() && (p_393998_ & 512) == 0 && !this.level.captureBlockSnapshots) {
-                         p_62866_.onPlace(this.level, p_62865_, blockstate, flag2);
+-                    if (!this.level.isClientSide() && (flags & 512) == 0) {
++                    if (!this.level.isClientSide() && (flags & 512) == 0 && !this.level.captureBlockSnapshots) {
+                         state.onPlace(this.level, pos, blockstate, flag2);
                      }
  
-@@ -371,6 +_,12 @@
+@@ -368,6 +_,12 @@
  
-     public @Nullable BlockEntity getBlockEntity(BlockPos p_62868_, LevelChunk.EntityCreationType p_62869_) {
-         BlockEntity blockentity = this.blockEntities.get(p_62868_);
+     public @Nullable BlockEntity getBlockEntity(final BlockPos pos, final LevelChunk.EntityCreationType creationType) {
+         BlockEntity blockentity = this.blockEntities.get(pos);
 +
 +        if (blockentity != null && blockentity.isRemoved()) {
-+           blockEntities.remove(p_62868_);
++           blockEntities.remove(pos);
 +           blockentity = null;
 +        }
 +
          if (blockentity == null) {
-             CompoundTag compoundtag = this.pendingBlockEntities.remove(p_62868_);
+             CompoundTag compoundtag = this.pendingBlockEntities.remove(pos);
              if (compoundtag != null) {
-@@ -388,9 +_,6 @@
+@@ -385,9 +_,6 @@
                      this.addAndRegisterBlockEntity(blockentity);
                  }
              }
 -        } else if (blockentity.isRemoved()) {
--            this.blockEntities.remove(p_62868_);
+-            this.blockEntities.remove(pos);
 -            return null;
          }
  
          return blockentity;
-@@ -405,6 +_,7 @@
+@@ -402,6 +_,7 @@
  
-             this.level.onBlockEntityAdded(p_156391_);
-             this.updateBlockEntityTicker(p_156391_);
-+            p_156391_.onLoad();
+             this.level.onBlockEntityAdded(blockEntity);
+             this.updateBlockEntityTicker(blockEntity);
++            blockEntity.onLoad();
          }
      }
  
-@@ -456,9 +_,14 @@
-     public @Nullable CompoundTag getBlockEntityNbtForSaving(BlockPos p_62932_, HolderLookup.Provider p_329605_) {
-         BlockEntity blockentity = this.getBlockEntity(p_62932_);
+@@ -453,9 +_,14 @@
+     public @Nullable CompoundTag getBlockEntityNbtForSaving(final BlockPos blockPos, final HolderLookup.Provider registryAccess) {
+         BlockEntity blockentity = this.getBlockEntity(blockPos);
          if (blockentity != null && !blockentity.isRemoved()) {
 +            try {
              CompoundTag compoundtag1 = blockentity.saveWithFullMetadata(this.level.registryAccess());
@@ -70,38 +70,38 @@
 +                return null;
 +            }
          } else {
-             CompoundTag compoundtag = this.pendingBlockEntities.get(p_62932_);
+             CompoundTag compoundtag = this.pendingBlockEntities.get(blockPos);
              if (compoundtag != null) {
-@@ -538,9 +_,10 @@
-                 (p_405747_, p_405748_, p_405749_) -> {
-                     BlockEntity blockentity = this.getBlockEntity(p_405747_, LevelChunk.EntityCreationType.IMMEDIATE);
-                     if (blockentity != null && p_405749_ != null && blockentity.getType() == p_405748_) {
+@@ -537,9 +_,10 @@
+                 (pos, type, tag) -> {
+                     BlockEntity blockentity = this.getBlockEntity(pos, LevelChunk.EntityCreationType.IMMEDIATE);
+                     if (blockentity != null && tag != null && blockentity.getType() == type) {
 -                        blockentity.loadWithComponents(
 +                        var input = (
-                             TagValueInput.create(problemreporter$scopedcollector.forChild(blockentity.problemPath()), this.level.registryAccess(), p_405749_)
+                             TagValueInput.create(problemreporter$scopedcollector.forChild(blockentity.problemPath()), this.level.registryAccess(), tag)
                          );
 +                        blockentity.handleUpdateTag(input, this.level.registryAccess());
                      }
                  }
              );
-@@ -678,6 +_,7 @@
+@@ -679,6 +_,7 @@
      }
  
      public void clearAllBlockEntities() {
 +        this.blockEntities.values().forEach(BlockEntity::onChunkUnloaded);
          this.blockEntities.values().forEach(BlockEntity::setRemoved);
          this.blockEntities.clear();
-         this.tickersInLevel.values().forEach(p_187966_ -> p_187966_.rebind(NULL_TICKER));
-@@ -685,6 +_,7 @@
+         this.tickersInLevel.values().forEach(ticker -> ticker.rebind(NULL_TICKER));
+@@ -686,6 +_,7 @@
      }
  
      public void registerAllBlockEntitiesAfterLevelLoad() {
 +        this.level.addFreshBlockEntities(this.blockEntities.values());
-         this.blockEntities.values().forEach(p_405750_ -> {
+         this.blockEntities.values().forEach(blockEntity -> {
              if (this.level instanceof ServerLevel serverlevel) {
-                 this.addGameEventListener(p_405750_, serverlevel);
-@@ -737,6 +_,24 @@
-         return new LevelChunk.BoundTickingBlockEntity<>(p_156376_, p_156377_);
+                 this.addGameEventListener(blockEntity, serverlevel);
+@@ -738,6 +_,24 @@
+         return new LevelChunk.BoundTickingBlockEntity<>(blockEntity, ticker);
      }
  
 +    private final net.minecraftforge.common.capabilities.CapabilityProvider.AsField.LevelChunks capProvider = new net.minecraftforge.common.capabilities.CapabilityProvider.AsField.LevelChunks(this);
@@ -122,10 +122,10 @@
 +        capProvider.reviveCaps();
 +    }
 +
-     class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
+     private class BoundTickingBlockEntity<T extends BlockEntity> implements TickingBlockEntity {
          private final T blockEntity;
          private final BlockEntityTicker<T> ticker;
-@@ -754,6 +_,7 @@
+@@ -757,6 +_,7 @@
                  if (LevelChunk.this.isTicking(blockpos)) {
                      try {
                          ProfilerFiller profilerfiller = Profiler.get();
@@ -133,7 +133,7 @@
                          profilerfiller.push(this::getType);
                          BlockState blockstate = LevelChunk.this.getBlockState(blockpos);
                          if (this.blockEntity.getType().isValid(blockstate)) {
-@@ -775,6 +_,11 @@
+@@ -778,6 +_,11 @@
                          CrashReport crashreport = CrashReport.forThrowable(throwable, "Ticking block entity");
                          CrashReportCategory crashreportcategory = crashreport.addCategory("Block entity being ticked");
                          this.blockEntity.fillCrashReportCategory(crashreportcategory);
@@ -145,7 +145,7 @@
                          throw new ReportedException(crashreport);
                      }
                  }
-@@ -848,6 +_,33 @@
+@@ -851,6 +_,33 @@
          public String toString() {
              return this.ticker + " <wrapped>";
          }

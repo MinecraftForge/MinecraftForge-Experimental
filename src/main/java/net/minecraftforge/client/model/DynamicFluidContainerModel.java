@@ -8,16 +8,17 @@ package net.minecraftforge.client.model;
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonObject;
 import com.mojang.math.Transformation;
-import net.minecraft.client.renderer.block.model.TextureSlots;
+
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.QuadCollection;
-import net.minecraft.client.resources.model.UnbakedGeometry;
+import net.minecraft.client.resources.model.cuboid.ItemModelGenerator;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.material.Fluid;
@@ -64,11 +65,6 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
         return new RenderTypeGroup(ChunkSectionLayer.TRANSLUCENT, unlit ? ForgeRenderTypes.ITEM_UNSORTED_UNLIT_TRANSLUCENT.get() : ForgeRenderTypes.ITEM_UNSORTED_TRANSLUCENT.get());
     }
 
-    @SuppressWarnings("deprecation")
-    private static Material getMaterial(Identifier texture) {
-        return new Material(TextureAtlas.LOCATION_BLOCKS, texture);
-    }
-
     /**
      * Returns a new ModelDynBucket representing the given fluid, but with the same
      * other properties (flipGas, tint, coverIsMask).
@@ -89,13 +85,13 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
 
         if (fluid != Fluids.EMPTY) {
             var stillTexture = IClientFluidTypeExtensions.of(fluid).getStillTexture();
-            stillMaterial = getMaterial(stillTexture);
+            stillMaterial = new Material(stillTexture);
         }
 
-        var sprites = baker.sprites();
-        var baseSprite = sprites.resolveSlot(textures, "base", name);
-        var fluidSprite = stillMaterial == null ? null : sprites.get(stillMaterial, name);
-        var coverSprite = sprites.resolveSlot(textures, "cover", name);
+        var materials = baker.materials();
+        var baseMaterial = materials.resolveSlot(textures, "base", name);
+        var fluidMaterial = stillMaterial == null ? null : materials.get(stillMaterial, name);
+        var coverMaterial = materials.resolveSlot(textures, "cover", name);
         /*
          var particleSprite = sprites.resolveSlot(textures, "particle", name);
 
@@ -113,39 +109,35 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
 
         var buf = new QuadCollection.Builder();
 
-        if (baseSprite != null) {
-            // Base texture
-            var unbaked = UnbakedGeometryHelper.createUnbakedItemElements(0, baseSprite.contents());
-            UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> baseSprite, state, buf);
-        }
+        if (baseMaterial != null)
+            ItemModelGenerator.bakeExtrudedSprite(buf, baker.interner(), state, info(baker, baseMaterial, 0));
 
-        if (fluidMaskLocation != null && fluidSprite != null) {
-            TextureAtlasSprite templateSprite = sprites.get(fluidMaskLocation, name);
-            if (templateSprite != null) {
-                // Fluid layer
+        // Fluid layer
+        if (fluidMaskLocation != null && fluidMaterial != null) {
+            var templateMaterial = materials.get(fluidMaskLocation, name);
+            if (templateMaterial != null) {
                 var transformedState = new SimpleModelState(transformation.compose(FLUID_TRANSFORM));
-                var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(1, templateSprite.contents()); // Use template as mask
-
-                //var emissive = applyFluidLuminosity && fluid.getFluidType().getLightLevel() > 0;
-                //var transformer = emissive ? QuadTransformers.settingMaxEmissivity() : QuadTransformers.empty();
-                // TODO: [Forge][Rendering] Emissive fluid models
-
-                UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> fluidSprite, transformedState, buf); // Bake with fluid texture
+                UnbakedGeometryHelper.bakeMaskedSprite(buf, baker.interner(), transformedState, info(baker, templateMaterial, 1), info(baker, fluidMaterial, 1));
             }
         }
 
-        if (coverSprite != null) {
-            var sprite = coverIsMask ? baseSprite : coverSprite;
+        // Cover/overlay
+        if (coverMaterial != null) {
+            var sprite = coverIsMask ? baseMaterial : coverMaterial;
             if (sprite != null) {
-                // Cover/overlay
                 var transformedState = new SimpleModelState(transformation.compose(COVER_TRANSFORM));
-                var unbaked = UnbakedGeometryHelper.createUnbakedItemMaskElements(2, coverSprite.contents()); // Use cover as mask
-                UnbakedGeometryHelper.bakeElements(baker.parts(), unbaked, $ -> sprite, transformedState, buf); // Bake with selected texture
+                UnbakedGeometryHelper.bakeMaskedSprite(buf, baker.interner(), transformedState, info(baker, coverMaterial, 2), info(baker, sprite, 2));
             }
         }
 
 
         return buf.build();
+    }
+
+    private static MaterialInfo info(final ModelBaker baker, final Material.Baked material, final int tintIndex) {
+        return baker.interner().materialInfo(
+            MaterialInfo.of(material, material.sprite().transparency(), tintIndex, true, 0)
+        );
     }
 
     public static final class Loader implements IGeometryLoader {

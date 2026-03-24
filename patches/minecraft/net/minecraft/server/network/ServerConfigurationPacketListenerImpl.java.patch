@@ -13,15 +13,15 @@
      private @Nullable PrepareSpawnTask prepareSpawnTask;
 +    private final net.minecraftforge.network.config.ConfigurationTaskContext taskContext;
  
-     public ServerConfigurationPacketListenerImpl(MinecraftServer p_301415_, Connection p_298106_, CommonListenerCookie p_301309_) {
-         super(p_301415_, p_298106_, p_301309_);
-         this.gameProfile = p_301309_.gameProfile();
-         this.clientInformation = p_301309_.clientInformation();
-+        this.taskContext = new net.minecraftforge.network.config.ConfigurationTaskContext(p_298106_, this::send, this::finishCurrentTask);
+     public ServerConfigurationPacketListenerImpl(final MinecraftServer server, final Connection connection, final CommonListenerCookie cookie) {
+         super(server, connection, cookie);
+         this.gameProfile = cookie.gameProfile();
+         this.clientInformation = cookie.clientInformation();
++        this.taskContext = new net.minecraftforge.network.config.ConfigurationTaskContext(connection, this::send, this::finishCurrentTask);
      }
  
      @Override
-@@ -81,18 +_,23 @@
+@@ -81,22 +_,27 @@
          return this.connection.isConnected();
      }
  
@@ -39,7 +39,11 @@
 +    public void startConfiguration() {
 +        net.minecraftforge.event.ForgeEventFactory.gatherLoginConfigTasks(this.connection, this.configurationTasks::add);
          LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = this.server.registries();
-         List<KnownPack> list = this.server.getResourceManager().listPacks().flatMap(p_326454_ -> p_326454_.location().knownPackInfo().stream()).toList();
+         List<KnownPack> list = this.server
+             .getResourceManager()
+             .listPacks()
+             .flatMap(packResources -> packResources.location().knownPackInfo().stream())
+             .toList();
 -        this.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(this.server.getWorldData().enabledFeatures())));
          this.synchronizeRegistriesTask = new SynchronizeRegistriesTask(list, layeredregistryaccess);
          this.configurationTasks.add(this.synchronizeRegistriesTask);
@@ -47,7 +51,7 @@
          this.addOptionalTasks();
          this.returnToWorld();
      }
-@@ -208,7 +_,7 @@
+@@ -212,7 +_,7 @@
                  this.currentTask = configurationtask;
  
                  try {

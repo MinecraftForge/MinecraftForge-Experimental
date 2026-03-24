@@ -2,17 +2,17 @@
 +++ b/net/minecraft/world/entity/vehicle/minecart/OldMinecartBehavior.java
 @@ -60,9 +_,9 @@
              BlockState blockstate = this.level().getBlockState(blockpos);
-             boolean $$4 = BaseRailBlock.isRail(blockstate);
-             this.minecart.setOnRails($$4);
--            if ($$4) {
-+            if (this.minecart.canUseRail() && $$4) {
+             boolean onRails = BaseRailBlock.isRail(blockstate);
+             this.minecart.setOnRails(onRails);
+-            if (onRails) {
++            if (this.minecart.canUseRail() && onRails) {
                  this.moveAlongTrack(serverlevel);
 -                if (blockstate.is(Blocks.ACTIVATOR_RAIL)) {
 +                if (blockstate.getBlock() instanceof PoweredRailBlock power && power.isActivatorRail()) {
                      this.minecart
-                         .activateMinecart(
-                             serverlevel, blockpos.getX(), blockpos.getY(), blockpos.getZ(), blockstate.getValue(PoweredRailBlock.POWERED)
-@@ -115,18 +_,19 @@
+                         .activateMinecart(serverlevel, blockpos.getX(), blockpos.getY(), blockpos.getZ(), blockstate.getValue(PoweredRailBlock.POWERED));
+                 }
+@@ -113,18 +_,19 @@
          d1 = blockpos.getY();
          boolean flag = false;
          boolean flag1 = false;
@@ -35,7 +35,7 @@
          switch (railshape) {
              case ASCENDING_EAST:
                  this.setDeltaMovement(vec31.add(-d3, 0.0, 0.0));
-@@ -178,7 +_,7 @@
+@@ -176,7 +_,7 @@
              }
          }
  
@@ -44,19 +44,19 @@
              double d20 = this.getDeltaMovement().horizontalDistance();
              if (d20 < 0.03) {
                  this.setDeltaMovement(Vec3.ZERO);
-@@ -207,10 +_,7 @@
+@@ -205,10 +_,7 @@
          d0 = d21 + d4 * d12;
          d2 = d9 + d5 * d12;
          this.setPos(d0, d1, d2);
 -        double d23 = this.minecart.isVehicle() ? 0.75 : 1.0;
--        double d24 = this.minecart.getMaxSpeed(p_458640_);
+-        double d24 = this.minecart.getMaxSpeed(level);
 -        vec31 = this.getDeltaMovement();
 -        this.minecart.move(MoverType.SELF, new Vec3(Mth.clamp(d23 * vec31.x, -d24, d24), 0.0, Mth.clamp(d23 * vec31.z, -d24, d24)));
-+        this.moveMinecartOnRail(p_458640_);
++        this.moveMinecartOnRail(level);
          if (vec3i.getY() != 0
              && Mth.floor(this.minecart.getX()) - blockpos.getX() == vec3i.getX()
              && Mth.floor(this.minecart.getZ()) - blockpos.getZ() == vec3i.getZ()) {
-@@ -242,7 +_,11 @@
+@@ -240,7 +_,11 @@
              this.setDeltaMovement(d25 * (j - blockpos.getX()), vec36.y, d25 * (i - blockpos.getZ()));
          }
  
@@ -69,16 +69,16 @@
              Vec3 vec37 = this.getDeltaMovement();
              double d26 = vec37.horizontalDistance();
              if (d26 > 0.01) {
-@@ -285,7 +_,7 @@
+@@ -283,7 +_,7 @@
  
          BlockState blockstate = this.level().getBlockState(new BlockPos(i, j, k));
          if (BaseRailBlock.isRail(blockstate)) {
 -            RailShape railshape = blockstate.getValue(((BaseRailBlock)blockstate.getBlock()).getShapeProperty());
 +            RailShape railshape = ((BaseRailBlock)blockstate.getBlock()).getRailDirection(blockstate, this.level(), new BlockPos(i, j, k), this.minecart);
-             p_458616_ = j;
+             y = j;
              if (railshape.isSlope()) {
-                 p_458616_ = j + 1;
-@@ -323,7 +_,7 @@
+                 y = j + 1;
+@@ -321,7 +_,7 @@
  
          BlockState blockstate = this.level().getBlockState(new BlockPos(i, j, k));
          if (BaseRailBlock.isRail(blockstate)) {
@@ -87,7 +87,7 @@
              Pair<Vec3i, Vec3i> pair = AbstractMinecart.exits(railshape);
              Vec3i vec3i = pair.getFirst();
              Vec3i vec3i1 = pair.getSecond();
-@@ -416,5 +_,20 @@
+@@ -414,5 +_,20 @@
      @Override
      public double getSlowdownFactor() {
          return this.minecart.isVehicle() ? 0.997 : 0.96;

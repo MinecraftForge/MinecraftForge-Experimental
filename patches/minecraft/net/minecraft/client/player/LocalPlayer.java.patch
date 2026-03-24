@@ -1,27 +1,26 @@
 --- a/net/minecraft/client/player/LocalPlayer.java
 +++ b/net/minecraft/client/player/LocalPlayer.java
-@@ -310,6 +_,7 @@
-         ServerboundPlayerActionPacket.Action serverboundplayeractionpacket$action = p_108701_
+@@ -324,6 +_,7 @@
+         ServerboundPlayerActionPacket.Action serverboundplayeractionpacket$action = all
              ? ServerboundPlayerActionPacket.Action.DROP_ALL_ITEMS
              : ServerboundPlayerActionPacket.Action.DROP_ITEM;
-+        if (isUsingItem() && getUsedItemHand() == InteractionHand.MAIN_HAND && (p_108701_ || getUseItem().getCount() == 1)) stopUsingItem(); // Forge: fix MC-231097 on the clientside
-         ItemStack itemstack = this.getInventory().removeFromSelected(p_108701_);
++        if (isUsingItem() && getUsedItemHand() == InteractionHand.MAIN_HAND && (all || getUseItem().getCount() == 1)) stopUsingItem(); // Forge: fix MC-231097 on the clientside
+         ItemStack itemstack = this.getInventory().removeFromSelected(all);
          this.connection.send(new ServerboundPlayerActionPacket(serverboundplayeractionpacket$action, BlockPos.ZERO, Direction.DOWN));
          return !itemstack.isEmpty();
-@@ -521,7 +_,11 @@
+@@ -551,7 +_,10 @@
  
      @Override
-     public void playSound(SoundEvent p_108651_, float p_108652_, float p_108653_) {
--        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), p_108651_, this.getSoundSource(), p_108652_, p_108653_, false);
-+        var holder = net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(p_108651_);
-+        var event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtEntity(this.level(), this, holder, this.getSoundSource(), p_108652_, p_108653_);
+     public void playSound(final SoundEvent sound, final float volume, final float pitch) {
+-        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), sound, this.getSoundSource(), volume, pitch, false);
++        var holder = net.minecraft.core.registries.BuiltInRegistries.SOUND_EVENT.wrapAsHolder(sound);
++        var event = net.minecraftforge.event.ForgeEventFactory.onPlaySoundAtEntity(this.level(), this, holder, this.getSoundSource(), volume, pitch);
 +        if (event == null || event.getSound() == null) return;
 +        this.level().playLocalSound(this.getX(), this.getY(), this.getZ(), event.getSound().get(), event.getSource(), event.getNewVolume(), event.getNewPitch(), false);
-+
      }
  
      @Override
-@@ -761,6 +_,7 @@
+@@ -793,6 +_,7 @@
              && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING)
              && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
          this.input.tick();
@@ -29,7 +28,7 @@
          this.minecraft.getTutorial().onInput(this.input);
          boolean flag3 = false;
          if (this.autoJumpTime > 0) {
-@@ -833,8 +_,9 @@
+@@ -865,8 +_,9 @@
          }
  
          this.wasFallFlying = this.isFallFlying();
@@ -41,7 +40,7 @@
          }
  
          if (this.isEyeInFluid(FluidTags.WATER)) {
-@@ -900,7 +_,7 @@
+@@ -934,7 +_,7 @@
      }
  
      private boolean shouldStopSwimSprinting() {
@@ -50,7 +49,7 @@
      }
  
      public Portal.Transition getActivePortalLocalTransition() {
-@@ -943,6 +_,8 @@
+@@ -979,6 +_,8 @@
      @Override
      public void rideTick() {
          super.rideTick();
@@ -59,7 +58,7 @@
          this.handsBusy = false;
          if (this.getControlledVehicle() instanceof AbstractBoat abstractboat) {
              abstractboat.setInput(
-@@ -1120,7 +_,7 @@
+@@ -1154,7 +_,7 @@
              && this.isSprintingPossible(this.getAbilities().flying)
              && !this.isSlowDueToUsingItem()
              && (!this.isFallFlying() || this.isUnderWater())
@@ -67,8 +66,8 @@
 +            && (!this.isMovingSlowly() || this.isUnderWater() || this.canStartSwimming());
      }
  
-     private boolean vehicleCanSprint(Entity p_265184_) {
-@@ -1195,6 +_,17 @@
+     private boolean vehicleCanSprint(final Entity vehicle) {
+@@ -1230,6 +_,17 @@
      @Override
      public float getVisualRotationYInDegrees() {
          return this.getYRot();

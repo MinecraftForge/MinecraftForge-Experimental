@@ -4,15 +4,15 @@
          for (Entry<EquipmentSlot, ItemStack> entry : this.items.entrySet()) {
              ItemStack itemstack = entry.getValue();
              if (!itemstack.isEmpty()) {
--                itemstack.inventoryTick(p_394224_.level(), p_394224_, entry.getKey());
-+                itemstack.inventoryTick(p_394224_.level(), p_394224_, entry.getKey(), -1);
+-                itemstack.inventoryTick(owner.level(), owner, entry.getKey());
++                itemstack.inventoryTick(owner.level(), owner, entry.getKey(), -1);
              }
          }
      }
 @@ -69,5 +_,9 @@
  
      public void clear() {
-         this.items.replaceAll((p_393205_, p_394162_) -> ItemStack.EMPTY);
+         this.items.replaceAll((s, v) -> ItemStack.EMPTY);
 +    }
 +
 +    public int size() {

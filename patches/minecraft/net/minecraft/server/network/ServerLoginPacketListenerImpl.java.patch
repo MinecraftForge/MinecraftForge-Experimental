@@ -1,25 +1,25 @@
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -185,7 +_,7 @@
+@@ -186,7 +_,7 @@
              throw new IllegalStateException("Protocol error", cryptexception);
          }
  
 -        Thread thread = new Thread("User Authenticator #" + UNIQUE_THREAD_ID.incrementAndGet()) {
 +        Thread thread = new Thread(net.minecraftforge.fml.util.thread.SidedThreadGroups.SERVER, "User Authenticator #" + UNIQUE_THREAD_ID.incrementAndGet()) {
-             @Override
-             public void run() {
-                 String s1 = Objects.requireNonNull(ServerLoginPacketListenerImpl.this.requestedUsername, "Player name not initialized");
-@@ -228,6 +_,7 @@
+             {
+                 Objects.requireNonNull(ServerLoginPacketListenerImpl.this);
+             }
+@@ -236,6 +_,7 @@
  
      @Override
-     public void handleCustomQueryPacket(ServerboundCustomQueryAnswerPacket p_297965_) {
-+        if (!net.minecraftforge.common.ForgeHooks.onCustomPayload(p_297965_, this.connection))
+     public void handleCustomQueryPacket(final ServerboundCustomQueryAnswerPacket packet) {
++        if (!net.minecraftforge.common.ForgeHooks.onCustomPayload(packet, this.connection))
          this.disconnect(ServerCommonPacketListenerImpl.DISCONNECT_UNEXPECTED_QUERY);
      }
  
-@@ -252,6 +_,11 @@
+@@ -260,6 +_,11 @@
      @Override
-     public void handleCookieResponse(ServerboundCookieResponsePacket p_333672_) {
+     public void handleCookieResponse(final ServerboundCookieResponsePacket packet) {
          this.disconnect(ServerCommonPacketListenerImpl.DISCONNECT_UNEXPECTED_QUERY);
 +    }
 +
@@ -28,4 +28,4 @@
 +        return this.authenticatedProfile;
      }
  
-     static enum State {
+     private static enum State {

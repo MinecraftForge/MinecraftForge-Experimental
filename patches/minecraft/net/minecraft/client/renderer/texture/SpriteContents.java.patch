@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/texture/SpriteContents.java
 +++ b/net/minecraft/client/renderer/texture/SpriteContents.java
-@@ -168,6 +_,10 @@
+@@ -183,6 +_,14 @@
          return this.name;
      }
  
@@ -8,6 +8,10 @@
 +        return this.originalImage;
 +    }
 +
-     public IntStream getUniqueFrames() {
-         return this.animatedTexture != null ? this.animatedTexture.getUniqueFrames() : IntStream.of(1);
++    public int getMipLevel() {
++        return this.byMipLevel.length - 1;
++    }
++
+     public IntList getUniqueFrames() {
+         return this.animatedTexture != null ? this.animatedTexture.getUniqueFrames() : IntList.of(1);
      }

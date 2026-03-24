@@ -1,0 +1,171 @@
+--- a/net/minecraft/client/gui/GuiGraphicsExtractor.java
++++ b/net/minecraft/client/gui/GuiGraphicsExtractor.java
+@@ -88,7 +_,7 @@
+ import org.jspecify.annotations.Nullable;
+ 
+ @OnlyIn(Dist.CLIENT)
+-public class GuiGraphicsExtractor {
++public class GuiGraphicsExtractor implements net.minecraftforge.client.extensions.IForgeGuiGraphicsExtractor {
+     private static final int EXTRA_SPACE_AFTER_FIRST_TOOLTIP_LINE = 2;
+     private final Minecraft minecraft;
+     private final Matrix3x2fStack pose;
+@@ -867,6 +_,7 @@
+                 CrashReport crashreport = CrashReport.forThrowable(throwable, "Rendering item");
+                 CrashReportCategory crashreportcategory = crashreport.addCategory("Item being rendered");
+                 crashreportcategory.setDetail("Item Type", () -> String.valueOf(itemStack.getItem()));
++                crashreportcategory.setDetail("Registry Name", () -> String.valueOf(net.minecraftforge.registries.ForgeRegistries.ITEMS.getKey(itemStack.getItem())));
+                 crashreportcategory.setDetail("Item Components", () -> String.valueOf(itemStack.getComponents()));
+                 crashreportcategory.setDetail("Item Foil", () -> String.valueOf(itemStack.hasFoil()));
+                 throw new ReportedException(crashreport);
+@@ -893,6 +_,7 @@
+             this.itemCooldown(itemStack, x, y);
+             this.itemCount(font, itemStack, x, y, countText);
+             this.pose.popMatrix();
++            net.minecraftforge.client.ItemDecoratorHandler.of(itemStack).render(this, font, itemStack, x, y);
+         }
+     }
+ 
+@@ -1069,16 +_,25 @@
+         this.setTooltipForNextFrame(this.minecraft.font, formattedCharSequences, DefaultTooltipPositioner.INSTANCE, x, y, false);
+     }
+ 
++    private ItemStack tooltipStack = ItemStack.EMPTY;
+     public void setTooltipForNextFrame(final Font font, final ItemStack itemStack, final int xo, final int yo) {
++        this.tooltipStack = itemStack;
+         this.setTooltipForNextFrame(
+             font, Screen.getTooltipFromItem(this.minecraft, itemStack), itemStack.getTooltipImage(), xo, yo, itemStack.get(DataComponents.TOOLTIP_STYLE)
+         );
++        this.tooltipStack = ItemStack.EMPTY;
+     }
+ 
+     public void setTooltipForNextFrame(final Font font, final List<Component> texts, final Optional<TooltipComponent> optionalImage, final int xo, final int yo) {
+         this.setTooltipForNextFrame(font, texts, optionalImage, xo, yo, null);
+     }
+ 
++    public void setTooltipForNextFrame(Font font, List<Component> texts, Optional<TooltipComponent> optionalImage, ItemStack stack, int xo, int yo) {
++       this.tooltipStack = stack;
++       this.setTooltipForNextFrame(font, texts, optionalImage, xo, yo, stack.get(DataComponents.TOOLTIP_STYLE));
++       this.tooltipStack = ItemStack.EMPTY;
++    }
++
+     public void setTooltipForNextFrame(
+         final Font font,
+         final List<Component> texts,
+@@ -1087,8 +_,7 @@
+         final int yo,
+         final @Nullable Identifier style
+     ) {
+-        List<ClientTooltipComponent> list = texts.stream().map(Component::getVisualOrderText).map(ClientTooltipComponent::create).collect(Util.toMutableList());
+-        optionalImage.ifPresent(image -> list.add(list.isEmpty() ? 0 : 1, ClientTooltipComponent.create(image)));
++        List<ClientTooltipComponent> list = net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponents(this.tooltipStack, texts, optionalImage, xo, guiWidth(), guiHeight(), font);
+         this.setTooltipForNextFrameInternal(font, list, xo, yo, DefaultTooltipPositioner.INSTANCE, style, false);
+     }
+ 
+@@ -1116,7 +_,22 @@
+     }
+ 
+     public void setComponentTooltipForNextFrame(final Font font, final List<Component> lines, final int xo, final int yo) {
+-        this.setComponentTooltipForNextFrame(font, lines, xo, yo, null);
++        List<ClientTooltipComponent> components = net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponents(this.tooltipStack, lines, xo, guiWidth(), guiHeight(), font);
++        this.setTooltipForNextFrameInternal(font, components, xo, yo, DefaultTooltipPositioner.INSTANCE, null, false);
++    }
++
++    public void renderComponentTooltip(Font font, List<? extends net.minecraft.network.chat.FormattedText> lines, int xo, int yo, ItemStack stack) {
++        this.tooltipStack = stack;
++        List<ClientTooltipComponent> components = net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponents(stack, lines, xo, guiWidth(), guiHeight(), font);
++        this.setTooltipForNextFrameInternal(font, components, xo, yo, DefaultTooltipPositioner.INSTANCE, null, false);
++        this.tooltipStack = ItemStack.EMPTY;
++    }
++
++    public void renderComponentTooltipFromElements(Font font, List<com.mojang.datafixers.util.Either<FormattedText, TooltipComponent>> lines, int xo, int yo, ItemStack stack) {
++        this.tooltipStack = stack;
++        List<ClientTooltipComponent> components = net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponentsFromElements(stack, lines, xo, guiWidth(), guiHeight(), font);
++        this.setTooltipForNextFrameInternal(font, components, xo, yo, DefaultTooltipPositioner.INSTANCE, null, false);
++        this.tooltipStack = ItemStack.EMPTY;
+     }
+ 
+     public void setComponentTooltipForNextFrame(final Font font, final List<Component> lines, final int xo, final int yo, final @Nullable Identifier style) {
+@@ -1167,10 +_,16 @@
+     ) {
+         if (!lines.isEmpty()) {
+             if (this.deferredTooltip == null || replaceExisting) {
+-                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style);
++                final var stackContext = this.tooltipStack;
++                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style, stackContext);
+             }
+         }
+     }
++
++    public void tooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style) {
++        tooltip(font, lines, xo, yo, positioner, style, ItemStack.EMPTY);
++    }
++
+ 
+     public void tooltip(
+         final Font font,
+@@ -1178,13 +_,16 @@
+         final int xo,
+         final int yo,
+         final ClientTooltipPositioner positioner,
+-        final @Nullable Identifier style
++        final @Nullable Identifier style,
++        ItemStack itemstack
+     ) {
++        var preEvent = net.minecraftforge.client.ForgeHooksClient.onRenderTooltipPre(itemstack, this, xo, yo, guiWidth(), guiHeight(), lines, font, positioner, style);
++        if (preEvent == null) return;
+         int i = 0;
+         int j = lines.size() == 1 ? -2 : 0;
+ 
+         for (ClientTooltipComponent clienttooltipcomponent : lines) {
+-            int k = clienttooltipcomponent.getWidth(font);
++            int k = clienttooltipcomponent.getWidth(preEvent.getFont());
+             if (k > i) {
+                 i = k;
+             }
+@@ -1194,25 +_,25 @@
+ 
+         int l1 = i;
+         int i2 = j;
+-        Vector2ic vector2ic = positioner.positionTooltip(this.guiWidth(), this.guiHeight(), xo, yo, i, j);
++        Vector2ic vector2ic = positioner.positionTooltip(this.guiWidth(), this.guiHeight(), preEvent.getX(), preEvent.getY(), i, j);
+         int l = vector2ic.x();
+         int i1 = vector2ic.y();
+         this.pose.pushMatrix();
+-        TooltipRenderUtil.extractTooltipBackground(this, l, i1, i, j, style);
++        TooltipRenderUtil.extractTooltipBackground(this, l, i1, i, j, preEvent.getBackground());
+         int j1 = i1;
+ 
+         for (int k1 = 0; k1 < lines.size(); k1++) {
+             ClientTooltipComponent clienttooltipcomponent1 = lines.get(k1);
+-            clienttooltipcomponent1.extractText(this, font, l, j1);
+-            j1 += clienttooltipcomponent1.getHeight(font) + (k1 == 0 ? 2 : 0);
++            clienttooltipcomponent1.extractText(this, preEvent.getFont(), l, j1);
++            j1 += clienttooltipcomponent1.getHeight(preEvent.getFont()) + (k1 == 0 ? 2 : 0);
+         }
+ 
+         j1 = i1;
+ 
+         for (int j2 = 0; j2 < lines.size(); j2++) {
+             ClientTooltipComponent clienttooltipcomponent2 = lines.get(j2);
+-            clienttooltipcomponent2.extractImage(font, l, j1, l1, i2, this);
+-            j1 += clienttooltipcomponent2.getHeight(font) + (j2 == 0 ? 2 : 0);
++            clienttooltipcomponent2.extractImage(preEvent.getFont(), l, j1, l1, i2, this);
++            j1 += clienttooltipcomponent2.getHeight(preEvent.getFont()) + (j2 == 0 ? 2 : 0);
+         }
+ 
+         this.pose.popMatrix();
+@@ -1287,6 +_,14 @@
+ 
+     private ActiveTextCollector.Parameters createDefaultTextParameters(final float opacity) {
+         return new ActiveTextCollector.Parameters(new Matrix3x2f(this.pose), opacity, this.scissorStack.peek());
++    }
++
++    public GuiRenderState getRenderState() {
++        return this.guiRenderState;
++    }
++
++    public GuiGraphicsExtractor.ScissorStack getScissorStack() {
++        return this.scissorStack;
+     }
+ 
+     @OnlyIn(Dist.CLIENT)

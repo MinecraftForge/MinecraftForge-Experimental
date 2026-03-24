@@ -7,12 +7,12 @@ package net.minecraftforge.debug.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenPosition;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.gui.render.state.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraftforge.client.event.RegisterPictureInPictureRendererEvent;
 
@@ -70,7 +70,7 @@ public class PictureInPictureTest extends BaseTestMod {
             return;
         RENDER_FRAMES--;
         var window = Minecraft.getInstance().getWindow();
-        event.getGuiGraphics().getRenderState().submitPicturesInPictureState(new TestPipRendererState(
+        event.getGuiGraphics().getRenderState().addPicturesInPictureState(new TestPipRendererState(
                 event.getGuiGraphics(),
                 10,
                 10,
@@ -115,8 +115,8 @@ public class PictureInPictureTest extends BaseTestMod {
         }
     }
 
-    record TestPipRendererState(GuiGraphics graphics, int x0, int y0, int x1, int y1, ScreenRectangle scissorArea, ScreenRectangle bounds) implements PictureInPictureRenderState {
-        public TestPipRendererState(GuiGraphics graphics, int x0, int y0, int x1, int y1, ScreenRectangle scissorArea) {
+    record TestPipRendererState(GuiGraphicsExtractor graphics, int x0, int y0, int x1, int y1, ScreenRectangle scissorArea, ScreenRectangle bounds) implements PictureInPictureRenderState {
+        public TestPipRendererState(GuiGraphicsExtractor graphics, int x0, int y0, int x1, int y1, ScreenRectangle scissorArea) {
             this(graphics, x0, y0, x1, y1, scissorArea, PictureInPictureRenderState.getBounds(x0, y0, x1, y1, scissorArea));
         }
 

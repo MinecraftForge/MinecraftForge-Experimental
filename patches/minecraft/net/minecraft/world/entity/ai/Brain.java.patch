@@ -1,17 +1,17 @@
 --- a/net/minecraft/world/entity/ai/Brain.java
 +++ b/net/minecraft/world/entity/ai/Brain.java
-@@ -232,6 +_,10 @@
-         this.schedule = p_455227_;
+@@ -259,6 +_,10 @@
+         this.schedule = schedule;
      }
  
 +    public EnvironmentAttribute<Activity> getSchedule() {
 +        return this.schedule;
 +    }
 +
-     public void setCoreActivities(Set<Activity> p_21931_) {
-         this.coreActivities = p_21931_;
+     public void setCoreActivities(final Set<Activity> activities) {
+         this.coreActivities = activities;
      }
-@@ -493,6 +_,30 @@
+@@ -460,6 +_,31 @@
  
      public boolean isBrainDead() {
          return this.memories.isEmpty() && this.sensors.isEmpty() && this.availableBehaviorsByPriority.isEmpty();
@@ -32,6 +32,7 @@
 +    }
 +
 +    public void copyFromBuilder(net.minecraftforge.common.util.BrainBuilder<E> builder) {
++        builder.getMemoryTypes().forEach(this::registerMemory);
 +        builder.addAvailableBehaviorsByPriorityTo(this.availableBehaviorsByPriority);
 +        this.setSchedule(builder.getSchedule());
 +        builder.addActivityRequirementsTo(this.activityRequirements);
@@ -41,4 +42,4 @@
 +        this.activeActivities.addAll(builder.getActiveActivites());
      }
  
-     static final class MemoryValue<U> {
+     @FunctionalInterface

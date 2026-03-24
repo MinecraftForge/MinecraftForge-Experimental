@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/clock/ServerClockManager.java
++++ b/net/minecraft/world/clock/ServerClockManager.java
+@@ -97,6 +_,12 @@
+         return mutableboolean.booleanValue();
+     }
+ 
++    public long getTimeMarker(final Holder<WorldClock> clock, final ResourceKey<ClockTimeMarker> timeMarkerId) {
++        var instance = this.getInstance(clock);
++        var marker = instance.timeMarkers.get(timeMarkerId);
++        return marker == null ? -1 : marker.resolveTimeToMoveTo(instance.totalTicks);
++    }
++
+     public void addTicks(final Holder<WorldClock> clock, final int ticks) {
+         this.modifyClock(clock, instance -> instance.totalTicks = Math.max(instance.totalTicks + ticks, 0L));
+     }

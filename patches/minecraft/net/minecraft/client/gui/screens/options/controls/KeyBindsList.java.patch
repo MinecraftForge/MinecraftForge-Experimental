@@ -1,27 +1,27 @@
 --- a/net/minecraft/client/gui/screens/options/controls/KeyBindsList.java
 +++ b/net/minecraft/client/gui/screens/options/controls/KeyBindsList.java
-@@ -116,9 +_,10 @@
-             this.name = p_343976_;
-             this.changeButton = Button.builder(p_343976_, p_342196_ -> {
-                     KeyBindsList.this.keyBindsScreen.selectedKey = p_343088_;
-+                    p_343088_.setKeyModifierAndCode(null, com.mojang.blaze3d.platform.InputConstants.UNKNOWN);
+@@ -123,9 +_,10 @@
+             this.name = name;
+             this.changeButton = Button.builder(name, button -> {
+                     KeyBindsList.this.keyBindsScreen.selectedKey = key;
++                    key.setKeyModifierAndCode(null, com.mojang.blaze3d.platform.InputConstants.UNKNOWN);
                      KeyBindsList.this.resetMappingAndUpdateButtons();
                  })
 -                .bounds(0, 0, 75, 20)
 +                .bounds(0, 0, 75 + 20 /* Forge: Add space */, 20)
                  .createNarration(
-                     p_342179_ -> p_343088_.isUnbound()
-                         ? Component.translatable("narrator.controls.unbound", p_343976_)
-@@ -126,7 +_,7 @@
+                     defaultNarrationSupplier -> key.isUnbound()
+                         ? Component.translatable("narrator.controls.unbound", name)
+@@ -133,7 +_,7 @@
                  )
                  .build();
-             this.resetButton = Button.builder(RESET_BUTTON_TITLE, p_357685_ -> {
--                p_343088_.setKey(p_343088_.getDefaultKey());
+             this.resetButton = Button.builder(RESET_BUTTON_TITLE, button -> {
+-                key.setKey(key.getDefaultKey());
 +                this.key.setToDefault();
                  KeyBindsList.this.resetMappingAndUpdateButtons();
-             }).bounds(0, 0, 50, 20).createNarration(p_344192_ -> Component.translatable("narrator.controls.reset", p_343976_)).build();
+             }).bounds(0, 0, 50, 20).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", name)).build();
              this.refreshEntry();
-@@ -167,7 +_,8 @@
+@@ -174,7 +_,8 @@
              MutableComponent mutablecomponent = Component.empty();
              if (!this.key.isUnbound()) {
                  for (KeyMapping keymapping : KeyBindsList.this.minecraft.options.keyMappings) {

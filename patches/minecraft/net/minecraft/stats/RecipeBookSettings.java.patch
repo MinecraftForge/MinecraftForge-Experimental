@@ -8,8 +8,8 @@
  public final class RecipeBookSettings {
      public static final StreamCodec<FriendlyByteBuf, RecipeBookSettings> STREAM_CODEC = StreamCodec.composite(
          RecipeBookSettings.TypeSettings.STREAM_CODEC,
-@@ -148,5 +_,13 @@
-                     .apply(p_407394_, RecipeBookSettings.TypeSettings::new)
+@@ -150,5 +_,13 @@
+                     .apply(i, RecipeBookSettings.TypeSettings::new)
              );
          }
 +    }

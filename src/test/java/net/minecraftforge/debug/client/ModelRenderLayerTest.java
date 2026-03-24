@@ -4,6 +4,8 @@
  */
 
 package net.minecraftforge.debug.client;
+/*
+ This should no longer be necessary in 26.1 as Material's now define their layers.
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.data.models.BlockModelGenerators;
@@ -11,7 +13,6 @@ import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
 import net.minecraft.client.data.models.model.TextureMapping;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
@@ -209,3 +210,4 @@ public class ModelRenderLayerTest extends BaseTestMod {
         }
     }
 }
+*/

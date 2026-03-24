@@ -8,7 +8,7 @@
 +        return background;
      }
  
-     public ItemStack remove(int p_40227_) {
+     public ItemStack remove(final int amount) {
 @@ -160,5 +_,36 @@
  
      public boolean isFake() {

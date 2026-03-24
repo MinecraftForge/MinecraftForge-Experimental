@@ -5,15 +5,19 @@
 
 package net.minecraftforge.debug.creativetabs;
 
+import java.util.ArrayList;
 import java.util.List;
+
+import org.jspecify.annotations.Nullable;
+
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.DyeItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -74,10 +78,7 @@ public class CreativeModeTabTest {
 
             helper.register(COLORS, CreativeModeTab.builder()
                 .title(Component.literal("Colors"))
-                .displayItems((params, output) -> {
-                    for (DyeColor color : DyeColor.values())
-                        output.accept(DyeItem.byColor(color));
-                })
+                .displayItems((params, output) -> output.acceptAll(getDyes()))
                 .withTabFactory(CreativeModeColorTab::new)
                 .withTabsBefore(STONE)
                 .build()
@@ -86,10 +87,7 @@ public class CreativeModeTabTest {
             helper.register(SEARCH, CreativeModeTab.builder()
                 .title(Component.literal("Search"))
                 .icon(() -> new ItemStack(Items.BOOKSHELF))
-                .displayItems((params, output) -> {
-                    for (DyeColor color : DyeColor.values())
-                        output.accept(DyeItem.byColor(color));
-                })
+                .displayItems((params, output) -> output.acceptAll(getDyes()))
                 .withTabsBefore(COLORS)
                 .withSearchBar()
                 .build()
@@ -138,22 +136,30 @@ public class CreativeModeTabTest {
         }
     }
 
+    private static final List<ItemStack> getDyes() {
+        var ret = new ArrayList<ItemStack>();
+        for (var itr = BuiltInRegistries.ITEM.listElements().iterator(); itr.hasNext(); ) {
+            var item = itr.next();
+            var color = item.components().get(DataComponents.DYE);
+            if (color != null)
+                ret.add(new ItemStack(item));
+        }
+        return ret;
+    }
+
     private static class CreativeModeColorTab extends CreativeModeTab {
-        private final ItemStack[] iconItems;
+        private @Nullable List<ItemStack> iconItems;
 
         public CreativeModeColorTab(CreativeModeTab.Builder builder) {
             super(builder);
-
-            DyeColor[] colors = DyeColor.values();
-            iconItems = new ItemStack[colors.length];
-            for (int i = 0; i < colors.length; i++)
-                iconItems[i] = new ItemStack(DyeItem.byColor(colors[i]));
         }
 
         @Override
         public ItemStack getIconItem() {
-            int idx = (int)(System.currentTimeMillis() / 1200) % iconItems.length;
-            return iconItems[idx];
+            if (iconItems == null)
+                iconItems = getDyes();
+            int idx = (int)(System.currentTimeMillis() / 1200) % iconItems.size();
+            return iconItems.get(idx);
         }
     }
 }

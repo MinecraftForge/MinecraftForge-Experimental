@@ -144,14 +144,14 @@ public class PreventItemDamageTest extends BaseTestMod {
                 .setId(ITEMS.key("fake_shield"))
                 .durability(10)
                 .equippableUnswappable(EquipmentSlot.OFFHAND)
-                .component(
+                .delayedComponent(
                     DataComponents.BLOCKS_ATTACKS,
-                    new BlocksAttacks(
+                    context -> new BlocksAttacks(
                         0F,
                         0F,
                         List.of(new BlocksAttacks.DamageReduction(360.0F, Optional.empty(), 0.0F, 1.0F)),
                         new BlocksAttacks.ItemDamageFunction(3.0F, 1.0F, 1.0F),
-                        Optional.of(DamageTypeTags.BYPASSES_SHIELD),
+                        Optional.of(context.getOrThrow(DamageTypeTags.BYPASSES_SHIELD)),
                         Optional.of(SoundEvents.SHIELD_BLOCK),
                         Optional.of(SoundEvents.SHIELD_BREAK)
                     )

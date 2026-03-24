@@ -3,9 +3,9 @@
 @@ -25,7 +_,11 @@
      }
  
-     public boolean isFuel(ItemStack p_369912_) {
--        return this.values.containsKey(p_369912_.getItem());
-+        return isFuel(p_369912_, null);
+     public boolean isFuel(final ItemStack itemStack) {
+-        return this.values.containsKey(itemStack.getItem());
++        return isFuel(itemStack, null);
 +    }
 +
 +    public boolean isFuel(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.item.crafting.RecipeType<?> type) {
@@ -16,18 +16,18 @@
 @@ -33,7 +_,16 @@
      }
  
-     public int burnDuration(ItemStack p_368393_) {
--        return p_368393_.isEmpty() ? 0 : this.values.getInt(p_368393_.getItem());
-+        return burnDuration(p_368393_, null);
+     public int burnDuration(final ItemStack itemStack) {
+-        return itemStack.isEmpty() ? 0 : this.values.getInt(itemStack.getItem());
++        return burnDuration(itemStack, null);
 +    }
 +
-+    public int burnDuration(ItemStack stack, @org.jetbrains.annotations.Nullable net.minecraft.world.item.crafting.RecipeType<?> type) {
-+        if (stack.isEmpty())
++    public int burnDuration(final ItemStack itemStack, final @org.jetbrains.annotations.Nullable net.minecraft.world.item.crafting.RecipeType<?> type) {
++        if (itemStack.isEmpty())
 +            return 0;
-+        int ret = stack.getBurnTime(type);
++        int ret = itemStack.getBurnTime(type);
 +        if (ret == -1)
-+            ret = this.values.getInt(stack.getItem());
-+        return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(stack, ret, type);
++            ret = this.values.getInt(itemStack.getItem());
++        return net.minecraftforge.event.ForgeEventFactory.getItemBurnTime(itemStack, ret, type);
      }
  
-     public static FuelValues vanillaBurnTimes(HolderLookup.Provider p_363816_, FeatureFlagSet p_367705_) {
+     public static FuelValues vanillaBurnTimes(final HolderLookup.Provider registries, final FeatureFlagSet enabledFeatures) {

@@ -1,24 +1,23 @@
 --- a/net/minecraft/client/renderer/fog/FogRenderer.java
 +++ b/net/minecraft/client/renderer/fog/FogRenderer.java
-@@ -151,6 +_,13 @@
+@@ -153,6 +_,12 @@
                  f2 = Mth.lerp(f6, f2, f2 * f7);
              }
  
-+
-+            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(p_407993_, p_409359_, p_409862_, p_409400_, p_406105_, f5, f1, f2);
++            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(camera, partialTicks, level, renderDistance, darkenWorldAmount, f5, f1, f2);
 +
 +            f5 = fogColor.x();
 +            f1 = fogColor.y();
 +            f2 = fogColor.z();
 +
-             return new Vector4f(f5, f1, f2, 1.0F);
+             dest.set(f5, f1, f2, 1.0F);
          }
      }
-@@ -177,6 +_,7 @@
+@@ -181,6 +_,7 @@
          float f2 = Mth.clamp(f1 / 10.0F, 4.0F, 64.0F);
          fogdata.renderDistanceStart = f1 - f2;
          fogdata.renderDistanceEnd = f1;
-+        vector4f = net.minecraftforge.client.ForgeHooksClient.setupFog(fogtype, p_407701_, p_406871_, fogdata, vector4f);
++        fogdata.color = net.minecraftforge.client.ForgeHooksClient.setupFog(fogtype, camera, deltaTracker, fogdata, fogdata.color);
+         return fogdata;
+     }
  
-         try (GpuBuffer.MappedView gpubuffer$mappedview = RenderSystem.getDevice().createCommandEncoder().mapBuffer(this.regularBuffer.currentBuffer(), false, true)) {
-             this.updateBuffer(

@@ -7,7 +7,7 @@ package net.minecraftforge.client.model.geometry;
 
 import com.mojang.math.Transformation;
 import it.unimi.dsi.fastutil.objects.Object2BooleanMap;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
+import net.minecraft.client.resources.model.cuboid.ItemTransforms;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.Nullable;
 
@@ -115,7 +115,7 @@ public class StandaloneGeometryBakingContext implements IGeometryBakingContext {
         private boolean useBlockLight = true;
         private boolean useAmbientOcclusion = true;
         private ItemTransforms transforms = ItemTransforms.NO_TRANSFORMS;
-        private Transformation rootTransform = Transformation.identity();
+        private Transformation rootTransform = Transformation.IDENTITY;
         @Nullable
         private Identifier renderTypeHint;
         @Nullable

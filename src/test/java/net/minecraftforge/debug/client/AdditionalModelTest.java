@@ -16,11 +16,11 @@ import net.minecraft.client.model.animal.cow.CowModel;
 import net.minecraft.client.model.animal.pig.PigModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
+import net.minecraft.client.renderer.block.model.BlockStateModelWrapper;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.entity.state.PigRenderState;
-import net.minecraft.client.renderer.item.BlockModelWrapper;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.CachedOutput;
@@ -100,8 +100,8 @@ public class AdditionalModelTest extends BaseTestMod {
         if (model == null)
             helper.fail("Failed to retreive " + key + " item model");
 
-        if (!(model instanceof BlockModelWrapper))
-            helper.fail("Itme Model was " + model.getClass()  + " when BlockModelWrapper expected");
+        if (model == manager.getMissingModel())
+            helper.fail("Itme Model was the missing model");
 
         helper.succeed();
     }
@@ -110,8 +110,8 @@ public class AdditionalModelTest extends BaseTestMod {
     public static void block_model(GameTestHelper helper) {
         var manager = Minecraft.getInstance().getModelManager();
 
-        var model = manager.getBlockModelShaper().getBlockModel(COW_HEAD_STATE.any());
-        helper.assertValueNotEqual(manager.getMissingBlockStateModel(), model, MODID, "Failed to retreive block model");
+        var model = manager.getBlockStateModelSet().get(COW_HEAD_STATE.any());
+        helper.assertValueNotEqual(manager.getBlockStateModelSet().missingModel(), model, MODID, "Failed to retreive block model");
 
         helper.succeed();
     }

@@ -1,110 +1,110 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -104,7 +_,7 @@
+@@ -102,7 +_,7 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
--public final class ItemStack implements DataComponentHolder {
-+public final class ItemStack extends net.minecraftforge.common.capabilities.CapabilityProvider.ItemStacks implements DataComponentHolder, net.minecraftforge.common.extensions.IForgeItemStack {
+-public final class ItemStack implements DataComponentHolder, ItemInstance {
++public final class ItemStack extends net.minecraftforge.common.capabilities.CapabilityProvider.ItemStacks implements DataComponentHolder, ItemInstance, net.minecraftforge.common.extensions.IForgeItemStack {
      private static final List<Component> OP_NBT_WARNING = List.of(
          Component.translatable("item.op_warning.line1").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
          Component.translatable("item.op_warning.line2").withStyle(ChatFormatting.RED),
-@@ -273,12 +_,15 @@
+@@ -260,12 +_,15 @@
      }
  
-     private ItemStack(ItemLike p_331826_, int p_332766_, PatchedDataComponentMap p_333722_) {
+     private ItemStack(final Holder<Item> item, final int count, final PatchedDataComponentMap components) {
 +        super(true);
-         this.item = p_331826_.asItem();
-         this.count = p_332766_;
-         this.components = p_333722_;
-+        gatherCapabilities(() -> this.item.getCapabilityProvider(this));
+         this.item = item;
+         this.count = count;
+         this.components = components;
++        gatherCapabilities(() -> this.item.get().getCapabilityProvider(this));
      }
  
-     private ItemStack(@Nullable Void p_282703_) {
+     private ItemStack(final @Nullable Void nullMarker) {
 +        super(false);
          this.item = null;
          this.components = new PatchedDataComponentMap(DataComponentMap.EMPTY);
      }
-@@ -359,13 +_,22 @@
+@@ -358,13 +_,22 @@
      }
  
-     public InteractionResult useOn(UseOnContext p_41662_) {
-+        if (!p_41662_.getLevel().isClientSide()) return net.minecraftforge.common.ForgeHooks.onPlaceItemIntoWorld(p_41662_);
-+        return onItemUse(p_41662_, (c) -> getItem().useOn(p_41662_));
+     public InteractionResult useOn(final UseOnContext context) {
++        if (!context.getLevel().isClientSide()) return net.minecraftforge.common.ForgeHooks.onPlaceItemIntoWorld(context);
++        return onItemUse(context, (c) -> getItem().useOn(context));
 +    }
 +
-+    public InteractionResult onItemUseFirst(UseOnContext p_41662_) {
-+        return onItemUse(p_41662_, (c) -> getItem().onItemUseFirst(this, p_41662_));
++    public InteractionResult onItemUseFirst(UseOnContext context) {
++        return onItemUse(context, (c) -> getItem().onItemUseFirst(this, context));
 +    }
 +
-+    private InteractionResult onItemUse(UseOnContext p_41662_, java.util.function.Function<UseOnContext, InteractionResult> callback) {
-         Player player = p_41662_.getPlayer();
-         BlockPos blockpos = p_41662_.getClickedPos();
-         if (player != null && !player.getAbilities().mayBuild && !this.canPlaceOnBlockInAdventureMode(new BlockInWorld(p_41662_.getLevel(), blockpos, false))) {
++    private InteractionResult onItemUse(UseOnContext context, java.util.function.Function<UseOnContext, InteractionResult> callback) {
+         Player player = context.getPlayer();
+         BlockPos blockpos = context.getClickedPos();
+         if (player != null && !player.getAbilities().mayBuild && !this.canPlaceOnBlockInAdventureMode(new BlockInWorld(context.getLevel(), blockpos, false))) {
              return InteractionResult.PASS;
          } else {
              Item item = this.getItem();
--            InteractionResult interactionresult = item.useOn(p_41662_);
-+            InteractionResult interactionresult = callback.apply(p_41662_);
-             if (player != null && interactionresult instanceof InteractionResult.Success interactionresult$success && interactionresult$success.wasItemInteraction()) {
-                 player.awardStat(Stats.ITEM_USED.get(item));
-             }
-@@ -450,18 +_,26 @@
+-            InteractionResult interactionresult = item.useOn(context);
++            InteractionResult interactionresult = callback.apply(context);
+             if (player != null
+                 && interactionresult instanceof InteractionResult.Success interactionresult$success
+                 && interactionresult$success.wasItemInteraction()) {
+@@ -447,18 +_,26 @@
      }
  
-     public void hurtAndBreak(int p_220158_, ServerLevel p_342197_, @Nullable ServerPlayer p_220160_, Consumer<Item> p_343361_) {
--        int i = this.processDurabilityChange(p_220158_, p_342197_, p_220160_);
+     public void hurtAndBreak(final int amount, final ServerLevel level, final @Nullable ServerPlayer player, final Consumer<Item> onBreak) {
+-        int i = this.processDurabilityChange(amount, level, player);
 +        // FORGE: use context-sensitive sister of processDurabilityChange that calls IForgeItem.damageItem
-+        int i = this.processDurabilityChange(p_220158_, p_342197_, p_220160_, true, p_343361_);
++        int i = this.processDurabilityChange(amount, level, player, true, onBreak);
          if (i != 0) {
-             this.applyDamage(this.getDamageValue() + i, p_220160_, p_343361_);
+             this.applyDamage(this.getDamageValue() + i, player, onBreak);
          }
      }
  
-     private int processDurabilityChange(int p_362423_, ServerLevel p_364910_, @Nullable ServerPlayer p_365570_) {
-+        return this.processDurabilityChange(p_362423_, p_364910_, p_365570_, false, p_359411_ -> { });
+     private int processDurabilityChange(final int amount, final ServerLevel level, final @Nullable ServerPlayer player) {
++        return this.processDurabilityChange(amount, level, player, false, item -> { });
 +    }
 +
 +    /** FORGE: context-sensitive sister of processDurabilityChange that calls IForgeItem.damageItem */
-+    private int processDurabilityChange(int p_362423_, ServerLevel p_364910_, @Nullable ServerPlayer p_365570_, boolean canBreak, Consumer<Item> onBreak) {
++    private int processDurabilityChange(int amount, final ServerLevel level, final @Nullable ServerPlayer player, final boolean canBreak, final Consumer<Item> onBreak) {
          if (!this.isDamageableItem()) {
              return 0;
-         } else if (p_365570_ != null && p_365570_.hasInfiniteMaterials()) {
+         } else if (player != null && player.hasInfiniteMaterials()) {
              return 0;
          } else {
 +            // FORGE: modify the base damage based on the item's impl of IForgeItem.damageItem
-+            p_362423_ = this.damageItem(p_362423_, p_364910_, p_365570_, canBreak, onBreak);
-             return p_362423_ > 0 ? EnchantmentHelper.processDurabilityChange(p_364910_, this, p_362423_) : p_362423_;
++            amount = this.damageItem(amount, level, player, canBreak, onBreak);
+             return amount > 0 ? EnchantmentHelper.processDurabilityChange(level, this, amount) : amount;
          }
      }
-@@ -501,7 +_,13 @@
-                 p_41623_,
+@@ -498,7 +_,13 @@
+                 amount,
                  serverlevel,
-                 p_41624_ instanceof ServerPlayer serverplayer ? serverplayer : null,
--                p_341563_ -> p_41624_.onEquippedItemBroken(p_341563_, p_335324_)
-+                p_341563_ -> {
-+                    if (p_41624_ instanceof Player player) {
-+                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, this, p_335324_);
+                 owner instanceof ServerPlayer serverplayer ? serverplayer : null,
+-                brokenItem -> owner.onEquippedItemBroken(brokenItem, slot)
++                brokenItem -> {
++                    if (owner instanceof Player player) {
++                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, this, slot);
 +                        if (player.getUseItem() == this) player.stopUsingItem(); // Forge: fix MC-168573
 +                    }
-+                    p_41624_.onEquippedItemBroken(p_341563_, p_335324_);
++                    owner.onEquippedItemBroken(brokenItem, slot);
 +                }
              );
          }
      }
-@@ -854,6 +_,7 @@
+@@ -857,6 +_,7 @@
              List<Component> list = Lists.newArrayList();
              list.add(this.getStyledHoverName());
-             this.addDetailsToTooltip(p_331329_, tooltipdisplay, p_41652_, p_41653_, list::add);
-+            net.minecraftforge.event.ForgeEventFactory.onItemTooltip(this, p_41652_, list, p_41653_);
+             this.addDetailsToTooltip(context, tooltipdisplay, player, tooltipFlag, list::add);
++            net.minecraftforge.event.ForgeEventFactory.onItemTooltip(this, player, list, tooltipFlag);
              return list;
          }
      }
-@@ -1110,6 +_,7 @@
+@@ -1105,6 +_,7 @@
          }
      }
  
 +    /** @deprecated Forge: Use {@linkplain net.minecraftforge.common.extensions.IForgeItemStack#onDestroyed(ItemEntity, net.minecraft.world.damagesource.DamageSource) damage source sensitive version} */
-     public void onDestroyed(ItemEntity p_150925_) {
-         this.getItem().onDestroyed(p_150925_);
+     public void onDestroyed(final ItemEntity itemEntity) {
+         this.getItem().onDestroyed(itemEntity);
      }

@@ -26,7 +26,6 @@ import com.mojang.serialization.RecordBuilder;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderLookup.Provider;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -40,7 +39,6 @@ import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
-import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -180,7 +178,9 @@ public class ConditionalRecipe {
 
     private static class Wrapper implements Recipe<CraftingInput> {
         @Override public boolean matches(CraftingInput inv, Level level) { return false; }
-        @Override public ItemStack assemble(CraftingInput inv, HolderLookup.Provider reg) { return null; }
+        @Override public ItemStack assemble(CraftingInput inv) { return null; }
+        @Override public boolean showNotification() { return false; }
+        @Override public String group() { return "ungrouped wrapper"; }
 
         @SuppressWarnings({ "unchecked", "rawtypes" })
         @Override
@@ -284,17 +284,12 @@ public class ConditionalRecipe {
         }
     });
 
-    public static final RecipeSerializer<Recipe<?>> SERIALZIER = new RecipeSerializer<Recipe<?>>() {
-        @Override
-        public MapCodec<Recipe<?>> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, Recipe<?>> streamCodec() {
-            throw new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network");
-        }
-    };
+    public static final RecipeSerializer<Recipe<?>> SERIALZIER = new RecipeSerializer<Recipe<?>>(CODEC,
+        StreamCodec.of(
+            (o, v) -> new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"),
+            i -> { throw new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"); }
+        )
+    );
 
     private static final class Holder<T> {
         private T value;

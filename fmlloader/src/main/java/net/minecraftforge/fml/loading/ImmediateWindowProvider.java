@@ -8,8 +8,6 @@ package net.minecraftforge.fml.loading;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
-import java.util.function.IntSupplier;
-import java.util.function.LongSupplier;
 import java.util.function.Supplier;
 
 /**
@@ -66,7 +64,7 @@ public interface ImmediateWindowProvider {
      * @param monitor This is the monitor it should appear on.
      * @return The window id
      */
-    long setupMinecraftWindow(final IntSupplier width, final IntSupplier height, final Supplier<String> title, final LongSupplier monitor);
+    long setupMinecraftWindow(final int width, final int height, final String title, final long monitor, final Supplier<Object> backend);
 
     /**
      * This is called after window handoff to allow us to tell Mojang about our window's position. This might give a

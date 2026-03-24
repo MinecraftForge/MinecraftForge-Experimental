@@ -3,16 +3,16 @@
 @@ -17,12 +_,14 @@
  
      @Override
-     public VertexConsumer addVertex(float p_342932_, float p_342886_, float p_342696_) {
--        return this.delegate.addVertex(p_342932_, p_342886_, p_342696_);
-+        this.delegate.addVertex(p_342932_, p_342886_, p_342696_);
+     public VertexConsumer addVertex(final float x, final float y, final float z) {
+-        return this.delegate.addVertex(x, y, z);
++        this.delegate.addVertex(x, y, z);
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  
      @Override
-     public VertexConsumer setColor(int p_344589_, int p_342555_, int p_344320_, int p_345258_) {
--        return this.delegate.setColor(p_344589_, p_342555_, p_344320_, p_345258_);
-+        this.delegate.setColor(p_344589_, p_342555_, p_344320_, p_345258_);
+     public VertexConsumer setColor(final int r, final int g, final int b, final int a) {
+-        return this.delegate.setColor(r, g, b, a);
++        this.delegate.setColor(r, g, b, a);
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  
@@ -20,30 +20,30 @@
 @@ -32,22 +_,26 @@
  
      @Override
-     public VertexConsumer setUv(float p_343856_, float p_344420_) {
--        return this.delegate.setUv(this.sprite.getU(p_343856_), this.sprite.getV(p_344420_));
-+        this.delegate.setUv(this.sprite.getU(p_343856_), this.sprite.getV(p_344420_));
+     public VertexConsumer setUv(final float u, final float v) {
+-        return this.delegate.setUv(this.sprite.getU(u), this.sprite.getV(v));
++        this.delegate.setUv(this.sprite.getU(u), this.sprite.getV(v));
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  
      @Override
-     public VertexConsumer setUv1(int p_343784_, int p_344827_) {
--        return this.delegate.setUv1(p_343784_, p_344827_);
-+        this.delegate.setUv1(p_343784_, p_344827_);
+     public VertexConsumer setUv1(final int u, final int v) {
+-        return this.delegate.setUv1(u, v);
++        this.delegate.setUv1(u, v);
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  
      @Override
-     public VertexConsumer setUv2(int p_345257_, int p_344124_) {
--        return this.delegate.setUv2(p_345257_, p_344124_);
-+        this.delegate.setUv2(p_345257_, p_344124_);
+     public VertexConsumer setUv2(final int u, final int v) {
+-        return this.delegate.setUv2(u, v);
++        this.delegate.setUv2(u, v);
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  
      @Override
-     public VertexConsumer setNormal(float p_342779_, float p_342534_, float p_344783_) {
--        return this.delegate.setNormal(p_342779_, p_342534_, p_344783_);
-+        this.delegate.setNormal(p_342779_, p_342534_, p_344783_);
+     public VertexConsumer setNormal(final float x, final float y, final float z) {
+-        return this.delegate.setNormal(x, y, z);
++        this.delegate.setNormal(x, y, z);
 +        return this; // Forge: Fix MC-263524 not working with chained methods
      }
  

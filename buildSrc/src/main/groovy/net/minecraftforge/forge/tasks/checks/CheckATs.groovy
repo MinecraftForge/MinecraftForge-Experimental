@@ -17,17 +17,15 @@ abstract class CheckATs extends CheckTask {
 
     @InputFile abstract RegularFileProperty getInheritance()
     @InputFiles abstract ConfigurableFileCollection getAts()
-    @InputFile @Optional abstract RegularFileProperty getMappings()
 
     @Override
     void check(Reporter reporter, boolean fix) {
-        final IMappingFile mappings = mappings.map { RegularFile it -> IMappingFile.load(it.asFile) }.getOrNull()
         final inheritance = InheritanceData.parse(this.inheritance.get().asFile)
 
         ats.each {
             final lines = process(it, reporter, inheritance)
             if (fix) {
-                it.text = joinBack(lines, inheritance, mappings).join('\n')
+                it.text = joinBack(lines, inheritance).join('\n')
             }
         }
     }
@@ -170,45 +168,18 @@ abstract class CheckATs extends CheckTask {
         return lines
     }
 
-    private static List<String> joinBack(TreeMap<String, ATParser.Entry> lines, Map<String, InheritanceData> inheritance, IMappingFile mappings) {
+    private static List<String> joinBack(TreeMap<String, ATParser.Entry> lines, Map<String, InheritanceData> inheritance) {
         final data = [] as List<String>
-        final remapComment = { ATParser.Entry entry ->
-            if (!mappings || !entry || !entry.desc) return null
-            final comment = entry.comment?.substring(1)?.trim()
-            final jsonCls = inheritance.get(entry.cls.replaceAll('\\.', '/'))
-            final mappingsClass = mappings?.getClass(jsonCls.name)
-            if (mappingsClass === null) return entry.comment
-            final idx = entry.desc.indexOf('(')
-
-            String mappedName = idx == -1
-                    ? mappingsClass.remapField(entry.desc)
-                    : mappingsClass.remapMethod(entry.desc.substring(0, idx), entry.desc.substring(idx))
-            if (!mappedName) return entry.comment
-            if (mappedName == '<init>')
-                mappedName = 'constructor'
-
-            if (comment?.startsWith(mappedName))
-                return '# ' + comment
-            if (comment && comment.indexOf(' ') !== -1) {
-                def split = comment.split(' - ').toList()
-                if (split[0].indexOf(' ') !== -1)
-                // The first string is more than one word, so append before it
-                    return "# ${mappedName} - ${comment}"
-                split.remove(0)
-                return "# ${mappedName} - ${String.join(' - ', split)}"
-            }
-            return '# ' + mappedName
-        }
         lines.each { key, value ->
             if (!value.group) {
-                def comment = remapComment.call(value)
+                def comment = null //value.comment
                 data.add(value.modifier + ' ' + key + (comment ? ' ' + comment : ''))
             } else {
                 data.add(('#group ' + value.modifier + ' ' + key + ' ' + (value.comment ?: '')).trim())
                 value.children.each {
                     final line = value.modifier + ' ' + it
                     final entry = ATParser.parseEntry(line)
-                    final comment = remapComment(entry)
+                    final comment = null //entry.comment
                     data.add(line + (comment ? ' ' + comment : ''))
                 }
                 data.add('#endgroup')

@@ -1,7 +1,6 @@
 {
   "values": [
-    "minecraft:swamp",
-    "minecraft:mangrove_swamp",
+    "minecraft:mushroom_fields",
     "minecraft:jungle",
     "minecraft:bamboo_jungle",
     "minecraft:sparse_jungle",
@@ -13,10 +12,6 @@
     "minecraft:savanna_plateau",
     "minecraft:windswept_savanna",
     "minecraft:stony_peaks",
-    "minecraft:warm_ocean",
-    {
-      "id": "#forge:is_hot/overworld",
-      "required": false
-    }
+    "minecraft:warm_ocean"
   ]
 }

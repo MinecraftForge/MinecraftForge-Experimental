@@ -80,7 +80,7 @@ public sealed interface BlockEvent
 
                 int fortuneLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.FORTUNE), player.getMainHandItem());
                 int silkTouchLevel = EnchantmentHelper.getItemEnchantmentLevel(lookup.getOrThrow(Enchantments.SILK_TOUCH), player.getMainHandItem());
-                this.exp = state.getExpDrop(level, level.random, pos, fortuneLevel, silkTouchLevel);
+                this.exp = state.getExpDrop(level, level.getRandom(), pos, fortuneLevel, silkTouchLevel);
             }
         }
 

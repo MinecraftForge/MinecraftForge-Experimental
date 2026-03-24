@@ -8,7 +8,6 @@ package net.minecraftforge.common.capabilities;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.fml.Logging;
 import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -20,9 +19,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class CapabilityManager {
-    @Deprecated(forRemoval = true, since = "1.21")
-    public static final CapabilityManager INSTANCE = new CapabilityManager();
-
     private static final Logger LOGGER = LogManager.getLogger();
 
     /**
@@ -88,8 +84,8 @@ public final class CapabilityManager {
     private static final Map<Key, Capability<?>> providers = new HashMap<>();
 
     @ApiStatus.Internal
-    public static void injectCapabilities(ModList modlist) {
-        var autos = modlist.getAllScanData().stream()
+    public static void injectCapabilities() {
+        var autos = ModList.getAllScanData().stream()
             .flatMap(e -> e.getAnnotations().stream())
             .filter(a -> AUTO_REGISTER.equals(a.annotationType()))
             .map(ModFileScanData.AnnotationData::clazz)
@@ -101,9 +97,6 @@ public final class CapabilityManager {
             LOGGER.debug(Logging.CAPABILITIES, "Attempting to automatically register: " + auto);
             get(auto.getInternalName(), null, true);
         }
-
-        @SuppressWarnings("removal")
-        var event = RegisterCapabilitiesEvent.BUS.fire(new RegisterCapabilitiesEvent());
     }
 
     private static void error(String message) {

@@ -8,7 +8,7 @@ package net.minecraftforge.client.loading;
 import com.mojang.blaze3d.opengl.GlTexture;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.server.packs.resources.ReloadInstance;
@@ -59,7 +59,7 @@ public class ForgeLoadingOverlay extends LoadingOverlay {
     }
 
     @Override
-    protected boolean renderContents(GuiGraphics gui, float fade) {
+    protected boolean extractContentRenderState(final GuiGraphicsExtractor graphics, float fade) {
         if (!ENABLE)
             return true;
         /* This should render the framebuffer but it doesnt work in 1.21.6's rendering changes.

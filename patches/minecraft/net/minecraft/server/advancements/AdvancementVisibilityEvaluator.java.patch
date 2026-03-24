@@ -1,7 +1,7 @@
 --- a/net/minecraft/server/advancements/AdvancementVisibilityEvaluator.java
 +++ b/net/minecraft/server/advancements/AdvancementVisibilityEvaluator.java
-@@ -69,6 +_,16 @@
-         evaluateVisibility(advancementnode, stack, p_265561_, p_265381_);
+@@ -71,6 +_,16 @@
+         evaluateVisibility(advancementnode, stack, isDone, output);
      }
  
 +    public static boolean isVisible(AdvancementNode advancement, Predicate<AdvancementNode> test) {
@@ -16,4 +16,4 @@
 +
      @FunctionalInterface
      public interface Output {
-         void accept(AdvancementNode p_298555_, boolean p_265580_);
+         void accept(AdvancementNode advancement, boolean visible);

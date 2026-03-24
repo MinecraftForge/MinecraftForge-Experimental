@@ -33,7 +33,6 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
     private static String DIST;
     private static final String ONLYIN = Type.getDescriptor(OnlyIn.class);
     private static final String ONLYINS = Type.getDescriptor(OnlyIns.class);
-    private static final String MOD = "Lnet/minecraftforge/fml/common/Mod;";
 
     @Override
     public String name() {
@@ -45,11 +44,17 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
 
     @Override
     public EnumSet<Phase> handlesClass(Type classType, boolean isEmpty) {
-        // TODO: [FML][RuntimeDistCleaner] In 26.1, only return YAY for MC classes on mod dev server
         if (isEmpty)
             return NAY;
 
         String internalName = classType.getInternalName();
+
+        // Only apply to MC classes when on a dedicated server in a production environment
+        if (FMLEnvironment.production)
+            return FMLEnvironment.dist.isDedicatedServer() && isMinecraftClass(internalName) ? YAY : NAY;
+
+        // For dev time it's a bit trickier so that we can throw exceptions when someone uses @OnlyIn in their mod code,
+        // so that it's more obvious that the behaviour they're expecting won't work in production anymore
         if (internalName.startsWith("net/minecraftforge/"))
             return NAY;
 
@@ -57,7 +62,7 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
         if (FMLEnvironment.dist.isClient() && isMinecraftClass(internalName))
             return NAY;
 
-        return YAY;
+        return YAY; // mod classes might have @OnlyIn, so parse them in dev to find out and throw if they do
     }
 
     @Override
@@ -66,29 +71,14 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
 
         var annotations = unpack(classNode.visibleAnnotations);
         var isNonMinecraftClass = !isMinecraftClass(classNode.name);
-        final class LazyInit {
-            private LazyInit() {}
-            private static final boolean CAN_EXPLODE = !FMLEnvironment.production && "21.6".equals(FMLLoader.versionInfo().mcVersion());
-        }
 
         if (remove(annotations, DIST)) {
             LOGGER.error(DISTXFORM, "Attempted to load class {} for invalid dist {}", classNode.name, DIST);
             throw new RuntimeException("Attempted to load class " + classNode.name  + " for invalid dist " + DIST);
         }
 
-        if (!annotations.isEmpty()) {
-            if (isNonMinecraftClass) {
-                if (LazyInit.CAN_EXPLODE)
-                    throw new UnsupportedOperationException("Mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
-                else
-                    LOGGER.warn(DISTXFORM, "Class {} is annotated with @OnlyIn, this is deprecated and won't work in a future MC release.", classNode.name);
-            }
-
-            if (!FMLEnvironment.production && hasModAnnotation(classNode.visibleAnnotations)) {
-                LOGGER.error(DISTXFORM, "Attempted to load class {} with @Mod and @OnlyIn/@OnlyIns annotations", classNode.name);
-                throw new RuntimeException("Found @OnlyIn on @Mod class " + classNode.name  + " - this is not allowed as it causes crashes. Remove the OnlyIn and consider setting clientSideOnly=true in the root of your mods.toml instead");
-            }
-        }
+        if (isNonMinecraftClass && !annotations.isEmpty())
+            throw new UnsupportedOperationException("Mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
 
         if (classNode.interfaces != null && !classNode.interfaces.isEmpty()) {
             for (var ann : annotations) {
@@ -121,12 +111,8 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
                 itr.remove();
                 changed = true;
 
-                if (isNonMinecraftClass) {
-                    if (LazyInit.CAN_EXPLODE)
-                        throw new UnsupportedOperationException("Field " + field.name + " in mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
-                    else
-                        LOGGER.warn(DISTXFORM, "Field {} in class {} is annotated with @OnlyIn, this is deprecated and won't work in a future MC release.", field.name, classNode.name);
-                }
+                if (isNonMinecraftClass)
+                    throw new UnsupportedOperationException("Field " + field.name + " in mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
             }
         }
 
@@ -139,12 +125,8 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
                 lambdaGatherer.accept(method);
                 changed = true;
 
-                if (isNonMinecraftClass) {
-                    if (LazyInit.CAN_EXPLODE)
-                        throw new UnsupportedOperationException("Method " + method.name + " in mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
-                    else
-                        LOGGER.warn(DISTXFORM, "Method {} in class {} is annotated with @OnlyIn, this is deprecated and won't work in a future MC release.", method.name, classNode.name);
-                }
+                if (isNonMinecraftClass)
+                    throw new UnsupportedOperationException("Method " + method.name + " in mod class " + classNode.name + " is annotated with @OnlyIn, this is no longer supported as it slowed down startup times");
             }
         }
 
@@ -225,18 +207,6 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
         return false;
     }
 
-    private static boolean hasModAnnotation(final List<AnnotationNode> anns) {
-        if (anns == null || anns.isEmpty())
-            return false;
-
-        for (var ann : anns) {
-            if (ann.desc.equals(MOD))
-                return true;
-        }
-
-        return false;
-    }
-
     private static boolean isMinecraftClass(final String internalName) {
         return internalName.startsWith("net/minecraft/") || internalName.startsWith("com/mojang/");
     }
@@ -250,7 +220,7 @@ public final class RuntimeDistCleaner implements ILaunchPluginService {
         };
     }
 
-    private static class LambdaGatherer extends MethodVisitor {
+    private static final class LambdaGatherer extends MethodVisitor {
         private static final Handle META_FACTORY = new Handle(Opcodes.H_INVOKESTATIC,
                 "java/lang/invoke/LambdaMetafactory", "metafactory",
                 "(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;",

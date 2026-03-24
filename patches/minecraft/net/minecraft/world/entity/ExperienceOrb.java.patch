@@ -11,10 +11,10 @@
  
              this.setDeltaMovement(this.getDeltaMovement().scale(f));
 @@ -278,6 +_,7 @@
-     public void playerTouch(Player p_20792_) {
-         if (p_20792_ instanceof ServerPlayer serverplayer) {
-             if (p_20792_.takeXpDelay == 0) {
-+                if (net.minecraftforge.event.ForgeEventFactory.onPlayerPickupXp(p_20792_, this)) return;
-                 p_20792_.takeXpDelay = 2;
-                 p_20792_.take(this, 1);
+     public void playerTouch(final Player player) {
+         if (player instanceof ServerPlayer serverplayer) {
+             if (player.takeXpDelay == 0) {
++                if (net.minecraftforge.event.ForgeEventFactory.onPlayerPickupXp(player, this)) return;
+                 player.takeXpDelay = 2;
+                 player.take(this, 1);
                  int i = this.repairPlayerItems(serverplayer, this.getValue());

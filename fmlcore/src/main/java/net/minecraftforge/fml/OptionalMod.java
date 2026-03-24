@@ -43,7 +43,7 @@ public final class OptionalMod<T>
     private T getValue()
     {
         if (!searched) {
-            this.value = ModList.get().<T>getModObjectById(this.modId).orElse(null);
+            this.value = ModList.<T>getModObjectById(this.modId).orElse(null);
             searched = true;
         }
         return this.value;

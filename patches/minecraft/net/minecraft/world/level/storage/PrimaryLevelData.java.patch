@@ -1,32 +1,32 @@
 --- a/net/minecraft/world/level/storage/PrimaryLevelData.java
 +++ b/net/minecraft/world/level/storage/PrimaryLevelData.java
-@@ -70,6 +_,7 @@
+@@ -42,6 +_,7 @@
+     private final Set<String> knownServerBrands;
      private boolean wasModded;
      private final Set<String> removedFeatureFlags;
-     private final TimerQueue<MinecraftServer> scheduledEvents;
 +    private boolean confirmedExperimentalWarning = false;
  
      private PrimaryLevelData(
-         @Nullable CompoundTag p_277888_,
-@@ -192,7 +_,7 @@
-             p_251864_,
-             p_250651_,
-             p_78538_
+         final @Nullable UUID singlePlayerUUID,
+@@ -105,7 +_,7 @@
+             settings,
+             specialWorldProperty,
+             worldGenSettingsLifecycle
 -        );
-+        ).withConfirmedWarning(p_78538_ != Lifecycle.stable() && p_78531_.get("confirmedExperimentalSettings").asBoolean(false));
++        ).withConfirmedWarning(worldGenSettingsLifecycle != Lifecycle.stable() && input.get("confirmedExperimentalSettings").asBoolean(false));
      }
  
      @Override
-@@ -257,6 +_,8 @@
-         p_78547_.putInt("WanderingTraderSpawnDelay", this.wanderingTraderSpawnDelay);
-         p_78547_.putInt("WanderingTraderSpawnChance", this.wanderingTraderSpawnChance);
-         p_78547_.storeNullable("WanderingTraderId", UUIDUtil.CODEC, this.wanderingTraderId);
-+        p_78547_.putString("forgeLifecycle", net.minecraftforge.common.ForgeHooks.encodeLifecycle(this.settings.getLifecycle()));
-+        p_78547_.putBoolean("confirmedExperimentalSettings", this.confirmedExperimentalWarning);
+@@ -142,6 +_,8 @@
+         }
+ 
+         tag.store(WorldDataConfiguration.MAP_CODEC, this.settings.dataConfiguration());
++        tag.putString("forgeLifecycle", net.minecraftforge.common.ForgeHooks.encodeLifecycle(this.settings.lifecycle()));
++        tag.putBoolean("confirmedExperimentalSettings", this.confirmedExperimentalWarning);
      }
  
-     private static ListTag stringCollectionToTag(Set<String> p_277880_) {
-@@ -546,6 +_,16 @@
+     public static void writeLastPlayed(final CompoundTag tag) {
+@@ -322,6 +_,16 @@
      public LevelSettings getLevelSettings() {
          return this.settings.copy();
      }

@@ -157,4 +157,15 @@ public interface IForgeFluidState {
     default boolean canExtinguish(BlockGetter getter, BlockPos pos) {
         return self().getType().canExtinguish(self(), getter, pos);
     }
+
+    /**
+     * Returns the Entity specific flow velocity of this fluid.
+     * @param getter the getter which can get the fluid
+     * @param pos the position of the fluid
+     * @param entity The entity current being effected by this fluid
+     * @return How much to move the player, this will
+     */
+    default Vec3 getFlow(final BlockGetter level, final BlockPos pos, final Entity entity) {
+        return self().getFlow(level, pos);
+    }
 }

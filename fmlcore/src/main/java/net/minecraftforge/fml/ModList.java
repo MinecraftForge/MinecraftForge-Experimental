@@ -5,14 +5,14 @@
 
 package net.minecraftforge.fml;
 
+import net.minecraftforge.fml.loading.LoadingModList;
 import net.minecraftforge.forgespi.language.IModFileInfo;
 import net.minecraftforge.forgespi.language.IModInfo;
 import net.minecraftforge.forgespi.language.ModFileScanData;
 import net.minecraftforge.fml.loading.moddiscovery.ModFile;
 import net.minecraftforge.fml.loading.moddiscovery.ModFileInfo;
-import net.minecraftforge.fml.loading.moddiscovery.ModInfo;
 import net.minecraftforge.forgespi.locating.IModFile;
-import java.util.Collections;
+
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -30,33 +30,36 @@ import java.util.stream.Stream;
  * Master list of all mods - game-side version. This is classloaded in the game scope and
  * can dispatch game level events as a result.
  */
-public class ModList {
-    private static ModList INSTANCE;
-    private final List<IModFileInfo> modFiles;
-    private final List<IModInfo> sortedList;
-    private final Map<String, IModFileInfo> fileById;
-    private List<ModContainer> mods;
-    private Map<String, ModContainer> indexedMods;
-    private List<ModFileScanData> modFileScanData;
-    private List<ModContainer> sortedContainers;
+public final class ModList {
+    private ModList() {}
 
-    private ModList(final List<ModFile> modFiles, final List<ModInfo> sortedList) {
-        var modFileInfos = this.modFiles = modFiles.stream().map(ModFile::getModFileInfo).toList();
-        this.sortedList = sortedList.stream().map(IModInfo.class::cast).toList();
+    private static final List<IModFileInfo> MOD_FILES;
+    private static final List<IModInfo> SORTED_LIST;
+    private static final Map<String, IModFileInfo> FILE_BY_ID;
+    private static List<ModContainer> mods;
+    private static Map<String, ModContainer> indexedMods;
+    private static List<ModContainer> sortedContainers;
+
+    static {
+        var loadingModFiles = LoadingModList.getModFiles().stream().map(ModFileInfo::getFile).toList();
+        var loadingSortedList = LoadingModList.getMods();
+
+        var modFileInfos = MOD_FILES = loadingModFiles.stream().map(ModFile::getModFileInfo).toList();
+        SORTED_LIST = loadingSortedList.stream().map(IModInfo.class::cast).toList();
         var byId = new HashMap<String, IModFileInfo>();
         for (var file : modFileInfos) {
             for (var mod : file.getMods())
                 byId.put(mod.getModId(), mod.getOwningFile());
         }
-        this.fileById = Map.copyOf(byId);
-        CrashReportCallables.registerCrashCallable("Mod List", this::crashReport);
+        FILE_BY_ID = Map.copyOf(byId);
+        CrashReportCallables.registerCrashCallable("Mod List", ModList::crashReport);
     }
 
-    private String getModContainerState(String modId) {
+    private static String getModContainerState(String modId) {
         return getModContainerById(modId).map(ModContainer::getCurrentState).map(Object::toString).orElse("NONE");
     }
 
-    private String fileToLine(IModFile mf) {
+    private static String fileToLine(IModFile mf) {
         var mainMod = mf.getModInfos().getFirst();
         return String.format(Locale.ENGLISH, "%-50.50s|%-30.30s|%-30.30s|%-20.20s|%-10.10s|Manifest: %s", mf.getFileName(),
                 mainMod.getDisplayName(),
@@ -66,92 +69,92 @@ public class ModList {
                 ((ModFileInfo)mf.getModFileInfo()).getCodeSigningFingerprint().orElse("NOSIGNATURE"));
     }
 
-    private String crashReport() {
-        return "\n" + applyForEachModFile(this::fileToLine).collect(Collectors.joining("\n\t\t", "\t\t", ""));
+    private static String crashReport() {
+        return "\n" + applyForEachModFile(ModList::fileToLine).collect(Collectors.joining("\n\t\t", "\t\t", ""));
     }
 
-    public static ModList of(List<ModFile> modFiles, List<ModInfo> sortedList) {
-        INSTANCE = new ModList(modFiles, sortedList);
-        return INSTANCE;
+    public static void init() {}
+
+    public static List<IModFileInfo> getModFiles() {
+        return MOD_FILES;
     }
 
-    public static ModList get() {
-        return INSTANCE;
+    public static IModFileInfo getModFileById(String modid) {
+        return FILE_BY_ID.get(modid);
     }
 
-    public List<IModFileInfo> getModFiles() {
-        return modFiles;
+    static void setLoadedMods(final List<ModContainer> modContainers) {
+        mods = modContainers;
+        sortedContainers = modContainers.stream().sorted(Comparator.comparingInt(c -> SORTED_LIST.indexOf(c.getModInfo()))).toList();
+        indexedMods = modContainers.stream().collect(Collectors.toUnmodifiableMap(ModContainer::getModId, Function.identity()));
     }
 
-    public IModFileInfo getModFileById(String modid) {
-        return this.fileById.get(modid);
-    }
-
-    void setLoadedMods(final List<ModContainer> modContainers) {
-        this.mods = modContainers;
-        this.sortedContainers = modContainers.stream().sorted(Comparator.comparingInt(c -> sortedList.indexOf(c.getModInfo()))).toList();
-        this.indexedMods = modContainers.stream().collect(Collectors.toMap(ModContainer::getModId, Function.identity()));
+    static void clearLoadedMods() {
+        mods = List.of();
+        indexedMods = Map.of();
+        sortedContainers = List.of();
     }
 
     @SuppressWarnings("unchecked")
-    public <T> Optional<T> getModObjectById(String modId) {
+    public static <T> Optional<T> getModObjectById(String modId) {
         return getModContainerById(modId).map(ModContainer::getMod).map(o -> (T) o);
     }
 
-    public Optional<? extends ModContainer> getModContainerById(String modId) {
-        return Optional.ofNullable(this.indexedMods.get(modId));
+    public static Optional<? extends ModContainer> getModContainerById(String modId) {
+        return Optional.ofNullable(indexedMods.get(modId));
     }
 
-    public Optional<? extends ModContainer> getModContainerByObject(Object obj) {
+    public static Optional<? extends ModContainer> getModContainerByObject(Object obj) {
         return mods.stream().filter(mc -> mc.getMod() == obj).findFirst();
     }
 
-    public List<IModInfo> getMods() {
-        return this.sortedList;
+    public static List<IModInfo> getMods() {
+        return SORTED_LIST;
     }
 
-    public boolean isLoaded(String modTarget) {
-        return this.indexedMods.containsKey(modTarget);
+    public static boolean isLoaded(String modTarget) {
+        return indexedMods.containsKey(modTarget);
     }
 
-    public int size() {
+    public static int size() {
         return mods.size();
     }
 
-    public List<ModFileScanData> getAllScanData() {
-        if (modFileScanData == null) {
-            modFileScanData = this.sortedList.stream().
-                    map(IModInfo::getOwningFile).
-                    filter(Objects::nonNull).
-                    map(IModFileInfo::getFile).
-                    distinct().
-                    map(IModFile::getScanResult).
-                    toList();
+    public static List<ModFileScanData> getAllScanData() {
+        final class LazyInit {
+            private LazyInit() {}
+            private static final List<ModFileScanData> MOD_FILE_SCAN_DATA = SORTED_LIST.stream()
+                    .map(IModInfo::getOwningFile)
+                    .filter(Objects::nonNull)
+                    .map(IModFileInfo::getFile)
+                    .distinct()
+                    .map(IModFile::getScanResult)
+                    .toList();
         }
-        return modFileScanData;
+        return LazyInit.MOD_FILE_SCAN_DATA;
     }
 
-    public void forEachModFile(Consumer<IModFile> fileConsumer) {
-        modFiles.stream().map(IModFileInfo::getFile).forEach(fileConsumer);
+    public static void forEachModFile(Consumer<IModFile> fileConsumer) {
+        MOD_FILES.stream().map(IModFileInfo::getFile).forEach(fileConsumer);
     }
 
-    public <T> Stream<T> applyForEachModFile(Function<IModFile, T> function) {
-        return modFiles.stream().map(IModFileInfo::getFile).map(function);
+    public static <T> Stream<T> applyForEachModFile(Function<IModFile, T> function) {
+        return MOD_FILES.stream().map(IModFileInfo::getFile).map(function);
     }
 
-    public void forEachModContainer(BiConsumer<String, ModContainer> modContainerConsumer) {
+    public static void forEachModContainer(BiConsumer<String, ModContainer> modContainerConsumer) {
         indexedMods.forEach(modContainerConsumer);
     }
 
-    public void forEachModInOrder(Consumer<ModContainer> containerConsumer) {
-        this.sortedContainers.forEach(containerConsumer);
+    public static void forEachModInOrder(Consumer<ModContainer> containerConsumer) {
+        sortedContainers.forEach(containerConsumer);
     }
 
-    public List<ModContainer> getLoadedMods() {
-        return this.sortedContainers;
+    public static List<ModContainer> getLoadedMods() {
+        return sortedContainers;
     }
 
-    public <T> Stream<T> applyForEachModContainer(Function<ModContainer, T> function) {
+    public static <T> Stream<T> applyForEachModContainer(Function<ModContainer, T> function) {
         return indexedMods.values().stream().map(function);
     }
 }

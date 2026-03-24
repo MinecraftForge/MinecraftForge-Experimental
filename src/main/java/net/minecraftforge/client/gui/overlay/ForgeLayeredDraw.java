@@ -9,7 +9,7 @@ import com.mojang.logging.LogUtils;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.client.event.ForgeEventFactoryClient;
 import net.minecraftforge.client.event.AddGuiOverlayLayersEvent;
@@ -270,7 +270,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
         var result = namedLayers.computeIfPresent(targetLayer,
                 (name, layer) -> (guiGraphics, deltaTracker) -> {
                     if (condition.getAsBoolean()) {
-                        layer.render(guiGraphics, deltaTracker);
+                        layer.extract(guiGraphics, deltaTracker);
                     }
                 });
         if (result == null) {
@@ -304,7 +304,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
                 var entry = subLayerStacks.get(layerName);
                 entry.getKey().resolveNested();
                 bakedLayers.add((gg, tr) -> {
-                    if (entry.getValue().getAsBoolean()) entry.getKey().render(gg,tr);
+                    if (entry.getValue().getAsBoolean()) entry.getKey().extract(gg,tr);
                 });
             } else {
                 bakedLayers.add(namedLayers.get(layerName));
@@ -368,41 +368,41 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     }
 
     @ApiStatus.Internal
-    public static void beginRender(GuiGraphics gg, DeltaTracker dt) {
-        instance.render(gg,dt);
+    public static void extractRenderState(GuiGraphicsExtractor gg, DeltaTracker dt) {
+        instance.extract(gg, dt);
     }
 
     @ApiStatus.Internal
-    public void render(GuiGraphics gg, DeltaTracker dt) {
+    public void extract(GuiGraphicsExtractor gg, DeltaTracker dt) {
         for (ForgeLayer bakedLayer : bakedLayers) {
-            bakedLayer.render(gg, dt);
+            bakedLayer.extract(gg, dt);
         }
     }
 
     @ApiStatus.Internal
     public static void init(Gui gui, Minecraft minecraft) {
         var preSleepDraw = new ForgeLayeredDraw(PRE_SLEEP_STACK)
-            .add(CAMERA_OVERLAY, gui::renderCameraOverlays)
-            .add(CROSSHAIR, gui::renderCrosshair)
+            .add(CAMERA_OVERLAY, gui::extractCameraOverlays)
+            .add(CROSSHAIR, gui::extractCrosshair)
             .add(CHANGE_STRATUM, (gg, dt) -> gg.nextStratum())
-            .add(HOTBAR_AND_DECOS, gui::renderHotbarAndDecorations)
-            .add(POTION_EFFECTS, gui::renderEffects)
-            .add(BOSS_OVERLAY, gui::renderBossOverlay);
+            .add(HOTBAR_AND_DECOS, gui::extractHotbarAndDecorations)
+            .add(POTION_EFFECTS, gui::extractEffects)
+            .add(BOSS_OVERLAY, gui::extractBossOverlay);
         var postSleepDraw = new ForgeLayeredDraw(POST_SLEEP_STACK)
-            .add(DEMO_OVERLAY, gui::renderDemoOverlay)
-            .add(SCOREBOARD, gui::renderScoreboardSidebar)
-            .add(HOTBAR_MESSAGE, gui::renderOverlayMessage)
-            .add(TITLE_OVERLAY, gui::renderTitle)
-            .add(CHAT_OVERLAY, gui::renderChat)
-            .add(TAB_LIST, gui::renderTabList)
-            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.renderSubtitleOverlay(gfx, minecraft.screen != null && minecraft.screen.isInGameUi()));
+            .add(DEMO_OVERLAY, gui::extractDemoOverlay)
+            .add(SCOREBOARD, gui::extractScoreboardSidebar)
+            .add(HOTBAR_MESSAGE, gui::extractOverlayMessage)
+            .add(TITLE_OVERLAY, gui::extractTitle)
+            .add(CHAT_OVERLAY, gui::extractChat)
+            .add(TAB_LIST, gui::extractTabList)
+            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.extractSubtitleOverlay(gfx, minecraft.screen != null && minecraft.screen.isInGameUi()));
         instance
             .add(PRE_SLEEP_STACK, preSleepDraw, () -> !minecraft.options.hideGui)
-            .add(SLEEP_OVERLAY, gui::renderSleepOverlay)
+            .add(SLEEP_OVERLAY, gui::extractSleepOverlay)
             .add(POST_SLEEP_STACK, postSleepDraw, () -> !minecraft.options.hideGui)
             .add(SUBTITLE_OVERLAY, (gfx, delta) -> {
                 if (minecraft.options.hideGui && minecraft.screen != null && minecraft.screen.isInGameUi())
-                    gui.renderSubtitleOverlay(gfx,  true);
+                    gui.extractSubtitleOverlay(gfx,  true);
             });
         instance.resolveLayers();
     }

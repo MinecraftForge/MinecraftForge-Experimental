@@ -2,11 +2,11 @@
 +++ b/net/minecraft/world/level/block/DropExperienceBlock.java
 @@ -30,8 +_,13 @@
      @Override
-     protected void spawnAfterBreak(BlockState p_221086_, ServerLevel p_221087_, BlockPos p_221088_, ItemStack p_221089_, boolean p_221090_) {
-         super.spawnAfterBreak(p_221086_, p_221087_, p_221088_, p_221089_, p_221090_);
--        if (p_221090_) {
-+        if (false && p_221090_) { // Forge: moved to getExpDrop
-             this.tryDropExperience(p_221087_, p_221088_, p_221089_, this.xpRange);
+     protected void spawnAfterBreak(final BlockState state, final ServerLevel level, final BlockPos pos, final ItemStack tool, final boolean dropExperience) {
+         super.spawnAfterBreak(state, level, pos, tool, dropExperience);
+-        if (dropExperience) {
++        if (false && dropExperience) { // Forge: moved to getExpDrop
+             this.tryDropExperience(level, pos, tool, this.xpRange);
          }
 +    }
 +

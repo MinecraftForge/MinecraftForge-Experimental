@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/LevelReader.java
 +++ b/net/minecraft/world/level/LevelReader.java
-@@ -176,6 +_,11 @@
+@@ -175,6 +_,11 @@
      }
  
      @Deprecated
@@ -9,6 +9,6 @@
 +    }
 +
 +    @Deprecated
-     default boolean hasChunkAt(int p_151578_, int p_151579_) {
-         return this.hasChunk(SectionPos.blockToSectionCoord(p_151578_), SectionPos.blockToSectionCoord(p_151579_));
+     default boolean hasChunkAt(final int blockX, final int blockZ) {
+         return this.hasChunk(SectionPos.blockToSectionCoord(blockX), SectionPos.blockToSectionCoord(blockZ));
      }

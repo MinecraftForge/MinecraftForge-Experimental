@@ -1,19 +1,19 @@
 --- a/net/minecraft/world/level/block/BaseFireBlock.java
 +++ b/net/minecraft/world/level/block/BaseFireBlock.java
-@@ -154,6 +_,7 @@
-         if (!p_49282_.is(p_49279_.getBlock())) {
-             if (inPortalDimension(p_49280_)) {
-                 Optional<PortalShape> optional = PortalShape.findEmptyPortalShape(p_49280_, p_49281_, Direction.Axis.X);
-+                optional = net.minecraftforge.event.ForgeEventFactory.onTrySpawnPortal(p_49280_, p_49281_, optional);
+@@ -161,6 +_,7 @@
+         if (!oldState.is(state.getBlock())) {
+             if (inPortalDimension(level)) {
+                 Optional<PortalShape> optional = PortalShape.findEmptyPortalShape(level, pos, Direction.Axis.X);
++                optional = net.minecraftforge.event.ForgeEventFactory.onTrySpawnPortal(level, pos, optional);
                  if (optional.isPresent()) {
-                     optional.get().createPortalBlocks(p_49280_);
+                     optional.get().createPortalBlocks(level);
                      return;
-@@ -196,7 +_,7 @@
+@@ -203,7 +_,7 @@
              boolean flag = false;
  
              for (Direction direction : Direction.values()) {
--                if (p_49270_.getBlockState(blockpos$mutableblockpos.set(p_49271_).move(direction)).is(Blocks.OBSIDIAN)) {
-+                if (p_49270_.getBlockState(blockpos$mutableblockpos.set(p_49271_).move(direction)).isPortalFrame(p_49270_, blockpos$mutableblockpos)) {
+-                if (level.getBlockState(blockpos$mutableblockpos.set(pos).move(direction)).is(Blocks.OBSIDIAN)) {
++                if (level.getBlockState(blockpos$mutableblockpos.set(pos).move(direction)).isPortalFrame(level, blockpos$mutableblockpos)) {
                      flag = true;
                      break;
                  }

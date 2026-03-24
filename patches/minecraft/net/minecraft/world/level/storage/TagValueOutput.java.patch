@@ -6,20 +6,20 @@
      private final CompoundTag output;
 +    public final HolderLookup.@org.jspecify.annotations.Nullable Provider lookup;
  
-     TagValueOutput(ProblemReporter p_407091_, DynamicOps<Tag> p_407083_, CompoundTag p_409593_) {
-+        this(p_407091_, p_407083_, p_409593_, null);
+     private TagValueOutput(final ProblemReporter problemReporter, final DynamicOps<Tag> ops, final CompoundTag output) {
++        this(problemReporter, ops, output, null);
 +    }
 +
-+    TagValueOutput(ProblemReporter p_407091_, DynamicOps<Tag> p_407083_, CompoundTag p_409593_, HolderLookup.@org.jspecify.annotations.Nullable Provider lookup) {
-         this.problemReporter = p_407091_;
-         this.ops = p_407083_;
-         this.output = p_409593_;
++    TagValueOutput(final ProblemReporter problemReporter, final DynamicOps<Tag> ops, final CompoundTag output, final HolderLookup.@org.jspecify.annotations.Nullable Provider lookup) {
+         this.problemReporter = problemReporter;
+         this.ops = ops;
+         this.output = output;
 +        this.lookup = lookup;
      }
  
-     public static TagValueOutput createWithContext(ProblemReporter p_409887_, HolderLookup.Provider p_409738_) {
--        return new TagValueOutput(p_409887_, p_409738_.createSerializationContext(NbtOps.INSTANCE), new CompoundTag());
-+        return new TagValueOutput(p_409887_, p_409738_.createSerializationContext(NbtOps.INSTANCE), new CompoundTag(), p_409738_);
+     public static TagValueOutput createWithContext(final ProblemReporter problemReporter, final HolderLookup.Provider provider) {
+-        return new TagValueOutput(problemReporter, provider.createSerializationContext(NbtOps.INSTANCE), new CompoundTag());
++        return new TagValueOutput(problemReporter, provider.createSerializationContext(NbtOps.INSTANCE), new CompoundTag(), provider);
      }
  
-     public static TagValueOutput createWithoutContext(ProblemReporter p_405875_) {
+     public static TagValueOutput createWithoutContext(final ProblemReporter problemReporter) {

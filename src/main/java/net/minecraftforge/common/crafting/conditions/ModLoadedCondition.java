@@ -19,7 +19,7 @@ public record ModLoadedCondition(String modid) implements ICondition {
 
     @Override
     public boolean test(IContext context, DynamicOps<?> ops) {
-        return ModList.get().isLoaded(modid);
+        return ModList.isLoaded(modid);
     }
 
     @Override

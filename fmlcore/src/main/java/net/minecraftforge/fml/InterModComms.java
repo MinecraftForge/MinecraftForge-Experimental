@@ -5,63 +5,20 @@
 
 package net.minecraftforge.fml;
 
-
 import java.util.Iterator;
 import java.util.Spliterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public class InterModComms
-{
-    public record IMCMessage(String senderModId, String modId, String method, Supplier<?> messageSupplier) {
+public final class InterModComms {
+    public record IMCMessage(String senderModId, String modId, String method, Supplier<?> messageSupplier) {}
 
-        /**
-         * Deprecated: use {@link #senderModId()}
-         * @return The modid of the sender. This is supplied by the caller, or by the active mod container context.
-         * Consider it unreliable.
-         */
-        @Deprecated
-        public final String getSenderModId() {
-            return this.senderModId;
-        }
-
-        /**
-         * Deprecated: use {@link #modId()}
-         * @return The modid being sent to.
-         */
-        @Deprecated
-        public final String getModId() {
-            return this.modId;
-        }
-
-        /**
-         * Deprecated: use {@link #method()}
-         * @return The method being sent to.
-         */
-        @Deprecated
-        public final String getMethod() {
-            return this.method;
-        }
-
-        /**
-         * @param <T> The type of the message.
-         * @return A {@link Supplier} of the message.
-         * Use {@link #messageSupplier()}
-         */
-        @SuppressWarnings("unchecked")
-        @Deprecated
-        public final <T> Supplier<T> getMessageSupplier() {
-            return (Supplier<T>) this.messageSupplier;
-        }
-    }
-
-    private static final ConcurrentMap<String, ConcurrentLinkedQueue<IMCMessage>> containerQueues = new ConcurrentHashMap<>();
+    private static final ConcurrentHashMap<String, ConcurrentLinkedQueue<IMCMessage>> containerQueues = new ConcurrentHashMap<>();
 
     /**
      * Send IMC to remote. Sender will default to the active modcontainer, or minecraft if not.
@@ -72,8 +29,9 @@ public class InterModComms
      * @return true if the message was enqueued for sending (the target modid is loaded)
      */
     public static boolean sendTo(final String modId, final String method, final Supplier<?> thing) {
-        if (!ModList.get().isLoaded(modId)) return false;
-        containerQueues.computeIfAbsent(modId, k->new ConcurrentLinkedQueue<>()).add(new IMCMessage(ModLoadingContext.get().getActiveContainer().getModId(), modId, method, thing));
+        if (!ModList.isLoaded(modId)) return false;
+        containerQueues.computeIfAbsent(modId, _ -> new ConcurrentLinkedQueue<>())
+                .add(new IMCMessage(ModLoadingContext.get().getContainer().getModId(), modId, method, thing));
         return true;
     }
 
@@ -87,8 +45,9 @@ public class InterModComms
      * @return true if the message was enqueued for sending (the target modid is loaded)
      */
     public static boolean sendTo(final String senderModId, final String modId, final String method, final Supplier<?> thing) {
-        if (!ModList.get().isLoaded(modId)) return false;
-        containerQueues.computeIfAbsent(modId, k->new ConcurrentLinkedQueue<>()).add(new IMCMessage(senderModId, modId, method, thing));
+        if (!ModList.isLoaded(modId)) return false;
+        containerQueues.computeIfAbsent(modId, _ -> new ConcurrentLinkedQueue<>())
+                .add(new IMCMessage(senderModId, modId, method, thing));
         return true;
     }
 
@@ -112,7 +71,7 @@ public class InterModComms
      * @return All messages
      */
     public static Stream<IMCMessage> getMessages(final String modId) {
-        return getMessages(modId, s->Boolean.TRUE);
+        return getMessages(modId, _ -> true);
     }
 
     private record QueueFilteringSpliterator(
@@ -136,13 +95,10 @@ public class InterModComms
         }
 
         @Override
-        public boolean tryAdvance(final Consumer<? super IMCMessage> action)
-        {
+        public boolean tryAdvance(final Consumer<? super IMCMessage> action) {
             IMCMessage next;
-            do
-            {
-                if (!iterator.hasNext())
-                {
+            do {
+                if (!iterator.hasNext()) {
                     return false;
                 }
                 next = this.iterator.next();
@@ -157,6 +113,5 @@ public class InterModComms
         public Spliterator<IMCMessage> trySplit() {
             return null;
         }
-
     }
 }

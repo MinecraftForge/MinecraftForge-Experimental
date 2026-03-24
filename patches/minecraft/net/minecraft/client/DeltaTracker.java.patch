@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/DeltaTracker.java
 +++ b/net/minecraft/client/DeltaTracker.java
-@@ -87,18 +_,22 @@
+@@ -82,18 +_,22 @@
  
          private void pause() {
              if (!this.paused) {
@@ -22,4 +22,4 @@
 +            net.minecraftforge.client.ForgeHooksClient.onClientPauseChangePost(false);
          }
  
-         public void updateFrozenState(boolean p_344005_) {
+         public void updateFrozenState(final boolean frozen) {

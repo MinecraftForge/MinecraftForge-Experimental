@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/sounds/SoundEngine.java
 +++ b/net/minecraft/client/sounds/SoundEngine.java
-@@ -82,6 +_,7 @@
-         this.soundManager = p_120236_;
-         this.options = p_120237_;
-         this.soundBuffers = new SoundBufferLibrary(p_249332_);
+@@ -84,6 +_,7 @@
+         this.options = options;
+         this.soundBuffers = new SoundBufferLibrary(resourceProvider);
+         this.lastSeenDevices = this.deviceTracker.currentDevices();
 +        net.minecraftforge.client.event.sound.SoundEngineLoadEvent.BUS.post(new net.minecraftforge.client.event.sound.SoundEngineLoadEvent(this));
      }
  
      public void reload() {
-@@ -99,6 +_,7 @@
+@@ -101,6 +_,7 @@
  
          this.destroy();
          this.loadLibrary();
@@ -16,32 +16,39 @@
      }
  
      private synchronized void loadLibrary() {
-@@ -339,6 +_,9 @@
-         } else if (!p_120313_.canPlaySound()) {
+@@ -342,12 +_,15 @@
+         }
+     }
+ 
+-    public SoundEngine.PlayResult play(final SoundInstance instance) {
++    public SoundEngine.PlayResult play(SoundInstance instance) {
+         if (!this.loaded) {
+             return SoundEngine.PlayResult.NOT_STARTED;
+         } else if (!instance.canPlaySound()) {
              return SoundEngine.PlayResult.NOT_STARTED;
          } else {
-+            p_120313_ = net.minecraftforge.client.ForgeHooksClient.playSound(this, p_120313_);
-+            if (p_120313_ == null || !p_120313_.canPlaySound())
++            instance = net.minecraftforge.client.ForgeHooksClient.playSound(this, instance);
++            if (instance == null || !instance.canPlaySound())
 +                return SoundEngine.PlayResult.NOT_STARTED;
-             WeighedSoundEvents weighedsoundevents = p_120313_.resolve(this.soundManager);
-             Identifier identifier = p_120313_.getIdentifier();
+             WeighedSoundEvents weighedsoundevents = instance.resolve(this.soundManager);
+             Identifier identifier = instance.getIdentifier();
              if (weighedsoundevents == null) {
-@@ -418,15 +_,18 @@
-                         p_194488_.setSelfPosition(vec3);
-                         p_194488_.setRelative(flag);
+@@ -427,15 +_,18 @@
+                         channel.setSelfPosition(vec3);
+                         channel.setRelative(flag);
                      });
-+                    SoundInstance soundinstance = p_120313_;
++                    SoundInstance soundinstance = instance;
                      if (!flag1) {
-                         this.soundBuffers.getCompleteBuffer(sound.getPath()).thenAccept(p_422528_ -> channelaccess$channelhandle.execute(p_194495_ -> {
-                             p_194495_.attachStaticBuffer(p_422528_);
-                             p_194495_.play();
-+                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlaySoundSource(this, soundinstance, p_194495_);
+                         this.soundBuffers.getCompleteBuffer(sound.getPath()).thenAccept(soundBuffer -> channelaccess$channelhandle.execute(channel -> {
+                             channel.attachStaticBuffer(soundBuffer);
+                             channel.play();
++                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlaySoundSource(this, soundinstance, channel);
                          }));
                      } else {
-                         this.soundBuffers.getStream(sound.getPath(), flag3).thenAccept(p_430918_ -> channelaccess$channelhandle.execute(p_194498_ -> {
-                             p_194498_.attachBufferStream(p_430918_);
-                             p_194498_.play();
-+                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlayStreamingSource(this, soundinstance, p_194498_);
+                         this.soundBuffers.getStream(sound.getPath(), flag3).thenAccept(stream -> channelaccess$channelhandle.execute(channel -> {
+                             channel.attachBufferStream(stream);
+                             channel.play();
++                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlayStreamingSource(this, soundinstance, channel);
                          }));
                      }
  

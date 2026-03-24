@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
 +++ b/net/minecraft/world/entity/projectile/FireworkRocketEntity.java
-@@ -306,6 +_,13 @@
+@@ -314,6 +_,13 @@
      }
  
      @Override
@@ -11,6 +11,6 @@
 +    }
 +
 +    @Override
-     public DoubleDoubleImmutablePair calculateHorizontalHurtKnockbackDirection(LivingEntity p_343097_, DamageSource p_343307_) {
-         double d0 = p_343097_.position().x - this.position().x;
-         double d1 = p_343097_.position().z - this.position().z;
+     public DoubleDoubleImmutablePair calculateHorizontalHurtKnockbackDirection(final LivingEntity hurtEntity, final DamageSource damageSource) {
+         double d0 = hurtEntity.position().x - this.position().x;
+         double d1 = hurtEntity.position().z - this.position().z;

@@ -24,6 +24,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -158,7 +159,7 @@ public interface IForgeItem {
      * @return The resulting ItemStack
      */
     @SuppressWarnings("deprecation")
-    default ItemStack getCraftingRemainder(ItemStack itemStack) {
+    default ItemStackTemplate getCraftingRemainder(ItemStack itemStack) {
         return self().getCraftingRemainder();
     }
 
@@ -337,29 +338,9 @@ public interface IForgeItem {
      * @param stack       the item stack to be enchanted
      * @param enchantment the enchantment to be applied
      * @return true if the enchantment can be applied to this item
-     *
-     * @deprecated Use {@link IForgeItemStack#canApplyAtEnchantingTable(Holder)}
-     */
-    @Deprecated(forRemoval = true, since = "1.21.3")
-    default boolean canApplyAtEnchantingTable(ItemStack stack, Enchantment enchantment) {
-        return enchantment.isPrimaryItem(stack);
-    }
-
-    /**
-     * Checks whether an item can be enchanted with a certain enchantment. This
-     * applies specifically to enchanting an item in the enchanting table and is
-     * called when retrieving the list of possible enchantments for an item.
-     * Enchantments may additionally (or exclusively) be doing their own checks in
-     * {@link Enchantment#canApplyAtEnchantingTable(ItemStack)};
-     * check the individual implementation for reference. By default this will check
-     * if the enchantment type is valid for this item type.
-     *
-     * @param stack       the item stack to be enchanted
-     * @param enchantment the enchantment to be applied
-     * @return true if the enchantment can be applied to this item
      */
     default boolean canApplyAtEnchantingTable(ItemStack stack, Holder<Enchantment> enchantment) {
-        return canApplyAtEnchantingTable(stack, enchantment.value());
+        return enchantment.value().isPrimaryItem(stack);
     }
 
     /**
@@ -451,21 +432,6 @@ public interface IForgeItem {
         return ShulkerItemStackInvWrapper.createDefaultProvider(stack);
     }
     */
-
-    /**
-     * Can this Item disable a shield
-     *
-     * @param stack    The ItemStack
-     * @param shield   The shield in question
-     * @param entity   The LivingEntity holding the shield
-     * @param attacker The LivingEntity holding the ItemStack
-     * @return True if this ItemStack can disable the shield in question.
-     * @deprecated Overriding this does nothing! Use {@link net.minecraft.core.component.DataComponents#WEAPON}.
-     */
-    @Deprecated(forRemoval = true, since = "1.21.5")
-    default boolean canDisableShield(ItemStack stack, ItemStack shield, LivingEntity entity, LivingEntity attacker) {
-        return attacker.getSecondsToDisableBlocking() > 0.0F;
-    }
 
     /**
      * @return the fuel burn time for this itemStack in a furnace. Return 0 to make
@@ -615,20 +581,9 @@ public interface IForgeItem {
         return false;
     }
 
-    /**
-     * @return The Default Capability Provider for this item, if any.
-     *
-     * @deprecated Use the itemstack-sensitive version instead: {@link #getCapabilityProvider(ItemStack)}
-     */
-    @Nullable
-    @Deprecated(forRemoval = true, since = "1.21.4")
-    default ICapabilityProvider getCapabilityProvider() {
-        return null;
-    }
-
     /** @return The Default Capability Provider for this item, if any, accounting for the given itemstack. */
     @Nullable
     default ICapabilityProvider getCapabilityProvider(ItemStack stack) {
-        return this.getCapabilityProvider();
+        return null;
     }
 }

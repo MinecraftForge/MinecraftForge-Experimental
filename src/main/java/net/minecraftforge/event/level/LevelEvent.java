@@ -40,7 +40,7 @@ import org.jspecify.annotations.NullMarked;
 @NullMarked
 public sealed interface LevelEvent extends InheritableEvent
         permits ChunkEvent, LevelEvent.CreateSpawnPosition, LevelEvent.Load, LevelEvent.PotentialSpawns, LevelEvent.Save,
-        LevelEvent.Unload, SaplingGrowTreeEvent, SleepFinishedTimeEvent {
+        LevelEvent.Unload, BlockFeatureGrowEvent, SleepFinishedTimeEvent {
     EventBus<LevelEvent> BUS = EventBus.create(LevelEvent.class);
 
     /**

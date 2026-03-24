@@ -1,8 +1,8 @@
 --- a/net/minecraft/tags/InstrumentTags.java
 +++ b/net/minecraft/tags/InstrumentTags.java
 @@ -12,4 +_,12 @@
-     private static TagKey<Instrument> create(String p_215861_) {
-         return TagKey.create(Registries.INSTRUMENT, Identifier.withDefaultNamespace(p_215861_));
+     private static TagKey<Instrument> create(final String name) {
+         return TagKey.create(Registries.INSTRUMENT, Identifier.withDefaultNamespace(name));
      }
 +
 +    public static TagKey<Instrument> create(String namepsace, String path) {

@@ -1,11 +1,11 @@
 --- a/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
 +++ b/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
-@@ -361,6 +_,8 @@
-                 p_425273_.setTooltipForNextFrame(Lists.transform(this.onlinePlayersTooltip, Component::getVisualOrderText), p_424268_, p_430737_);
+@@ -371,6 +_,8 @@
+                 graphics.setTooltipForNextFrame(Lists.transform(this.onlinePlayersTooltip, Component::getVisualOrderText), mouseX, mouseY);
              }
  
-+            net.minecraftforge.client.ForgeHooksClient.drawForgePingInfo(this.screen, serverData, p_425273_, this.getContentX(), this.getContentY(), this.getContentWidth(), p_424268_ - this.getContentX(), p_430737_ - this.getContentY());
++            net.minecraftforge.client.ForgeHooksClient.drawForgePingInfo(this.screen, serverData, graphics, this.getContentX(), this.getContentY(), this.getContentWidth(), mouseX - this.getContentX(), mouseY - this.getContentY());
 +
-             if (this.minecraft.options.touchscreen().get() || p_425246_) {
-                 p_425273_.fill(this.getContentX(), this.getContentY(), this.getContentX() + 32, this.getContentY() + 32, -1601138544);
-                 int i1 = p_424268_ - this.getContentX();
+             if (this.minecraft.options.touchscreen().get() || hovered) {
+                 graphics.fill(this.getContentX(), this.getContentY(), this.getContentX() + 32, this.getContentY() + 32, -1601138544);
+                 int i1 = mouseX - this.getContentX();

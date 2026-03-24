@@ -1,20 +1,20 @@
 --- a/net/minecraft/world/entity/npc/villager/Villager.java
 +++ b/net/minecraft/world/entity/npc/villager/Villager.java
-@@ -320,7 +_,7 @@
+@@ -299,7 +_,7 @@
      @Override
-     public InteractionResult mobInteract(Player p_458495_, InteractionHand p_455648_) {
-         ItemStack itemstack = p_458495_.getItemInHand(p_455648_);
+     public InteractionResult mobInteract(final Player player, final InteractionHand hand) {
+         ItemStack itemstack = player.getItemInHand(hand);
 -        if (itemstack.is(Items.VILLAGER_SPAWN_EGG) || !this.isAlive() || this.isTrading() || this.isSleeping()) {
-+        if (itemstack.is(Items.VILLAGER_SPAWN_EGG) || !this.isAlive() || this.isTrading() || this.isSleeping() || p_458495_.isSecondaryUseActive()) {
-             return super.mobInteract(p_458495_, p_455648_);
++        if (itemstack.is(Items.VILLAGER_SPAWN_EGG) || !this.isAlive() || this.isTrading() || this.isSleeping() || player.isSecondaryUseActive()) {
+             return super.mobInteract(player, hand);
          } else if (this.isBaby()) {
              this.setUnhappy();
 @@ -760,7 +_,7 @@
  
      @Override
-     public void thunderHit(ServerLevel p_455159_, LightningBolt p_455393_) {
--        if (p_455159_.getDifficulty() != Difficulty.PEACEFUL) {
-+        if (p_455159_.getDifficulty() != Difficulty.PEACEFUL && net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.WITCH, (timer) -> {})) {
-             LOGGER.info("Villager {} was struck by lightning {}.", this, p_455393_);
-             Witch witch = this.convertTo(EntityType.WITCH, ConversionParams.single(this, false, false), p_451416_ -> {
-                 p_451416_.finalizeSpawn(p_455159_, p_455159_.getCurrentDifficultyAt(p_451416_.blockPosition()), EntitySpawnReason.CONVERSION, null);
+     public void thunderHit(final ServerLevel level, final LightningBolt lightningBolt) {
+-        if (level.getDifficulty() != Difficulty.PEACEFUL) {
++        if (level.getDifficulty() != Difficulty.PEACEFUL && net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.WITCH, (timer) -> {})) {
+             LOGGER.info("Villager {} was struck by lightning {}.", this, lightningBolt);
+             Witch witch = this.convertTo(EntityType.WITCH, ConversionParams.single(this, false, false), w -> {
+                 w.finalizeSpawn(level, level.getCurrentDifficultyAt(w.blockPosition()), EntitySpawnReason.CONVERSION, null);

@@ -1,37 +1,34 @@
 --- a/net/minecraft/client/renderer/block/ModelBlockRenderer.java
 +++ b/net/minecraft/client/renderer/block/ModelBlockRenderer.java
-@@ -49,7 +_,7 @@
-         int p_234389_
-     ) {
-         if (!p_393688_.isEmpty()) {
--            boolean flag = Minecraft.useAmbientOcclusion() && p_234382_.getLightEmission() == 0 && p_393688_.getFirst().useAmbientOcclusion();
-+            boolean flag = Minecraft.useAmbientOcclusion() && p_234382_.getLightEmission(p_234380_, p_234383_) == 0 && p_393688_.getFirst().useAmbientOcclusion();
-             p_234384_.translate(p_234382_.getOffset(p_234383_));
- 
-             try {
-@@ -319,6 +_,11 @@
-         }
+@@ -49,6 +_,12 @@
+         return !cutoutLeaves && blockState.getBlock() instanceof LeavesBlock;
      }
  
-+    @Deprecated //Forge: Model data and render type parameter
-+    public static void renderModel(PoseStack.Pose p_111068_, VertexConsumer p_111069_, BlockStateModel p_111070_, float p_111072_, float p_111073_, float p_111074_, int p_111075_, int p_111076_) {
-+        renderModel(p_111068_, p_111069_, p_111070_, p_111072_, p_111073_, p_111074_, p_111075_, p_111076_, net.minecraftforge.client.model.data.ModelData.EMPTY, null);
++
++    /** @deprecated Use ModelData variant */
++    public void tesselateBlock(final BlockQuadOutput output, final float x, final float y, final float z, final BlockAndTintGetter level, final BlockPos pos, final BlockState blockState, final BlockStateModel model, final long seed) {
++        tesselateBlock(output, x, y, z, level, pos, blockState, model, seed, net.minecraftforge.client.model.data.ModelData.EMPTY);
 +    }
 +
-     public static void renderModel(
-         PoseStack.Pose p_111068_,
-         VertexConsumer p_111069_,
-@@ -327,9 +_,11 @@
-         float p_111073_,
-         float p_111074_,
-         int p_111075_,
--        int p_111076_
-+        int p_111076_,
-+        net.minecraftforge.client.model.data.ModelData modelData,
-+        @org.jetbrains.annotations.Nullable net.minecraft.client.renderer.chunk.ChunkSectionLayer renderType
+     public void tesselateBlock(
+         final BlockQuadOutput output,
+         final float x,
+@@ -58,14 +_,15 @@
+         final BlockPos pos,
+         final BlockState blockState,
+         final BlockStateModel model,
+-        final long seed
++        final long seed,
++        net.minecraftforge.client.model.data.ModelData modelData
      ) {
--        for (BlockModelPart blockmodelpart : p_397754_.collectParts(RandomSource.create(42L))) {
-+        for (BlockModelPart blockmodelpart : p_397754_.collectParts(RandomSource.create(42L), modelData, renderType)) {
-             for (Direction direction : DIRECTIONS) {
-                 renderQuadList(p_111068_, p_111069_, p_111072_, p_111073_, p_111074_, blockmodelpart.getQuads(direction), p_111075_, p_111076_);
-             }
+         this.random.setSeed(seed);
+-        model.collectParts(this.random, this.parts);
++        model.collectParts(this.random, this.parts, modelData);
+         if (!this.parts.isEmpty()) {
+             try {
+                 Vec3 vec3 = blockState.getOffset(pos);
+-                if (this.ambientOcclusion && blockState.getLightEmission() == 0 && this.parts.getFirst().useAmbientOcclusion()) {
++                if (this.ambientOcclusion && blockState.getLightEmission(level, pos) == 0 && this.parts.getFirst().useAmbientOcclusion()) {
+                     this.tesselateAmbientOcclusion(output, x + (float)vec3.x, y + (float)vec3.y, z + (float)vec3.z, this.parts, level, blockState, pos);
+                 } else {
+                     this.tesselateFlat(output, x + (float)vec3.x, y + (float)vec3.y, z + (float)vec3.z, this.parts, level, blockState, pos);

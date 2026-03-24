@@ -16,7 +16,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraft.core.Direction;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 
@@ -162,7 +161,7 @@ public class VanillaInventoryCodeHooks {
         double x = hopper.getLevelX() + (double) hopperFacing.getStepX();
         double y = hopper.getLevelY() + (double) hopperFacing.getStepY();
         double z = hopper.getLevelZ() + (double) hopperFacing.getStepZ();
-        return getItemHandler(level, x, y, z, hopperFacing.getOpposite());
+        return getItemHandlerPair(level, BlockPos.containing(x, y, z), hopperFacing.getOpposite());
     }
 
     private static boolean isFull(IItemHandler itemHandler) {
@@ -208,7 +207,7 @@ public class VanillaInventoryCodeHooks {
         if (entities.isEmpty())
             return Optional.empty();
 
-        var rand = level.random.nextInt(entities.size());
+        var rand = level.getRandom().nextInt(entities.size());
         var entity = entities.get(rand);
         return entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side).resolve();
     }
@@ -222,18 +221,6 @@ public class VanillaInventoryCodeHooks {
             return Optional.empty();
 
         return entity.getCapability(ForgeCapabilities.ITEM_HANDLER, side).resolve();
-    }
-
-    /**
-     *  I don't think anyone should be using this. If they are they probably want the non-pair version.
-     *  As the only use for knowing the object holding the IItemHandler is for hopper cooldowns
-     */
-    @Deprecated(forRemoval = true, since = "1.21.8")
-    public static Optional<Pair<IItemHandler, Object>> getItemHandler(Level worldIn, double x, double y, double z, final Direction side) {
-        int i = Mth.floor(x);
-        int j = Mth.floor(y);
-        int k = Mth.floor(z);
-        return getItemHandlerPair(worldIn, new BlockPos(i, j, k), side);
     }
 
     private static Optional<Pair<IItemHandler, Object>> getItemHandlerPair(Level level, BlockPos pos, Direction side) {

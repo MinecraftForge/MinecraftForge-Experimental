@@ -2,7 +2,7 @@
   "type": "minecraft:crafting_shaped",
   "category": "redstone",
   "key": {
-    "#": "#forge:cobblestone/normal",
+    "#": "#c:cobblestones/normal",
     "R": "minecraft:redstone"
   },
   "pattern": [
@@ -11,7 +11,6 @@
     "#R#"
   ],
   "result": {
-    "count": 1,
     "id": "minecraft:dropper"
   }
 }

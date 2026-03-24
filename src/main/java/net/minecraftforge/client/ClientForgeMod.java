@@ -6,14 +6,13 @@
 package net.minecraftforge.client;
 
 import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
-import net.minecraft.client.resources.model.UnbakedGeometry;
+import net.minecraft.client.resources.model.geometry.UnbakedGeometry;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.event.RegisterClientReloadListenersEvent;
 import net.minecraftforge.client.event.RegisterNamedRenderTypesEvent;
 import net.minecraftforge.client.model.DynamicFluidContainerModel;
-import net.minecraftforge.client.model.ItemLayerGeometry;
 import net.minecraftforge.client.model.obj.ObjLoader;
 import net.minecraftforge.eventbus.api.listener.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -25,7 +24,6 @@ public class ClientForgeMod {
         event.register(forgeRL("empty"), (json, ctx) -> UnbakedGeometry.EMPTY);
         event.register(forgeRL("obj"), ObjLoader.INSTANCE);
         event.register(forgeRL("fluid_container"), DynamicFluidContainerModel.Loader.INSTANCE);
-        event.register(forgeRL("item_layers"), ItemLayerGeometry.Loader.INSTANCE);
     }
 
     @SubscribeEvent

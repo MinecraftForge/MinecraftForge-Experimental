@@ -1,11 +1,11 @@
 --- a/net/minecraft/util/SpawnUtil.java
 +++ b/net/minecraft/util/SpawnUtil.java
-@@ -45,7 +_,7 @@
+@@ -46,7 +_,7 @@
                  )) {
-                 T t = (T)p_216404_.create(p_216406_, null, blockpos$mutableblockpos, p_369127_, false, false);
+                 T t = (T)entityType.create(level, null, blockpos$mutableblockpos, spawnReason, false, false);
                  if (t != null) {
--                    if (t.checkSpawnRules(p_216406_, p_369127_) && t.checkSpawnObstruction(p_216406_)) {
-+                    if (net.minecraftforge.event.ForgeEventFactory.checkSpawnPosition(t, p_216406_, p_369127_)) {
-                         p_216406_.addFreshEntityWithPassengers(t);
+-                    if (t.checkSpawnRules(level, spawnReason) && t.checkSpawnObstruction(level)) {
++                    if (net.minecraftforge.event.ForgeEventFactory.checkSpawnPosition(t, level, spawnReason)) {
+                         level.addFreshEntityWithPassengers(t);
                          t.playAmbientSound();
                          return Optional.of(t);

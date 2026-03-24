@@ -8,8 +8,10 @@ package net.minecraftforge.client.model.pipeline;
 import com.google.common.base.Preconditions;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.model.geom.builders.UVPair;
-import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.geometry.BakedQuad.MaterialInfo;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Direction;
 import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
 
@@ -35,7 +37,6 @@ public class BakedQuadBuilder implements VertexConsumer {
     private Direction direction = Direction.DOWN;
     private TextureAtlasSprite sprite = UnitTextureAtlasSprite.INSTANCE;
     private boolean shade;
-    private boolean hasAmbientOcclusion;
     private int lightEmission;
 
     public BakedQuadBuilder(Consumer<BakedQuad> quadConsumer) {
@@ -113,7 +114,12 @@ public class BakedQuadBuilder implements VertexConsumer {
         BakedQuad quad = new BakedQuad(
             this.positions[0], this.positions[1], this.positions[2], this.positions[3],
             this.uvs[0],       this.uvs[1],       this.uvs[2],       this.uvs[3],
-            tintIndex, direction, sprite, shade, lightEmission, hasAmbientOcclusion
+            direction,
+            MaterialInfo.of(
+                new Material.Baked(sprite, false),
+                sprite.transparency(),
+                tintIndex, shade, lightEmission
+            )
         );
         setup();
         // We have a full quad, pass it to the consumer and reset
@@ -135,10 +141,6 @@ public class BakedQuadBuilder implements VertexConsumer {
 
     public void setShade(boolean shade) {
         this.shade = shade;
-    }
-
-    public void setHasAmbientOcclusion(boolean hasAmbientOcclusion) {
-        this.hasAmbientOcclusion = hasAmbientOcclusion;
     }
 
     public void setLightEmission(int value) {

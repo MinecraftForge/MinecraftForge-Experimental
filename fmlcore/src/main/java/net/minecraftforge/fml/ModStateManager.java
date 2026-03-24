@@ -15,18 +15,19 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @SuppressWarnings("UnstableApiUsage")
-public class ModStateManager {
-    private final EnumMap<ModLoadingPhase, List<IModLoadingState>> stateMap;
+public final class ModStateManager {
+    private ModStateManager() {}
+    private static final EnumMap<ModLoadingPhase, List<IModLoadingState>> stateMap;
 
-    public ModStateManager() {
+    static {
         final var sp = ServiceLoader.load(FMLLoader.getGameLayer(), IModStateProvider.class);
-        this.stateMap = ServiceLoaderUtils.streamWithErrorHandling(sp, sce->{})
+        stateMap = ServiceLoaderUtils.streamWithErrorHandling(sp, _ -> {})
                 .map(IModStateProvider::getAllStates)
                 .flatMap(List::stream)
-                .collect(Collectors.groupingBy(IModLoadingState::phase, ()->new EnumMap<>(ModLoadingPhase.class), Collectors.toUnmodifiableList()));
+                .collect(Collectors.groupingBy(IModLoadingState::phase, () -> new EnumMap<>(ModLoadingPhase.class), Collectors.toUnmodifiableList()));
     }
 
-    public List<IModLoadingState> getStates(final ModLoadingPhase phase) {
+    public static List<IModLoadingState> getStates(final ModLoadingPhase phase) {
         var nodes = stateMap.get(phase);
         var lookup = nodes.stream().collect(Collectors.toMap(IModLoadingState::name, Function.identity()));
 
@@ -40,7 +41,7 @@ public class ModStateManager {
         return TopologicalSort.topologicalSort(graph, Comparator.comparingInt(nodes::indexOf)).stream().filter(st->st!=dummy).toList();
     }
 
-    public IModLoadingState findState(final String stateName) {
+    public static IModLoadingState findState(final String stateName) {
         var result = stateMap.values()
                 .stream()
                 .flatMap(List::stream)

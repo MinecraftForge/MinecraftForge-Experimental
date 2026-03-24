@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/rabbit/Rabbit.java
 +++ b/net/minecraft/world/entity/animal/rabbit/Rabbit.java
-@@ -555,7 +_,7 @@
+@@ -604,7 +_,7 @@
          @Override
          public boolean canUse() {
              if (this.nextStartTick <= 0) {
@@ -9,12 +9,12 @@
                      return false;
                  }
  
-@@ -604,7 +_,7 @@
+@@ -653,7 +_,7 @@
          @Override
-         protected boolean isValidTarget(LevelReader p_457725_, BlockPos p_456006_) {
-             BlockState blockstate = p_457725_.getBlockState(p_456006_);
--            if (blockstate.is(Blocks.FARMLAND) && this.wantsToRaid && !this.canRaid) {
-+            if (blockstate.getBlock() instanceof net.minecraft.world.level.block.FarmBlock && this.wantsToRaid && !this.canRaid) {
-                 blockstate = p_457725_.getBlockState(p_456006_.above());
-                 if (blockstate.getBlock() instanceof CarrotBlock && ((CarrotBlock)blockstate.getBlock()).isMaxAge(blockstate)) {
+         protected boolean isValidTarget(final LevelReader level, final BlockPos pos) {
+             BlockState blockstate = level.getBlockState(pos);
+-            if (blockstate.is(BlockTags.SUPPORTS_CROPS) && this.wantsToRaid && !this.canRaid) {
++            if (blockstate.getBlock() instanceof net.minecraft.world.level.block.FarmlandBlock && this.wantsToRaid && !this.canRaid) {
+                 blockstate = level.getBlockState(pos.above());
+                 if (blockstate.getBlock() instanceof CarrotBlock carrotblock && carrotblock.isMaxAge(blockstate)) {
                      this.canRaid = true;

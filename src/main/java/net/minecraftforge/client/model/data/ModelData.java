@@ -6,7 +6,6 @@
 package net.minecraftforge.client.model.data;
 
 import com.google.common.base.Preconditions;
-import net.minecraft.client.renderer.block.model.BlockModelPart;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Contract;

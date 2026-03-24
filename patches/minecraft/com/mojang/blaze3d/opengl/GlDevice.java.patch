@@ -1,74 +1,54 @@
 --- a/com/mojang/blaze3d/opengl/GlDevice.java
 +++ b/com/mojang/blaze3d/opengl/GlDevice.java
-@@ -124,8 +_,15 @@
-         int p_407582_,
-         int p_408928_
+@@ -129,7 +_,12 @@
+         final int depthOrLayers,
+         final int mipLevels
      ) {
-+        return createTexture(p_397830_, p_394481_, p_394839_, p_391831_, p_395609_, p_407582_, p_408928_, false);
+-        return this.createTexture(this.debugLabels.exists() && label != null ? label.get() : null, usage, format, width, height, depthOrLayers, mipLevels);
++        return this.createTexture(label, usage, format, width, height, depthOrLayers, mipLevels, false);
 +    }
 +
 +    @Override
-+    public GpuTexture createTexture(
-+            @Nullable Supplier<String> p_397830_, int p_394481_, TextureFormat p_394839_, int p_391831_, int p_395609_, int p_407582_, int p_408928_, boolean stencil
-+        ) {
-         return this.createTexture(
--            this.debugLabels.exists() && p_397830_ != null ? p_397830_.get() : null, p_394481_, p_394839_, p_391831_, p_395609_, p_407582_, p_408928_
-+            this.debugLabels.exists() && p_397830_ != null ? p_397830_.get() : null, p_394481_, p_394839_, p_391831_, p_395609_, p_407582_, p_408928_, stencil
-         );
++    public GpuTexture createTexture(final @Nullable Supplier<String> label, @GpuTexture.Usage final int usage, final TextureFormat format, final int width, final int height, final int depthOrLayers, final int mipLevels, final boolean stencil ) {
++        return this.createTexture(this.debugLabels.exists() && label != null ? label.get() : null, usage, format, width, height, depthOrLayers, mipLevels, stencil);
      }
  
-@@ -133,6 +_,15 @@
-     public GpuTexture createTexture(
-         @Nullable String p_394142_, @GpuTexture.Usage int p_395535_, TextureFormat p_394951_, int p_393944_, int p_392329_, int p_408015_, int p_406483_
+     @Override
+@@ -142,6 +_,11 @@
+         final int depthOrLayers,
+         final int mipLevels
      ) {
-+        return createTexture(p_394142_, p_395535_, p_394951_, p_393944_, p_392329_, p_408015_, p_406483_, false);
++        return this.createTexture(label, usage, format, width, height, depthOrLayers, mipLevels, false);
 +    }
 +
 +    @Override
-+    public GpuTexture createTexture(
-+        @Nullable String p_394142_, @GpuTexture.Usage int p_395535_, TextureFormat p_394951_, int p_393944_, int p_392329_, int p_408015_, int p_406483_, boolean stencil
-+    ) {
-+        // Forge: stencil rendering is only for depth
-+        stencil &= p_394951_.hasDepthAspect();
-         if (p_406483_ < 1) {
-             throw new IllegalArgumentException("mipLevels must be at least 1");
-         } else if (p_408015_ < 1) {
-@@ -183,11 +_,14 @@
-                         GlStateManager._texImage2D(
-                             k,
-                             l,
-+                            stencil ? org.lwjgl.opengl.GL30.GL_DEPTH32F_STENCIL8 :
-                             GlConst.toGlInternalId(p_394951_),
-                             p_393944_ >> l,
-                             p_392329_ >> l,
-                             0,
-+                            stencil ? org.lwjgl.opengl.GL30.GL_DEPTH_STENCIL :
-                             GlConst.toGlExternalId(p_394951_),
-+                            stencil ? org.lwjgl.opengl.GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
-                             GlConst.toGlType(p_394951_),
-                             null
-                         );
-@@ -198,11 +_,14 @@
++    public GpuTexture createTexture(@Nullable String label, @GpuTexture.Usage final int usage, final TextureFormat format, final int width, final int height, final int depthOrLayers, final int mipLevels, boolean stencil) {
+         GlStateManager.clearGlErrors();
+         int i = GlStateManager._genTexture();
+         if (label == null) {
+@@ -169,14 +_,14 @@
+             for (int k : GlConst.CUBEMAP_TARGETS) {
+                 for (int l = 0; l < mipLevels; l++) {
                      GlStateManager._texImage2D(
-                         j,
-                         i1,
-+                        stencil ? org.lwjgl.opengl.GL30.GL_DEPTH32F_STENCIL8 :
-                         GlConst.toGlInternalId(p_394951_),
-                         p_393944_ >> i1,
-                         p_392329_ >> i1,
-                         0,
-+                        stencil ? org.lwjgl.opengl.GL30.GL_DEPTH_STENCIL :
-                         GlConst.toGlExternalId(p_394951_),
-+                        stencil ? org.lwjgl.opengl.GL30.GL_FLOAT_32_UNSIGNED_INT_24_8_REV :
-                         GlConst.toGlType(p_394951_),
-                         null
+-                        k, l, GlConst.toGlInternalId(format), width >> l, height >> l, 0, GlConst.toGlExternalId(format), GlConst.toGlType(format), null
++                        k, l, GlConst.toGlInternalId(format, stencil), width >> l, height >> l, 0, GlConst.toGlExternalId(format, stencil), GlConst.toGlType(format, stencil), null
                      );
-@@ -215,7 +_,7 @@
-             } else if (j1 != 0) {
-                 throw new IllegalStateException("OpenGL error " + j1);
-             } else {
--                GlTexture gltexture = new GlTexture(p_395535_, p_394142_, p_394951_, p_393944_, p_392329_, p_408015_, p_406483_, i);
-+                GlTexture gltexture = new GlTexture(p_395535_, p_394142_, p_394951_, p_393944_, p_392329_, p_408015_, p_406483_, i, stencil);
-                 this.debugLabels.applyLabel(gltexture);
-                 return gltexture;
+                 }
              }
+         } else {
+             for (int i1 = 0; i1 < mipLevels; i1++) {
+                 GlStateManager._texImage2D(
+-                    j, i1, GlConst.toGlInternalId(format), width >> i1, height >> i1, 0, GlConst.toGlExternalId(format), GlConst.toGlType(format), null
++                    j, i1, GlConst.toGlInternalId(format, stencil), width >> i1, height >> i1, 0, GlConst.toGlExternalId(format, stencil), GlConst.toGlType(format, stencil), null
+                 );
+             }
+         }
+@@ -187,7 +_,7 @@
+         } else if (j1 != 0) {
+             throw new IllegalStateException("OpenGL error " + j1);
+         } else {
+-            GlTexture gltexture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, i);
++            GlTexture gltexture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, i, stencil);
+             this.debugLabels.applyLabel(gltexture);
+             return gltexture;
+         }

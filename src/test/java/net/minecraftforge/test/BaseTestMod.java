@@ -223,7 +223,7 @@ public abstract class BaseTestMod {
                     var rdata = entry.getValue().data();
                     var env = envs.getOrThrow(ResourceKey.create(Registries.TEST_ENVIRONMENT, rdata.environment()));
 
-                    var edata = new TestData<Holder<TestEnvironmentDefinition>>(
+                    var edata = new TestData<Holder<TestEnvironmentDefinition<?>>>(
                         env,
                         rdata.structure(),
                         rdata.maxTicks(),
@@ -233,7 +233,8 @@ public abstract class BaseTestMod {
                         rdata.manualOnly(),
                         rdata.maxAttempts(),
                         rdata.requiredSuccesses(),
-                        rdata.skyAccess()
+                        rdata.skyAccess(),
+                        rdata.padding()
                     );
 
                     var funcKey = ResourceKey.create(Registries.TEST_FUNCTION, entry.getKey());

@@ -1,0 +1,13 @@
+--- a/net/minecraft/world/item/component/CustomData.java
++++ b/net/minecraft/world/item/component/CustomData.java
+@@ -31,6 +_,10 @@
+         return NbtUtils.compareNbt(expectedTag, this.tag, true);
+     }
+ 
++    public boolean strictMatchedBy(final CompoundTag expectedTag) {
++        return expectedTag == null ? this.tag == null : expectedTag.equals(this.tag);
++    }
++
+     public static void update(final DataComponentType<CustomData> component, final ItemStack itemStack, final Consumer<CompoundTag> consumer) {
+         CustomData customdata = itemStack.getOrDefault(component, EMPTY).update(consumer);
+         if (customdata.tag.isEmpty()) {

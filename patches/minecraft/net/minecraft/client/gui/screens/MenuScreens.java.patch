@@ -3,17 +3,17 @@
 @@ -41,11 +_,16 @@
      private static final Map<MenuType<?>, MenuScreens.ScreenConstructor<?, ?>> SCREENS = Maps.newHashMap();
  
-     public static <T extends AbstractContainerMenu> void create(MenuType<T> p_96202_, Minecraft p_96203_, int p_96204_, Component p_96205_) {
-+        getScreenFactory(p_96202_, p_96203_, p_96204_, p_96205_).ifPresent(f -> f.fromPacket(p_96205_, p_96202_, p_96203_, p_96204_));
+     public static <T extends AbstractContainerMenu> void create(final MenuType<T> type, final Minecraft minecraft, final int containerId, final Component title) {
++        getScreenFactory(type, minecraft, containerId, title).ifPresent(f -> f.fromPacket(title, type, minecraft, containerId));
 +    }
 +
-+    public static <T extends AbstractContainerMenu> java.util.Optional<ScreenConstructor<T, ?>> getScreenFactory(@Nullable MenuType<T> p_96202_, Minecraft p_96203_, int p_96204_, Component p_96205_) {
-         MenuScreens.ScreenConstructor<T, ?> screenconstructor = getConstructor(p_96202_);
++    public static <T extends AbstractContainerMenu> java.util.Optional<ScreenConstructor<T, ?>> getScreenFactory(@Nullable MenuType<T> type, Minecraft minecraft, int containerId, Component title) {
+         MenuScreens.ScreenConstructor<T, ?> screenconstructor = getConstructor(type);
          if (screenconstructor == null) {
-             LOGGER.warn("Failed to create screen for menu type: {}", BuiltInRegistries.MENU.getKey(p_96202_));
+             LOGGER.warn("Failed to create screen for menu type: {}", BuiltInRegistries.MENU.getKey(type));
 +            return java.util.Optional.empty();
          } else {
--            screenconstructor.fromPacket(p_96205_, p_96202_, p_96203_, p_96204_);
+-            screenconstructor.fromPacket(title, type, minecraft, containerId);
 +            return java.util.Optional.of(screenconstructor);
          }
      }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/golem/CopperGolem.java
 +++ b/net/minecraft/world/entity/animal/golem/CopperGolem.java
-@@ -213,7 +_,7 @@
+@@ -214,7 +_,7 @@
          }
  
          Level level = this.level();
@@ -8,11 +8,11 @@
 +        if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) { // Forge: Moved to onSheared
              if (level instanceof ServerLevel serverlevel) {
                  this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
-                 this.gameEvent(GameEvent.SHEAR, p_458561_);
+                 this.gameEvent(GameEvent.SHEAR, player);
 @@ -427,6 +_,18 @@
          ItemStack itemstack = this.getItemBySlot(EQUIPMENT_SLOT_ANTENNA);
          this.setItemSlot(EQUIPMENT_SLOT_ANTENNA, ItemStack.EMPTY);
-         this.spawnAtLocation(p_459970_, itemstack, 1.5F);
+         this.spawnAtLocation(level, itemstack, 1.5F);
 +    }
 +
 +    @Override

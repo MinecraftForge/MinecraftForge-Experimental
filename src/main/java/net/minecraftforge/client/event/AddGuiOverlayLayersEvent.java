@@ -6,11 +6,9 @@
 package net.minecraftforge.client.event;
 
 import net.minecraftforge.client.gui.overlay.ForgeLayeredDraw;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.SelfDestructing;
-import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 
@@ -28,10 +26,4 @@ public record AddGuiOverlayLayersEvent(ForgeLayeredDraw getLayeredDraw) implemen
 
     @ApiStatus.Internal
     public AddGuiOverlayLayersEvent {}
-
-    /** @deprecated {@link AddGuiOverlayLayersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<AddGuiOverlayLayersEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 }

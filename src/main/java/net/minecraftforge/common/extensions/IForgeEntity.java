@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.function.BiPredicate;
 
 import net.minecraft.sounds.SoundEvent;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.ProblemReporter;
 import net.minecraft.world.entity.boss.enderdragon.EnderDragon;
 import net.minecraft.world.entity.player.Player;
@@ -22,6 +23,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.storage.TagValueInput;
 import net.minecraft.world.level.storage.TagValueOutput;
@@ -124,24 +126,21 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag> {
      *
      * @return True if this entity is being tracked by a world
      */
-    // TODO: rename in 1.19 to isAddedToLevel
-    boolean isAddedToWorld();
+    boolean isAddedToLevel();
 
     /**
      * Called after the entity has been added to the world's
      * ticking list. Can be overriden, but needs to call super
      * to prevent MC-136995.
      */
-    // TODO: rename in 1.19 to onAddedToLevel
-    void onAddedToWorld();
+    void onAddedToLevel();
 
     /**
      * Called after the entity has been removed to the world's
      * ticking list. Can be overriden, but needs to call super
      * to prevent MC-136995.
      */
-    // TODO: rename in 1.19 to onRemovedFromLevel
-    void onRemovedFromWorld();
+    void onRemovedFromLevel();
 
     /**
      * Revives an entity that has been removed from a world.
@@ -186,7 +185,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag> {
      * @param type the type of the fluid
      * @return the height of the fluid compared to the entity
      */
-    double getFluidTypeHeight(FluidType type);
+    default double getFluidTypeHeight(FluidType type) {
+        return self().getFluidInteraction().getFluidHeight(type);
+    }
 
     /**
      * Returns the fluid type which is the highest on the bounding box of
@@ -195,7 +196,9 @@ public interface IForgeEntity extends ICapabilitySerializable<CompoundTag> {
      * @return the fluid type which is the highest on the bounding box of
      *         the entity
      */
-    FluidType getMaxHeightFluidType();
+    default FluidType getMaxHeightFluidType() {
+        return self().getFluidInteraction().getMaxHeightFluid();
+    }
 
     /**
      * Returns whether the entity is within the fluid type of the state.

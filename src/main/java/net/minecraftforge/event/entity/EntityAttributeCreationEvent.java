@@ -11,10 +11,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.DefaultAttributes;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
-import net.minecraftforge.fml.event.IModBusEvent;
 
 /**
  * EntityAttributeCreationEvent.<br>
@@ -23,12 +21,6 @@ import net.minecraftforge.fml.event.IModBusEvent;
  **/
 public final class EntityAttributeCreationEvent extends MutableEvent {
     public static final EventBus<EntityAttributeCreationEvent> BUS = EventBus.create(EntityAttributeCreationEvent.class);
-
-    /** @deprecated {@link EntityAttributeCreationEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<EntityAttributeCreationEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
 
     private final Map<EntityType<? extends LivingEntity>, AttributeSupplier> map;
 

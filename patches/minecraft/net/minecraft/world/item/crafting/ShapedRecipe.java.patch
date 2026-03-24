@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/item/crafting/ShapedRecipe.java
 +++ b/net/minecraft/world/item/crafting/ShapedRecipe.java
-@@ -18,7 +_,19 @@
+@@ -16,7 +_,19 @@
+ import net.minecraft.world.item.crafting.display.SlotDisplay;
  import net.minecraft.world.level.Level;
- import org.jspecify.annotations.Nullable;
  
--public class ShapedRecipe implements CraftingRecipe {
-+public class ShapedRecipe implements CraftingRecipe, net.minecraftforge.common.crafting.IShapedRecipe<CraftingInput> {
+-public class ShapedRecipe extends NormalCraftingRecipe {
++public class ShapedRecipe extends NormalCraftingRecipe implements net.minecraftforge.common.crafting.IShapedRecipe<CraftingInput> {
 +    static int MAX_WIDTH = 3;
 +    static int MAX_HEIGHT = 3;
 +    /**
@@ -18,13 +18,13 @@
 +        if (MAX_WIDTH < width) MAX_WIDTH = width;
 +        if (MAX_HEIGHT < height) MAX_HEIGHT = height;
 +    }
-     final ShapedRecipePattern pattern;
-     final ItemStack result;
-     final String group;
-@@ -65,6 +_,16 @@
-         }
+     public static final MapCodec<ShapedRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
+         i -> i.group(
+                 Recipe.CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
+@@ -78,6 +_,16 @@
  
-         return this.placementInfo;
+     public int getHeight() {
+         return this.pattern.height();
 +    }
 +
 +    @Override

@@ -1,35 +1,28 @@
 --- a/net/minecraft/data/loot/LootTableProvider.java
 +++ b/net/minecraft/data/loot/LootTableProvider.java
-@@ -61,7 +_,7 @@
-     private CompletableFuture<?> run(CachedOutput p_327970_, HolderLookup.Provider p_331092_) {
+@@ -60,7 +_,7 @@
+     private CompletableFuture<?> run(final CachedOutput cache, final HolderLookup.Provider registries) {
          WritableRegistry<LootTable> writableregistry = new MappedRegistry<>(Registries.LOOT_TABLE, Lifecycle.experimental());
          Map<RandomSupport.Seed128bit, Identifier> map = new Object2ObjectOpenHashMap<>();
--        this.subProviders.forEach(p_341016_ -> p_341016_.provider().apply(p_331092_).generate((p_448699_, p_448700_) -> {
-+        this.getTables().forEach(p_341016_ -> p_341016_.provider().apply(p_331092_).generate((p_448699_, p_448700_) -> {
-             Identifier identifier = sequenceIdForLootTable(p_448699_);
+-        this.subProviders.forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
++        this.getTables().forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
+             Identifier identifier = sequenceIdForLootTable(id);
              Identifier identifier1 = map.put(RandomSequence.seedForKey(identifier), identifier);
              if (identifier1 != null) {
-@@ -77,18 +_,8 @@
+@@ -76,11 +_,8 @@
          HolderGetter.Provider holdergetter$provider = new RegistryAccess.ImmutableRegistryAccess(List.of(writableregistry)).freeze();
-         ValidationContext validationcontext = new ValidationContext(problemreporter$collector, LootContextParamSets.ALL_PARAMS, holdergetter$provider);
+         ValidationContextSource validationcontextsource = new ValidationContextSource(problemreporter$collector, holdergetter$provider);
  
 -        for (ResourceKey<LootTable> resourcekey : Sets.difference(this.requiredTables, writableregistry.registryKeySet())) {
 -            problemreporter$collector.report(new LootTableProvider.MissingTableProblem(resourcekey));
 -        }
-+        validate(writableregistry, validationcontext, problemreporter$collector);
++        validate(writableregistry, validationcontextsource, problemreporter$collector);
  
--        writableregistry.listElements()
--            .forEach(
--                p_405062_ -> p_405062_.value()
--                    .validate(
--                        validationcontext.setContextKeySet(p_405062_.value().getParamSet())
--                            .enterElement(new ProblemReporter.RootElementPathElement(p_405062_.key()), p_405062_.key())
--                    )
--            );
+-        LootDataType.TABLE.runValidation(validationcontextsource, writableregistry);
          if (!problemreporter$collector.isEmpty()) {
-             problemreporter$collector.forEach(
-                 (p_405059_, p_405060_) -> LOGGER.warn("Found validation problem in {}: {}", p_405059_, p_405060_.description())
-@@ -111,6 +_,21 @@
+             problemreporter$collector.forEach((id, problem) -> LOGGER.warn("Found validation problem in {}: {}", id, problem.description()));
+             throw new IllegalStateException("Failed to validate loot tables, see logs");
+@@ -101,6 +_,18 @@
      @Override
      public final String getName() {
          return "Loot Tables";
@@ -39,15 +32,12 @@
 +        return this.subProviders;
 +    }
 +
-+    protected void validate(net.minecraft.core.Registry<LootTable> map, ValidationContext validationcontext, ProblemReporter report) {
++    protected void validate(net.minecraft.core.Registry<LootTable> map, ValidationContextSource context, ProblemReporter report) {
 +        for (ResourceKey<LootTable> resourcekey : Sets.difference(this.requiredTables, map.registryKeySet())) {
 +            report.report(new LootTableProvider.MissingTableProblem(resourcekey));
 +        }
 +
-+        map.listElements().forEach(table -> table.value().validate(
-+            validationcontext.setContextKeySet(table.value().getParamSet())
-+                .enterElement(new ProblemReporter.RootElementPathElement(table.key()), table.key())
-+        ));
++        LootDataType.TABLE.runValidation(context, map);
      }
  
      public record MissingTableProblem(ResourceKey<LootTable> id) implements ProblemReporter.Problem {

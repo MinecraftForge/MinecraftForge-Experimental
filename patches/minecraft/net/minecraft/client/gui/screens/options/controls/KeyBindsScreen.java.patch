@@ -2,7 +2,7 @@
 +++ b/net/minecraft/client/gui/screens/options/controls/KeyBindsScreen.java
 @@ -42,7 +_,7 @@
      protected void addFooter() {
-         this.resetButton = Button.builder(Component.translatable("controls.resetAll"), p_343640_ -> {
+         this.resetButton = Button.builder(Component.translatable("controls.resetAll"), button -> {
              for (KeyMapping keymapping : this.options.keyMappings) {
 -                keymapping.setKey(keymapping.getDefaultKey());
 +                keymapping.setToDefault();
@@ -10,17 +10,17 @@
  
              this.keyBindsList.resetMappingAndUpdateButtons();
 @@ -74,11 +_,12 @@
-     public boolean keyPressed(KeyEvent p_424487_) {
+     public boolean keyPressed(final KeyEvent event) {
          if (this.selectedKey != null) {
-             if (p_424487_.isEscape()) {
+             if (event.isEscape()) {
 -                this.selectedKey.setKey(InputConstants.UNKNOWN);
 +                this.selectedKey.setKeyModifierAndCode(null, InputConstants.UNKNOWN);
              } else {
--                this.selectedKey.setKey(InputConstants.getKey(p_424487_));
-+                this.selectedKey.setKeyModifierAndCode(null, InputConstants.getKey(p_424487_));
+-                this.selectedKey.setKey(InputConstants.getKey(event));
++                this.selectedKey.setKeyModifierAndCode(null, InputConstants.getKey(event));
              }
  
-+            if (p_424487_.isEscape() || !net.minecraftforge.client.settings.KeyModifier.isKeyCodeModifier(this.selectedKey.getKey()))
++            if (event.isEscape() || !net.minecraftforge.client.settings.KeyModifier.isKeyCodeModifier(this.selectedKey.getKey()))
              this.selectedKey = null;
              this.lastKeySelection = Util.getMillis();
              this.keyBindsList.resetMappingAndUpdateButtons();

@@ -1,53 +1,58 @@
 --- a/net/minecraft/world/level/storage/loot/LootPool.java
 +++ b/net/minecraft/world/level/storage/loot/LootPool.java
-@@ -34,10 +_,13 @@
-                 LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(p_297008_ -> p_297008_.conditions),
-                 LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(p_297009_ -> p_297009_.functions),
-                 NumberProviders.CODEC.fieldOf("rolls").forGetter(p_297004_ -> p_297004_.rolls),
--                NumberProviders.CODEC.fieldOf("bonus_rolls").orElse(ConstantValue.exactly(0.0F)).forGetter(p_297006_ -> p_297006_.bonusRolls)
-+                NumberProviders.CODEC.fieldOf("bonus_rolls").orElse(ConstantValue.exactly(0.0F)).forGetter(p_297006_ -> p_297006_.bonusRolls),
+@@ -33,10 +_,13 @@
+                 LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(p -> p.conditions),
+                 LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(p -> p.functions),
+                 NumberProviders.CODEC.fieldOf("rolls").forGetter(p -> p.rolls),
+-                NumberProviders.CODEC.fieldOf("bonus_rolls").orElse(ConstantValue.exactly(0.0F)).forGetter(p -> p.bonusRolls)
++                NumberProviders.CODEC.fieldOf("bonus_rolls").orElse(ConstantValue.exactly(0.0F)).forGetter(p -> p.bonusRolls),
 +                Codec.STRING.optionalFieldOf("name").forGetter(p -> p.name.filter(n -> !n.startsWith("custom#"))),
 +                net.minecraftforge.common.crafting.conditions.ICondition.OPTIONAL_FEILD_CODEC.forGetter(p -> p.forge_condition)
              )
-             .apply(p_341975_, LootPool::new)
+             .apply(i, LootPool::new)
      );
 +    public static final Codec<LootPool> CONDITIONAL_CODEC = net.minecraftforge.common.crafting.conditions.ConditionCodec.checkingDecode(CODEC, () -> lootPool().build());
      private final List<LootPoolEntryContainer> entries;
      private final List<LootItemCondition> conditions;
      private final Predicate<LootContext> compositeCondition;
-@@ -45,13 +_,21 @@
+@@ -44,6 +_,8 @@
      private final BiFunction<ItemStack, LootContext, ItemStack> compositeFunction;
      private NumberProvider rolls;
      private NumberProvider bonusRolls;
 +    private java.util.Optional<String> name;
 +    private java.util.Optional<net.minecraftforge.common.crafting.conditions.ICondition> forge_condition;
-+
-+    LootPool(List<LootPoolEntryContainer> p_298341_, List<LootItemCondition> p_297697_, List<LootItemFunction> p_299722_, NumberProvider p_165131_, NumberProvider p_165132_) {
-+        this(p_298341_, p_297697_, p_299722_, p_165131_, p_165132_, java.util.Optional.empty(), java.util.Optional.empty());
-+    }
  
-     LootPool(
-         List<LootPoolEntryContainer> p_298341_,
-         List<LootItemCondition> p_297697_,
-         List<LootItemFunction> p_299722_,
-         NumberProvider p_165131_,
--        NumberProvider p_165132_
-+        NumberProvider p_165132_,
-+        java.util.Optional<String> name,
-+        java.util.Optional<net.minecraftforge.common.crafting.conditions.ICondition> forge_condition
+     private LootPool(
+         final List<LootPoolEntryContainer> entries,
+@@ -52,6 +_,18 @@
+         final NumberProvider rolls,
+         final NumberProvider bonusRolls
      ) {
-         this.entries = p_298341_;
-         this.conditions = p_297697_;
-@@ -60,6 +_,8 @@
-         this.compositeFunction = LootItemFunctions.compose(p_299722_);
-         this.rolls = p_165131_;
-         this.bonusRolls = p_165132_;
++        this(entries, conditions, functions, rolls, bonusRolls, java.util.Optional.empty(), java.util.Optional.empty());
++    }
++
++    private LootPool(
++        final List<LootPoolEntryContainer> entries,
++        final List<LootItemCondition> conditions,
++        final List<LootItemFunction> functions,
++        final NumberProvider rolls,
++        final NumberProvider bonusRolls,
++        final java.util.Optional<String> name,
++        final java.util.Optional<net.minecraftforge.common.crafting.conditions.ICondition> forge_condition
++    ) {
+         this.entries = entries;
+         this.conditions = conditions;
+         this.compositeCondition = Util.allOf(conditions);
+@@ -59,6 +_,8 @@
+         this.compositeFunction = LootItemFunctions.compose(functions);
+         this.rolls = rolls;
+         this.bonusRolls = bonusRolls;
 +        this.name = name;
 +        this.forge_condition = forge_condition;
      }
  
-     private void addRandomItem(Consumer<ItemStack> p_79059_, LootContext p_79060_) {
-@@ -127,12 +_,35 @@
+     private void addRandomItem(final Consumer<ItemStack> result, final LootContext context) {
+@@ -118,12 +_,35 @@
          return new LootPool.Builder();
      }
  
@@ -81,9 +86,9 @@
 +        @org.jetbrains.annotations.Nullable
 +        private net.minecraftforge.common.crafting.conditions.ICondition forge_condition;
  
-         public LootPool.Builder setRolls(NumberProvider p_165134_) {
-             this.rolls = p_165134_;
-@@ -163,8 +_,18 @@
+         public LootPool.Builder setRolls(final NumberProvider rolls) {
+             this.rolls = rolls;
+@@ -154,8 +_,18 @@
              return this;
          }
  

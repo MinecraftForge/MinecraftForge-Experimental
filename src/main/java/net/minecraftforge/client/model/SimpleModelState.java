@@ -6,7 +6,8 @@
 package net.minecraftforge.client.model;
 
 import com.mojang.math.Transformation;
-import net.minecraft.client.resources.model.ModelState;
+
+import net.minecraft.client.renderer.block.dispatch.ModelState;
 
 /**
  * Simple implementation of {@link ModelState}.

@@ -4,21 +4,21 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
--public class Item implements FeatureElement, ItemLike {
-+public class Item implements FeatureElement, ItemLike, net.minecraftforge.common.extensions.IForgeItem {
+-public class Item implements ItemLike, FeatureElement {
++public class Item implements ItemLike, FeatureElement, net.minecraftforge.common.extensions.IForgeItem {
      public static final Codec<Holder<Item>> CODEC = BuiltInRegistries.ITEM
          .holderByNameCodec()
-         .validate(
-@@ -105,7 +_,7 @@
-         );
-     public static final StreamCodec<RegistryFriendlyByteBuf, Holder<Item>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.ITEM);
+         .validate(item -> item.is(Items.AIR.builtInRegistryHolder()) ? DataResult.error(() -> "Item must not be minecraft:air") : DataResult.success(item));
+@@ -106,7 +_,7 @@
+             : DataResult.success(item)
+     );
      private static final Logger LOGGER = LogUtils.getLogger();
 -    public static final Map<Block, Item> BY_BLOCK = Maps.newHashMap();
 +    public static final Map<Block, Item> BY_BLOCK = net.minecraftforge.registries.GameData.ItemCallbacks.getBlockItemMap();
      public static final Identifier BASE_ATTACK_DAMAGE_ID = Identifier.withDefaultNamespace("base_attack_damage");
      public static final Identifier BASE_ATTACK_SPEED_ID = Identifier.withDefaultNamespace("base_attack_speed");
      public static final int DEFAULT_MAX_STACK_SIZE = 64;
-@@ -142,6 +_,7 @@
+@@ -145,6 +_,7 @@
                  LOGGER.error("Item classes should end with Item and {} doesn't.", s);
              }
          }
@@ -26,7 +26,7 @@
      }
  
      @Deprecated
-@@ -149,17 +_,25 @@
+@@ -152,8 +_,15 @@
          return this.builtInRegistryHolder;
      }
  
@@ -34,36 +34,33 @@
 +    private DataComponentMap builtComponents = null;
 +
      public DataComponentMap components() {
--        return this.components;
+-        return this.builtInRegistryHolder.components();
 +        if (builtComponents == null) {
-+            builtComponents = net.minecraftforge.common.ForgeHooks.gatherItemComponents(this, components);
++            builtComponents = net.minecraftforge.common.ForgeHooks.gatherItemComponents(this, this.builtInRegistryHolder.components());
 +        }
 +
 +        return builtComponents;
      }
  
      public int getDefaultMaxStackSize() {
--        return this.components.getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
-+        return builtComponents == null ? this.components.getOrDefault(DataComponents.MAX_STACK_SIZE, 1) : this.builtComponents.getOrDefault(DataComponents.MAX_STACK_SIZE, 1);
-     }
- 
-     public void onUseTick(Level p_41428_, LivingEntity p_41429_, ItemStack p_41430_, int p_41431_) {
+@@ -163,6 +_,7 @@
+     public void onUseTick(final Level level, final LivingEntity livingEntity, final ItemStack itemStack, final int ticksRemaining) {
      }
  
 +    /** @deprecated Forge: {@link net.minecraftforge.common.extensions.IForgeItem#onDestroyed(ItemEntity, DamageSource) Use damage source sensitive version} */
-     public void onDestroyed(ItemEntity p_150887_) {
+     public void onDestroyed(final ItemEntity itemEntity) {
      }
  
-@@ -276,6 +_,8 @@
+@@ -281,6 +_,8 @@
          return BuiltInRegistries.ITEM.wrapAsHolder(this).getRegisteredName();
      }
  
 +    /** Forge: use {@link ItemStack#getCraftingRemainder()}. */
 +    @Deprecated
-     public final ItemStack getCraftingRemainder() {
-         return this.craftingRemainingItem == null ? ItemStack.EMPTY : new ItemStack(this.craftingRemainingItem);
+     public final @Nullable ItemStackTemplate getCraftingRemainder() {
+         return this.craftingRemainingItem;
      }
-@@ -366,6 +_,30 @@
+@@ -373,6 +_,30 @@
          return false;
      }
  
@@ -92,9 +89,9 @@
 +    public void initializeClient(java.util.function.Consumer<net.minecraftforge.client.extensions.common.IClientItemExtensions> consumer) { }
 +
      public static class Properties {
-         private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = p_449793_ -> Util.makeDescriptionId("block", p_449793_.identifier());
-         private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = p_449792_ -> Util.makeDescriptionId("item", p_449792_.identifier());
-@@ -683,6 +_,11 @@
+         private static final DependantName<Item, String> BLOCK_DESCRIPTION_ID = id -> Util.makeDescriptionId("block", id.identifier());
+         private static final DependantName<Item, String> ITEM_DESCRIPTION_ID = id -> Util.makeDescriptionId("item", id.identifier());
+@@ -721,6 +_,11 @@
  
          boolean isPeaceful();
  
@@ -103,18 +100,18 @@
 +            return null;
 +        }
 +
-         static Item.TooltipContext of(final @Nullable Level p_332083_) {
-             return p_332083_ == null ? EMPTY : new Item.TooltipContext() {
+         static Item.TooltipContext of(final @Nullable Level level) {
+             return level == null ? EMPTY : new Item.TooltipContext() {
                  @Override
-@@ -703,6 +_,11 @@
+@@ -741,6 +_,11 @@
                  @Override
                  public boolean isPeaceful() {
-                     return p_332083_.getDifficulty() == Difficulty.PEACEFUL;
+                     return level.getDifficulty() == Difficulty.PEACEFUL;
 +                }
 +
 +                @Override
 +                public Level level() {
-+                    return p_332083_;
++                    return level;
                  }
              };
          }

@@ -1,7 +1,7 @@
 --- a/net/minecraft/util/context/ContextMap.java
 +++ b/net/minecraft/util/context/ContextMap.java
 @@ -37,6 +_,10 @@
-         return (T)this.params.getOrDefault(p_368195_, p_368521_);
+         return (T)this.params.getOrDefault(param, _default);
      }
  
 +    public Set<ContextKey<?>> keySet() {

@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.attribute.EnvironmentAttributes;
 import net.minecraft.world.entity.Entity;
@@ -39,13 +40,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.pathfinder.WalkNodeEvaluator;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.client.ForgeHooksClient;
 import net.minecraftforge.client.model.data.ModelData;
 import net.minecraftforge.client.model.data.ModelDataManager;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.IPlantable;
 
-import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.Level;
@@ -54,7 +53,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.ToolActions;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 
 @SuppressWarnings("deprecation")
@@ -356,8 +354,8 @@ public interface IForgeBlock {
     * @return True if the soil should be considered fertile.
     */
     default boolean isFertile(BlockState state, BlockGetter level, BlockPos pos) {
-        if (state.getBlock() instanceof FarmBlock)
-            return state.getValue(FarmBlock.MOISTURE) > 0;
+        if (state.getBlock() instanceof FarmlandBlock)
+            return state.getValue(FarmlandBlock.MOISTURE) > 0;
 
         return  false;
     }
@@ -501,7 +499,7 @@ public interface IForgeBlock {
      */
     @Nullable
     default PathType getBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob) {
-        return state.getBlock() == Blocks.LAVA ? PathType.LAVA : state.isBurning(level, pos) ? PathType.DAMAGE_FIRE : null;
+        return state.getBlock() == Blocks.LAVA ? PathType.LAVA : state.isBurning(level, pos) ? PathType.FIRE : null;
     }
 
     /**
@@ -519,8 +517,8 @@ public interface IForgeBlock {
      */
     @Nullable
     default PathType getAdjacentBlockPathType(BlockState state, BlockGetter level, BlockPos pos, @Nullable Mob mob, PathType originalType) {
-        if (state.is(Blocks.SWEET_BERRY_BUSH)) return PathType.DANGER_OTHER;
-        else if (WalkNodeEvaluator.isBurningBlock(state)) return PathType.DANGER_FIRE;
+        if (state.is(Blocks.SWEET_BERRY_BUSH)) return PathType.DAMAGING_IN_NEIGHBOR;
+        else if (WalkNodeEvaluator.isBurningBlock(state)) return PathType.FIRE_IN_NEIGHBOR;
         else return null;
     }
 
@@ -780,42 +778,6 @@ public interface IForgeBlock {
         } else {
             return state.isSignalSource() && direction != null;
         }
-    }
-
-    /**
-     * Whether this block hides the neighbors face pointed towards by the given direction.
-     * <p>
-     * This method should only be used for blocks you don't control, for your own blocks override
-     * {@link Block#skipRendering(BlockState, BlockState, Direction)} on the respective block instead
-     * <p>
-     * WARNING: This method is likely to be called from a worker thread! If you want to retrieve a
-     *          {@link net.minecraft.world.level.block.entity.BlockEntity} from the given level, make sure to use
-     *          {@link net.minecraftforge.common.extensions.IForgeBlockGetter#getExistingBlockEntity(BlockPos)} to not
-     *          accidentally create a new or delete an old {@link net.minecraft.world.level.block.entity.BlockEntity}
-     *          off of the main thread as this would cause a write operation to the given {@link BlockGetter} and cause
-     *          a CME in the process. Any other direct or indirect write operation to the {@link BlockGetter} will have
-     *          the same outcome.
-     *
-     * @param level The world
-     * @param pos The blocks position in the world
-     * @param state The blocks {@link BlockState}
-     * @param neighborState The neighboring blocks {@link BlockState}
-     * @param dir The direction towards the neighboring block
-     */
-    default boolean hidesNeighborFace(BlockGetter level, BlockPos pos, BlockState state, BlockState neighborState, Direction dir) {
-        return false;
-    }
-
-    /**
-     * Whether this block allows a neighboring block to hide the face of this block it touches.
-     * If this returns true, {@link IForgeBlockState#hidesNeighborFace(BlockGetter, BlockPos, BlockState, Direction)}
-     * will be called on the neighboring block.
-     */
-    default boolean supportsExternalFaceHiding(BlockState state) {
-        if (FMLEnvironment.dist.isClient()) {
-            return !ForgeHooksClient.isBlockInSolidLayer(state);
-        }
-        return true;
     }
 
     /**

@@ -8,7 +8,6 @@ package net.minecraftforge.common.loot;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 
-import net.minecraft.world.level.storage.loot.predicates.LootItemConditionType;
 import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.resources.Identifier;
@@ -19,13 +18,11 @@ public record LootTableIdCondition(Identifier id) implements LootItemCondition {
     ).apply(b, LootTableIdCondition::new));
 
 
-    // TODO Forge Registry at some point?
-    public static final LootItemConditionType TYPE = new LootItemConditionType(CODEC);
     public static final Identifier UNKNOWN_LOOT_TABLE = Identifier.fromNamespaceAndPath("forge", "unknown_loot_table");
 
     @Override
-    public LootItemConditionType getType() {
-        return TYPE;
+    public MapCodec<LootTableIdCondition> codec() {
+        return CODEC;
     }
 
     @Override

@@ -27,8 +27,7 @@ public final class ForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
     @Override
     public void addTags(HolderLookup.Provider lookupProvider) {
         tag(BOSSES)
-            .add(EntityType.ENDER_DRAGON, EntityType.WITHER)
-            .addOptionalTag(forgeTagKey("bosses"));
+            .add(EntityType.ENDER_DRAGON, EntityType.WITHER);
         tag(MINECARTS).add(
             EntityType.MINECART,
             EntityType.CHEST_MINECART,
@@ -41,6 +40,8 @@ public final class ForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
         tag(BOATS).add(
             EntityType.ACACIA_BOAT,
             EntityType.ACACIA_CHEST_BOAT,
+            EntityType.BAMBOO_CHEST_RAFT,
+            EntityType.BAMBOO_RAFT,
             EntityType.BIRCH_BOAT,
             EntityType.BIRCH_CHEST_BOAT,
             EntityType.CHERRY_BOAT,
@@ -58,12 +59,9 @@ public final class ForgeEntityTypeTagsProvider extends EntityTypeTagsProvider {
             EntityType.SPRUCE_BOAT,
             EntityType.SPRUCE_CHEST_BOAT
         );
+        tag(ITEM_FRAMES).add(EntityType.ITEM_FRAME, EntityType.GLOW_ITEM_FRAME);
         tag(CAPTURING_NOT_SUPPORTED);
         tag(TELEPORTING_NOT_SUPPORTED);
-
-        // Backwards compat definitions for pre-1.21 legacy `forge:` tags.
-        // TODO: Remove backwards compat tag entries in 1.22
-        tag(forgeTagKey("bosses")).add(EntityType.ENDER_DRAGON, EntityType.WITHER);
     }
 
     private static TagKey<EntityType<?>> forgeTagKey(String path) {

@@ -9,9 +9,9 @@
  
 +    /** @deprecated Forge - Use {@link #jumpInFluid(net.minecraftforge.fluids.FluidType)} */
      @Override
-     protected void jumpInLiquid(TagKey<Fluid> p_204065_) {
--        if (p_204065_ == FluidTags.LAVA) {
-+        this.jumpInLiquidInternal(() -> p_204065_ == FluidTags.LAVA, () -> super.jumpInLiquid(p_204065_));
+     protected void jumpInLiquid(final TagKey<Fluid> type) {
+-        if (type == FluidTags.LAVA) {
++        this.jumpInLiquidInternal(() -> type == FluidTags.LAVA, () -> super.jumpInLiquid(type));
 +    }
 +
 +    private void jumpInLiquidInternal(java.util.function.BooleanSupplier isLava, Runnable onSuper) {
@@ -20,7 +20,7 @@
              this.setDeltaMovement(vec3.x, 0.22F + this.getSize() * 0.05F, vec3.z);
              this.needsSync = true;
          } else {
--            super.jumpInLiquid(p_204065_);
+-            super.jumpInLiquid(type);
 +            onSuper.run();
          }
 +    }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/resources/model/ModelDiscovery.java
 +++ b/net/minecraft/client/resources/model/ModelDiscovery.java
-@@ -172,6 +_,14 @@
+@@ -177,6 +_,14 @@
              return this.parent;
          }
  
@@ -15,21 +15,20 @@
          @Override
          public String debugName() {
              return this.id.toString();
-@@ -224,7 +_,7 @@
- 
-         private QuadCollection bakeDefaultState(TextureSlots p_392267_, ModelBaker p_393576_, ModelState p_391972_) {
+@@ -233,14 +_,14 @@
              QuadCollection quadcollection = this.getSlot(KEY_DEFAULT_GEOMETRY);
--            return quadcollection != null ? quadcollection : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(p_392267_, p_393576_, p_391972_, this));
-+            return quadcollection != null ? quadcollection : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(p_392267_, p_393576_, p_391972_, this, getContext()));
+             return quadcollection != null
+                 ? quadcollection
+-                : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this));
++                : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this, getContext()));
          }
  
          @Override
-@@ -233,7 +_,7 @@
-                 ? this.bakeDefaultState(p_396404_, p_391625_, p_396681_)
-                 : this.modelBakeCache.computeIfAbsent(p_396681_, p_394933_ -> {
-                     UnbakedGeometry unbakedgeometry = this.getTopGeometry();
--                    return unbakedgeometry.bake(p_396404_, p_391625_, p_394933_, this);
-+                    return unbakedgeometry.bake(p_396404_, p_391625_, p_394933_, this, getContext());
-                 });
+         public QuadCollection bakeTopGeometry(final TextureSlots textureSlots, final ModelBaker baker, final ModelState state) {
+             return state == BlockModelRotation.IDENTITY ? this.bakeDefaultState(textureSlots, baker, state) : this.modelBakeCache.computeIfAbsent(state, s -> {
+                 UnbakedGeometry unbakedgeometry = this.getTopGeometry();
+-                return unbakedgeometry.bake(textureSlots, baker, s, this);
++                return unbakedgeometry.bake(textureSlots, baker, s, this, getContext());
+             });
          }
      }

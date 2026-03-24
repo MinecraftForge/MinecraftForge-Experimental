@@ -1,36 +1,50 @@
 --- a/net/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessor.java
 +++ b/net/minecraft/world/level/levelgen/structure/templatesystem/StructureProcessor.java
-@@ -7,6 +_,11 @@
+@@ -7,6 +_,7 @@
  import org.jspecify.annotations.Nullable;
  
  public abstract class StructureProcessor {
-+
-+    /**
-+     * @deprecated Forge: Use {@link #process(LevelReader, BlockPos, BlockPos, StructureTemplate.StructureBlockInfo, StructureTemplate.StructureBlockInfo, StructurePlaceSettings, StructureTemplate)} instead.
-+     */
-+    @Deprecated
++    /** @deprecated Use variant with StructureTemplate argument */
      public StructureTemplate.@Nullable StructureBlockInfo processBlock(
-         LevelReader p_74416_,
-         BlockPos p_74417_,
-@@ -29,5 +_,21 @@
-         StructurePlaceSettings p_277497_
+         final LevelReader level,
+         final BlockPos targetPosition,
+@@ -18,6 +_,18 @@
+         return processedBlockInfo;
+     }
+ 
++    public StructureTemplate.@Nullable StructureBlockInfo processBlock(
++        final LevelReader level,
++        final BlockPos targetPosition,
++        final BlockPos referencePos,
++        final StructureTemplate.StructureBlockInfo originalBlockInfo,
++        final StructureTemplate.StructureBlockInfo processedBlockInfo,
++        final StructurePlaceSettings settings,
++        final @Nullable StructureTemplate template
++    ) {
++       return processBlock(level, targetPosition, referencePos, originalBlockInfo, processedBlockInfo, settings);
++    }
++
+     protected abstract StructureProcessorType<?> getType();
+ 
+     public List<StructureTemplate.StructureBlockInfo> finalizeProcessing(
+@@ -29,5 +_,20 @@
+         final StructurePlaceSettings settings
      ) {
-         return p_278053_;
+         return processedBlockInfoList;
 +    }
 +
 +    /**
-+     * FORGE: Add entity processing.
-+     * <p>
 +     * Use this method to process entities from a structure in much the same way as
 +     * blocks, parameters are analogous.
-+     *
-+     * @see #process(LevelReader, BlockPos, BlockPos, StructureTemplate.StructureBlockInfo, StructureTemplate.StructureBlockInfo, StructurePlaceSettings, StructureTemplate)
 +     */
-+    public StructureTemplate.StructureEntityInfo processEntity(LevelReader world, BlockPos seedPos, StructureTemplate.StructureEntityInfo rawEntityInfo, StructureTemplate.StructureEntityInfo entityInfo, StructurePlaceSettings placementSettings, StructureTemplate template) {
-+       return entityInfo;
-+    }
-+
-+    public StructureTemplate.@Nullable StructureBlockInfo process(LevelReader level, BlockPos seed, BlockPos offset, StructureTemplate.StructureBlockInfo rawBlock, StructureTemplate.StructureBlockInfo block, StructurePlaceSettings settings, @Nullable StructureTemplate template) {
-+       return processBlock(level, seed, offset, rawBlock, block, settings);
++    public StructureTemplate.@Nullable StructureEntityInfo processEntity(
++        final LevelReader level,
++        final BlockPos targetPosition,
++        final StructureTemplate.StructureEntityInfo originalEntityInfo,
++        final StructureTemplate.StructureEntityInfo processedEntityInfo,
++        final StructurePlaceSettings settings,
++        final @Nullable StructureTemplate template
++    ) {
++       return processedEntityInfo;
      }
  }

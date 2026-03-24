@@ -6,7 +6,7 @@
 package net.minecraftforge.client.event;
 
 import com.mojang.blaze3d.platform.Window;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -29,7 +29,7 @@ import java.util.List;
 public sealed interface CustomizeGuiOverlayEvent {
     Window getWindow();
 
-    GuiGraphics getGuiGraphics();
+    GuiGraphicsExtractor getGuiGraphics();
 
     float getPartialTick();
 
@@ -46,7 +46,7 @@ public sealed interface CustomizeGuiOverlayEvent {
         public static final CancellableEventBus<BossEventProgress> BUS = CancellableEventBus.create(BossEventProgress.class);
 
         private final Window window;
-        private final GuiGraphics guiGraphics;
+        private final GuiGraphicsExtractor guiGraphics;
         private final float partialTick;
         private final LerpingBossEvent bossEvent;
         private final int x;
@@ -54,7 +54,7 @@ public sealed interface CustomizeGuiOverlayEvent {
         private int increment;
 
         @ApiStatus.Internal
-        public BossEventProgress(Window window, GuiGraphics guiGraphics, float partialTick, LerpingBossEvent bossEvent, int x, int y, int increment) {
+        public BossEventProgress(Window window, GuiGraphicsExtractor guiGraphics, float partialTick, LerpingBossEvent bossEvent, int x, int y, int increment) {
             this.window = window;
             this.guiGraphics = guiGraphics;
             this.partialTick = partialTick;
@@ -70,7 +70,7 @@ public sealed interface CustomizeGuiOverlayEvent {
         }
 
         @Override
-        public GuiGraphics getGuiGraphics() {
+        public GuiGraphicsExtractor getGuiGraphics() {
             return guiGraphics;
         }
 
@@ -129,7 +129,7 @@ public sealed interface CustomizeGuiOverlayEvent {
      */
     record DebugText(
             Window getWindow,
-            GuiGraphics getGuiGraphics,
+            GuiGraphicsExtractor getGuiGraphics,
             float getPartialTick,
             List<String> getText,
             Side getSide
@@ -155,13 +155,13 @@ public sealed interface CustomizeGuiOverlayEvent {
         public static final EventBus<Chat> BUS = EventBus.create(Chat.class);
 
         private final Window window;
-        private final GuiGraphics guiGraphics;
+        private final GuiGraphicsExtractor guiGraphics;
         private final float partialTick;
         private int posX;
         private int posY;
 
         @ApiStatus.Internal
-        public Chat(Window window, GuiGraphics guiGraphics, float partialTick, int posX, int posY) {
+        public Chat(Window window, GuiGraphicsExtractor guiGraphics, float partialTick, int posX, int posY) {
             this.window = window;
             this.guiGraphics = guiGraphics;
             this.partialTick = partialTick;
@@ -175,7 +175,7 @@ public sealed interface CustomizeGuiOverlayEvent {
         }
 
         @Override
-        public GuiGraphics getGuiGraphics() {
+        public GuiGraphicsExtractor getGuiGraphics() {
             return guiGraphics;
         }
 

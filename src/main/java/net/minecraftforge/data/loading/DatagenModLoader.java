@@ -29,7 +29,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import joptsimple.OptionSpec;
 
-public class DatagenModLoader {
+public final class DatagenModLoader {
     private static final Logger LOGGER = LogManager.getLogger();
     private static ExistingFileHelper existingFileHelper;
     private static boolean runningDataGen;
@@ -71,7 +71,7 @@ public class DatagenModLoader {
 
     public boolean run(
         OptionSet options, Path output, Collection<Path> inputs,
-        boolean genServer, boolean genClient, boolean genDev, boolean genReports, boolean validate
+        boolean genServer, boolean genClient, boolean genDev, boolean genReports
     ) {
         var existingPacks = options.valuesOf(this.existing).stream().map(Paths::get).toList();
         var existingMods = new HashSet<>(options.valuesOf(this.existingMod));
@@ -90,7 +90,7 @@ public class DatagenModLoader {
         Bootstrap.bootStrap();
         if (genClient)
             ClientBootstrap.bootstrap();
-        ModLoader.get().gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
+        ModLoader.gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
         var lookupProvider = CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor());
 
         var mods = new HashSet<String>();
@@ -99,7 +99,7 @@ public class DatagenModLoader {
                 mods.add(pattern);
 
             var m = Pattern.compile('^' + pattern + '$');
-            ModList.get().forEachModInOrder(mc -> {
+            ModList.forEachModInOrder(mc -> {
                 var id = mc.getModId();
                 if (!"forge".equals(id) && !"minecraft".equals(id) && m.matcher(id).matches())
                     mods.add(id);
@@ -108,14 +108,14 @@ public class DatagenModLoader {
         LOGGER.info("Initializing Data Gatherer for mods {}", mods);
 
         var config = new GatherDataEvent.DataGeneratorConfig(mods, output, inputs, lookupProvider, genServer,
-                genClient, genDev, genReports, validate, flat);
+                genClient, genDev, genReports, flat);
 
         if (!mods.contains("forge")) {
             // If we aren't generating data for forge, automatically add forge as an existing so mods can access forge's data
             existingMods.add("forge");
         }
 
-        existingFileHelper = new ExistingFileHelper(existingPacks, existingMods, validate, assetIndex, assetsDir);
+        existingFileHelper = new ExistingFileHelper(existingPacks, existingMods, assetIndex, assetsDir);
         ModLoader.runEventGenerator(mc -> new GatherDataEvent(
             mc,
             config.makeGenerator(

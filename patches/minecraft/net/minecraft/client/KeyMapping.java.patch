@@ -15,12 +15,12 @@
 @@ -39,7 +_,7 @@
      }
  
-     private static void forAllKeyMappings(InputConstants.Key p_424096_, Consumer<KeyMapping> p_427756_) {
--        List<KeyMapping> list = MAP.get(p_424096_);
-+        List<KeyMapping> list = MAP.getAll(p_424096_);
+     private static void forAllKeyMappings(final InputConstants.Key key, final Consumer<KeyMapping> operation) {
+-        List<KeyMapping> list = MAP.get(key);
++        List<KeyMapping> list = MAP.getAll(key);
          if (list != null && !list.isEmpty()) {
              for (KeyMapping keymapping : list) {
-                 p_427756_.accept(keymapping);
+                 operation.accept(keymapping);
 @@ -106,7 +_,7 @@
      }
  
@@ -30,12 +30,12 @@
      }
  
      public KeyMapping.Category getCategory() {
-@@ -149,8 +_,17 @@
-                 ? I18n.get(this.name).compareTo(I18n.get(p_90841_.name))
-                 : Integer.compare(this.order, p_90841_.order);
+@@ -147,8 +_,17 @@
+         if (this.category == o.category) {
+             return this.order == o.order ? I18n.get(this.name).compareTo(I18n.get(o.name)) : Integer.compare(this.order, o.order);
          } else {
--            return Integer.compare(KeyMapping.Category.SORT_ORDER.indexOf(this.category), KeyMapping.Category.SORT_ORDER.indexOf(p_90841_.category));
-+            return compareSort(this.category, p_90841_.category);
+-            return Integer.compare(KeyMapping.Category.SORT_ORDER.indexOf(this.category), KeyMapping.Category.SORT_ORDER.indexOf(o.category));
++            return compareSort(this.category, o.category);
          }
 +    }
 +
@@ -48,17 +48,17 @@
 +        return  o1 - o2;
      }
  
-     public static Supplier<Component> createNameSupplier(String p_90843_) {
-@@ -159,6 +_,20 @@
+     public static Supplier<Component> createNameSupplier(final String key) {
+@@ -157,6 +_,20 @@
      }
  
-     public boolean same(KeyMapping p_90851_) {
-+        if (getKeyConflictContext().conflicts(p_90851_.getKeyConflictContext()) || p_90851_.getKeyConflictContext().conflicts(getKeyConflictContext())) {
+     public boolean same(final KeyMapping that) {
++        if (getKeyConflictContext().conflicts(that.getKeyConflictContext()) || that.getKeyConflictContext().conflicts(getKeyConflictContext())) {
 +            var keyModifier = getKeyModifier();
-+            var otherKeyModifier = p_90851_.getKeyModifier();
-+            if (keyModifier.matches(p_90851_.getKey()) || otherKeyModifier.matches(getKey())) {
++            var otherKeyModifier = that.getKeyModifier();
++            if (keyModifier.matches(that.getKey()) || otherKeyModifier.matches(getKey())) {
 +               return true;
-+            } else if (getKey().equals(p_90851_.getKey())) {
++            } else if (getKey().equals(that.getKey())) {
 +               // IN_GAME key contexts have a conflict when at least one modifier is NONE.
 +               // For example: If you hold shift to crouch, you can still press E to open your inventory. This means that a Shift+E hotkey is in conflict with E.
 +               // GUI and other key contexts do not have this limitation.
@@ -67,10 +67,10 @@
 +                  (keyModifier == net.minecraftforge.client.settings.KeyModifier.NONE || otherKeyModifier == net.minecraftforge.client.settings.KeyModifier.NONE));
 +            }
 +         }
-         return this.key.equals(p_90851_.key);
+         return this.key.equals(that.key);
      }
  
-@@ -177,11 +_,13 @@
+@@ -175,11 +_,13 @@
      }
  
      public Component getTranslatedKeyMessage() {
@@ -85,16 +85,16 @@
      }
  
      public String saveString() {
-@@ -193,11 +_,94 @@
+@@ -191,11 +_,94 @@
      }
  
-     private void registerMapping(InputConstants.Key p_423386_) {
--        MAP.computeIfAbsent(p_423386_, p_420623_ -> new ArrayList<>()).add(this);
-+        MAP.put(p_423386_, this);
+     private void registerMapping(final InputConstants.Key key) {
+-        MAP.computeIfAbsent(key, k -> new ArrayList<>()).add(this);
++        MAP.put(key, this);
      }
  
-     public static @Nullable KeyMapping get(String p_378660_) {
-         return ALL.get(p_378660_);
+     public static @Nullable KeyMapping get(final String name) {
+         return ALL.get(name);
 +    }
 +
 +    private net.minecraftforge.client.settings.KeyModifier keyModifierDefault = net.minecraftforge.client.settings.KeyModifier.NONE;

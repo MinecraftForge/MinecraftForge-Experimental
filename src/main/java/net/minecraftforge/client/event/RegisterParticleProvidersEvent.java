@@ -9,11 +9,9 @@ import net.minecraft.client.particle.ParticleProvider;
 import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleType;
-import net.minecraftforge.eventbus.api.bus.BusGroup;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.fml.LogicalSide;
-import net.minecraftforge.fml.event.IModBusEvent;
 import net.minecraftforge.registries.RegisterEvent;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
@@ -28,13 +26,7 @@ import org.jspecify.annotations.NullMarked;
  */
 @NullMarked
 public final class RegisterParticleProvidersEvent extends MutableEvent {
-    public static EventBus<RegisterParticleProvidersEvent> BUS = EventBus.create(RegisterParticleProvidersEvent.class);
-
-    /** @deprecated {@link RegisterParticleProvidersEvent} is no longer an {@link IModBusEvent}, so use {@link #BUS} directly. */
-    @Deprecated(forRemoval = true, since = "1.21.9")
-    public static EventBus<RegisterParticleProvidersEvent> getBus(BusGroup modBusGroup) {
-        return BUS;
-    }
+    public static final EventBus<RegisterParticleProvidersEvent> BUS = EventBus.create(RegisterParticleProvidersEvent.class);
 
     private final ParticleResources particles;
 

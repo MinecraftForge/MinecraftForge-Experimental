@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/entity/ChestBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ChestBlockEntity.java
-@@ -194,4 +_,43 @@
-         Block block = p_155335_.getBlock();
-         p_155333_.blockEvent(p_155334_, block, 1, p_155337_);
+@@ -202,4 +_,43 @@
+         Block block = blockState.getBlock();
+         level.blockEvent(pos, block, 1, current);
      }
 +
 +    private net.minecraftforge.common.util.LazyOptional<net.minecraftforge.items.IItemHandlerModifiable> chestHandler;

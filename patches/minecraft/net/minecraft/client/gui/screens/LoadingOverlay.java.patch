@@ -1,25 +1,25 @@
 --- a/net/minecraft/client/gui/screens/LoadingOverlay.java
 +++ b/net/minecraft/client/gui/screens/LoadingOverlay.java
-@@ -63,6 +_,8 @@
-         return p_169325_ & 16777215 | p_169326_ << 24;
+@@ -64,6 +_,8 @@
+         return color & 16777215 | alpha << 24;
      }
  
-+    protected boolean renderContents(GuiGraphics gui, float alpha) { return true; }
++    protected boolean extractContentRenderState(final GuiGraphicsExtractor graphics, float alpha) { return true; }
 +
      @Override
-     public void render(GuiGraphics p_281839_, int p_282704_, int p_283650_, float p_283394_) {
-         int i = p_281839_.guiWidth();
+     public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
+         int i = graphics.guiWidth();
 @@ -103,6 +_,7 @@
              f2 = 1.0F;
          }
  
-+        if (renderContents(p_281839_, f2)) {
-         int l2 = (int)(p_281839_.guiWidth() * 0.5);
-         int i1 = (int)(p_281839_.guiHeight() * 0.5);
-         double d0 = Math.min(p_281839_.guiWidth() * 0.75, (double)p_281839_.guiHeight()) * 0.25;
++        if (extractContentRenderState(graphics, f2)) {
+         int k2 = (int)(graphics.guiWidth() * 0.5);
+         int i1 = (int)(graphics.guiHeight() * 0.5);
+         double d0 = Math.min(graphics.guiWidth() * 0.75, (double)graphics.guiHeight()) * 0.25;
 @@ -118,6 +_,7 @@
          if (f < 1.0F) {
-             this.drawProgressBar(p_281839_, i / 2 - k1, i2 - 5, i / 2 + k1, i2 + 5, 1.0F - Mth.clamp(f, 0.0F, 1.0F));
+             this.extractProgressBar(graphics, i / 2 - k1, i2 - 5, i / 2 + k1, i2 + 5, 1.0F - Mth.clamp(f, 0.0F, 1.0F));
          }
 +        }
  
