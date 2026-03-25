@@ -53,7 +53,7 @@ public class LoadingErrorScreen extends ErrorScreen {
         this.clearWidgets();
 
         this.errorHeader = Component.literal(ChatFormatting.RED + ForgeI18n.parseMessage("fml.loadingerrorscreen.errorheader", this.modLoadErrors.size()) + ChatFormatting.RESET);
-        this.warningHeader = Component.literal(ChatFormatting.YELLOW + ForgeI18n.parseMessage("fml.loadingerrorscreen.warningheader", this.modLoadErrors.size()) + ChatFormatting.RESET);
+        this.warningHeader = Component.literal(ChatFormatting.YELLOW + ForgeI18n.parseMessage("fml.loadingerrorscreen.warningheader", this.modLoadWarnings.size()) + ChatFormatting.RESET);
 
         int yOffset = 46;
         this.addRenderableWidget(new ExtendedButton(50, this.height - yOffset, this.width / 2 - 55, 20, Component.literal(ForgeI18n.parseMessage("fml.button.open.mods.folder")), b -> Util.getPlatform().openFile(modsDir.toFile())));
@@ -70,7 +70,6 @@ public class LoadingErrorScreen extends ErrorScreen {
 
     @Override
     public void extractRenderState(GuiGraphicsExtractor guiGraphics, int mouseX, int mouseY, float partialTick) {
-        this.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         this.entryList.extractRenderState(guiGraphics, mouseX, mouseY, partialTick);
         drawMultiLineCenteredString(guiGraphics, font, this.modLoadErrors.isEmpty() ? warningHeader : errorHeader, this.width / 2, 10);
         this.renderables.forEach(button -> button.extractRenderState(guiGraphics, mouseX, mouseY, partialTick));
