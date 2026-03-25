@@ -6,7 +6,7 @@ plugins {
     id 'java'
     id 'idea'
     id 'eclipse'
-    id 'net.minecraftforge.gradle' version '[7.0.3,8)'
+    id 'net.minecraftforge.gradle' version '[7.0.17,8)'
 }
 
 version = '1.0.0'
@@ -19,8 +19,6 @@ java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 minecraft {
-    mappings channel: 'official', version: '@MC_VERSION@'
-
     runs {
         configureEach {
             workingDir = layout.projectDirectory.dir('run')
