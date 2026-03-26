@@ -64,10 +64,10 @@
                  this.stopSleepInBed(false, true);
              }
          } else if (this.sleepCounter > 0) {
-@@ -308,6 +_,7 @@
-         if (!this.getAbilities().flying) {
-             super.onAboveBubbleColumn(dragDown, pos);
-         }
+@@ -279,6 +_,7 @@
+ 
+         this.cooldowns.tick();
+         this.updatePlayerPose();
 +        net.minecraftforge.event.ForgeEventFactory.onPlayerPostTick(this);
      }
  
