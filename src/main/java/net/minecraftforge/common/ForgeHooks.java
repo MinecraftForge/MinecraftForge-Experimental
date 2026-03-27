@@ -31,7 +31,6 @@ import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.Decoder;
-import com.mojang.serialization.Dynamic;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
@@ -40,7 +39,6 @@ import io.netty.handler.codec.DecoderException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.SharedSuggestionProvider;
-import net.minecraft.commands.arguments.selector.EntitySelectorParser;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder.Reference;
@@ -50,7 +48,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.HolderSet.Named;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.Connection;
@@ -107,7 +104,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.PacketFlow;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.network.protocol.common.custom.DiscardedPayload;
 import net.minecraft.network.syncher.EntityDataSerializer;
@@ -158,11 +154,9 @@ import net.minecraftforge.event.level.NoteBlockEvent;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.network.CustomPayloadEvent;
 import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoader;
 import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.util.thread.EffectiveSide;
 import net.minecraftforge.network.ConnectionType;
 import net.minecraftforge.network.ForgePayload;
 import net.minecraftforge.network.NetworkContext;
@@ -1015,11 +1009,13 @@ public final class ForgeHooks {
     @SuppressWarnings("deprecation")
     public static void onLivingBreathe(LivingEntity entity, int consumeAirAmount, int refillAirAmount) {
         // Check things that vanilla considers to be air - these will cause the air supply to be increased.
+        // This is only called when the server level is already checked
+        var level = (ServerLevel)entity.level();
         var eyeFluid = entity.getEyeInFluidType();
-        boolean isAir = eyeFluid == null || entity.level().getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
+        boolean isAir = eyeFluid.isAir() || level.getBlockState(BlockPos.containing(entity.getX(), entity.getEyeY(), entity.getZ())).is(Blocks.BUBBLE_COLUMN);
         // The following effects cause the entity to not drown, but do not cause the air supply to be increased.
         boolean canBreathe = !entity.canDrownInFluidType(eyeFluid) || MobEffectUtil.hasWaterBreathing(entity) || (entity instanceof Player player && player.getAbilities().invulnerable);
-        var breatheEvent = ForgeEventFactory.onLivingBreathe(entity, isAir || canBreathe, consumeAirAmount, refillAirAmount, isAir);
+        var breatheEvent = ForgeEventFactory.onLivingBreathe(entity, isAir || canBreathe, consumeAirAmount, refillAirAmount, isAir || MobEffectUtil.shouldEffectsRefillAirsupply(entity));
         if (breatheEvent.canBreathe()) {
             if (breatheEvent.canRefillAir()) {
                 entity.setAirSupply(Math.min(entity.getAirSupply() + breatheEvent.getRefillAirAmount(), entity.getMaxAirSupply()));
@@ -1028,25 +1024,17 @@ public final class ForgeHooks {
             entity.setAirSupply(entity.getAirSupply() - breatheEvent.getConsumeAirAmount());
 
         if (entity.getAirSupply() <= -20) {
-            var drownEvent = new LivingDrownEvent(entity, entity.getAirSupply() <= -20, 2.0F, 8);
+            var drownEvent = new LivingDrownEvent(entity, true, 2.0F, 8);
             if (!LivingDrownEvent.BUS.post(drownEvent) && drownEvent.isDrowning()) {
                 entity.setAirSupply(0);
-                Vec3 vec3 = entity.getDeltaMovement();
-
-                for (int i = 0; i < drownEvent.getBubbleCount(); ++i) {
-                    double d2 = entity.getRandom().nextDouble() - entity.getRandom().nextDouble();
-                    double d3 = entity.getRandom().nextDouble() - entity.getRandom().nextDouble();
-                    double d4 = entity.getRandom().nextDouble() - entity.getRandom().nextDouble();
-                    entity.level().addParticle(ParticleTypes.BUBBLE, entity.getX() + d2, entity.getY() + d3, entity.getZ() + d4, vec3.x, vec3.y, vec3.z);
-                }
-
+                level.broadcastEntityEvent(entity, (byte)67);
                 if (drownEvent.getDamageAmount() > 0) {
-                    entity.hurt(entity.damageSources().drown(), drownEvent.getDamageAmount());
+                    entity.hurtServer(level, entity.damageSources().drown(), drownEvent.getDamageAmount());
                 }
             }
         }
 
-        if (!isAir && !entity.level().isClientSide() && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluidType(entity.getEyeInFluidType(), entity)) {
+        if (!isAir && entity.isPassenger() && entity.getVehicle() != null && !entity.getVehicle().canBeRiddenUnderFluidType(entity.getEyeInFluidType(), entity)) {
             entity.stopRiding();
         }
     }
