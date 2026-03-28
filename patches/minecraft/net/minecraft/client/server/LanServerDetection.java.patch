@@ -10,15 +10,15 @@
              this.socket.joinGroup(this.pingGroup);
          }
 @@ -87,7 +_,11 @@
-             String s = LanServerPinger.parseMotd(pingData);
-             String s1 = LanServerPinger.parseAddress(pingData);
-             if (s1 != null) {
--                s1 = socketAddress.getHostAddress() + ":" + s1;
+             String motd = LanServerPinger.parseMotd(pingData);
+             String address = LanServerPinger.parseAddress(pingData);
+             if (address != null) {
+-                address = socketAddress.getHostAddress() + ":" + address;
 +                if (net.minecraftforge.network.DualStackUtils.checkIPv6(socketAddress)) {
-+                    s1 = "[" + com.google.common.net.InetAddresses.toAddrString(socketAddress) + "]:" + s1;
++                    address = "[" + com.google.common.net.InetAddresses.toAddrString(socketAddress) + "]:" + address;
 +                } else {
-+                    s1 = socketAddress.getHostAddress() + ":" + s1;
++                    address = socketAddress.getHostAddress() + ":" + address;
 +                }
-                 boolean flag = false;
+                 boolean found = false;
  
-                 for (LanServer lanserver : this.servers) {
+                 for (LanServer server : this.servers) {

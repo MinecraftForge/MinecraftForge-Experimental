@@ -2,19 +2,19 @@
 +++ b/net/minecraft/client/gui/components/BossHealthOverlay.java
 @@ -68,13 +_,16 @@
  
-             for (LerpingBossEvent lerpingbossevent : this.events.values()) {
-                 int k = i / 2 - 91;
-+                var event = net.minecraftforge.client.ForgeHooksClient.onCustomizeBossEventProgress(graphics, this.minecraft.getWindow(), lerpingbossevent, k, j, 10 + this.minecraft.font.lineHeight);
-+                if (event != null) {
-                 this.extractBar(graphics, k, j, lerpingbossevent);
-                 Component component = lerpingbossevent.getName();
-                 int l = this.minecraft.font.width(component);
-                 int i1 = i / 2 - l / 2;
-                 int j1 = j - 9;
-                 graphics.text(this.minecraft.font, component, i1, j1, -1);
--                j += 10 + 9;
+             for (LerpingBossEvent event : this.events.values()) {
+                 int xLeft = screenWidth / 2 - 91;
++                var progressEvent = net.minecraftforge.client.ForgeHooksClient.onCustomizeBossEventProgress(graphics, this.minecraft.getWindow(), event, xLeft, yOffset, 10 + this.minecraft.font.lineHeight);
++                if (progressEvent != null) {
+                 this.extractBar(graphics, xLeft, yOffset, event);
+                 Component msg = event.getName();
+                 int width = this.minecraft.font.width(msg);
+                 int x = screenWidth / 2 - width / 2;
+                 int y = yOffset - 9;
+                 graphics.text(this.minecraft.font, msg, x, y, -1);
+-                yOffset += 10 + 9;
 +                }
-+                j += event.getIncrement();
-                 if (j >= graphics.guiHeight() / 3) {
++                yOffset += progressEvent.getIncrement();
+                 if (yOffset >= graphics.guiHeight() / 3) {
                      break;
                  }

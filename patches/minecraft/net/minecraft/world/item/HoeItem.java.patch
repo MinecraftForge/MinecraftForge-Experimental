@@ -16,11 +16,11 @@
 @@ -44,7 +_,8 @@
      public InteractionResult useOn(final UseOnContext context) {
          Level level = context.getLevel();
-         BlockPos blockpos = context.getClickedPos();
--        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = TILLABLES.get(level.getBlockState(blockpos).getBlock());
-+        BlockState toolModifiedState = level.getBlockState(blockpos).getToolModifiedState(context, net.minecraftforge.common.ToolActions.HOE_TILL, false);
-+        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> pair = toolModifiedState == null ? null : Pair.of(ctx -> true, changeIntoState(toolModifiedState));
-         if (pair == null) {
+         BlockPos pos = context.getClickedPos();
+-        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> logicPair = TILLABLES.get(level.getBlockState(pos).getBlock());
++        BlockState toolModifiedState = level.getBlockState(pos).getToolModifiedState(context, net.minecraftforge.common.ToolActions.HOE_TILL, false);
++        Pair<Predicate<UseOnContext>, Consumer<UseOnContext>> logicPair = toolModifiedState == null ? null : Pair.of(ctx -> true, changeIntoState(toolModifiedState));
+         if (logicPair == null) {
              return InteractionResult.PASS;
          } else {
 @@ -84,5 +_,10 @@

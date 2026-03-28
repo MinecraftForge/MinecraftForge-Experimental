@@ -1,20 +1,20 @@
 --- a/net/minecraft/server/commands/SpreadPlayersCommand.java
 +++ b/net/minecraft/server/commands/SpreadPlayersCommand.java
-@@ -259,11 +_,17 @@
-                 spreadplayerscommand$position = positions[i++];
+@@ -256,11 +_,17 @@
+                 position = positions[positionIndex++];
              }
  
 +            var event = net.minecraftforge.event.ForgeEventFactory.onEntityTeleportSpreadPlayersCommand(entity,
-+                (double)Mth.floor(spreadplayerscommand$position.x) + 0.5D,
-+                (double)spreadplayerscommand$position.getSpawnY(level, maxHeight),
-+                (double)Mth.floor(spreadplayerscommand$position.z) + 0.5D
++                (double)Mth.floor(position.x) + 0.5D,
++                (double)position.getSpawnY(level, maxHeight),
++                (double)Mth.floor(position.z) + 0.5D
 +            );
 +            if (event != null)
              entity.teleportTo(
                  level,
--                Mth.floor(spreadplayerscommand$position.x) + 0.5,
--                spreadplayerscommand$position.getSpawnY(level, maxHeight),
--                Mth.floor(spreadplayerscommand$position.z) + 0.5,
+-                Mth.floor(position.x) + 0.5,
+-                position.getSpawnY(level, maxHeight),
+-                Mth.floor(position.z) + 0.5,
 +                event.getTargetX(),
 +                event.getTargetY(),
 +                event.getTargetZ(),

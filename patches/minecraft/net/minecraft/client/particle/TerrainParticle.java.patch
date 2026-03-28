@@ -3,18 +3,18 @@
 @@ -43,7 +_,7 @@
          this.gCol = 0.6F;
          this.bCol = 0.6F;
-         BlockTintSource blocktintsource = Minecraft.getInstance().getBlockColors().getTintSource(blockState, 0);
--        if (blocktintsource != null) {
-+        if (blocktintsource != null && net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(blockState).areBreakingParticlesTinted(blockState, level, pos)) {
-             int i = blocktintsource.colorAsTerrainParticle(blockState, level, pos);
-             this.rCol *= (i >> 16 & 0xFF) / 255.0F;
-             this.gCol *= (i >> 8 & 0xFF) / 255.0F;
+         BlockTintSource tintSource = Minecraft.getInstance().getBlockColors().getTintSource(blockState, 0);
+-        if (tintSource != null) {
++        if (tintSource != null && net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(blockState).areBreakingParticlesTinted(blockState, level, pos)) {
+             int col = tintSource.colorAsTerrainParticle(blockState, level, pos);
+             this.rCol *= (col >> 16 & 0xFF) / 255.0F;
+             this.gCol *= (col >> 8 & 0xFF) / 255.0F;
 @@ -93,8 +_,14 @@
      ) {
-         BlockState blockstate = options.getState();
-         return !blockstate.isAir() && !blockstate.is(Blocks.MOVING_PISTON) && blockstate.shouldSpawnTerrainParticles()
--            ? new TerrainParticle(level, x, y, z, xAux, yAux, zAux, blockstate)
-+            ? (TerrainParticle)new TerrainParticle(level, x, y, z, xAux, yAux, zAux, blockstate).updateSprite(blockstate, options.getPos())
+         BlockState state = options.getState();
+         return !state.isAir() && !state.is(Blocks.MOVING_PISTON) && state.shouldSpawnTerrainParticles()
+-            ? new TerrainParticle(level, x, y, z, xAux, yAux, zAux, state)
++            ? (TerrainParticle)new TerrainParticle(level, x, y, z, xAux, yAux, zAux, state).updateSprite(state, options.getPos())
              : null;
 +    }
 +

@@ -8,24 +8,24 @@
 +
      @Override
      public void extractRenderState(final GuiGraphicsExtractor graphics, final int mouseX, final int mouseY, final float a) {
-         int i = graphics.guiWidth();
+         int width = graphics.guiWidth();
 @@ -103,6 +_,7 @@
-             f2 = 1.0F;
+             logoAlpha = 1.0F;
          }
  
-+        if (extractContentRenderState(graphics, f2)) {
-         int k2 = (int)(graphics.guiWidth() * 0.5);
-         int i1 = (int)(graphics.guiHeight() * 0.5);
-         double d0 = Math.min(graphics.guiWidth() * 0.75, (double)graphics.guiHeight()) * 0.25;
-@@ -118,6 +_,7 @@
-         if (f < 1.0F) {
-             this.extractProgressBar(graphics, i / 2 - k1, i2 - 5, i / 2 + k1, i2 + 5, 1.0F - Mth.clamp(f, 0.0F, 1.0F));
++        if (extractContentRenderState(graphics, logoAlpha)) {
+         int contentX = (int)(graphics.guiWidth() * 0.5);
+         int logoY = (int)(graphics.guiHeight() * 0.5);
+         double logoHeight = Math.min(graphics.guiWidth() * 0.75, (double)graphics.guiHeight()) * 0.25;
+@@ -148,6 +_,7 @@
+                 graphics, width / 2 - logoWidthHalf, barY - 5, width / 2 + logoWidthHalf, barY + 5, 1.0F - Mth.clamp(fadeOutAnim, 0.0F, 1.0F)
+             );
          }
 +        }
  
-         if (f >= 2.0F) {
+         if (fadeOutAnim >= 2.0F) {
              this.minecraft.setOverlay(null);
-@@ -127,6 +_,7 @@
+@@ -157,6 +_,7 @@
      @Override
      public void tick() {
          if (this.fadeOutStart == -1L && this.reload.isDone() && this.isReadyToFadeOut()) {
@@ -33,8 +33,8 @@
              try {
                  this.reload.checkExceptions();
                  this.onFinish.accept(Optional.empty());
-@@ -134,7 +_,6 @@
-                 this.onFinish.accept(Optional.of(throwable));
+@@ -164,7 +_,6 @@
+                 this.onFinish.accept(Optional.of(var2));
              }
  
 -            this.fadeOutStart = Util.getMillis();

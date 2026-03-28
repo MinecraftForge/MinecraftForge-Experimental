@@ -8,7 +8,7 @@
 +    private final Codec<Either<net.minecraftforge.registries.holdersets.ICustomHolderSet<E>, Either<TagKey<E>, List<Holder<E>>>>> combinedCodec;
  
      private static <E> Codec<List<Holder<E>>> homogenousList(final Codec<Holder<E>> elementCodec, final boolean alwaysUseList) {
-         Codec<List<Holder<E>>> codec = elementCodec.listOf().validate(ExtraCodecs.ensureHomogenous(Holder::kind));
+         Codec<List<Holder<E>>> listCodec = elementCodec.listOf().validate(ExtraCodecs.ensureHomogenous(Holder::kind));
 @@ -38,6 +_,10 @@
          this.elementCodec = elementCodec;
          this.homogenousListCodec = homogenousList(elementCodec, alwaysUseList);
@@ -21,23 +21,23 @@
  
      @Override
 @@ -46,14 +_,17 @@
-             Optional<HolderGetter<E>> optional = registryops.getter(this.registryKey);
-             if (optional.isPresent()) {
-                 HolderGetter<E> holdergetter = optional.get();
+             Optional<HolderGetter<E>> registryOptional = registryOps.getter(this.registryKey);
+             if (registryOptional.isPresent()) {
+                 HolderGetter<E> registry = registryOptional.get();
 -                return this.registryAwareCodec
 +                return this.combinedCodec
                      .decode(ops, input)
                      .flatMap(
                          p -> {
-                             DataResult<HolderSet<E>> dataresult = p.getFirst()
+                             DataResult<HolderSet<E>> result = p.getFirst()
 +                                .map(custom -> DataResult.success(custom),
 +                                tagOrList -> tagOrList
                                  .map(
-                                     tag -> lookupTag(holdergetter, (TagKey<E>)tag),
+                                     tag -> lookupTag(registry, (TagKey<E>)tag),
                                      values -> DataResult.success(HolderSet.direct((List<? extends Holder<E>>)values))
 +                                )
                                  );
-                             return dataresult.map(holders -> Pair.of((HolderSet<E>)holders, (T)p.getSecond()));
+                             return result.map(holders -> Pair.of((HolderSet<E>)holders, (T)p.getSecond()));
                          }
 @@ -86,7 +_,7 @@
      }
@@ -45,7 +45,7 @@
      private <T> DataResult<Pair<HolderSet<E>, T>> decodeWithoutRegistry(final DynamicOps<T> ops, final T input) {
 -        return this.elementCodec.listOf().decode(ops, input).flatMap(p -> {
 +        return this.homogenousListCodec.decode(ops, input).flatMap(p -> { // Forge: Match encodeWithoutRegistry's use of the homogenousListCodec
-             List<Holder.Direct<E>> list = new ArrayList<>();
+             List<Holder.Direct<E>> directHolders = new ArrayList<>();
  
              for (Holder<E> holder : p.getFirst()) {
 @@ -102,6 +_,9 @@

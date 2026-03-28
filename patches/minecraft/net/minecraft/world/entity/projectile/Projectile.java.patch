@@ -3,9 +3,9 @@
 @@ -363,7 +_,7 @@
      @Override
      public boolean mayInteract(final ServerLevel level, final BlockPos pos) {
-         Entity entity = this.getOwner();
--        return entity instanceof Player ? entity.mayInteract(level, pos) : entity == null || level.getGameRules().get(GameRules.MOB_GRIEFING);
-+        return entity instanceof Player ? entity.mayInteract(level, pos) : entity == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(level, entity);
+         Entity owner = this.getOwner();
+-        return owner instanceof Player ? owner.mayInteract(level, pos) : owner == null || level.getGameRules().get(GameRules.MOB_GRIEFING);
++        return owner instanceof Player ? owner.mayInteract(level, pos) : owner == null || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(level, owner);
      }
  
      public boolean mayBreak(final ServerLevel level) {

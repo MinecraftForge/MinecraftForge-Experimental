@@ -1,16 +1,15 @@
 --- a/net/minecraft/client/particle/ParticleEngine.java
 +++ b/net/minecraft/client/particle/ParticleEngine.java
-@@ -64,8 +_,7 @@
+@@ -63,7 +_,7 @@
+     private <T extends ParticleOptions> @Nullable Particle makeParticle(
          final T options, final double x, final double y, final double z, final double xa, final double ya, final double za
      ) {
-         ParticleProvider<T> particleprovider = (ParticleProvider<T>)this.resourceManager
--            .getProviders()
--            .get(BuiltInRegistries.PARTICLE_TYPE.getId(options.getType()));
-+            .getProvider(options.getType());
-         return particleprovider == null ? null : particleprovider.createParticle(options, this.level, x, y, z, xa, ya, za, this.random);
+-        ParticleProvider<T> provider = (ParticleProvider<T>)this.resourceManager.getProviders().get(BuiltInRegistries.PARTICLE_TYPE.getId(options.getType()));
++        ParticleProvider<T> provider = (ParticleProvider<T>)this.resourceManager.getProvider(options.getType());
+         return provider == null ? null : provider.createParticle(options, this.level, x, y, z, xa, ya, za, this.random);
      }
  
-@@ -113,6 +_,8 @@
+@@ -111,6 +_,8 @@
              return new ItemPickupParticleGroup(this);
          } else if (type == ParticleRenderType.ELDER_GUARDIANS) {
              return new ElderGuardianParticleGroup(this);
@@ -19,7 +18,7 @@
          } else {
              return (ParticleGroup<?>)(type == ParticleRenderType.NO_RENDER ? new NoRenderParticleGroup(this) : new QuadParticleGroup(this, type));
          }
-@@ -122,8 +_,20 @@
+@@ -120,8 +_,20 @@
          this.trackedParticleCounts.addTo(limit, change);
      }
  
@@ -36,8 +35,8 @@
 +    }
 +
      public void extract(final ParticlesRenderState particlesRenderState, final Frustum frustum, final Camera camera, final float partialTickTime) {
--        for (ParticleRenderType particlerendertype : RENDER_ORDER) {
-+        for (ParticleRenderType particlerendertype : particleRenderOrder) { // Forge: allow custom ParticleRenderType's
-             ParticleGroup<?> particlegroup = this.particles.get(particlerendertype);
-             if (particlegroup != null && !particlegroup.isEmpty()) {
-                 particlesRenderState.add(particlegroup.extractRenderState(frustum, camera, partialTickTime));
+-        for (ParticleRenderType particleType : RENDER_ORDER) {
++        for (ParticleRenderType particleType : particleRenderOrder) { // Forge: allow custom ParticleRenderType's
+             ParticleGroup<?> particles = this.particles.get(particleType);
+             if (particles != null && !particles.isEmpty()) {
+                 particlesRenderState.add(particles.extractRenderState(frustum, camera, partialTickTime));

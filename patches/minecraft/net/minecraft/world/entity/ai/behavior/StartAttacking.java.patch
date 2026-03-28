@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/entity/ai/behavior/StartAttacking.java
 +++ b/net/minecraft/world/entity/ai/behavior/StartAttacking.java
-@@ -30,7 +_,11 @@
-                             if (!body.canAttack(livingentity)) {
+@@ -29,7 +_,11 @@
+                             if (!body.canAttack(targetEntity)) {
                                  return false;
                              } else {
--                                attackTarget.set(livingentity);
-+                                var changeTargetEvent = net.minecraftforge.event.ForgeEventFactory.onLivingChangeTargetBehavior(body, livingentity);
+-                                attackTarget.set(targetEntity);
++                                var changeTargetEvent = net.minecraftforge.event.ForgeEventFactory.onLivingChangeTargetBehavior(body, targetEntity);
 +                                if (changeTargetEvent == null)
 +                                    return false;
 +

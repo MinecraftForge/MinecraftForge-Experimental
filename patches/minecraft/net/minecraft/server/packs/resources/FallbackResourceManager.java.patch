@@ -3,21 +3,21 @@
 @@ -103,8 +_,11 @@
  
          for (int i = this.fallbacks.size() - 1; i >= 0; i--) {
-             FallbackResourceManager.PackEntry fallbackresourcemanager$packentry = this.fallbacks.get(i);
--            PackResources packresources = fallbackresourcemanager$packentry.resources;
--            if (packresources != null) {
-+            PackResources pack = fallbackresourcemanager$packentry.resources;
+             FallbackResourceManager.PackEntry entry = this.fallbacks.get(i);
+-            PackResources fileSource = entry.resources;
+-            if (fileSource != null) {
++            PackResources pack = entry.resources;
 +            if (pack != null) {
 +                var children = pack.getChildren();
 +                var packs = children == null ? List.of(pack) : children;
-+                for (final PackResources packresources : packs) {
-                 IoSupplier<InputStream> iosupplier = packresources.getResource(this.type, location);
-                 if (iosupplier != null) {
-                     IoSupplier<ResourceMetadata> iosupplier1;
++                for (final PackResources fileSource : packs) {
+                 IoSupplier<InputStream> resource = fileSource.getResource(this.type, location);
+                 if (resource != null) {
+                     IoSupplier<ResourceMetadata> metadataGetter;
 @@ -118,6 +_,7 @@
                      }
  
-                     list.add(new Resource(packresources, iosupplier, iosupplier1));
+                     result.add(new Resource(fileSource, resource, metadataGetter));
 +                }
                  }
              }

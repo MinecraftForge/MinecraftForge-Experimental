@@ -1,12 +1,12 @@
 --- a/net/minecraft/client/multiplayer/ClientHandshakePacketListenerImpl.java
 +++ b/net/minecraft/client/multiplayer/ClientHandshakePacketListenerImpl.java
 @@ -209,6 +_,7 @@
-         Component component = this.wasTransferredTo ? CommonComponents.TRANSFER_CONNECT_FAILED : CommonComponents.CONNECT_FAILED;
+         Component title = this.wasTransferredTo ? CommonComponents.TRANSFER_CONNECT_FAILED : CommonComponents.CONNECT_FAILED;
          if (this.serverData != null && this.serverData.isRealm()) {
-             this.minecraft.setScreen(new DisconnectedScreen(this.parent, component, details.reason(), CommonComponents.GUI_BACK));
+             this.minecraft.setScreen(new DisconnectedScreen(this.parent, title, details.reason(), CommonComponents.GUI_BACK));
 +        } else if (net.minecraftforge.client.ForgeHooksClient.onClientDisconnect(this.connection, this.minecraft, this.parent, details.reason())) {
          } else {
-             this.minecraft.setScreen(new DisconnectedScreen(this.parent, component, details));
+             this.minecraft.setScreen(new DisconnectedScreen(this.parent, title, details));
          }
 @@ -233,6 +_,7 @@
  

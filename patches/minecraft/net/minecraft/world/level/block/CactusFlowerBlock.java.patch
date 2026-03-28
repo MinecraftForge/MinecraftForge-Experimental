@@ -3,8 +3,8 @@
 @@ -31,6 +_,6 @@
      @Override
      protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
-         BlockState blockstate = level.getBlockState(pos);
--        return blockstate.is(BlockTags.SUPPORT_OVERRIDE_CACTUS_FLOWER) || blockstate.isFaceSturdy(level, pos, Direction.UP, SupportType.CENTER);
-+        return blockstate.is(BlockTags.SUPPORT_OVERRIDE_CACTUS_FLOWER) || blockstate.isFaceSturdy(level, pos, Direction.UP, SupportType.CENTER) || blockstate.getBlock() instanceof FarmlandBlock;
+         BlockState blockBelow = level.getBlockState(pos);
+-        return blockBelow.is(BlockTags.SUPPORT_OVERRIDE_CACTUS_FLOWER) || blockBelow.isFaceSturdy(level, pos, Direction.UP, SupportType.CENTER);
++        return blockBelow.is(BlockTags.SUPPORT_OVERRIDE_CACTUS_FLOWER) || blockBelow.isFaceSturdy(level, pos, Direction.UP, SupportType.CENTER) || blockBelow.getBlock() instanceof FarmlandBlock;
      }
  }

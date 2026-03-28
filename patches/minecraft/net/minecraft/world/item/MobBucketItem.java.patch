@@ -36,8 +36,8 @@
 -        Mob mob = this.type.create(level, EntityType.createDefaultStackConfig(level, itemStack, null), spawnPos, EntitySpawnReason.BUCKET, true, false);
 +        Mob mob = this.getFishType().create(level, EntityType.createDefaultStackConfig(level, itemStack, null), spawnPos, EntitySpawnReason.BUCKET, true, false);
          if (mob instanceof Bucketable bucketable) {
-             CustomData customdata = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
-             bucketable.loadFromBucketTag(customdata.copyTag());
+             CustomData entityData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
+             bucketable.loadFromBucketTag(entityData.copyTag());
 @@ -52,5 +_,13 @@
              level.addFreshEntityWithPassengers(mob);
              mob.playAmbientSound();

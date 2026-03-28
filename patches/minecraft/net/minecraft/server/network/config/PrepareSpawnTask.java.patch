@@ -1,10 +1,10 @@
 --- a/net/minecraft/server/network/config/PrepareSpawnTask.java
 +++ b/net/minecraft/server/network/config/PrepareSpawnTask.java
-@@ -192,6 +_,7 @@
+@@ -187,6 +_,7 @@
                      .loadPlayerData(PrepareSpawnTask.this.nameAndId)
-                     .map(tag -> TagValueInput.create(problemreporter$scopedcollector, PrepareSpawnTask.this.server.registryAccess(), tag));
-                 optional.ifPresent(serverplayer::load);
-+                optional.ifPresent(v -> net.minecraftforge.event.ForgeEventFactory.firePlayerLoadingEvent(serverplayer, PrepareSpawnTask.this.server.getPlayerList().getPlayerIo().getPlayerDataFolder(), PrepareSpawnTask.this.nameAndId.id().toString()));
-                 serverplayer.snapTo(this.spawnPosition, this.spawnAngle.x, this.spawnAngle.y);
-                 PrepareSpawnTask.this.server.getPlayerList().placeNewPlayer(connection, serverplayer, cookie);
-                 optional.ifPresent(tag -> {
+                     .map(tag -> TagValueInput.create(reporter, PrepareSpawnTask.this.server.registryAccess(), tag));
+                 input.ifPresent(player::load);
++                input.ifPresent(v -> net.minecraftforge.event.ForgeEventFactory.firePlayerLoadingEvent(player, PrepareSpawnTask.this.server.getPlayerList().getPlayerIo().getPlayerDataFolder(), PrepareSpawnTask.this.nameAndId.id().toString()));
+                 player.snapTo(this.spawnPosition, this.spawnAngle.x, this.spawnAngle.y);
+                 PrepareSpawnTask.this.server.getPlayerList().placeNewPlayer(connection, player, cookie);
+                 input.ifPresent(tag -> {

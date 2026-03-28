@@ -1,6 +1,6 @@
 --- a/com/mojang/math/Transformation.java
 +++ b/com/mojang/math/Transformation.java
-@@ -17,7 +_,7 @@
+@@ -16,7 +_,7 @@
  import org.joml.Vector3fc;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      private static final Vector3fc ZERO_TRANSLATION = new Vector3f();
      private static final Vector3fc UNIT_SCALE = new Vector3f(1.0F, 1.0F, 1.0F);
      private static final Quaternionfc ZERO_ROTATION = new Quaternionf();
-@@ -172,6 +_,20 @@
+@@ -171,6 +_,20 @@
              this.scale().lerp(that.scale(), progress, new Vector3f()),
              this.rightRotation().slerp(that.rightRotation(), progress, new Quaternionf())
          );

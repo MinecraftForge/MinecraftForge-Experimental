@@ -1,11 +1,11 @@
 --- a/com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
 +++ b/com/mojang/realmsclient/gui/screens/RealmsResetWorldScreen.java
-@@ -303,7 +_,7 @@
-             int k = this.getY();
-             graphics.blit(RenderPipelines.GUI_TEXTURED, this.image, j + 2, k + 2, 0.0F, 0.0F, 56, 56, 56, 56, 56, 56, i);
-             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_FRAME_SPRITE, j, k, 60, 60, i);
--            int l = flag ? -6250336 : -1;
-+            int l = getFGColor();
-             graphics.centeredText(RealmsResetWorldScreen.this.font, this.getMessage(), j + 28, k - 14, l);
+@@ -302,7 +_,7 @@
+             int y = this.getY();
+             graphics.blit(RenderPipelines.GUI_TEXTURED, this.image, x + 2, y + 2, 0.0F, 0.0F, 56, 56, 56, 56, 56, 56, color);
+             graphics.blitSprite(RenderPipelines.GUI_TEXTURED, SLOT_FRAME_SPRITE, x, y, 60, 60, color);
+-            int textColor = hoveredOrFocused ? -6250336 : -1;
++            int textColor = getFGColor();
+             graphics.centeredText(RealmsResetWorldScreen.this.font, this.getMessage(), x + 28, y - 14, textColor);
          }
      }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
 +++ b/net/minecraft/client/gui/screens/multiplayer/ServerSelectionList.java
-@@ -371,6 +_,8 @@
+@@ -372,6 +_,8 @@
                  graphics.setTooltipForNextFrame(Lists.transform(this.onlinePlayersTooltip, Component::getVisualOrderText), mouseX, mouseY);
              }
  
@@ -8,4 +8,4 @@
 +
              if (this.minecraft.options.touchscreen().get() || hovered) {
                  graphics.fill(this.getContentX(), this.getContentY(), this.getContentX() + 32, this.getContentY() + 32, -1601138544);
-                 int i1 = mouseX - this.getContentX();
+                 int relX = mouseX - this.getContentX();

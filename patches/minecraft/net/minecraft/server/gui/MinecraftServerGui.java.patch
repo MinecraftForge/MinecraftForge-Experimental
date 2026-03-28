@@ -1,7 +1,7 @@
 --- a/net/minecraft/server/gui/MinecraftServerGui.java
 +++ b/net/minecraft/server/gui/MinecraftServerGui.java
-@@ -142,8 +_,10 @@
-         return jpanel;
+@@ -141,8 +_,10 @@
+         return panel;
      }
  
 +    private final java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
@@ -11,7 +11,7 @@
      }
  
      public void close() {
-@@ -157,6 +_,9 @@
+@@ -156,6 +_,9 @@
      }
  
      public void print(final JTextArea console, final JScrollPane scrollPane, final String line) {

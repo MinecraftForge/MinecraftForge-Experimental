@@ -3,9 +3,9 @@
 @@ -217,12 +_,14 @@
              return 90.0F;
          } else {
-             float f = this.minecraft.options.fov().get().intValue() * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier);
--            return this.modifyFovBasedOnDeathOrFluid(partialTicks, f);
-+            var ret = this.modifyFovBasedOnDeathOrFluid(partialTicks, f);
+             float fov = this.minecraft.options.fov().get().intValue() * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier);
+-            return this.modifyFovBasedOnDeathOrFluid(partialTicks, fov);
++            var ret = this.modifyFovBasedOnDeathOrFluid(partialTicks, fov);
 +            return net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeFov(this.minecraft.gameRenderer, this, partialTicks, ret, true).getFOV();
          }
      }

@@ -1,14 +1,14 @@
 --- a/net/minecraft/world/level/block/CoralBlock.java
 +++ b/net/minecraft/world/level/block/CoralBlock.java
-@@ -61,9 +_,10 @@
+@@ -60,9 +_,10 @@
      }
  
      protected boolean scanForWater(final BlockGetter level, final BlockPos blockPos) {
 +        BlockState state = level.getBlockState(blockPos);
          for (Direction direction : Direction.values()) {
-             FluidState fluidstate = level.getFluidState(blockPos.relative(direction));
--            if (fluidstate.is(FluidTags.WATER)) {
-+            if (state.canBeHydrated(level, blockPos, fluidstate, blockPos.relative(direction))) {
+             FluidState fluidState = level.getFluidState(blockPos.relative(direction));
+-            if (fluidState.is(FluidTags.WATER)) {
++            if (state.canBeHydrated(level, blockPos, fluidState, blockPos.relative(direction))) {
                  return true;
              }
          }

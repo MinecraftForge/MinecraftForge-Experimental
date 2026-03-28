@@ -3,8 +3,8 @@
 @@ -77,6 +_,7 @@
          }
  
-         builder.add(this.resourceManagerSource);
-+        builder.add(net.minecraftforge.common.ForgeHooks.emptyStructureSource());
-         this.sources = builder.build();
+         sources.add(this.resourceManagerSource);
++        sources.add(net.minecraftforge.common.ForgeHooks.emptyStructureSource());
+         this.sources = sources.build();
      }
  

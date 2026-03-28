@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/storage/LevelSummary.java
 +++ b/net/minecraft/world/level/storage/LevelSummary.java
-@@ -15,7 +_,7 @@
+@@ -14,7 +_,7 @@
  import org.apache.commons.lang3.StringUtils;
  import org.jspecify.annotations.Nullable;
  

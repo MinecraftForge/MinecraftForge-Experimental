@@ -1,14 +1,14 @@
 --- a/net/minecraft/network/chat/contents/TranslatableContents.java
 +++ b/net/minecraft/network/chat/contents/TranslatableContents.java
-@@ -136,6 +_,11 @@
-                 j = l;
+@@ -135,6 +_,11 @@
+                 current = end;
              }
  
-+            if (j == 0) {
++            if (current == 0) {
 +                // Forge has some special formatting handlers defined in ForgeI18n, use those if no %s replacements present.
-+                j = net.minecraftforge.internal.TextComponentMessageFormatHandler.handle(this, decomposedParts, this.args, template);
++                current = net.minecraftforge.internal.TextComponentMessageFormatHandler.handle(this, decomposedParts, this.args, template);
 +            }
 +
-             if (j < template.length()) {
-                 String s3 = template.substring(j);
-                 if (s3.indexOf(37) != -1) {
+             if (current < template.length()) {
+                 String tail = template.substring(current);
+                 if (tail.indexOf(37) != -1) {

@@ -25,7 +25,7 @@
 +        }
  
          private AttributeInstance create(final Holder<Attribute> attribute) {
-             AttributeInstance attributeinstance = new AttributeInstance(attribute, attributeInstance -> {
+             AttributeInstance result = new AttributeInstance(attribute, attributeInstance -> {
 @@ -91,7 +_,8 @@
  
          public AttributeSupplier build() {

@@ -10,7 +10,7 @@
          } else {
              if (avatar.getUsedItemHand() == hand && avatar.getUseItemRemainingTicks() > 0) {
 @@ -138,7 +_,9 @@
-             if (swinganimation != null && swinganimation.type() == SwingAnimationType.STAB && avatar.swinging) {
+             if (attack != null && attack.type() == SwingAnimationType.STAB && avatar.swinging) {
                  return HumanoidModel.ArmPose.SPEAR;
              } else {
 -                return itemInHand.is(ItemTags.SPEARS) ? HumanoidModel.ArmPose.SPEAR : HumanoidModel.ArmPose.ITEM;

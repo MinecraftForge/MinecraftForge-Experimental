@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/crafting/ShapedRecipe.java
 +++ b/net/minecraft/world/item/crafting/ShapedRecipe.java
-@@ -16,7 +_,19 @@
+@@ -15,7 +_,19 @@
  import net.minecraft.world.item.crafting.display.SlotDisplay;
  import net.minecraft.world.level.Level;
  
@@ -21,7 +21,7 @@
      public static final MapCodec<ShapedRecipe> MAP_CODEC = RecordCodecBuilder.mapCodec(
          i -> i.group(
                  Recipe.CommonInfo.MAP_CODEC.forGetter(o -> o.commonInfo),
-@@ -78,6 +_,16 @@
+@@ -77,6 +_,16 @@
  
      public int getHeight() {
          return this.pattern.height();

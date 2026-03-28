@@ -1,12 +1,12 @@
 --- a/net/minecraft/data/recipes/RecipeProvider.java
 +++ b/net/minecraft/data/recipes/RecipeProvider.java
-@@ -892,13 +_,13 @@
+@@ -891,13 +_,13 @@
                              }
  
                              @Override
 -                            public void accept(final ResourceKey<Recipe<?>> id, final Recipe<?> recipe, final @Nullable AdvancementHolder advancementHolder) {
 +                            public void accept(final ResourceKey<Recipe<?>> id, final Recipe<?> recipe, net.minecraft.resources.@Nullable Identifier advancementId, com.google.gson.@Nullable JsonElement advancement) {
-                                 if (!set.add(id)) {
+                                 if (!allRecipes.add(id)) {
                                      throw new IllegalStateException("Duplicate recipe " + id.identifier());
                                  } else {
                                      this.saveRecipe(id, recipe);
@@ -17,26 +17,26 @@
                                      }
                                  }
                              }
-@@ -913,19 +_,26 @@
-                                 AdvancementHolder advancementholder = Advancement.Builder.recipeAdvancement()
+@@ -912,19 +_,26 @@
+                                 AdvancementHolder root = Advancement.Builder.recipeAdvancement()
                                      .addCriterion("impossible", CriteriaTriggers.IMPOSSIBLE.createCriterion(new ImpossibleTrigger.TriggerInstance()))
                                      .build(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
--                                this.saveAdvancement(advancementholder);
+-                                this.saveAdvancement(root);
 +                                var ops = registry().createSerializationContext(com.mojang.serialization.JsonOps.INSTANCE);
-+                                var json = Advancement.CODEC.encodeStart(ops, advancementholder.value()).getOrThrow(IllegalStateException::new);
-+                                this.saveAdvancement(advancementholder.id(), json);
++                                var json = Advancement.CODEC.encodeStart(ops, root.value()).getOrThrow(IllegalStateException::new);
++                                this.saveAdvancement(root.id(), json);
                              }
  
                              private void saveRecipe(final ResourceKey<Recipe<?>> id, final Recipe<?> recipe) {
-                                 list.add(DataProvider.saveStable(cache, registries, Recipe.CODEC, recipe, packoutput$pathprovider.json(id.identifier())));
+                                 tasks.add(DataProvider.saveStable(cache, registries, Recipe.CODEC, recipe, recipePathProvider.json(id.identifier())));
                              }
  
 -                            private void saveAdvancement(final AdvancementHolder advancementHolder) {
 +                            private void saveAdvancement(net.minecraft.resources.Identifier id, com.google.gson.JsonElement advancement) {
-                                 list.add(
+                                 tasks.add(
                                      DataProvider.saveStable(
--                                        cache, registries, Advancement.CODEC, advancementHolder.value(), packoutput$pathprovider1.json(advancementHolder.id())
-+                                        cache, advancement, packoutput$pathprovider1.json(id)
+-                                        cache, registries, Advancement.CODEC, advancementHolder.value(), advancementPathProvider.json(advancementHolder.id())
++                                        cache, advancement, advancementPathProvider.json(id)
                                      )
                                  );
 +                            }
@@ -46,4 +46,4 @@
 +                                return registries;
                              }
                          };
-                         this.createRecipeProvider(registries, recipeoutput).buildRecipes();
+                         this.createRecipeProvider(registries, recipeOutput).buildRecipes();

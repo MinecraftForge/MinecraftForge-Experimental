@@ -4,14 +4,14 @@
      }
  
      private void sendCmdResponse(final int requestid, String response) throws IOException {
--        int i = response.length();
+-        int len = response.length();
 -
 -        do {
--            int j = 4096 <= i ? 4096 : i;
--            this.send(requestid, 0, response.substring(0, j));
--            response = response.substring(j);
--            i = response.length();
--        } while (0 != i);
+-            int dataLen = 4096 <= len ? 4096 : len;
+-            this.send(requestid, 0, response.substring(0, dataLen));
+-            response = response.substring(dataLen);
+-            len = response.length();
+-        } while (0 != len);
 +        // Forge: Actually convert to UTF8 and process bytes accordingly. Why do we do this? UTF8 should be single byte per character
 +        byte[] data = response.getBytes(StandardCharsets.UTF_8);
 +        for (int x = 0; x < data.length; x += 4096) {

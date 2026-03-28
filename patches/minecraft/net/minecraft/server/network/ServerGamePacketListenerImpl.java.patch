@@ -1,12 +1,12 @@
 --- a/net/minecraft/server/network/ServerGamePacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerGamePacketListenerImpl.java
-@@ -1279,9 +_,10 @@
+@@ -1286,9 +_,10 @@
                      }
                  case SWAP_ITEM_WITH_OFFHAND:
                      if (!this.player.isSpectator()) {
--                        ItemStack itemstack1 = this.player.getItemInHand(InteractionHand.OFF_HAND);
+-                        ItemStack swap = this.player.getItemInHand(InteractionHand.OFF_HAND);
 -                        this.player.setItemInHand(InteractionHand.OFF_HAND, this.player.getItemInHand(InteractionHand.MAIN_HAND));
--                        this.player.setItemInHand(InteractionHand.MAIN_HAND, itemstack1);
+-                        this.player.setItemInHand(InteractionHand.MAIN_HAND, swap);
 +                        var event = net.minecraftforge.event.ForgeEventFactory.onLivingSwapHandItems(this.player);
 +                        if (event == null) return;
 +                        this.player.setItemInHand(InteractionHand.OFF_HAND, event.getItemSwappedToOffHand());
@@ -14,18 +14,18 @@
                          this.player.stopUsingItem();
                      }
  
-@@ -1503,8 +_,9 @@
+@@ -1504,8 +_,9 @@
                  }
  
-                 CompletableFuture<FilteredText> completablefuture = this.filterTextPacket(playerchatmessage.signedContent());
--                Component component = this.server.getChatDecorator().decorate(this.player, playerchatmessage.decoratedContent());
-+                Component component = net.minecraftforge.common.ForgeHooks.onServerChatSubmittedEvent(this.player, playerchatmessage.decoratedContent());
-                 this.chatMessageChain.append(completablefuture, filtered -> {
-+                    if (component == null) return;
-                     PlayerChatMessage playerchatmessage1 = playerchatmessage.withUnsignedContent(component).filter(filtered.mask());
-                     this.broadcastChatMessage(playerchatmessage1);
+                 CompletableFuture<FilteredText> filteredFuture = this.filterTextPacket(signedMessage.signedContent());
+-                Component decorated = this.server.getChatDecorator().decorate(this.player, signedMessage.decoratedContent());
++                Component decorated = net.minecraftforge.common.ForgeHooks.onServerChatSubmittedEvent(this.player, signedMessage.decoratedContent());
+                 this.chatMessageChain.append(filteredFuture, filtered -> {
++                    if (decorated == null) return;
+                     PlayerChatMessage filteredMessage = signedMessage.withUnsignedContent(decorated).filter(filtered.mask());
+                     this.broadcastChatMessage(filteredMessage);
                  });
-@@ -2186,6 +_,7 @@
+@@ -2175,6 +_,7 @@
  
      @Override
      public void handleCustomPayload(final ServerboundCustomPayloadPacket packet) {

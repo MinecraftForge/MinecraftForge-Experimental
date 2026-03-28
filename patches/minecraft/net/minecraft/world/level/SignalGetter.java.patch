@@ -2,10 +2,10 @@
 +++ b/net/minecraft/world/level/SignalGetter.java
 @@ -65,7 +_,7 @@
      default int getSignal(final BlockPos pos, final Direction direction) {
-         BlockState blockstate = this.getBlockState(pos);
-         int i = blockstate.getSignal(this, pos, direction);
--        return blockstate.isRedstoneConductor(this, pos) ? Math.max(i, this.getDirectSignalTo(pos)) : i;
-+        return blockstate.shouldCheckWeakPower(this, pos, direction) ? Math.max(i, this.getDirectSignalTo(pos)) : i;
+         BlockState state = this.getBlockState(pos);
+         int signal = state.getSignal(this, pos, direction);
+-        return state.isRedstoneConductor(this, pos) ? Math.max(signal, this.getDirectSignalTo(pos)) : signal;
++        return state.shouldCheckWeakPower(this, pos, direction) ? Math.max(signal, this.getDirectSignalTo(pos)) : signal;
      }
  
      default boolean hasNeighborSignal(final BlockPos blockPos) {

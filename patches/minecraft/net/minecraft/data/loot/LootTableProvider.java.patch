@@ -1,28 +1,28 @@
 --- a/net/minecraft/data/loot/LootTableProvider.java
 +++ b/net/minecraft/data/loot/LootTableProvider.java
-@@ -60,7 +_,7 @@
+@@ -59,7 +_,7 @@
      private CompletableFuture<?> run(final CachedOutput cache, final HolderLookup.Provider registries) {
-         WritableRegistry<LootTable> writableregistry = new MappedRegistry<>(Registries.LOOT_TABLE, Lifecycle.experimental());
-         Map<RandomSupport.Seed128bit, Identifier> map = new Object2ObjectOpenHashMap<>();
+         WritableRegistry<LootTable> tables = new MappedRegistry<>(Registries.LOOT_TABLE, Lifecycle.experimental());
+         Map<RandomSupport.Seed128bit, Identifier> randomSequenceSeeds = new Object2ObjectOpenHashMap<>();
 -        this.subProviders.forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
 +        this.getTables().forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
-             Identifier identifier = sequenceIdForLootTable(id);
-             Identifier identifier1 = map.put(RandomSequence.seedForKey(identifier), identifier);
-             if (identifier1 != null) {
-@@ -76,11 +_,8 @@
-         HolderGetter.Provider holdergetter$provider = new RegistryAccess.ImmutableRegistryAccess(List.of(writableregistry)).freeze();
-         ValidationContextSource validationcontextsource = new ValidationContextSource(problemreporter$collector, holdergetter$provider);
+             Identifier sequenceId = sequenceIdForLootTable(id);
+             Identifier previous = randomSequenceSeeds.put(RandomSequence.seedForKey(sequenceId), sequenceId);
+             if (previous != null) {
+@@ -75,11 +_,8 @@
+         HolderGetter.Provider validationProvider = new RegistryAccess.ImmutableRegistryAccess(List.of(tables)).freeze();
+         ValidationContextSource validationContext = new ValidationContextSource(problems, validationProvider);
  
--        for (ResourceKey<LootTable> resourcekey : Sets.difference(this.requiredTables, writableregistry.registryKeySet())) {
--            problemreporter$collector.report(new LootTableProvider.MissingTableProblem(resourcekey));
+-        for (ResourceKey<LootTable> missingTable : Sets.difference(this.requiredTables, tables.registryKeySet())) {
+-            problems.report(new LootTableProvider.MissingTableProblem(missingTable));
 -        }
-+        validate(writableregistry, validationcontextsource, problemreporter$collector);
++        validate(tables, validationContext, problems);
  
--        LootDataType.TABLE.runValidation(validationcontextsource, writableregistry);
-         if (!problemreporter$collector.isEmpty()) {
-             problemreporter$collector.forEach((id, problem) -> LOGGER.warn("Found validation problem in {}: {}", id, problem.description()));
+-        LootDataType.TABLE.runValidation(validationContext, tables);
+         if (!problems.isEmpty()) {
+             problems.forEach((id, problem) -> LOGGER.warn("Found validation problem in {}: {}", id, problem.description()));
              throw new IllegalStateException("Failed to validate loot tables, see logs");
-@@ -101,6 +_,18 @@
+@@ -100,6 +_,18 @@
      @Override
      public final String getName() {
          return "Loot Tables";

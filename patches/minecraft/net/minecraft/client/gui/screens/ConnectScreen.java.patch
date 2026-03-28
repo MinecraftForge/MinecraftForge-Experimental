@@ -3,7 +3,7 @@
 @@ -114,6 +_,8 @@
                      }
  
-                     if (optional.isEmpty()) {
+                     if (resolvedAddress.isEmpty()) {
 +                        ConnectScreen.LOGGER.error("Couldn't connect to server: Unknown host \"{}\"", hostAndPort.getHost());
 +                        net.minecraftforge.network.DualStackUtils.logInitialPreferences();
                          minecraft.execute(

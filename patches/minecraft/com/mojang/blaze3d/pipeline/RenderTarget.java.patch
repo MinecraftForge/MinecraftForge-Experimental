@@ -4,9 +4,9 @@
              this.width = width;
              this.height = height;
              if (this.useDepth) {
--                this.depthTexture = gpudevice.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, width, height, 1, 1);
-+                this.depthTexture = gpudevice.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, width, height, 1, 1, this.stencilEnabled);
-                 this.depthTextureView = gpudevice.createTextureView(this.depthTexture);
+-                this.depthTexture = device.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, width, height, 1, 1);
++                this.depthTexture = device.createTexture(() -> this.label + " / Depth", 15, TextureFormat.DEPTH32, width, height, 1, 1, this.stencilEnabled);
+                 this.depthTextureView = device.createTextureView(this.depthTexture);
              }
  
 @@ -124,5 +_,26 @@

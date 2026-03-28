@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/item/BoneMealItem.java
 +++ b/net/minecraft/world/item/BoneMealItem.java
-@@ -38,7 +_,7 @@
-         BlockPos blockpos = context.getClickedPos();
-         BlockPos blockpos1 = blockpos.relative(context.getClickedFace());
-         ItemStack itemstack = context.getItemInHand();
--        if (growCrop(itemstack, level, blockpos)) {
-+        if (applyBonemeal(itemstack, level, blockpos, context.getPlayer())) {
+@@ -37,7 +_,7 @@
+         BlockPos pos = context.getClickedPos();
+         BlockPos relative = pos.relative(context.getClickedFace());
+         ItemStack boneMealStack = context.getItemInHand();
+-        if (growCrop(boneMealStack, level, pos)) {
++        if (applyBonemeal(boneMealStack, level, pos, context.getPlayer())) {
              if (!level.isClientSide()) {
-                 itemstack.causeUseVibration(context.getPlayer(), GameEvent.ITEM_INTERACT_FINISH);
-                 level.levelEvent(1505, blockpos, 15);
-@@ -62,8 +_,18 @@
+                 boneMealStack.causeUseVibration(context.getPlayer(), GameEvent.ITEM_INTERACT_FINISH);
+                 level.levelEvent(1505, pos, 15);
+@@ -61,8 +_,18 @@
          }
      }
  
@@ -22,9 +22,9 @@
 +    }
 +
 +    public static boolean applyBonemeal(final ItemStack itemStack, final Level level, final BlockPos pos, net.minecraft.world.entity.player.Player player) {
-         BlockState blockstate = level.getBlockState(pos);
-+        int hook = net.minecraftforge.event.ForgeEventFactory.onApplyBonemeal(player, level, pos, blockstate, itemStack);
+         BlockState state = level.getBlockState(pos);
++        int hook = net.minecraftforge.event.ForgeEventFactory.onApplyBonemeal(player, level, pos, state, itemStack);
 +        if (hook != 0) return hook > 0;
-         if (blockstate.getBlock() instanceof BonemealableBlock bonemealableblock && bonemealableblock.isValidBonemealTarget(level, pos, blockstate)) {
+         if (state.getBlock() instanceof BonemealableBlock block && block.isValidBonemealTarget(level, pos, state)) {
              if (level instanceof ServerLevel) {
-                 if (bonemealableblock.isBonemealSuccess(level, level.getRandom(), pos, blockstate)) {
+                 if (block.isBonemealSuccess(level, level.getRandom(), pos, state)) {

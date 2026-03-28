@@ -1,12 +1,12 @@
 --- a/net/minecraft/world/level/block/DiodeBlock.java
 +++ b/net/minecraft/world/level/block/DiodeBlock.java
-@@ -177,6 +_,9 @@
+@@ -178,6 +_,9 @@
          Direction direction = state.getValue(FACING);
-         BlockPos blockpos = pos.relative(direction.getOpposite());
+         BlockPos oppositePos = pos.relative(direction.getOpposite());
          Orientation orientation = ExperimentalRedstoneUtils.initialOrientation(level, direction.getOpposite(), Direction.UP);
 +        if (net.minecraftforge.event.ForgeEventFactory.onNeighborNotify(level, pos, level.getBlockState(pos), java.util.EnumSet.of(direction.getOpposite()), false)) {
 +            return;
 +        }
-         level.neighborChanged(blockpos, this, orientation);
-         level.updateNeighborsAtExceptFromFacing(blockpos, this, direction, orientation);
+         level.neighborChanged(oppositePos, this, orientation);
+         level.updateNeighborsAtExceptFromFacing(oppositePos, this, direction, orientation);
      }

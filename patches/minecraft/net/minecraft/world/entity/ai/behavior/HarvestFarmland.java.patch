@@ -10,14 +10,14 @@
          } else if (!body.getVillagerData().profession().is(VillagerProfession.FARMER)) {
              return false;
 @@ -118,6 +_,11 @@
-                             level.setBlockAndUpdate(this.aboveFarmlandPos, blockstate1);
-                             level.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(body, blockstate1));
-                             flag = true;
-+                        } else if (itemstack.getItem() instanceof net.minecraftforge.common.IPlantable) {
-+                            if (((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlantType(level, aboveFarmlandPos) == net.minecraftforge.common.PlantType.CROP) {
-+                                level.setBlock(aboveFarmlandPos, ((net.minecraftforge.common.IPlantable) itemstack.getItem()).getPlant(level, aboveFarmlandPos), 3);
-+                                flag = true;
+                             level.setBlockAndUpdate(this.aboveFarmlandPos, place);
+                             level.gameEvent(GameEvent.BLOCK_PLACE, this.aboveFarmlandPos, GameEvent.Context.of(body, place));
+                             ok = true;
++                        } else if (itemStack.getItem() instanceof net.minecraftforge.common.IPlantable) {
++                            if (((net.minecraftforge.common.IPlantable) itemStack.getItem()).getPlantType(level, aboveFarmlandPos) == net.minecraftforge.common.PlantType.CROP) {
++                                level.setBlock(aboveFarmlandPos, ((net.minecraftforge.common.IPlantable) itemStack.getItem()).getPlant(level, aboveFarmlandPos), 3);
++                                ok = true;
 +                            }
                          }
  
-                         if (flag) {
+                         if (ok) {

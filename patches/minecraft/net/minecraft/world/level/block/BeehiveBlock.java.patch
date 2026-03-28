@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/level/block/BeehiveBlock.java
 +++ b/net/minecraft/world/level/block/BeehiveBlock.java
 @@ -160,7 +_,7 @@
-         boolean flag = false;
-         if (i >= 5) {
+         boolean hiveEmptied = false;
+         if (honeyLevel >= 5) {
              Item item = itemStack.getItem();
--            if (level instanceof ServerLevel serverlevel && itemStack.is(Items.SHEARS)) {
-+            if (level instanceof ServerLevel serverlevel && itemStack.canPerformAction(net.minecraftforge.common.ToolActions.SHEARS_HARVEST)) {
-                 dropHoneycomb(serverlevel, itemStack, state, level.getBlockEntity(pos), player, pos);
+-            if (level instanceof ServerLevel serverLevel && itemStack.is(Items.SHEARS)) {
++            if (level instanceof ServerLevel serverLevel && itemStack.canPerformAction(net.minecraftforge.common.ToolActions.SHEARS_HARVEST)) {
+                 dropHoneycomb(serverLevel, itemStack, state, level.getBlockEntity(pos), player, pos);
                  level.playSound(null, player.getX(), player.getY(), player.getZ(), SoundEvents.BEEHIVE_SHEAR, SoundSource.BLOCKS, 1.0F, 1.0F);
                  itemStack.hurtAndBreak(1, player, hand.asEquipmentSlot());

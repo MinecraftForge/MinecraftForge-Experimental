@@ -6,9 +6,9 @@
          super.spawnAfterBreak(state, level, pos, tool, dropExperience);
 -        if (dropExperience) {
 +        if (false && dropExperience) { // Forge: moved to getExpDrop
-             RandomSource randomsource = level.getRandom();
-             int i = 15 + randomsource.nextInt(15) + randomsource.nextInt(15);
-             this.popExperience(level, pos, i);
+             RandomSource random = level.getRandom();
+             int magicCount = 15 + random.nextInt(15) + random.nextInt(15);
+             this.popExperience(level, pos, magicCount);
          }
 +    }
 +

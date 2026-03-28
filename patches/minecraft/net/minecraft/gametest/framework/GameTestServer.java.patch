@@ -1,15 +1,15 @@
 --- a/net/minecraft/gametest/framework/GameTestServer.java
 +++ b/net/minecraft/gametest/framework/GameTestServer.java
-@@ -102,7 +_,7 @@
+@@ -101,7 +_,7 @@
          final int repeatCount
      ) {
          packRepository.reload();
--        ArrayList<String> arraylist = new ArrayList<>(packRepository.getAvailableIds());
-+        ArrayList<String> arraylist = new ArrayList<>(packRepository.getSelectedIds()); // Forge: Use the selected datapacks as this takes sorting into account.
-         arraylist.remove("vanilla");
-         arraylist.addFirst("vanilla");
-         WorldDataConfiguration worlddataconfiguration = new WorldDataConfiguration(new DataPackConfig(arraylist, List.of()), ENABLED_FEATURES);
-@@ -178,6 +_,7 @@
+-        ArrayList<String> enabledPacks = new ArrayList<>(packRepository.getAvailableIds());
++        ArrayList<String> enabledPacks = new ArrayList<>(packRepository.getSelectedIds()); // Forge: Use the selected datapacks as this takes sorting into account.
+         enabledPacks.remove("vanilla");
+         enabledPacks.addFirst("vanilla");
+         WorldDataConfiguration defaultTestConfig = new WorldDataConfiguration(new DataPackConfig(enabledPacks, List.of()), ENABLED_FEATURES);
+@@ -173,6 +_,7 @@
  
      @Override
      protected boolean initServer() {

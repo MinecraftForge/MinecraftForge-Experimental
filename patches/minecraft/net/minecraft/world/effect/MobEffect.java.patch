@@ -11,8 +11,8 @@
      public static final StreamCodec<RegistryFriendlyByteBuf, Holder<MobEffect>> STREAM_CODEC = ByteBufCodecs.holderRegistry(Registries.MOB_EFFECT);
      private static final int AMBIENT_ALPHA = Mth.floor(38.25F);
 @@ -58,12 +_,14 @@
-             int i = effectInstance.isAmbient() ? AMBIENT_ALPHA : 255;
-             return ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, ARGB.color(i, color));
+             int alpha = effectInstance.isAmbient() ? AMBIENT_ALPHA : 255;
+             return ColorParticleOption.create(ParticleTypes.ENTITY_EFFECT, ARGB.color(alpha, color));
          };
 +        initClient();
      }

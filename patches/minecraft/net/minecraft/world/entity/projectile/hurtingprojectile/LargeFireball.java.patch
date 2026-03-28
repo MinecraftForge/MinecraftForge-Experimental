@@ -3,9 +3,9 @@
 @@ -31,7 +_,7 @@
      protected void onHit(final HitResult hitResult) {
          super.onHit(hitResult);
-         if (this.level() instanceof ServerLevel serverlevel) {
--            boolean flag = serverlevel.getGameRules().get(GameRules.MOB_GRIEFING);
-+            boolean flag = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, this.getOwner());
-             this.level().explode(this, this.getX(), this.getY(), this.getZ(), this.explosionPower, flag, Level.ExplosionInteraction.MOB);
+         if (this.level() instanceof ServerLevel serverLevel) {
+-            boolean grief = serverLevel.getGameRules().get(GameRules.MOB_GRIEFING);
++            boolean grief = net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverLevel, this.getOwner());
+             this.level().explode(this, this.getX(), this.getY(), this.getZ(), this.explosionPower, grief, Level.ExplosionInteraction.MOB);
              this.discard();
          }

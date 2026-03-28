@@ -3,9 +3,9 @@
 @@ -272,7 +_,7 @@
                  .getSchema(DataFixUtils.makeKey(SharedConstants.getCurrentVersion().dataVersion().version()))
                  .getChoiceType(reference, name);
-         } catch (IllegalArgumentException illegalargumentexception) {
+         } catch (IllegalArgumentException var4) {
 -            LOGGER.error("No data fixer registered for {}", name);
 +            LOGGER.debug("No data fixer registered for {}", name);
              if (SharedConstants.IS_RUNNING_IN_IDE) {
-                 throw illegalargumentexception;
+                 throw var4;
              }

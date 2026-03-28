@@ -4,12 +4,12 @@
      void onCrossbowAttackPerformed();
  
      default void performCrossbowAttack(final LivingEntity body, final float crossbowPower) {
--        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(body, Items.CROSSBOW);
-+        InteractionHand interactionhand = ProjectileUtil.getWeaponHoldingHand(body, item -> item instanceof CrossbowItem);
-         ItemStack itemstack = body.getItemInHand(interactionhand);
--        if (itemstack.getItem() instanceof CrossbowItem crossbowitem) {
+-        InteractionHand hand = ProjectileUtil.getWeaponHoldingHand(body, Items.CROSSBOW);
++        InteractionHand hand = ProjectileUtil.getWeaponHoldingHand(body, item -> item instanceof CrossbowItem);
+         ItemStack usedItem = body.getItemInHand(hand);
+-        if (usedItem.getItem() instanceof CrossbowItem crossbow) {
 +        if (body.isHolding(is -> is.getItem() instanceof CrossbowItem)) {
-+            var crossbowitem = (CrossbowItem) itemstack.getItem();
-             crossbowitem.performShooting(
-                 body.level(), body, interactionhand, itemstack, crossbowPower, 14 - body.level().getDifficulty().getId() * 4, this.getTarget()
-             );
++            var crossbow = (CrossbowItem) usedItem.getItem();
+             crossbow.performShooting(body.level(), body, hand, usedItem, crossbowPower, 14 - body.level().getDifficulty().getId() * 4, this.getTarget());
+         }
+ 

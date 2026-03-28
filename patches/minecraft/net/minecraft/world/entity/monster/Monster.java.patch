@@ -2,10 +2,10 @@
 +++ b/net/minecraft/world/entity/monster/Monster.java
 @@ -149,9 +_,9 @@
          if (heldWeapon.getItem() instanceof ProjectileWeaponItem) {
-             Predicate<ItemStack> predicate = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles();
-             ItemStack itemstack = ProjectileWeaponItem.getHeldProjectile(this, predicate);
--            return itemstack.isEmpty() ? new ItemStack(Items.ARROW) : itemstack;
-+            return net.minecraftforge.common.ForgeHooks.getProjectile(this, heldWeapon, itemstack.isEmpty() ? new ItemStack(Items.ARROW) : itemstack);
+             Predicate<ItemStack> supportedProjectiles = ((ProjectileWeaponItem)heldWeapon.getItem()).getSupportedHeldProjectiles();
+             ItemStack heldProjectile = ProjectileWeaponItem.getHeldProjectile(this, supportedProjectiles);
+-            return heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile;
++            return net.minecraftforge.common.ForgeHooks.getProjectile(this, heldWeapon, heldProjectile.isEmpty() ? new ItemStack(Items.ARROW) : heldProjectile);
          } else {
 -            return ItemStack.EMPTY;
 +            return net.minecraftforge.common.ForgeHooks.getProjectile(this, heldWeapon, ItemStack.EMPTY);

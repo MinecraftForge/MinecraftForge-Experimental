@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/entity/EntityRenderDispatcher.java
 +++ b/net/minecraft/client/renderer/entity/EntityRenderDispatcher.java
-@@ -209,6 +_,14 @@
+@@ -207,6 +_,14 @@
          return this.itemInHandRenderer;
      }
  
@@ -14,11 +14,11 @@
 +
      @Override
      public void onResourceManagerReload(final ResourceManager resourceManager) {
-         EntityRendererProvider.Context entityrendererprovider$context = new EntityRendererProvider.Context(
-@@ -226,5 +_,6 @@
-         this.renderers = EntityRenderers.createEntityRenderers(entityrendererprovider$context);
-         this.playerRenderers = EntityRenderers.createAvatarRenderers(entityrendererprovider$context);
-         this.mannequinRenderers = EntityRenderers.createAvatarRenderers(entityrendererprovider$context);
-+        net.minecraftforge.client.event.ForgeEventFactoryClient.onGatherLayers(renderers, playerRenderers, mannequinRenderers, entityrendererprovider$context);
+         EntityRendererProvider.Context context = new EntityRendererProvider.Context(
+@@ -224,5 +_,6 @@
+         this.renderers = EntityRenderers.createEntityRenderers(context);
+         this.playerRenderers = EntityRenderers.createAvatarRenderers(context);
+         this.mannequinRenderers = EntityRenderers.createAvatarRenderers(context);
++        net.minecraftforge.client.event.ForgeEventFactoryClient.onGatherLayers(renderers, playerRenderers, mannequinRenderers, context);
      }
  }

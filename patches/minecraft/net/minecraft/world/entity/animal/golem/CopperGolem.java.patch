@@ -4,15 +4,15 @@
          }
  
          Level level = this.level();
--        if (itemstack.is(Items.SHEARS) && this.readyForShearing()) {
-+        if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) { // Forge: Moved to onSheared
-             if (level instanceof ServerLevel serverlevel) {
-                 this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
+-        if (itemStack.is(Items.SHEARS) && this.readyForShearing()) {
++        if (false && itemStack.is(Items.SHEARS) && this.readyForShearing()) { // Forge: Moved to onSheared
+             if (level instanceof ServerLevel serverLevel) {
+                 this.shear(serverLevel, SoundSource.PLAYERS, itemStack);
                  this.gameEvent(GameEvent.SHEAR, player);
 @@ -427,6 +_,18 @@
-         ItemStack itemstack = this.getItemBySlot(EQUIPMENT_SLOT_ANTENNA);
+         ItemStack itemStack = this.getItemBySlot(EQUIPMENT_SLOT_ANTENNA);
          this.setItemSlot(EQUIPMENT_SLOT_ANTENNA, ItemStack.EMPTY);
-         this.spawnAtLocation(level, itemstack, 1.5F);
+         this.spawnAtLocation(level, itemStack, 1.5F);
 +    }
 +
 +    @Override

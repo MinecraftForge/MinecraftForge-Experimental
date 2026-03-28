@@ -54,11 +54,11 @@
 @@ -100,7 +_,7 @@
  
      public void buildContents(final CreativeModeTab.ItemDisplayParameters parameters) {
-         CreativeModeTab.ItemDisplayBuilder creativemodetab$itemdisplaybuilder = new CreativeModeTab.ItemDisplayBuilder(this, parameters.enabledFeatures);
--        this.displayItemsGenerator.accept(parameters, creativemodetab$itemdisplaybuilder);
-+        net.minecraftforge.common.ForgeHooks.onCreativeModeTabBuildContents(this, this.displayItemsGenerator, parameters, creativemodetab$itemdisplaybuilder);
-         this.displayItems = creativemodetab$itemdisplaybuilder.tabContents;
-         this.displayItemsSearchTab = creativemodetab$itemdisplaybuilder.searchTabContents;
+         CreativeModeTab.ItemDisplayBuilder displayList = new CreativeModeTab.ItemDisplayBuilder(this, parameters.enabledFeatures);
+-        this.displayItemsGenerator.accept(parameters, displayList);
++        net.minecraftforge.common.ForgeHooks.onCreativeModeTabBuildContents(this, this.displayItemsGenerator, parameters, displayList);
+         this.displayItems = displayList.tabContents;
+         this.displayItemsSearchTab = displayList.searchTabContents;
      }
 @@ -117,6 +_,22 @@
          return this.displayItemsSearchTab.contains(stack);
@@ -108,7 +108,7 @@
              return this;
          }
  
-@@ -175,13 +_,80 @@
+@@ -175,11 +_,80 @@
              return this;
          }
  
@@ -185,10 +185,8 @@
              if ((this.type == CreativeModeTab.Type.HOTBAR || this.type == CreativeModeTab.Type.INVENTORY) && this.displayItemsGenerator != EMPTY_GENERATOR) {
                  throw new IllegalStateException("Special tabs can't have display items");
              } else {
--                CreativeModeTab creativemodetab = new CreativeModeTab(
--                    this.row, this.column, this.type, this.displayName, this.iconGenerator, this.displayItemsGenerator
--                );
-+                CreativeModeTab creativemodetab = this.tabFactory.apply(this);
-                 creativemodetab.alignedRight = this.alignedRight;
-                 creativemodetab.showTitle = this.showTitle;
-                 creativemodetab.canScroll = this.canScroll;
+-                CreativeModeTab tab = new CreativeModeTab(this.row, this.column, this.type, this.displayName, this.iconGenerator, this.displayItemsGenerator);
++                CreativeModeTab tab = this.tabFactory.apply(this);
+                 tab.alignedRight = this.alignedRight;
+                 tab.showTitle = this.showTitle;
+                 tab.canScroll = this.canScroll;

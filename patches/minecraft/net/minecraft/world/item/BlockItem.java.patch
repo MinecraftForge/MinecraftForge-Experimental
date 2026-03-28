@@ -1,20 +1,18 @@
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java
-@@ -76,11 +_,11 @@
+@@ -76,9 +_,9 @@
                          }
                      }
  
--                    SoundType soundtype = blockstate1.getSoundType();
-+                    SoundType soundtype = blockstate1.getSoundType(level, blockpos, placeContext.getPlayer());
+-                    SoundType soundType = placedState.getSoundType();
++                    SoundType soundType = placedState.getSoundType(level, pos, placeContext.getPlayer());
                      level.playSound(
-                         player,
-                         blockpos,
--                        this.getPlaceSound(blockstate1),
-+                        this.getPlaceSound(blockstate1, level, blockpos, placeContext.getPlayer()),
-                         SoundSource.BLOCKS,
-                         (soundtype.getVolume() + 1.0F) / 2.0F,
-                         soundtype.getPitch() * 0.8F
-@@ -93,10 +_,16 @@
+-                        player, pos, this.getPlaceSound(placedState), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F
++                        player, pos, this.getPlaceSound(placedState, level, pos, placeContext.getPlayer()), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F
+                     );
+                     level.gameEvent(GameEvent.BLOCK_PLACE, pos, GameEvent.Context.of(player, placedState));
+                     itemStack.consume(1, player);
+@@ -88,10 +_,16 @@
          }
      }
  
@@ -31,7 +29,7 @@
      public @Nullable BlockPlaceContext updatePlacementContext(final BlockPlaceContext context) {
          return context;
      }
-@@ -191,6 +_,10 @@
+@@ -186,6 +_,10 @@
  
      public void registerBlocks(final Map<Block, Item> map, final Item item) {
          map.put(this.getBlock(), item);

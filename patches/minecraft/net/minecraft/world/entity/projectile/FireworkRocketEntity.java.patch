@@ -12,5 +12,5 @@
 +
 +    @Override
      public DoubleDoubleImmutablePair calculateHorizontalHurtKnockbackDirection(final LivingEntity hurtEntity, final DamageSource damageSource) {
-         double d0 = hurtEntity.position().x - this.position().x;
-         double d1 = hurtEntity.position().z - this.position().z;
+         double dx = hurtEntity.position().x - this.position().x;
+         double dz = hurtEntity.position().z - this.position().z;

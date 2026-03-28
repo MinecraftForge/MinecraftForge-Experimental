@@ -8,20 +8,20 @@
 +    }
 +    @Nullable
 +    public T detectPackResources(Path content, List<ForbiddenSymlinkInfo> issues, boolean requireMeta) throws IOException {
-         Path path = content;
+         Path targetContext = content;
  
-         BasicFileAttributes basicfileattributes;
+         BasicFileAttributes attributes;
 @@ -43,10 +_,11 @@
              if (!issues.isEmpty()) {
                  return null;
              } else {
--                return !Files.isRegularFile(path.resolve("pack.mcmeta")) ? null : this.createDirectoryPack(path);
-+                return !Files.isRegularFile(path.resolve("pack.mcmeta")) && requireMeta ? null : this.createDirectoryPack(path);
+-                return !Files.isRegularFile(targetContext.resolve("pack.mcmeta")) ? null : this.createDirectoryPack(targetContext);
++                return !Files.isRegularFile(targetContext.resolve("pack.mcmeta")) && requireMeta ? null : this.createDirectoryPack(targetContext);
              }
          } else {
--            return basicfileattributes.isRegularFile() && path.getFileName().toString().endsWith(".zip") ? this.createZipPack(path) : null;
-+            var name = path.getFileName().toString();
-+            return basicfileattributes.isRegularFile() && (name.endsWith(".zip") || name.endsWith(".jar")) ? this.createZipPack(path) : null;
+-            return attributes.isRegularFile() && targetContext.getFileName().toString().endsWith(".zip") ? this.createZipPack(targetContext) : null;
++            var name = targetContext.getFileName().toString();
++            return attributes.isRegularFile() && (name.endsWith(".zip") || name.endsWith(".jar")) ? this.createZipPack(targetContext) : null;
          }
      }
  

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/FlowerPotBlock.java
 +++ b/net/minecraft/world/level/block/FlowerPotBlock.java
-@@ -44,9 +_,31 @@
+@@ -43,9 +_,31 @@
      }
  
      public FlowerPotBlock(final Block potted, final BlockBehaviour.Properties properties) {
@@ -34,17 +34,17 @@
      }
  
      @Override
-@@ -65,7 +_,7 @@
+@@ -64,7 +_,7 @@
          final BlockHitResult hitResult
      ) {
-         BlockState blockstate = (itemStack.getItem() instanceof BlockItem blockitem
--                ? POTTED_BY_CONTENT.getOrDefault(blockitem.getBlock(), Blocks.AIR)
-+                ? getEmptyPot().fullPots.getOrDefault(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(blockitem.getBlock()), net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(Blocks.AIR)).get()
+         BlockState newContents = (itemStack.getItem() instanceof BlockItem blockItem
+-                ? POTTED_BY_CONTENT.getOrDefault(blockItem.getBlock(), Blocks.AIR)
++                ? getEmptyPot().fullPots.getOrDefault(net.minecraftforge.registries.ForgeRegistries.BLOCKS.getKey(blockItem.getBlock()), net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(Blocks.AIR)).get()
                  : Blocks.AIR)
              .defaultBlockState();
-         if (blockstate.isAir()) {
-@@ -93,7 +_,7 @@
-                 player.drop(itemstack, false);
+         if (newContents.isAir()) {
+@@ -92,7 +_,7 @@
+                 player.drop(plant, false);
              }
  
 -            level.setBlock(pos, Blocks.FLOWER_POT.defaultBlockState(), 3);
@@ -52,7 +52,7 @@
              level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
              return InteractionResult.SUCCESS;
          }
-@@ -125,7 +_,7 @@
+@@ -124,7 +_,7 @@
      }
  
      public Block getPotted() {
@@ -61,7 +61,7 @@
      }
  
      @Override
-@@ -160,5 +_,24 @@
+@@ -159,5 +_,24 @@
          } else {
              return state.is(Blocks.POTTED_CLOSED_EYEBLOSSOM) ? Blocks.POTTED_OPEN_EYEBLOSSOM.defaultBlockState() : state;
          }

@@ -8,69 +8,68 @@
      }
  
      @Override
-@@ -515,8 +_,9 @@
-             this.addSkyPass(framegraphbuilder, cameraState, terrainFog);
+@@ -518,7 +_,8 @@
+             this.addSkyPass(frame, cameraState, terrainFog);
          }
  
+-        this.addMainPass(frame, cullFrustum, modelViewMatrix, terrainFog, renderOutline, this.levelRenderState, deltaTracker, profiler, chunkSectionsToRender);
 +        var hasCustomOutline = this.levelRenderState.blockOutlineRenderState != null && this.levelRenderState.blockOutlineRenderState.customRenderer() != null;
-         this.addMainPass(
--            framegraphbuilder, frustum, modelViewMatrix, terrainFog, renderOutline, this.levelRenderState, deltaTracker, profilerfiller, chunkSectionsToRender
-+            framegraphbuilder, frustum, modelViewMatrix, terrainFog, renderOutline | hasCustomOutline, this.levelRenderState, deltaTracker, profilerfiller, chunkSectionsToRender
-         );
-         PostChain postchain1 = this.minecraft.getShaderManager().getPostChain(ENTITY_OUTLINE_POST_CHAIN_ID, LevelTargetBundle.OUTLINE_TARGETS);
-         if (this.levelRenderState.haveGlowingEntities && postchain1 != null) {
-@@ -543,6 +_,7 @@
++        this.addMainPass(frame, cullFrustum, modelViewMatrix, terrainFog, renderOutline | hasCustomOutline, this.levelRenderState, deltaTracker, profiler, chunkSectionsToRender);
+         PostChain entityOutlineChain = this.minecraft.getShaderManager().getPostChain(ENTITY_OUTLINE_POST_CHAIN_ID, LevelTargetBundle.OUTLINE_TARGETS);
+         if (this.levelRenderState.haveGlowingEntities && entityOutlineChain != null) {
+             entityOutlineChain.addToFrame(frame, screenWidth, screenHeight, this.targets);
+@@ -544,6 +_,7 @@
          }
  
-         this.addLateDebugPass(framegraphbuilder, this.levelRenderState.cameraRenderState, terrainFog, modelViewMatrix);
-+        net.minecraftforge.client.FramePassManager.insertForgePasses(framegraphbuilder, targets, this.levelRenderState); // Forge: Modded passes are inserted here.
-         profilerfiller.popPush("executeFrameGraph");
-         framegraphbuilder.execute(resourceAllocator, new FrameGraphBuilder.Inspector() {
+         this.addLateDebugPass(frame, this.levelRenderState.cameraRenderState, terrainFog, modelViewMatrix);
++        net.minecraftforge.client.FramePassManager.insertForgePasses(frame, targets, this.levelRenderState); // Forge: Modded passes are inserted here.
+         profiler.popPush("executeFrameGraph");
+         frame.execute(resourceAllocator, new FrameGraphBuilder.Inspector() {
              {
-@@ -580,7 +_,7 @@
-         profilerfiller.popPush("entities");
-         this.extractVisibleEntities(camera, frustum, deltaTracker, this.levelRenderState);
-         profilerfiller.popPush("blockEntities");
+@@ -581,7 +_,7 @@
+         profiler.popPush("entities");
+         this.extractVisibleEntities(camera, cullFrustum, deltaTracker, this.levelRenderState);
+         profiler.popPush("blockEntities");
 -        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState);
-+        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState, frustum);
-         profilerfiller.popPush("blockOutline");
++        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState, cullFrustum);
+         profiler.popPush("blockOutline");
          this.extractBlockOutline(camera, this.levelRenderState);
-         profilerfiller.popPush("blockBreaking");
-@@ -863,7 +_,7 @@
+         profiler.popPush("blockBreaking");
+@@ -857,7 +_,7 @@
          }
      }
  
 -    private void extractVisibleBlockEntities(final Camera camera, final float deltaPartialTick, final LevelRenderState levelRenderState) {
 +    private void extractVisibleBlockEntities(final Camera camera, final float deltaPartialTick, final LevelRenderState levelRenderState, final Frustum frustum) {
-         Vec3 vec3 = camera.position();
-         double d0 = vec3.x();
-         double d1 = vec3.y();
-@@ -874,6 +_,7 @@
-             List<BlockEntity> list = sectionrenderdispatcher$rendersection.getSectionMesh().getRenderableBlockEntities();
-             if (!list.isEmpty() && !(sectionrenderdispatcher$rendersection.getVisibility(Util.getMillis()) < 0.3F)) {
-                 for (BlockEntity blockentity : list) {
-+                    if (!frustum.isVisible(blockentity.getRenderBoundingBox())) continue;
-                     BlockPos blockpos = blockentity.getBlockPos();
-                     SortedSet<BlockDestructionProgress> sortedset = this.destructionProgress.get(blockpos.asLong());
-                     ModelFeatureRenderer.CrumblingOverlay modelfeaturerenderer$crumblingoverlay;
-@@ -902,6 +_,7 @@
-             if (blockentity1.isRemoved()) {
+         Vec3 cameraPos = camera.position();
+         double camX = cameraPos.x();
+         double camY = cameraPos.y();
+@@ -868,6 +_,7 @@
+             List<BlockEntity> renderableBlockEntities = section.getSectionMesh().getRenderableBlockEntities();
+             if (!renderableBlockEntities.isEmpty() && !(section.getVisibility(Util.getMillis()) < 0.3F)) {
+                 for (BlockEntity blockEntity : renderableBlockEntities) {
++                    if (!frustum.isVisible(blockEntity.getRenderBoundingBox())) continue;
+                     BlockPos blockPos = blockEntity.getBlockPos();
+                     SortedSet<BlockDestructionProgress> progresses = this.destructionProgress.get(blockPos.asLong());
+                     ModelFeatureRenderer.CrumblingOverlay breakProgress;
+@@ -895,6 +_,7 @@
+             if (blockEntity.isRemoved()) {
                  iterator.remove();
              } else {
-+                if (!frustum.isVisible(blockentity1.getRenderBoundingBox())) continue;
-                 BlockEntityRenderState blockentityrenderstate1 = this.blockEntityRenderDispatcher.tryExtractRenderState(blockentity1, deltaPartialTick, null);
-                 if (blockentityrenderstate1 != null) {
-                     levelRenderState.blockEntityRenderStates.add(blockentityrenderstate1);
-@@ -938,7 +_,7 @@
-                 SortedSet<BlockDestructionProgress> sortedset = entry.getValue();
-                 if (sortedset != null && !sortedset.isEmpty()) {
-                     int i = sortedset.last().getProgress();
--                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(blockpos, this.level.getBlockState(blockpos), i));
-+                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(blockpos, this.level.getBlockState(blockpos), i, this.level.getModelDataManager().getAtOrEmpty(blockpos)));
++                if (!frustum.isVisible(blockEntity.getRenderBoundingBox())) continue;
+                 BlockEntityRenderState state = this.blockEntityRenderDispatcher.tryExtractRenderState(blockEntity, deltaPartialTick, null);
+                 if (state != null) {
+                     levelRenderState.blockEntityRenderStates.add(state);
+@@ -931,7 +_,7 @@
+                 SortedSet<BlockDestructionProgress> progresses = entry.getValue();
+                 if (progresses != null && !progresses.isEmpty()) {
+                     int progress = progresses.last().getProgress();
+-                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(pos, this.level.getBlockState(pos), progress));
++                    levelRenderState.blockBreakingRenderStates.add(new BlockBreakingRenderState(pos, this.level.getBlockState(pos), progress, this.level.getModelDataManager().getAtOrEmpty(pos)));
                  }
              }
          }
-@@ -966,6 +_,12 @@
+@@ -957,6 +_,12 @@
  
      private void extractBlockOutline(final Camera camera, final LevelRenderState levelRenderState) {
          levelRenderState.blockOutlineRenderState = null;
@@ -80,30 +79,30 @@
 +            return;
 +        }
 +
-         if (this.minecraft.hitResult instanceof BlockHitResult blockhitresult) {
-             if (blockhitresult.getType() != HitResult.Type.MISS) {
-                 BlockPos blockpos = blockhitresult.getBlockPos();
-@@ -999,6 +_,10 @@
+         if (this.minecraft.hitResult instanceof BlockHitResult blockHitResult) {
+             if (blockHitResult.getType() != HitResult.Type.MISS) {
+                 BlockPos pos = blockHitResult.getBlockPos();
+@@ -990,6 +_,10 @@
      ) {
-         BlockOutlineRenderState blockoutlinerenderstate = levelRenderState.blockOutlineRenderState;
-         if (blockoutlinerenderstate != null) {
-+            if (blockoutlinerenderstate.customRenderer() != null) {
-+                blockoutlinerenderstate.customRenderer().render(bufferSource, poseStack, onlyTranslucentBlocks, levelRenderState);
+         BlockOutlineRenderState state = levelRenderState.blockOutlineRenderState;
+         if (state != null) {
++            if (state.customRenderer() != null) {
++                state.customRenderer().render(bufferSource, poseStack, onlyTranslucentBlocks, levelRenderState);
 +                return;
 +            }
-             if (blockoutlinerenderstate.isTranslucent() == onlyTranslucentBlocks) {
-                 Vec3 vec3 = levelRenderState.cameraRenderState.pos;
-                 if (blockoutlinerenderstate.highContrast()) {
-@@ -1491,7 +_,7 @@
+             if (state.isTranslucent() == onlyTranslucentBlocks) {
+                 Vec3 cameraPos = levelRenderState.cameraRenderState.pos;
+                 if (state.highContrast()) {
+@@ -1458,7 +_,7 @@
          } else {
-             int i = brightnessGetter.packedBrightness(level, pos);
-             int j = LightCoordsUtil.block(i);
--            int k = state.getLightEmission();
-+            int k = state.getLightEmission(level, pos);
-             return j < k ? LightCoordsUtil.withBlock(i, k) : i;
+             int packedBrightness = brightnessGetter.packedBrightness(level, pos);
+             int block = LightCoordsUtil.block(packedBrightness);
+-            int blockSelfEmission = state.getLightEmission();
++            int blockSelfEmission = state.getLightEmission(level, pos);
+             return block < blockSelfEmission ? LightCoordsUtil.withBlock(packedBrightness, blockSelfEmission) : packedBrightness;
          }
      }
-@@ -1539,6 +_,18 @@
+@@ -1506,6 +_,18 @@
  
      public CloudRenderer getCloudRenderer() {
          return this.cloudRenderer;

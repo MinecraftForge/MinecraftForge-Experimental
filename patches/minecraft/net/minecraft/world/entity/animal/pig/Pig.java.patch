@@ -6,10 +6,10 @@
      public void thunderHit(final ServerLevel level, final LightningBolt lightningBolt) {
 -        if (level.getDifficulty() != Difficulty.PEACEFUL) {
 +        if (level.getDifficulty() != Difficulty.PEACEFUL && net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.ZOMBIFIED_PIGLIN, (timer) -> {})) {
-             ZombifiedPiglin zombifiedpiglin = this.convertTo(EntityType.ZOMBIFIED_PIGLIN, ConversionParams.single(this, false, true), zp -> {
+             ZombifiedPiglin zombifiedPiglin = this.convertTo(EntityType.ZOMBIFIED_PIGLIN, ConversionParams.single(this, false, true), zp -> {
                  zp.populateDefaultEquipmentSlots(this.getRandom(), level.getCurrentDifficultyAt(this.blockPosition()));
                  zp.setPersistenceRequired();
 +                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, zp);
              });
-             if (zombifiedpiglin == null) {
+             if (zombifiedPiglin == null) {
                  super.thunderHit(level, lightningBolt);

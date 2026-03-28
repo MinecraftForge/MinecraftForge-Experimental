@@ -1,11 +1,11 @@
 --- a/net/minecraft/client/renderer/feature/BlockFeatureRenderer.java
 +++ b/net/minecraft/client/renderer/feature/BlockFeatureRenderer.java
-@@ -164,7 +_,7 @@
-             this.random.setSeed(submitnodestorage$breakingblockmodelsubmit.seed());
+@@ -153,7 +_,7 @@
+             this.random.setSeed(submit.seed());
  
              try {
--                submitnodestorage$breakingblockmodelsubmit.model().collectParts(this.random, this.parts);
-+                submitnodestorage$breakingblockmodelsubmit.model().collectParts(this.random, this.parts, submitnodestorage$breakingblockmodelsubmit.data());
+-                submit.model().collectParts(this.random, this.parts);
++                submit.model().collectParts(this.random, this.parts, submit.data());
  
-                 for (BlockStateModelPart blockstatemodelpart : this.parts) {
-                     putPartQuads(blockstatemodelpart, submitnodestorage$breakingblockmodelsubmit.pose(), this.quadInstance, NO_TINT, vertexconsumer, null);
+                 for (BlockStateModelPart part : this.parts) {
+                     putPartQuads(part, submit.pose(), this.quadInstance, NO_TINT, buffer, null);

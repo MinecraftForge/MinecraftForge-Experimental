@@ -1,19 +1,19 @@
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -438,6 +_,7 @@
-                 ItemStack itemstack10 = this.getCarried();
-                 player.updateTutorialInventoryAction(itemstack10, slot7.getItem(), clickaction);
-                 if (!this.tryItemClickBehaviourOverride(player, clickaction, slot7, itemstack9, itemstack10)) {
-+                    if (!net.minecraftforge.event.ForgeEventFactory.onItemStackedOn(itemstack10, itemstack9, slot7, clickaction, player, createCarriedSlotAccess()))
-                     if (itemstack9.isEmpty()) {
-                         if (!itemstack10.isEmpty()) {
-                             int i3 = clickaction == ClickAction.PRIMARY ? itemstack10.getCount() : 1;
-@@ -658,7 +_,7 @@
-                 ItemStack itemstack = slot.getItem();
-                 if (!itemstack.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, itemstack)) {
-                     int j = itemstack.getCount() + itemStack.getCount();
--                    int k = slot.getMaxStackSize(itemstack);
-+                    int k = Math.min(slot.getMaxStackSize(itemstack), itemstack.getMaxStackSize());
-                     if (j <= k) {
+@@ -436,6 +_,7 @@
+                 ItemStack carried = this.getCarried();
+                 player.updateTutorialInventoryAction(carried, slotx.getItem(), clickAction);
+                 if (!this.tryItemClickBehaviourOverride(player, clickAction, slotx, clicked, carried)) {
++                    if (!net.minecraftforge.event.ForgeEventFactory.onItemStackedOn(carried, clicked, slotx, clickAction, player, createCarriedSlotAccess()))
+                     if (clicked.isEmpty()) {
+                         if (!carried.isEmpty()) {
+                             int amount = clickAction == ClickAction.PRIMARY ? carried.getCount() : 1;
+@@ -654,7 +_,7 @@
+                 ItemStack target = slot.getItem();
+                 if (!target.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, target)) {
+                     int totalStack = target.getCount() + itemStack.getCount();
+-                    int maxStackSize = slot.getMaxStackSize(target);
++                    int maxStackSize = Math.min(slot.getMaxStackSize(target), target.getMaxStackSize());
+                     if (totalStack <= maxStackSize) {
                          itemStack.setCount(0);
-                         itemstack.setCount(j);
+                         target.setCount(totalStack);

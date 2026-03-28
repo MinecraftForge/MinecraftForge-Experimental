@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/monster/piglin/AbstractPiglin.java
 +++ b/net/minecraft/world/entity/monster/piglin/AbstractPiglin.java
-@@ -85,7 +_,7 @@
+@@ -84,7 +_,7 @@
              this.timeInOverworld = 0;
          }
  
@@ -9,14 +9,14 @@
              this.playConvertedSound();
              this.finishConversion(level);
          }
-@@ -106,7 +_,10 @@
+@@ -105,7 +_,10 @@
          this.convertTo(
              EntityType.ZOMBIFIED_PIGLIN,
              ConversionParams.single(this, true, true),
 -            zombified -> zombified.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0))
-+            p_449701_ -> {
-+                p_449701_.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
-+                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, p_449701_);
++            zombified -> {
++                zombified.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
++                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, zombified);
 +            }
          );
      }

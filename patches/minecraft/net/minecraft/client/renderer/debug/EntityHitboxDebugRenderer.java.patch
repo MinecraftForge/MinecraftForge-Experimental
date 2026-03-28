@@ -1,13 +1,13 @@
 --- a/net/minecraft/client/renderer/debug/EntityHitboxDebugRenderer.java
 +++ b/net/minecraft/client/renderer/debug/EntityHitboxDebugRenderer.java
-@@ -93,8 +_,8 @@
+@@ -98,8 +_,8 @@
              );
          }
  
--        if (entity instanceof EnderDragon enderdragon) {
--            for (EnderDragonPart enderdragonpart : enderdragon.getSubEntities()) {
+-        if (entity instanceof EnderDragon dragon) {
+-            for (EnderDragonPart subEntity : dragon.getSubEntities()) {
 +        if (entity.isMultipartEntity()) {
-+            for (var enderdragonpart : entity.getParts()) {
-                 Vec3 vec34 = enderdragonpart.position();
-                 Vec3 vec35 = enderdragonpart.getPosition(partialTicks);
-                 Vec3 vec36 = vec35.subtract(vec34);
++            for (var subEntity : entity.getParts()) {
+                 Vec3 latestSubPosition = subEntity.position();
+                 Vec3 currentSubPosition = subEntity.getPosition(partialTicks);
+                 Vec3 subOffset = currentSubPosition.subtract(latestSubPosition);

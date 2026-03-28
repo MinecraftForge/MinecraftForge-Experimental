@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/ConcretePowderBlock.java
 +++ b/net/minecraft/world/level/block/ConcretePowderBlock.java
-@@ -36,7 +_,7 @@
+@@ -35,7 +_,7 @@
  
      @Override
      public void onLand(final Level level, final BlockPos pos, final BlockState state, final BlockState replacedBlock, final FallingBlockEntity entity) {
@@ -9,8 +9,8 @@
              level.setBlock(pos, this.concrete.defaultBlockState(), 3);
          }
      }
-@@ -49,20 +_,24 @@
-         return shouldSolidify(blockgetter, blockpos, blockstate) ? this.concrete.defaultBlockState() : super.getStateForPlacement(context);
+@@ -48,20 +_,24 @@
+         return shouldSolidify(level, pos, replacedBlock) ? this.concrete.defaultBlockState() : super.getStateForPlacement(context);
      }
  
 +    private static boolean shouldSolidify(final BlockGetter level, final BlockPos pos, final BlockState state, final net.minecraft.world.level.material.FluidState fluidState) {
@@ -24,21 +24,21 @@
  
 -    private static boolean touchesLiquid(final BlockGetter level, final BlockPos pos) {
 +    private static boolean touchesLiquid(final BlockGetter level, BlockPos pos, BlockState state) {
-         boolean flag = false;
-         BlockPos.MutableBlockPos blockpos$mutableblockpos = pos.mutable();
+         boolean touchesLiquid = false;
+         BlockPos.MutableBlockPos testPos = pos.mutable();
  
          for (Direction direction : Direction.values()) {
-             BlockState blockstate = level.getBlockState(blockpos$mutableblockpos);
--            if (direction != Direction.DOWN || canSolidify(blockstate)) {
-+            if (direction != Direction.DOWN || state.canBeHydrated(level, pos, blockstate.getFluidState(), blockpos$mutableblockpos)) {
-                 blockpos$mutableblockpos.setWithOffset(pos, direction);
-                 blockstate = level.getBlockState(blockpos$mutableblockpos);
--                if (canSolidify(blockstate) && !blockstate.isFaceSturdy(level, pos, direction.getOpposite())) {
-+                if (state.canBeHydrated(level, pos, blockstate.getFluidState(), blockpos$mutableblockpos) && !blockstate.isFaceSturdy(level, pos, direction.getOpposite())) {
-                     flag = true;
+             BlockState blockState = level.getBlockState(testPos);
+-            if (direction != Direction.DOWN || canSolidify(blockState)) {
++            if (direction != Direction.DOWN || state.canBeHydrated(level, pos, blockState.getFluidState(), testPos)) {
+                 testPos.setWithOffset(pos, direction);
+                 blockState = level.getBlockState(testPos);
+-                if (canSolidify(blockState) && !blockState.isFaceSturdy(level, pos, direction.getOpposite())) {
++                if (state.canBeHydrated(level, pos, blockState.getFluidState(), testPos) && !blockState.isFaceSturdy(level, pos, direction.getOpposite())) {
+                     touchesLiquid = true;
                      break;
                  }
-@@ -87,7 +_,7 @@
+@@ -86,7 +_,7 @@
          final BlockState neighbourState,
          final RandomSource random
      ) {

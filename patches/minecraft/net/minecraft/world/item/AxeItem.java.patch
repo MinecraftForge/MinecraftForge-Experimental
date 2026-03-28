@@ -4,38 +4,38 @@
          if (playerHasBlockingItemUseIntent(context)) {
              return InteractionResult.PASS;
          } else {
--            Optional<BlockState> optional = this.evaluateNewBlockState(level, blockpos, player, level.getBlockState(blockpos));
-+            Optional<BlockState> optional = this.evaluateNewBlockState(level, blockpos, player, level.getBlockState(blockpos), context);
-             if (optional.isEmpty()) {
+-            Optional<BlockState> newBlock = this.evaluateNewBlockState(level, pos, player, level.getBlockState(pos));
++            Optional<BlockState> newBlock = this.evaluateNewBlockState(level, pos, player, level.getBlockState(pos), context);
+             if (newBlock.isEmpty()) {
                  return InteractionResult.PASS;
              } else {
 @@ -92,17 +_,24 @@
      }
  
      private Optional<BlockState> evaluateNewBlockState(final Level level, final BlockPos pos, final @Nullable Player player, final BlockState oldState) {
--        Optional<BlockState> optional = this.getStripped(oldState);
+-        Optional<BlockState> strippedBlock = this.getStripped(oldState);
 +        return this.evaluateNewBlockState(level, pos, player, oldState, null);
 +    }
 +
 +    private Optional<BlockState> evaluateNewBlockState(final Level level, final BlockPos pos, final @Nullable Player player, final BlockState oldState, final @Nullable UseOnContext ctx) {
 +        var strip = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
-+        Optional<BlockState> optional = strip != null ? Optional.of(strip) : this.getStripped(oldState);
-         if (optional.isPresent()) {
++        Optional<BlockState> strippedBlock = strip != null ? Optional.of(strip) : this.getStripped(oldState);
+         if (strippedBlock.isPresent()) {
              level.playSound(player, pos, SoundEvents.AXE_STRIP, SoundSource.BLOCKS, 1.0F, 1.0F);
-             return optional;
+             return strippedBlock;
          } else {
--            Optional<BlockState> optional1 = WeatheringCopper.getPrevious(oldState);
+-            Optional<BlockState> scrapedBlock = WeatheringCopper.getPrevious(oldState);
 +            var scrape = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_STRIP, false);
-+            Optional<BlockState> optional1 = scrape != null ? Optional.of(scrape) : WeatheringCopper.getPrevious(oldState);
-             if (optional1.isPresent()) {
++            Optional<BlockState> scrapedBlock = scrape != null ? Optional.of(scrape) : WeatheringCopper.getPrevious(oldState);
+             if (scrapedBlock.isPresent()) {
                  spawnSoundAndParticle(level, pos, player, oldState, SoundEvents.AXE_SCRAPE, 3005);
-                 return optional1;
+                 return scrapedBlock;
              } else {
--                Optional<BlockState> optional2 = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
+-                Optional<BlockState> waxoffBlock = Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
 +                var waxOff = ctx == null ? null : oldState.getToolModifiedState(ctx, net.minecraftforge.common.ToolActions.AXE_WAX_OFF, false);
-+                Optional<BlockState> optional2 = waxOff != null ? Optional.of(waxOff) : Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
++                Optional<BlockState> waxoffBlock = waxOff != null ? Optional.of(waxOff) : Optional.ofNullable(HoneycombItem.WAX_OFF_BY_BLOCK.get().get(oldState.getBlock()))
                      .map(b -> b.withPropertiesOf(oldState));
-                 if (optional2.isPresent()) {
+                 if (waxoffBlock.isPresent()) {
                      spawnSoundAndParticle(level, pos, player, oldState, SoundEvents.AXE_WAX_OFF, 3004);
 @@ -129,5 +_,16 @@
      private Optional<BlockState> getStripped(final BlockState state) {

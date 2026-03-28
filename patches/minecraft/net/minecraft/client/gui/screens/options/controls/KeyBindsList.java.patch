@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/options/controls/KeyBindsList.java
 +++ b/net/minecraft/client/gui/screens/options/controls/KeyBindsList.java
-@@ -123,9 +_,10 @@
+@@ -122,9 +_,10 @@
              this.name = name;
              this.changeButton = Button.builder(name, button -> {
                      KeyBindsList.this.keyBindsScreen.selectedKey = key;
@@ -12,7 +12,7 @@
                  .createNarration(
                      defaultNarrationSupplier -> key.isUnbound()
                          ? Component.translatable("narrator.controls.unbound", name)
-@@ -133,7 +_,7 @@
+@@ -132,7 +_,7 @@
                  )
                  .build();
              this.resetButton = Button.builder(RESET_BUTTON_TITLE, button -> {
@@ -21,13 +21,13 @@
                  KeyBindsList.this.resetMappingAndUpdateButtons();
              }).bounds(0, 0, 50, 20).createNarration(defaultNarrationSupplier -> Component.translatable("narrator.controls.reset", name)).build();
              this.refreshEntry();
-@@ -174,7 +_,8 @@
-             MutableComponent mutablecomponent = Component.empty();
+@@ -173,7 +_,8 @@
+             MutableComponent tooltip = Component.empty();
              if (!this.key.isUnbound()) {
-                 for (KeyMapping keymapping : KeyBindsList.this.minecraft.options.keyMappings) {
--                    if (keymapping != this.key && this.key.same(keymapping) && (!keymapping.isDefault() || !this.key.isDefault())) {
-+                    var vanillConflict = keymapping != this.key && this.key.same(keymapping) && (!keymapping.isDefault() || !this.key.isDefault());
-+                    if (vanillConflict || keymapping.hasKeyModifierConflict(this.key)) { // FORGE: gracefully handle conflicts like SHIFT vs SHIFT+G
+                 for (KeyMapping otherKey : KeyBindsList.this.minecraft.options.keyMappings) {
+-                    if (otherKey != this.key && this.key.same(otherKey) && (!otherKey.isDefault() || !this.key.isDefault())) {
++                    var vanillConflict = otherKey != this.key && this.key.same(otherKey) && (!otherKey.isDefault() || !this.key.isDefault());
++                    if (vanillConflict || otherKey.hasKeyModifierConflict(this.key)) { // FORGE: gracefully handle conflicts like SHIFT vs SHIFT+G
                          if (this.hasCollision) {
-                             mutablecomponent.append(", ");
+                             tooltip.append(", ");
                          }

@@ -3,9 +3,9 @@
 @@ -56,7 +_,7 @@
                  level.levelEvent(1001, pos, 0);
              } else {
-                 ItemStack itemstack = dispenserblockentity.getItem(i);
--                if (!itemstack.isEmpty()) {
-+                if (!itemstack.isEmpty() && net.minecraftforge.items.VanillaInventoryCodeHooks.dropperInsertHook(level, pos, dispenserblockentity, i, itemstack)) {
+                 ItemStack itemStack = blockEntity.getItem(slot);
+-                if (!itemStack.isEmpty()) {
++                if (!itemStack.isEmpty() && net.minecraftforge.items.VanillaInventoryCodeHooks.dropperInsertHook(level, pos, blockEntity, slot, itemStack)) {
                      Direction direction = level.getBlockState(pos).getValue(FACING);
-                     Container container = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
-                     ItemStack itemstack1;
+                     Container into = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
+                     ItemStack remaining;

@@ -2,30 +2,30 @@
 +++ b/net/minecraft/tags/TagLoader.java
 @@ -64,6 +_,7 @@
  
-                     String s = resource.sourcePackId();
-                     tagfile.entries().forEach(ex -> list.add(new TagLoader.EntryWithSource(ex, s)));
-+                    tagfile.remove().forEach(e -> list.add(new TagLoader.EntryWithSource(e, s, true)));
-                 } catch (Exception exception) {
-                     LOGGER.error("Couldn't read tag list {} from {} in data pack {}", identifier1, identifier, resource.sourcePackId(), exception);
+                     String sourceId = resource.sourcePackId();
+                     parsedContents.entries().forEach(ex -> tagContents.add(new TagLoader.EntryWithSource(ex, sourceId)));
++                    parsedContents.remove().forEach(e -> tagContents.add(new TagLoader.EntryWithSource(e, sourceId, true)));
+                 } catch (Exception var17) {
+                     LOGGER.error("Couldn't read tag list {} from {} in data pack {}", id, location, resource.sourcePackId(), var17);
                  }
 @@ -74,16 +_,17 @@
      }
  
      private Either<List<TagLoader.EntryWithSource>, List<T>> tryBuildTag(final TagEntry.Lookup<T> lookup, final List<TagLoader.EntryWithSource> entries) {
--        SequencedSet<T> sequencedset = new LinkedHashSet<>();
+-        SequencedSet<T> values = new LinkedHashSet<>();
 +        var builder = new java.util.LinkedHashSet<T>(); // Order is important, as ImmutableSet is ordered and some people rely on that. https://github.com/MinecraftForge/MinecraftForge/issues/9774
-         List<TagLoader.EntryWithSource> list = new ArrayList<>();
+         List<TagLoader.EntryWithSource> missingElements = new ArrayList<>();
  
-         for (TagLoader.EntryWithSource tagloader$entrywithsource : entries) {
--            if (!tagloader$entrywithsource.entry().build(lookup, sequencedset::add)) {
-+            if (!tagloader$entrywithsource.entry().build(lookup, tagloader$entrywithsource.remove() ? builder::remove : builder::add)) {
-+                if (!tagloader$entrywithsource.remove()) // Treat all removals as optional at runtime. If it was missing, then it could of never been added.
-                 list.add(tagloader$entrywithsource);
+         for (TagLoader.EntryWithSource entry : entries) {
+-            if (!entry.entry().build(lookup, values::add)) {
++            if (!entry.entry().build(lookup, entry.remove() ? builder::remove : builder::add)) {
++                if (!entry.remove()) // Treat all removals as optional at runtime. If it was missing, then it could of never been added.
+                 missingElements.add(entry);
              }
          }
  
--        return list.isEmpty() ? Either.right(List.copyOf(sequencedset)) : Either.left(list);
-+        return list.isEmpty() ? Either.right(List.copyOf(builder)) : Either.left(list);
+-        return missingElements.isEmpty() ? Either.right(List.copyOf(values)) : Either.left(missingElements);
++        return missingElements.isEmpty() ? Either.right(List.copyOf(builder)) : Either.left(missingElements);
      }
  
      public Map<Identifier, List<T>> build(final Map<Identifier, List<TagLoader.EntryWithSource>> builders) {
@@ -37,7 +37,7 @@
 +                        missing.stream().map(Objects::toString).collect(Collectors.joining(", \n\t"))
                      )
                  )
-                 .ifRight(tag -> map.put(id, (List<T>)tag))
+                 .ifRight(tag -> newTags.put(id, (List<T>)tag))
 @@ -192,7 +_,11 @@
          }
      }

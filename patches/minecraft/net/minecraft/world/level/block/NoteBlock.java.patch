@@ -15,15 +15,15 @@
  
      @Override
      protected boolean triggerEvent(final BlockState state, final Level level, final BlockPos pos, final int b0, final int b1) {
--        NoteBlockInstrument noteblockinstrument = state.getValue(INSTRUMENT);
+-        NoteBlockInstrument instrument = state.getValue(INSTRUMENT);
 +        var event = net.minecraftforge.event.ForgeEventFactory.onNotePlay(level, pos, state, state.getValue(NOTE), state.getValue(INSTRUMENT));
 +        if (event == null) return false;
 +        var newState = state.setValue(NOTE, event.getVanillaNoteId()).setValue(INSTRUMENT, event.getInstrument());
-+        NoteBlockInstrument noteblockinstrument = newState.getValue(INSTRUMENT);
-         float f;
-         if (noteblockinstrument.isTunable()) {
--            int i = state.getValue(NOTE);
-+            int i = newState.getValue(NOTE);
-             f = getPitchFromNote(i);
-             level.addParticle(ParticleTypes.NOTE, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, i / 24.0, 0.0, 0.0);
++        NoteBlockInstrument instrument = newState.getValue(INSTRUMENT);
+         float pitch;
+         if (instrument.isTunable()) {
+-            int note = state.getValue(NOTE);
++            int note = newState.getValue(NOTE);
+             pitch = getPitchFromNote(note);
+             level.addParticle(ParticleTypes.NOTE, pos.getX() + 0.5, pos.getY() + 1.2, pos.getZ() + 0.5, note / 24.0, 0.0, 0.0);
          } else {

@@ -4,22 +4,22 @@
          if (this.level() != null && !this.level().isClientSide()) {
              this.goalSelector.removeGoal(this.meleeGoal);
              this.goalSelector.removeGoal(this.bowGoal);
--            ItemStack itemstack = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
-+            ItemStack itemstack = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, item -> item instanceof net.minecraft.world.item.BowItem));
-             if (itemstack.is(Items.BOW)) {
-                 int i = this.getHardAttackInterval();
+-            ItemStack usedWeapon = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
++            ItemStack usedWeapon = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, item -> item instanceof net.minecraft.world.item.BowItem));
+             if (usedWeapon.is(Items.BOW)) {
+                 int minAttackInterval = this.getHardAttackInterval();
                  if (this.level().getDifficulty() != Difficulty.HARD) {
 @@ -163,9 +_,12 @@
  
      @Override
      public void performRangedAttack(final LivingEntity target, final float power) {
--        ItemStack itemstack = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
-+        ItemStack itemstack = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, item -> item instanceof net.minecraft.world.item.BowItem));
-         ItemStack itemstack1 = this.getProjectile(itemstack);
-         AbstractArrow abstractarrow = this.getArrow(itemstack1, power, itemstack);
+-        ItemStack bowItem = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, Items.BOW));
++        ItemStack bowItem = this.getItemInHand(ProjectileUtil.getWeaponHoldingHand(this, item -> item instanceof net.minecraft.world.item.BowItem));
+         ItemStack projectile = this.getProjectile(bowItem);
+         AbstractArrow arrow = this.getArrow(projectile, power, bowItem);
 +        if (this.getMainHandItem().getItem() instanceof net.minecraft.world.item.BowItem bow) {
-+            abstractarrow = bow.customArrow(abstractarrow);
++            arrow = bow.customArrow(arrow);
 +        }
-         double d0 = target.getX() - this.getX();
-         double d1 = target.getY(0.3333333333333333) - abstractarrow.getY();
-         double d2 = target.getZ() - this.getZ();
+         double xd = target.getX() - this.getX();
+         double yd = target.getY(0.3333333333333333) - arrow.getY();
+         double zd = target.getZ() - this.getZ();

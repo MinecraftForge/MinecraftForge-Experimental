@@ -53,38 +53,38 @@
 +    }
 +
      private RegistrySetBuilder.BuildState createState(final RegistryAccess context) {
-         RegistrySetBuilder.BuildState registrysetbuilder$buildstate = RegistrySetBuilder.BuildState.create(
-             context, this.entries.stream().map(RegistrySetBuilder.RegistryStub::key)
-@@ -183,14 +_,16 @@
+         RegistrySetBuilder.BuildState state = RegistrySetBuilder.BuildState.create(context, this.entries.stream().map(RegistrySetBuilder.RegistryStub::key));
+         this.entries.forEach(e -> e.apply(state));
+@@ -181,14 +_,16 @@
              throw new NullPointerException("No cloner for " + registryKey.identifier());
          } else {
-             Map<ResourceKey<T>, Holder.Reference<T>> map = new HashMap<>();
--            HolderLookup.RegistryLookup<T> registrylookup = patchProvider.lookupOrThrow(registryKey);
-+            HolderLookup.RegistryLookup<T> registrylookup = patchProvider.lookup(registryKey).orElse(null);
-             registrylookup.listElements().forEach(elementHolder -> {
-                 ResourceKey<T> resourcekey = elementHolder.key();
-                 RegistrySetBuilder.LazyHolder<T> lazyholder = new RegistrySetBuilder.LazyHolder<>(owner, resourcekey);
-                 lazyholder.supplier = () -> cloner.clone((T)elementHolder.value(), patchProvider, targetProvider.get());
-                 map.put(resourcekey, lazyholder);
+             Map<ResourceKey<T>, Holder.Reference<T>> entries = new HashMap<>();
+-            HolderLookup.RegistryLookup<T> patchContents = patchProvider.lookupOrThrow(registryKey);
++            HolderLookup.RegistryLookup<T> patchContents = patchProvider.lookup(registryKey).orElse(null);
+             patchContents.listElements().forEach(elementHolder -> {
+                 ResourceKey<T> elementKey = elementHolder.key();
+                 RegistrySetBuilder.LazyHolder<T> holder = new RegistrySetBuilder.LazyHolder<>(owner, elementKey);
+                 holder.supplier = () -> cloner.clone((T)elementHolder.value(), patchProvider, targetProvider.get());
+                 entries.put(elementKey, holder);
              });
--            HolderLookup.RegistryLookup<T> registrylookup1 = fallbackProvider.lookupOrThrow(registryKey);
-+            HolderLookup.RegistryLookup<T> registrylookup1 = fallbackProvider.lookup(registryKey).orElse(null);
-+            Lifecycle lifecycle = registrylookup.registryLifecycle();
-+            if (registrylookup1 != null) {
-             registrylookup1.listElements().forEach(elementHolder -> {
-                 ResourceKey<T> resourcekey = elementHolder.key();
-                 map.computeIfAbsent(resourcekey, key -> {
-@@ -199,7 +_,8 @@
-                     return lazyholder;
+-            HolderLookup.RegistryLookup<T> fallbackContents = fallbackProvider.lookupOrThrow(registryKey);
++            HolderLookup.RegistryLookup<T> fallbackContents = fallbackProvider.lookup(registryKey).orElse(null);
++            Lifecycle lifecycle = patchContents.registryLifecycle();
++            if (fallbackContents != null) {
+             fallbackContents.listElements().forEach(elementHolder -> {
+                 ResourceKey<T> elementKey = elementHolder.key();
+                 entries.computeIfAbsent(elementKey, key -> {
+@@ -197,7 +_,8 @@
+                     return holder;
                  });
              });
--            Lifecycle lifecycle = registrylookup.registryLifecycle().add(registrylookup1.registryLifecycle());
-+            lifecycle = registrylookup.registryLifecycle().add(registrylookup1.registryLifecycle());
+-            Lifecycle lifecycle = patchContents.registryLifecycle().add(fallbackContents.registryLifecycle());
++            lifecycle = patchContents.registryLifecycle().add(fallbackContents.registryLifecycle());
 +            }
-             return lookupFromMap(registryKey, lifecycle, owner, map);
+             return lookupFromMap(registryKey, lifecycle, owner, entries);
          }
      }
-@@ -275,6 +_,11 @@
+@@ -271,6 +_,11 @@
                  @Override
                  public <S> HolderGetter<S> lookup(final ResourceKey<? extends Registry<? extends S>> key) {
                      return (HolderGetter<S>)BuildState.this.registries.getOrDefault(key.identifier(), BuildState.this.lookup);

@@ -15,15 +15,15 @@
      private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
          .maximumSize(512L)
          .weakKeys()
-@@ -253,6 +_,7 @@
-                 LOGGER.error("Block classes should end with Block and {} doesn't.", s);
+@@ -251,6 +_,7 @@
+                 LOGGER.error("Block classes should end with Block and {} doesn't.", className);
              }
          }
 +        initClient();
      }
  
      public static boolean isExceptionForConnection(final BlockState state) {
-@@ -303,7 +_,12 @@
+@@ -301,7 +_,12 @@
          }
      }
  
@@ -33,10 +33,10 @@
 +    }
 +
 +    public static boolean shouldRenderFace(final BlockGetter level, final BlockPos pos, final BlockState state, final BlockState neighborState, final Direction direction) {
-         VoxelShape voxelshape = neighborState.getFaceOcclusionShape(direction.getOpposite());
-         if (voxelshape == Shapes.block()) {
+         VoxelShape occluder = neighborState.getFaceOcclusionShape(direction.getOpposite());
+         if (occluder == Shapes.block()) {
              return false;
-@@ -398,17 +_,22 @@
+@@ -396,17 +_,22 @@
          }
      }
  
@@ -54,23 +54,23 @@
 +        final ItemStack tool,
 +        final boolean dropXp
      ) {
-         if (level instanceof ServerLevel serverlevel) {
-             getDrops(state, serverlevel, pos, blockEntity, breaker, tool).forEach(stack -> popResource(level, pos, stack));
--            state.spawnAfterBreak(serverlevel, pos, tool, true);
-+            state.spawnAfterBreak(serverlevel, pos, tool, dropXp);
+         if (level instanceof ServerLevel serverLevel) {
+             getDrops(state, serverLevel, pos, blockEntity, breaker, tool).forEach(stack -> popResource(level, pos, stack));
+-            state.spawnAfterBreak(serverLevel, pos, tool, true);
++            state.spawnAfterBreak(serverLevel, pos, tool, dropXp);
          }
      }
  
-@@ -438,7 +_,7 @@
+@@ -436,7 +_,7 @@
      }
  
      private static void popResource(final Level level, final Supplier<ItemEntity> entityFactory, final ItemStack itemStack) {
--        if (level instanceof ServerLevel serverlevel && !itemStack.isEmpty() && serverlevel.getGameRules().get(GameRules.BLOCK_DROPS)) {
-+        if (level instanceof ServerLevel serverlevel && !itemStack.isEmpty() && serverlevel.getGameRules().get(GameRules.BLOCK_DROPS) && !level.restoringBlockSnapshots) {
-             ItemEntity itementity = entityFactory.get();
-             itementity.setDefaultPickUpDelay();
-             level.addFreshEntity(itementity);
-@@ -446,11 +_,12 @@
+-        if (level instanceof ServerLevel serverLevel && !itemStack.isEmpty() && serverLevel.getGameRules().get(GameRules.BLOCK_DROPS)) {
++        if (level instanceof ServerLevel serverLevel && !itemStack.isEmpty() && serverLevel.getGameRules().get(GameRules.BLOCK_DROPS) && !level.restoringBlockSnapshots) {
+             ItemEntity entity = entityFactory.get();
+             entity.setDefaultPickUpDelay();
+             level.addFreshEntity(entity);
+@@ -444,11 +_,12 @@
      }
  
      public void popExperience(final ServerLevel level, final BlockPos pos, final int amount) {
@@ -84,7 +84,7 @@
      public float getExplosionResistance() {
          return this.explosionResistance;
      }
-@@ -475,7 +_,8 @@
+@@ -473,7 +_,8 @@
      ) {
          player.awardStat(Stats.BLOCK_MINED.get(this));
          player.causeFoodExhaustion(0.005F);
@@ -94,7 +94,7 @@
      }
  
      public void setPlacedBy(final Level level, final BlockPos pos, final BlockState state, final @Nullable LivingEntity by, final ItemStack itemStack) {
-@@ -497,6 +_,7 @@
+@@ -495,6 +_,7 @@
          entity.setDeltaMovement(entity.getDeltaMovement().multiply(1.0, 0.0, 1.0));
      }
  
@@ -102,7 +102,7 @@
      public float getFriction() {
          return this.friction;
      }
-@@ -567,7 +_,7 @@
+@@ -565,7 +_,7 @@
              this.item = Item.byBlock(this);
          }
  
@@ -111,7 +111,7 @@
      }
  
      public boolean hasDynamicShape() {
-@@ -632,6 +_,79 @@
+@@ -630,6 +_,79 @@
          public int hashCode() {
              return System.identityHashCode(this.first) * 31 + System.identityHashCode(this.second);
          }

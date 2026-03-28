@@ -6,8 +6,8 @@
              builder.append("Thread: ").append(Thread.currentThread().getName()).append("\n");
 -            builder.append("Stacktrace:\n");
 -
--            for (StackTraceElement stacktraceelement : this.uncategorizedStackTrace) {
--                builder.append("\t").append("at ").append(stacktraceelement);
+-            for (StackTraceElement element : this.uncategorizedStackTrace) {
+-                builder.append("\t").append("at ").append(element);
 -                builder.append("\n");
 -            }
 -
@@ -17,7 +17,7 @@
 +            builder.append(net.minecraftforge.logging.CrashReportExtender.generateEnhancedStackTrace(this.uncategorizedStackTrace));
          }
  
-         for (CrashReportCategory crashreportcategory : this.details) {
+         for (CrashReportCategory entry : this.details) {
 @@ -73,6 +_,7 @@
              builder.append("\n\n");
          }
@@ -27,22 +27,22 @@
      }
  
 @@ -92,18 +_,7 @@
-             throwable.setStackTrace(this.exception.getStackTrace());
+             exception.setStackTrace(this.exception.getStackTrace());
          }
  
--        String s;
+-        String var4;
 -        try {
--            stringwriter = new StringWriter();
--            printwriter = new PrintWriter(stringwriter);
--            throwable.printStackTrace(printwriter);
--            s = stringwriter.toString();
+-            writer = new StringWriter();
+-            printWriter = new PrintWriter(writer);
+-            exception.printStackTrace(printWriter);
+-            var4 = writer.toString();
 -        } finally {
--            IOUtils.closeQuietly((Writer)stringwriter);
--            IOUtils.closeQuietly((Writer)printwriter);
+-            IOUtils.closeQuietly((Writer)writer);
+-            IOUtils.closeQuietly((Writer)printWriter);
 -        }
 -
--        return s;
-+        return net.minecraftforge.logging.CrashReportExtender.generateEnhancedStackTrace(throwable);
+-        return var4;
++        return net.minecraftforge.logging.CrashReportExtender.generateEnhancedStackTrace(exception);
      }
  
      public String getFriendlyReport(final ReportType reportType, final List<String> extraComments) {

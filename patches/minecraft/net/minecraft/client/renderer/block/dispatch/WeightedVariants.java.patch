@@ -8,9 +8,9 @@
  
      public WeightedVariants(final WeightedList<BlockStateModel> list) {
          this.list = list;
-         BlockStateModel blockstatemodel = list.unwrap().getFirst().value();
-         this.particleMaterial = blockstatemodel.particleMaterial();
-+        this.first = blockstatemodel;
+         BlockStateModel firstModel = list.unwrap().getFirst().value();
+         this.particleMaterial = firstModel.particleMaterial();
++        this.first = firstModel;
          this.materialFlags = computeMaterialFlags(list);
      }
  

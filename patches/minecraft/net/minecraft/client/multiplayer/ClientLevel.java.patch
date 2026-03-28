@@ -19,7 +19,7 @@
          if (SharedConstants.DEBUG_BLOCK_BREAK) {
 @@ -273,6 +_,8 @@
  
-             runnable.run();
+             update.run();
          }
 +        this.gatherCapabilities();
 +        net.minecraftforge.event.ForgeEventFactory.onLevelLoad(this);
@@ -45,7 +45,7 @@
      }
  
      public void removeEntity(final int id, final Entity.RemovalReason reason) {
-@@ -579,8 +_,10 @@
+@@ -576,8 +_,10 @@
          final float pitch,
          final long seed
      ) {
@@ -57,7 +57,7 @@
          }
      }
  
-@@ -594,8 +_,10 @@
+@@ -591,8 +_,10 @@
          final float pitch,
          final long seed
      ) {
@@ -69,24 +69,24 @@
          }
      }
  
-@@ -951,7 +_,7 @@
+@@ -946,7 +_,7 @@
  
      @Override
      public void addDestroyBlockEffect(final BlockPos pos, final BlockState blockState) {
 -        if (!blockState.isAir() && blockState.shouldSpawnTerrainParticles()) {
 +        if (!blockState.isAir() && !net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(blockState).addDestroyEffects(blockState, this, pos, this.minecraft.particleEngine)) {
-             VoxelShape voxelshape = blockState.getShape(this, pos);
-             double d0 = 0.25;
-             voxelshape.forAllBoxes(
-@@ -978,6 +_,7 @@
+             VoxelShape shape = blockState.getShape(this, pos);
+             double density = 0.25;
+             shape.forAllBoxes(
+@@ -973,6 +_,7 @@
                                          new TerrainParticle(
-                                             this, pos.getX() + d7, pos.getY() + d8, pos.getZ() + d9, d4 - 0.5, d5 - 0.5, d6 - 0.5, blockState, pos
+                                             this, pos.getX() + x, pos.getY() + y, pos.getZ() + z, relX - 0.5, relY - 0.5, relZ - 0.5, blockState, pos
                                          )
 +                                        .updateSprite(blockState, pos)
                                      );
                              }
                          }
-@@ -987,6 +_,13 @@
+@@ -982,6 +_,13 @@
          }
      }
  
@@ -98,18 +98,18 @@
 +
 +    /** @deprecated Forge - Use crack(BlockPos, BlockHitResult) as it has more context and gives more control to modders */
      public void addBreakingBlockEffect(final BlockPos pos, final Direction direction) {
-         BlockState blockstate = this.getBlockState(pos);
-         if (blockstate.getRenderShape() != RenderShape.INVISIBLE && blockstate.shouldSpawnTerrainParticles()) {
-@@ -1022,7 +_,7 @@
-                 d0 = i + aabb.maxX + 0.1F;
+         BlockState blockState = this.getBlockState(pos);
+         if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.shouldSpawnTerrainParticles()) {
+@@ -1017,7 +_,7 @@
+                 xp = x + shape.maxX + 0.1F;
              }
  
--            this.minecraft.particleEngine.add(new TerrainParticle(this, d0, d1, d2, 0.0, 0.0, 0.0, blockstate, pos).setPower(0.2F).scale(0.6F));
-+            this.minecraft.particleEngine.add(new TerrainParticle(this, d0, d1, d2, 0.0, 0.0, 0.0, blockstate, pos).updateSprite(blockstate, pos).setPower(0.2F).scale(0.6F));
+-            this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).setPower(0.2F).scale(0.6F));
++            this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).updateSprite(blockState, pos).setPower(0.2F).scale(0.6F));
          }
      }
  
-@@ -1088,6 +_,16 @@
+@@ -1083,6 +_,16 @@
          this.explosionTracker.track(center, radius, blockCount, blockParticles);
      }
  
@@ -126,7 +126,7 @@
      @OnlyIn(Dist.CLIENT)
      public static class ClientLevelData implements WritableLevelData {
          private final boolean hardcore;
-@@ -1143,6 +_,7 @@
+@@ -1138,6 +_,7 @@
          }
  
          public void setDifficulty(final Difficulty difficulty) {
@@ -134,7 +134,7 @@
              this.difficulty = difficulty;
          }
  
-@@ -1190,6 +_,12 @@
+@@ -1185,6 +_,12 @@
                      break;
                  default:
              }
@@ -147,8 +147,8 @@
          }
  
          public void onTrackingEnd(final Entity entity) {
-@@ -1202,6 +_,15 @@
-                     ClientLevel.this.dragonParts.removeAll(Arrays.asList(enderdragon.getSubEntities()));
+@@ -1197,6 +_,15 @@
+                     ClientLevel.this.dragonParts.removeAll(Arrays.asList(dragon.getSubEntities()));
                      break;
                  default:
 +            }

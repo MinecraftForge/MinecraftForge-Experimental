@@ -11,31 +11,31 @@
 @@ -65,6 +_,7 @@
          }
  
-         this.caches = map;
+         this.caches = loadedCaches;
 +        this.originalCaches = Map.copyOf(this.caches);
-         this.initialCount = i;
+         this.initialCount = initialCount;
      }
  
 @@ -106,6 +_,8 @@
          this.caches.forEach((providerId, cache) -> {
              if (this.cachesToWrite.contains(providerId)) {
-                 Path path = this.getProviderCachePath(providerId);
+                 Path cachePath = this.getProviderCachePath(providerId);
 +                // Forge: Only rewrite the cache file if it changed or is missing
-+                if (!cache.equals(this.originalCaches.get(providerId)) || !Files.exists(path))
-                 cache.save(this.rootDir, path, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "\t" + providerId);
++                if (!cache.equals(this.originalCaches.get(providerId)) || !Files.exists(cachePath))
+                 cache.save(this.rootDir, cachePath, DateTimeFormatter.ISO_LOCAL_DATE_TIME.format(ZonedDateTime.now()) + "\t" + providerId);
              }
  
 @@ -224,10 +_,11 @@
-                 bufferedwriter.write(extraHeaderInfo);
-                 bufferedwriter.newLine();
+                 output.write(extraHeaderInfo);
+                 output.newLine();
  
--                for (Entry<Path, HashCode> entry : this.data.entrySet()) {
+-                for (Entry<Path, HashCode> e : this.data.entrySet()) {
 +                // Forge: Standardize order of entries
-+                for (Entry<Path, HashCode> entry : this.data.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
-                     bufferedwriter.write(entry.getValue().toString());
-                     bufferedwriter.write(32);
--                    bufferedwriter.write(rootDir.relativize(entry.getKey()).toString());
-+                    bufferedwriter.write(rootDir.relativize(entry.getKey()).toString().replace("\\", "/")); // Forge: Standardize file paths.
-                     bufferedwriter.newLine();
++                for (Entry<Path, HashCode> e : this.data.entrySet().stream().sorted(Map.Entry.comparingByKey()).toList()) {
+                     output.write(e.getValue().toString());
+                     output.write(32);
+-                    output.write(rootDir.relativize(e.getKey()).toString());
++                    output.write(rootDir.relativize(e.getKey()).toString().replace("\\", "/")); // Forge: Standardize file paths.
+                     output.newLine();
                  }
-             } catch (IOException ioexception) {
+             } catch (IOException var9) {

@@ -1,23 +1,21 @@
 --- a/net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer.java
 +++ b/net/minecraft/client/renderer/entity/layers/HumanoidArmorLayer.java
-@@ -66,6 +_,7 @@
+@@ -66,12 +_,13 @@
          Equippable equippable = itemStack.get(DataComponents.EQUIPPABLE);
          if (equippable != null && shouldRender(equippable, slot)) {
-             A a = this.getArmorModel(state, slot);
-+            var model = this.getArmorModel(state, slot, itemStack, a);
-             EquipmentClientInfo.LayerType equipmentclientinfo$layertype = state.isBaby && state.entityType != EntityType.ARMOR_STAND
+             A model = this.getArmorModel(state, slot);
++            var newModel = this.getArmorModel(state, slot, itemStack, model);
+             EquipmentClientInfo.LayerType layerType = state.isBaby && state.entityType != EntityType.ARMOR_STAND
                  ? EquipmentClientInfo.LayerType.HUMANOID_BABY
                  : (this.usesInnerModel(slot) ? EquipmentClientInfo.LayerType.HUMANOID_LEGGINGS : EquipmentClientInfo.LayerType.HUMANOID);
-@@ -73,7 +_,7 @@
+             this.equipmentRenderer
                  .renderLayers(
-                     equipmentclientinfo$layertype,
-                     equippable.assetId().orElseThrow(),
--                    a,
-+                    model,
-                     state,
-                     itemStack,
-                     poseStack,
-@@ -90,5 +_,12 @@
+-                    layerType, equippable.assetId().orElseThrow(), model, state, itemStack, poseStack, submitNodeCollector, lightCoords, state.outlineColor
++                    layerType, equippable.assetId().orElseThrow(), newModel, state, itemStack, poseStack, submitNodeCollector, lightCoords, state.outlineColor
+                 );
+         }
+     }
+@@ -82,5 +_,12 @@
  
      private boolean usesInnerModel(final EquipmentSlot slot) {
          return slot == EquipmentSlot.LEGS;

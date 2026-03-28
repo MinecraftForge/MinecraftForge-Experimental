@@ -10,34 +10,34 @@
  
      protected IntegerProperty getAgeProperty() {
 @@ -81,8 +_,9 @@
-             int i = this.getAge(state);
-             if (i < this.getMaxAge()) {
-                 float f = getGrowthSpeed(this, level, pos);
--                if (random.nextInt((int)(25.0F / f) + 1) == 0) {
-+                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int)(25.0F / f) + 1) == 0)) {
-                     level.setBlock(pos, this.getStateForAge(i + 1), 2);
+             int age = this.getAge(state);
+             if (age < this.getMaxAge()) {
+                 float growthSpeed = getGrowthSpeed(this, level, pos);
+-                if (random.nextInt((int)(25.0F / growthSpeed) + 1) == 0) {
++                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, random.nextInt((int)(25.0F / growthSpeed) + 1) == 0)) {
+                     level.setBlock(pos, this.getStateForAge(age + 1), 2);
 +                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
                  }
              }
          }
 @@ -105,9 +_,9 @@
-             for (int j = -1; j <= 1; j++) {
-                 float f1 = 0.0F;
-                 BlockState blockstate = level.getBlockState(blockpos.offset(i, 0, j));
--                if (blockstate.is(BlockTags.GROWS_CROPS)) {
-+                if (blockstate.canSustainPlant(level, blockpos.offset(i, 0, j), net.minecraft.core.Direction.UP, (net.minecraftforge.common.IPlantable)type)) {
-                     f1 = 1.0F;
--                    if (blockstate.getValueOrElse(FarmlandBlock.MOISTURE, 0) > 0) {
-+                    if (blockstate.isFertile(level, blockpos.offset(i, 0, j))) {
-                         f1 = 3.0F;
+             for (int zz = -1; zz <= 1; zz++) {
+                 float blockSpeed = 0.0F;
+                 BlockState blockState = level.getBlockState(below.offset(xx, 0, zz));
+-                if (blockState.is(BlockTags.GROWS_CROPS)) {
++                if (blockState.canSustainPlant(level, below.offset(xx, 0, zz), net.minecraft.core.Direction.UP, (net.minecraftforge.common.IPlantable)type)) {
+                     blockSpeed = 1.0F;
+-                    if (blockState.getValueOrElse(FarmlandBlock.MOISTURE, 0) > 0) {
++                    if (blockState.isFertile(level, below.offset(xx, 0, zz))) {
+                         blockSpeed = 3.0F;
                      }
                  }
 @@ -159,7 +_,7 @@
          final InsideBlockEffectApplier effectApplier,
          final boolean isPrecise
      ) {
--        if (level instanceof ServerLevel serverlevel && entity instanceof Ravager && serverlevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+        if (level instanceof ServerLevel serverlevel && entity instanceof Ravager && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, entity)) {
-             serverlevel.destroyBlock(pos, true, entity);
+-        if (level instanceof ServerLevel serverLevel && entity instanceof Ravager && serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
++        if (level instanceof ServerLevel serverLevel && entity instanceof Ravager && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverLevel, entity)) {
+             serverLevel.destroyBlock(pos, true, entity);
          }
  

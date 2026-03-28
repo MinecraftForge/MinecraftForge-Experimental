@@ -28,10 +28,10 @@
          }
 @@ -54,7 +_,7 @@
  
-         for (BlockStateModel blockstatemodel : this.models) {
-             random.setSeed(i);
--            blockstatemodel.collectParts(random, output);
-+            blockstatemodel.collectParts(random, output, data);
+         for (BlockStateModel model : this.models) {
+             random.setSeed(seed);
+-            model.collectParts(random, output);
++            model.collectParts(random, output, data);
          }
      }
  

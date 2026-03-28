@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -402,6 +_,7 @@
+@@ -391,6 +_,7 @@
                  this.modified = true;
              }
  
@@ -8,28 +8,28 @@
              return chunk;
          }
      }
-@@ -533,6 +_,7 @@
-                 if (this.pendingUnloads.remove(pos, chunkHolder) && chunkaccess != null) {
-                     if (chunkaccess instanceof LevelChunk levelchunk) {
-                         levelchunk.setLoaded(false);
-+                        net.minecraftforge.event.ForgeEventFactory.onChunkUnload(chunkaccess);
+@@ -522,6 +_,7 @@
+                 if (this.pendingUnloads.remove(pos, chunkHolder) && chunk != null) {
+                     if (chunk instanceof LevelChunk levelChunk) {
+                         levelChunk.setLoaded(false);
++                        net.minecraftforge.event.ForgeEventFactory.onChunkUnload(chunk);
                      }
  
-                     this.save(chunkaccess);
-@@ -775,6 +_,7 @@
+                     this.save(chunk);
+@@ -764,6 +_,7 @@
                  this.activeChunkWrites.incrementAndGet();
-                 SerializableChunkData serializablechunkdata = SerializableChunkData.copyOf(this.level, chunk);
-                 CompletableFuture<CompoundTag> completablefuture = CompletableFuture.supplyAsync(serializablechunkdata::write, Util.backgroundExecutor());
-+                net.minecraftforge.event.ForgeEventFactory.onChunkDataSave(chunk, chunk.getWorldForge() != null ? chunk.getWorldForge() : this.level, serializablechunkdata);
-                 this.write(chunkpos, completablefuture::join).handle((ignored, throwable) -> {
+                 SerializableChunkData data = SerializableChunkData.copyOf(this.level, chunk);
+                 CompletableFuture<CompoundTag> encodedData = CompletableFuture.supplyAsync(data::write, Util.backgroundExecutor());
++                net.minecraftforge.event.ForgeEventFactory.onChunkDataSave(chunk, chunk.getWorldForge() != null ? chunk.getWorldForge() : this.level, data);
+                 this.write(pos, encodedData::join).handle((ignored, throwable) -> {
                      if (throwable != null) {
-                         this.level.getServer().reportChunkSaveFailure(throwable, this.storageInfo(), chunkpos);
-@@ -1153,7 +_,7 @@
+                         this.level.getServer().reportChunkSaveFailure(throwable, this.storageInfo(), pos);
+@@ -1136,7 +_,7 @@
      }
  
      protected void addEntity(final Entity entity) {
 -        if (!(entity instanceof EnderDragonPart)) {
 +        if (!(entity instanceof net.minecraftforge.entity.PartEntity)) {
-             EntityType<?> entitytype = entity.getType();
-             int i = entitytype.clientTrackingRange() * 16;
-             if (i != 0) {
+             EntityType<?> type = entity.getType();
+             int range = type.clientTrackingRange() * 16;
+             if (range != 0) {

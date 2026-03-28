@@ -1,14 +1,14 @@
 --- a/net/minecraft/server/PlayerAdvancements.java
 +++ b/net/minecraft/server/PlayerAdvancements.java
-@@ -173,6 +_,7 @@
+@@ -172,6 +_,7 @@
              this.unregisterListeners(holder);
              this.progressChanged.add(holder);
-             flag = true;
-+            net.minecraftforge.event.ForgeEventFactory.onAdvancementGrant(this.player, holder, advancementprogress, criterion);
-             if (!flag1 && advancementprogress.isDone()) {
+             result = true;
++            net.minecraftforge.event.ForgeEventFactory.onAdvancementGrant(this.player, holder, progress, criterion);
+             if (!wasDone && progress.isDone()) {
                  holder.value().rewards().grant(this.player);
                  holder.value().display().ifPresent(display -> {
-@@ -180,6 +_,7 @@
+@@ -179,6 +_,7 @@
                          this.playerList.broadcastSystemMessage(display.getType().createAnnouncement(holder, this.player), false);
                      }
                  });
@@ -16,11 +16,11 @@
              }
          }
  
-@@ -198,6 +_,7 @@
+@@ -197,6 +_,7 @@
              this.registerListeners(advancement);
              this.progressChanged.add(advancement);
-             flag = true;
-+            net.minecraftforge.event.ForgeEventFactory.onAdvancementRevoke(this.player, advancement, advancementprogress, criterion);
+             result = true;
++            net.minecraftforge.event.ForgeEventFactory.onAdvancementRevoke(this.player, advancement, progress, criterion);
          }
  
-         if (flag1 && !advancementprogress.isDone()) {
+         if (wasDone && !progress.isDone()) {

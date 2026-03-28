@@ -23,7 +23,7 @@
          return this.testInfo.getStructureBounds();
      }
 @@ -1122,6 +_,26 @@
-         if (either.right().isPresent()) {
+         if (result.right().isPresent()) {
              throw this.assertionException("test.error.set_biome");
          }
 +    }

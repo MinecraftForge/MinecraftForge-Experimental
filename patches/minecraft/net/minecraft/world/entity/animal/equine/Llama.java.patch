@@ -4,16 +4,16 @@
  
      @Override
      public boolean causeFallDamage(final double fallDistance, final float damageModifier, final DamageSource damageSource) {
--        int i = this.calculateFallDamage(fallDistance, damageModifier);
+-        int dmg = this.calculateFallDamage(fallDistance, damageModifier);
 +        var event = net.minecraftforge.event.ForgeEventFactory.onLivingFall(this, fallDistance, damageModifier);
 +        if (event == null) return false;
-+        int i = this.calculateFallDamage(event.getDistance(), event.getDamageMultiplier());
-         if (i <= 0) {
++        int dmg = this.calculateFallDamage(event.getDistance(), event.getDamageMultiplier());
+         if (dmg <= 0) {
              return false;
          } else {
 -            if (fallDistance >= 6.0) {
 +            if (event.getDistance() >= 6.0) {
-                 this.hurt(damageSource, i);
+                 this.hurt(damageSource, dmg);
 -                this.propagateFallToPassengers(fallDistance, damageModifier, damageSource);
 +                this.propagateFallToPassengers(event.getDistance(), event.getDamageMultiplier(), damageSource);
              }

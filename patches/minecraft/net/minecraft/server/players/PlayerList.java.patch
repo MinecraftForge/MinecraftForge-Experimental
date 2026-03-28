@@ -8,46 +8,46 @@
  
      public PlayerList(
          final MinecraftServer server,
-@@ -184,6 +_,7 @@
-         servergamepacketlistenerimpl.send(new ClientboundPlayerAbilitiesPacket(player.getAbilities()));
-         servergamepacketlistenerimpl.send(new ClientboundSetHeldSlotPacket(player.getInventory().getSelectedSlot()));
-         RecipeManager recipemanager = this.server.getRecipeManager();
+@@ -189,6 +_,7 @@
+         playerConnection.send(new ClientboundPlayerAbilitiesPacket(player.getAbilities()));
+         playerConnection.send(new ClientboundSetHeldSlotPacket(player.getInventory().getSelectedSlot()));
+         RecipeManager recipeManager = this.server.getRecipeManager();
 +        net.minecraftforge.event.OnDatapackSyncEvent.BUS.post(new net.minecraftforge.event.OnDatapackSyncEvent(this, player));
-         servergamepacketlistenerimpl.send(
-             new ClientboundUpdateRecipesPacket(recipemanager.getSynchronizedItemProperties(), recipemanager.getSynchronizedStonecutterRecipes())
+         playerConnection.send(
+             new ClientboundUpdateRecipesPacket(recipeManager.getSynchronizedItemProperties(), recipeManager.getSynchronizedStonecutterRecipes())
          );
-@@ -217,6 +_,7 @@
+@@ -222,6 +_,7 @@
          player.initInventoryMenu();
          this.server.notificationManager().playerJoined(player);
-         servergamepacketlistenerimpl.resumeFlushing();
+         playerConnection.resumeFlushing();
 +        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedIn(player);
      }
  
      protected void updateEntireScoreboard(final ServerScoreboard scoreboard, final ServerPlayer player) {
-@@ -290,6 +_,7 @@
+@@ -295,6 +_,7 @@
      }
  
      protected void save(final ServerPlayer player) {
 +        if (player.connection == null) return; // Not sure if still needed -Paint_Ninja
          this.playerIo.save(player);
-         ServerStatsCounter serverstatscounter = this.stats.get(player.getUUID());
-         if (serverstatscounter != null) {
-@@ -303,6 +_,7 @@
+         ServerStatsCounter stats = this.stats.get(player.getUUID());
+         if (stats != null) {
+@@ -308,6 +_,7 @@
      }
  
      public void remove(final ServerPlayer player) {
 +        net.minecraftforge.event.ForgeEventFactory.firePlayerLoggedOut(player);
-         ServerLevel serverlevel = player.level();
+         ServerLevel level = player.level();
          player.awardStat(Stats.LEAVE_GAME);
          this.save(player);
 @@ -429,6 +_,7 @@
-         this.playersByUUID.put(serverplayer.getUUID(), serverplayer);
-         serverplayer.initInventoryMenu();
-         serverplayer.setHealth(serverplayer.getHealth());
-+        net.minecraftforge.event.ForgeEventFactory.firePlayerRespawnEvent(serverplayer, keepAllPlayerData);
-         ServerPlayer.RespawnConfig serverplayer$respawnconfig = serverplayer.getRespawnConfig();
-         if (!keepAllPlayerData && serverplayer$respawnconfig != null) {
-             LevelData.RespawnData leveldata$respawndata = serverplayer$respawnconfig.respawnData();
+         this.playersByUUID.put(player.getUUID(), player);
+         player.initInventoryMenu();
+         player.setHealth(player.getHealth());
++        net.minecraftforge.event.ForgeEventFactory.firePlayerRespawnEvent(player, keepAllPlayerData);
+         ServerPlayer.RespawnConfig respawnConfig = player.getRespawnConfig();
+         if (!keepAllPlayerData && respawnConfig != null) {
+             LevelData.RespawnData respawnData = respawnConfig.respawnData();
 @@ -542,6 +_,7 @@
      }
  
@@ -62,8 +62,8 @@
      public void deop(final NameAndId nameAndId) {
 +        if (net.minecraftforge.event.ForgeEventFactory.onPermissionChanged(nameAndId, null, this)) return;
          if (this.ops.remove(nameAndId)) {
-             ServerPlayer serverplayer = this.getPlayer(nameAndId.id());
-             if (serverplayer != null) {
+             ServerPlayer player = this.getPlayer(nameAndId.id());
+             if (player != null) {
 @@ -824,7 +_,7 @@
      }
  
@@ -74,13 +74,13 @@
  
      public @Nullable ServerPlayer getPlayer(final UUID uuid) {
 @@ -850,6 +_,7 @@
-             playeradvancements.reload(this.server.getAdvancements());
+             advancements.reload(this.server.getAdvancements());
          }
  
 +        net.minecraftforge.event.OnDatapackSyncEvent.BUS.post(new net.minecraftforge.event.OnDatapackSyncEvent(this, null));
          this.broadcastAll(new ClientboundUpdateTagsPacket(TagNetworkSerialization.serializeTagsToNetwork(this.registries)));
-         RecipeManager recipemanager = this.server.getRecipeManager();
-         ClientboundUpdateRecipesPacket clientboundupdaterecipespacket = new ClientboundUpdateRecipesPacket(
+         RecipeManager recipeManager = this.server.getRecipeManager();
+         ClientboundUpdateRecipesPacket recipes = new ClientboundUpdateRecipesPacket(
 @@ -864,5 +_,9 @@
  
      public boolean isAllowCommandsForAllPlayers() {

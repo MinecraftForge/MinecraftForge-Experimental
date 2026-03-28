@@ -3,9 +3,9 @@
 @@ -33,6 +_,8 @@
  
      static Function<Identifier, StateDefinition<Block, BlockState>> definitionLocationToBlockStateMapper() {
-         Map<Identifier, StateDefinition<Block, BlockState>> map = new HashMap<>(STATIC_DEFINITIONS);
+         Map<Identifier, StateDefinition<Block, BlockState>> result = new HashMap<>(STATIC_DEFINITIONS);
 +        var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onRegisterModeStateDefinitions();
-+        map.putAll(event.getStates());
++        result.putAll(event.getStates());
  
          for (Block block : BuiltInRegistries.BLOCK) {
-             map.put(block.builtInRegistryHolder().key().identifier(), block.getStateDefinition());
+             result.put(block.builtInRegistryHolder().key().identifier(), block.getStateDefinition());

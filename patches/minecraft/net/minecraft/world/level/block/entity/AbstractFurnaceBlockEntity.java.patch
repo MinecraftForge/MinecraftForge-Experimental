@@ -47,29 +47,29 @@
          output.store("RecipesUsed", RECIPES_USED_CODEC, this.recipesUsed);
      }
 @@ -164,13 +_,13 @@
-                 if (recipeholder != null) {
-                     int i = entity.getMaxStackSize();
-                     ItemStack itemstack2 = recipeholder.value().assemble(singlerecipeinput);
--                    if (!itemstack2.isEmpty() && canBurn(entity.items, i, itemstack2)) {
-+                    if (!itemstack2.isEmpty() && entity.canBurn(entity.items, i, itemstack2)) {
-                         if (!flag1) {
-                             int j = entity.getBurnDuration(level.fuelValues(), itemstack);
-                             entity.litTimeRemaining = j;
-                             entity.litTotalTime = j;
-                             if (j > 0) {
--                                consumeFuel(entity.items, itemstack);
-+                                entity.consumeFuel(entity.items, itemstack);
-                                 flag1 = true;
-                                 flag = true;
+                 if (recipe != null) {
+                     int maxStackSize = entity.getMaxStackSize();
+                     ItemStack burnResult = recipe.value().assemble(input);
+-                    if (!burnResult.isEmpty() && canBurn(entity.items, maxStackSize, burnResult)) {
++                    if (!burnResult.isEmpty() && entity.canBurn(entity.items, maxStackSize, burnResult)) {
+                         if (!isLit) {
+                             int newLitTime = entity.getBurnDuration(level.fuelValues(), fuel);
+                             entity.litTimeRemaining = newLitTime;
+                             entity.litTotalTime = newLitTime;
+                             if (newLitTime > 0) {
+-                                consumeFuel(entity.items, fuel);
++                                entity.consumeFuel(entity.items, fuel);
+                                 isLit = true;
+                                 changed = true;
                              }
 @@ -181,7 +_,7 @@
                              if (entity.cookingTimer == entity.cookingTotalTime) {
                                  entity.cookingTimer = 0;
-                                 entity.cookingTotalTime = recipeholder.value().cookingTime();
--                                burn(entity.items, itemstack1, itemstack2);
-+                                entity.burn(entity.items, itemstack1, itemstack2);
-                                 entity.setRecipeUsed(recipeholder);
-                                 flag = true;
+                                 entity.cookingTotalTime = recipe.value().cookingTime();
+-                                burn(entity.items, ingredient, burnResult);
++                                entity.burn(entity.items, ingredient, burnResult);
+                                 entity.setRecipeUsed(recipe);
+                                 changed = true;
                              }
 @@ -210,16 +_,16 @@
          }
@@ -77,21 +77,21 @@
  
 -    private static void consumeFuel(final NonNullList<ItemStack> items, final ItemStack fuel) {
 +    protected void consumeFuel(final NonNullList<ItemStack> items, final ItemStack fuel) {
-         Item item = fuel.getItem();
+         Item fuelItem = fuel.getItem();
 -        fuel.shrink(1);
 -        if (fuel.isEmpty()) {
--            ItemStackTemplate itemstacktemplate = item.getCraftingRemainder();
+-            ItemStackTemplate remainder = fuelItem.getCraftingRemainder();
 +        if (fuel.count() == 1) {
-+            ItemStackTemplate itemstacktemplate = fuel.getCraftingRemainder();
-             items.set(1, itemstacktemplate != null ? itemstacktemplate.create() : ItemStack.EMPTY);
++            ItemStackTemplate remainder = fuel.getCraftingRemainder();
+             items.set(1, remainder != null ? remainder.create() : ItemStack.EMPTY);
          }
 +        fuel.shrink(1);
      }
  
 -    private static boolean canBurn(final NonNullList<ItemStack> items, final int maxStackSize, final ItemStack burnResult) {
 +    protected boolean canBurn(final NonNullList<ItemStack> items, final int maxStackSize, final ItemStack burnResult) {
-         ItemStack itemstack = items.get(2);
-         if (itemstack.isEmpty()) {
+         ItemStack resultItemStack = items.get(2);
+         if (resultItemStack.isEmpty()) {
              return true;
 @@ -232,7 +_,7 @@
          }
@@ -99,12 +99,12 @@
  
 -    private static void burn(final NonNullList<ItemStack> items, final ItemStack inputItemStack, final ItemStack result) {
 +    protected void burn(final NonNullList<ItemStack> items, final ItemStack inputItemStack, final ItemStack result) {
-         ItemStack itemstack = items.get(2);
-         if (itemstack.isEmpty()) {
+         ItemStack resultItemStack = items.get(2);
+         if (resultItemStack.isEmpty()) {
              items.set(2, result.copy());
 @@ -371,6 +_,35 @@
-         for (ItemStack itemstack : this.items) {
-             contents.accountStack(itemstack);
+         for (ItemStack itemStack : this.items) {
+             contents.accountStack(itemStack);
          }
 +    }
 +

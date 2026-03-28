@@ -15,23 +15,23 @@
 +        var fixedAddress = address != null ? address : new java.net.InetSocketAddress(port).getAddress();
 +        net.minecraftforge.network.DualStackUtils.checkIPv6(fixedAddress);
          synchronized (this.channels) {
-             EventLoopGroupHolder eventloopgroupholder = EventLoopGroupHolder.remote(this.server.useNativeTransport());
-             this.channels.add(new ServerBootstrap().channel(eventloopgroupholder.serverChannelCls()).childHandler(new ChannelInitializer<Channel>() {
-@@ -64,7 +_,7 @@
-                     } catch (ChannelException channelexception) {
-                     }
+             EventLoopGroupHolder eventLoopGroupHolder = EventLoopGroupHolder.remote(this.server.useNativeTransport());
+             this.channels
+@@ -69,7 +_,7 @@
+                                     } catch (ChannelException var5) {
+                                     }
  
--                    ChannelPipeline channelpipeline = channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
-+                    ChannelPipeline channelpipeline = channel.pipeline().addLast("timeout", new ReadTimeoutHandler(READ_TIMEOUT));
-                     if (ServerConnectionListener.this.server.repliesToStatus()) {
-                         channelpipeline.addLast("legacy_query", new LegacyQueryHandler(ServerConnectionListener.this.getServer()));
-                     }
-@@ -76,7 +_,7 @@
-                     connection.configurePacketHandler(channelpipeline);
-                     connection.setListenerForServerboundHandshake(new ServerHandshakePacketListenerImpl(ServerConnectionListener.this.server, connection));
-                 }
--            }).group(eventloopgroupholder.eventLoopGroup()).localAddress(address, port).bind().syncUninterruptibly());
-+            }).group(eventloopgroupholder.eventLoopGroup()).localAddress(fixedAddress, port).bind().syncUninterruptibly());
-         }
-     }
- 
+-                                    ChannelPipeline pipeline = channel.pipeline().addLast("timeout", new ReadTimeoutHandler(30));
++                                    ChannelPipeline pipeline = channel.pipeline().addLast("timeout", new ReadTimeoutHandler(READ_TIMEOUT));
+                                     if (ServerConnectionListener.this.server.repliesToStatus()) {
+                                         pipeline.addLast("legacy_query", new LegacyQueryHandler(ServerConnectionListener.this.getServer()));
+                                     }
+@@ -88,7 +_,7 @@
+                             }
+                         )
+                         .group(eventLoopGroupHolder.eventLoopGroup())
+-                        .localAddress(address, port)
++                        .localAddress(fixedAddress, port)
+                         .bind()
+                         .syncUninterruptibly()
+                 );

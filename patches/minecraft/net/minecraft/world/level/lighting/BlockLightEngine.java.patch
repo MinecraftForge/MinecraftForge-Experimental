@@ -1,20 +1,20 @@
 --- a/net/minecraft/world/level/lighting/BlockLightEngine.java
 +++ b/net/minecraft/world/level/lighting/BlockLightEngine.java
-@@ -109,7 +_,7 @@
+@@ -110,7 +_,7 @@
      }
  
      private int getEmission(final long blockNode, final BlockState state) {
--        int i = state.getLightEmission();
-+        int i = state.getLightEmission(chunkSource.getLevel(), mutablePos);
-         return i > 0 && this.storage.lightOnInSection(SectionPos.blockToSection(blockNode)) ? i : 0;
+-        int emission = state.getLightEmission();
++        int emission = state.getLightEmission(chunkSource.getLevel(), mutablePos);
+         return emission > 0 && this.storage.lightOnInSection(SectionPos.blockToSection(blockNode)) ? emission : 0;
      }
  
-@@ -119,7 +_,7 @@
-         LightChunk lightchunk = this.chunkSource.getChunkForLighting(pos.x(), pos.z());
-         if (lightchunk != null) {
-             lightchunk.findBlockLightSources((lightPos, state) -> {
--                int i = state.getLightEmission();
-+                int i = state.getLightEmission(chunkSource.getLevel(), lightPos);
-                 this.enqueueIncrease(lightPos.asLong(), LightEngine.QueueEntry.increaseLightFromEmission(i, isEmptyShape(state)));
+@@ -120,7 +_,7 @@
+         LightChunk chunk = this.chunkSource.getChunkForLighting(pos.x(), pos.z());
+         if (chunk != null) {
+             chunk.findBlockLightSources((lightPos, state) -> {
+-                int lightEmission = state.getLightEmission();
++                int lightEmission = state.getLightEmission(chunkSource.getLevel(), lightPos);
+                 this.enqueueIncrease(lightPos.asLong(), LightEngine.QueueEntry.increaseLightFromEmission(lightEmission, isEmptyShape(state)));
              });
          }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/data/tags/TagsProvider.java
 +++ b/net/minecraft/data/tags/TagsProvider.java
-@@ -32,28 +_,53 @@
+@@ -31,28 +_,53 @@
      private final CompletableFuture<TagsProvider.TagLookup<T>> parentProvider;
      protected final ResourceKey<? extends Registry<T>> registryKey;
      protected final Map<Identifier, TagBuilder> builders = Maps.newLinkedHashMap();
@@ -57,45 +57,45 @@
      }
  
      protected abstract void addTags(HolderLookup.Provider registries);
-@@ -71,7 +_,13 @@
+@@ -70,7 +_,13 @@
              .thenCombineAsync(this.parentProvider, (x$0, x$1) -> new CombinedData<>(x$0, (TagsProvider.TagLookup<T>)x$1), Util.backgroundExecutor())
              .thenCompose(
                  c -> {
--                    HolderLookup.RegistryLookup<T> registrylookup = c.contents.lookupOrThrow(this.registryKey);
-+                    HolderLookup.RegistryLookup<T> registrylookup = c.contents.lookup(this.registryKey).orElseThrow(() -> {
+-                    HolderLookup.RegistryLookup<T> lookup = c.contents.lookupOrThrow(this.registryKey);
++                    HolderLookup.RegistryLookup<T> lookup = c.contents.lookup(this.registryKey).orElseThrow(() -> {
 +                       // FORGE: Throw a more descriptive error message if this is a Forge registry without tags enabled
 +                       if (net.minecraftforge.registries.RegistryManager.ACTIVE.getRegistry(this.registryKey) != null) {
 +                          return new IllegalStateException("Forge registry " + this.registryKey.identifier() + " does not have support for tags");
 +                       }
 +                       return new IllegalStateException("Registry " + this.registryKey.identifier() + " not found");
 +                    });
-                     Predicate<Identifier> predicate = id -> registrylookup.get(ResourceKey.create(this.registryKey, id)).isPresent();
-                     Predicate<Identifier> predicate1 = id -> this.builders.containsKey(id) || c.parent.contains(TagKey.create(this.registryKey, id));
+                     Predicate<Identifier> elementCheck = id -> lookup.get(ResourceKey.create(this.registryKey, id)).isPresent();
+                     Predicate<Identifier> tagCheck = id -> this.builders.containsKey(id) || c.parent.contains(TagKey.create(this.registryKey, id));
                      return CompletableFuture.allOf(
-@@ -83,7 +_,7 @@
-                                     Identifier identifier = entry.getKey();
-                                     TagBuilder tagbuilder = entry.getValue();
-                                     List<TagEntry> list = tagbuilder.build();
--                                    List<TagEntry> list1 = list.stream().filter(e -> !e.verifyIfPresent(predicate, predicate1)).toList();
-+                                    List<TagEntry> list1 = java.util.stream.Stream.concat(list.stream(), tagbuilder.getRemoveEntries()).filter(e -> !e.verifyIfPresent(predicate, predicate1)).filter(this::missing).toList();
-                                     if (!list1.isEmpty()) {
+@@ -82,7 +_,7 @@
+                                     Identifier id = entry.getKey();
+                                     TagBuilder builder = entry.getValue();
+                                     List<TagEntry> entries = builder.build();
+-                                    List<TagEntry> unresolvedEntries = entries.stream().filter(e -> !e.verifyIfPresent(elementCheck, tagCheck)).toList();
++                                    List<TagEntry> unresolvedEntries = java.util.stream.Stream.concat(entries.stream(), builder.getRemoveEntries()).filter(e -> !e.verifyIfPresent(elementCheck, tagCheck)).filter(this::missing).toList();
+                                     if (!unresolvedEntries.isEmpty()) {
                                          throw new IllegalArgumentException(
                                              String.format(
-@@ -94,8 +_,11 @@
+@@ -93,8 +_,11 @@
                                              )
                                          );
                                      } else {
--                                        Path path = this.pathProvider.json(identifier);
--                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(list, tagbuilder.shouldReplace()), path);
-+                                        Path path = this.getPath(identifier);
+-                                        Path path = this.pathProvider.json(id);
+-                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(entries, builder.shouldReplace()), path);
++                                        Path path = this.getPath(id);
 +                                        if (path == null) {
 +                                            return CompletableFuture.completedFuture(null); // Forge: Allow running this data provider without writing it. Recipe provider needs valid tags.
 +                                        }
-+                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(list, tagbuilder.shouldReplace(), tagbuilder.getRemoveEntries().toList()), path);
++                                        return DataProvider.saveStable(cache, c.contents, TagFile.CODEC, new TagFile(entries, builder.shouldReplace(), builder.getRemoveEntries().toList()), path);
                                      }
                                  }
                              )
-@@ -106,7 +_,12 @@
+@@ -105,7 +_,12 @@
      }
  
      protected TagBuilder getOrCreateRawBuilder(final TagKey<T> tag) {
@@ -109,7 +109,7 @@
      }
  
      public CompletableFuture<TagsProvider.TagLookup<T>> contentsGetter() {
-@@ -119,6 +_,15 @@
+@@ -118,6 +_,15 @@
              this.addTags(registries);
              return (HolderLookup.Provider)registries;
          });

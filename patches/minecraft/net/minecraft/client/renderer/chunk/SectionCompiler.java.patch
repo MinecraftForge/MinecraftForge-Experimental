@@ -1,20 +1,20 @@
 --- a/net/minecraft/client/renderer/chunk/SectionCompiler.java
 +++ b/net/minecraft/client/renderer/chunk/SectionCompiler.java
-@@ -63,6 +_,7 @@
+@@ -61,6 +_,7 @@
      public SectionCompiler.Results compile(
          final SectionPos sectionPos, final RenderSectionRegion region, final VertexSorting vertexSorting, final SectionBufferBuilderPack builders
      ) {
 +        var modelDataMap = net.minecraft.client.Minecraft.getInstance().level.getModelDataManager().getAt(sectionPos);
-         SectionCompiler.Results sectioncompiler$results = new SectionCompiler.Results();
-         BlockPos blockpos = sectionPos.origin();
-         BlockPos blockpos1 = blockpos.offset(15, 15, 15);
-@@ -111,7 +_,8 @@
-                             blockpos2,
-                             blockstate,
-                             this.blockModelSet.get(blockstate),
--                            blockstate.getSeed(blockpos2)
-+                            blockstate.getSeed(blockpos2),
-+                            modelDataMap.getOrDefault(blockpos2, net.minecraftforge.client.model.data.ModelData.EMPTY)
+         SectionCompiler.Results results = new SectionCompiler.Results();
+         BlockPos minPos = sectionPos.origin();
+         BlockPos maxPos = minPos.offset(15, 15, 15);
+@@ -109,7 +_,8 @@
+                             pos,
+                             blockState,
+                             this.blockModelSet.get(blockState),
+-                            blockState.getSeed(pos)
++                            blockState.getSeed(pos),
++                            modelDataMap.getOrDefault(pos, net.minecraftforge.client.model.data.ModelData.EMPTY)
                          );
                      }
-                 } catch (Throwable throwable) {
+                 } catch (Throwable var21) {

@@ -1,28 +1,28 @@
 --- a/net/minecraft/core/dispenser/BoatDispenseItemBehavior.java
 +++ b/net/minecraft/core/dispenser/BoatDispenseItemBehavior.java
 @@ -29,18 +_,22 @@
-         double d2 = vec3.y() + direction.getStepY() * 1.125F;
-         double d3 = vec3.z() + direction.getStepZ() * d0;
-         BlockPos blockpos = source.pos().relative(direction);
-+        AbstractBoat abstractboat = this.type.create(serverlevel, EntitySpawnReason.DISPENSER);
-+        if (abstractboat == null) {
+         double spawnY = center.y() + direction.getStepY() * 1.125F;
+         double spawnZ = center.z() + direction.getStepZ() * justOutsideDispenser;
+         BlockPos frontPos = source.pos().relative(direction);
++        AbstractBoat boat = this.type.create(level, EntitySpawnReason.DISPENSER);
++        if (boat == null) {
 +            return this.defaultDispenseItemBehavior.dispense(source, dispensed);
 +        }
-+        abstractboat.setYRot(direction.toYRot());
-         double d4;
--        if (serverlevel.getFluidState(blockpos).is(FluidTags.WATER)) {
-+        if (abstractboat.canBoatInFluid(serverlevel.getFluidState(blockpos))) {
-             d4 = 1.0;
++        boat.setYRot(direction.toYRot());
+         double yOffset;
+-        if (level.getFluidState(frontPos).is(FluidTags.WATER)) {
++        if (boat.canBoatInFluid(level.getFluidState(frontPos))) {
+             yOffset = 1.0;
          } else {
--            if (!serverlevel.getBlockState(blockpos).isAir() || !serverlevel.getFluidState(blockpos.below()).is(FluidTags.WATER)) {
-+            if (!serverlevel.getBlockState(blockpos).isAir() || !abstractboat.canBoatInFluid(serverlevel.getFluidState(blockpos.below()))) {
+-            if (!level.getBlockState(frontPos).isAir() || !level.getFluidState(frontPos.below()).is(FluidTags.WATER)) {
++            if (!level.getBlockState(frontPos).isAir() || !boat.canBoatInFluid(level.getFluidState(frontPos.below()))) {
                  return this.defaultDispenseItemBehavior.dispense(source, dispensed);
              }
  
-             d4 = 0.0;
+             yOffset = 0.0;
          }
  
--        AbstractBoat abstractboat = this.type.create(serverlevel, EntitySpawnReason.DISPENSER);
-         if (abstractboat != null) {
-             abstractboat.setInitialPos(d1, d2 + d4, d3);
-             EntityType.<AbstractBoat>createDefaultStackConfig(serverlevel, dispensed, null).accept(abstractboat);
+-        AbstractBoat boat = this.type.create(level, EntitySpawnReason.DISPENSER);
+         if (boat != null) {
+             boat.setInitialPos(spawnX, spawnY + yOffset, spawnZ);
+             EntityType.<AbstractBoat>createDefaultStackConfig(level, dispensed, null).accept(boat);

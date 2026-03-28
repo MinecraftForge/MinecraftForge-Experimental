@@ -2,9 +2,9 @@
 +++ b/net/minecraft/client/gui/components/debug/DebugEntryLookingAtEntity.java
 @@ -29,6 +_,7 @@
          if (entity != null) {
-             list.add(ChatFormatting.UNDERLINE + "Targeted Entity");
-             list.add(entity.typeHolder().getRegisteredName());
-+            entity.getType().builtInRegistryHolder().tags().forEach(t -> list.add("#" + t.location()));
+             result.add(ChatFormatting.UNDERLINE + "Targeted Entity");
+             result.add(entity.typeHolder().getRegisteredName());
++            entity.getType().builtInRegistryHolder().tags().forEach(t -> result.add("#" + t.location()));
          }
  
-         displayer.addToGroup(GROUP, list);
+         displayer.addToGroup(GROUP, result);

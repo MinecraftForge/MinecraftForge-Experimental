@@ -9,11 +9,11 @@
              case LOGIN:
                  this.beginLogin(packet, false);
 @@ -32,7 +_,7 @@
-                 ServerStatus serverstatus = this.server.getStatus();
+                 ServerStatus status = this.server.getStatus();
                  this.connection.setupOutboundProtocol(StatusProtocols.CLIENTBOUND);
-                 if (this.server.repliesToStatus() && serverstatus != null) {
--                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(serverstatus, this.connection));
-+                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(serverstatus, this.connection, this.server.getStatusJson()));
+                 if (this.server.repliesToStatus() && status != null) {
+-                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(status, this.connection));
++                    this.connection.setupInboundProtocol(StatusProtocols.SERVERBOUND, new ServerStatusPacketListenerImpl(status, this.connection, this.server.getStatusJson()));
                  } else {
                      this.connection.disconnect(IGNORE_STATUS_REASON);
                  }

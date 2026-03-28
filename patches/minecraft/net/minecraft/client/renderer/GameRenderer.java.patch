@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/GameRenderer.java
 +++ b/net/minecraft/client/renderer/GameRenderer.java
-@@ -235,6 +_,9 @@
+@@ -233,6 +_,9 @@
              case null:
              default:
                  this.clearPostEffect();
@@ -10,47 +10,47 @@
          }
      }
  
-@@ -246,7 +_,13 @@
+@@ -244,7 +_,13 @@
      public void processBlurEffect() {
-         PostChain postchain = this.minecraft.getShaderManager().getPostChain(BLUR_POST_CHAIN_ID, LevelTargetBundle.MAIN_TARGETS);
-         if (postchain != null) {
+         PostChain postChain = this.minecraft.getShaderManager().getPostChain(BLUR_POST_CHAIN_ID, LevelTargetBundle.MAIN_TARGETS);
+         if (postChain != null) {
 +            // TODO: [Forge][Rendering] Check if this blend management is needed anymnore with the new render pipeline changes
 +            boolean wasBlendEnabled = com.mojang.blaze3d.opengl.GlStateManager._isBlendEnabled();
 +            if (wasBlendEnabled)
 +                com.mojang.blaze3d.opengl.GlStateManager._disableBlend();
-             postchain.process(this.minecraft.getMainRenderTarget(), this.resourcePool);
+             postChain.process(this.minecraft.getMainRenderTarget(), this.resourcePool);
 +            if (wasBlendEnabled)
 +                com.mojang.blaze3d.opengl.GlStateManager._enableBlend();
          }
      }
  
-@@ -507,7 +_,7 @@
-             profilerfiller.push("screen");
+@@ -509,7 +_,7 @@
+             profiler.push("screen");
  
              try {
--                this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(guigraphicsextractor, i, j, deltaTracker.getGameTimeDeltaTicks());
-+                net.minecraftforge.client.ForgeHooksClient.drawScreen(this.minecraft.screen, guigraphicsextractor, i, j, deltaTracker.getRealtimeDeltaTicks());
-             } catch (Throwable throwable) {
-                 CrashReport crashreport1 = CrashReport.forThrowable(throwable, "Rendering screen");
-                 CrashReportCategory crashreportcategory1 = crashreport1.addCategory("Screen render details");
-@@ -672,6 +_,10 @@
-                         Registry<Block> registry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
-                         flag = !itemstack.isEmpty()
-                             && (itemstack.canBreakBlockInAdventureMode(blockinworld) || itemstack.canPlaceOnBlockInAdventureMode(blockinworld));
-+                        if (!flag && blockstate.hasBlockEntity()) {
-+                            var blockEntity = this.minecraft.level.getBlockEntity(blockpos);
-+                            flag = blockEntity != null && blockEntity.hasCustomOutlineRendering();
+-                this.minecraft.screen.extractRenderStateWithTooltipAndSubtitles(graphics, xMouse, yMouse, deltaTracker.getGameTimeDeltaTicks());
++                net.minecraftforge.client.ForgeHooksClient.drawScreen(this.minecraft.screen, graphics, xMouse, yMouse, deltaTracker.getRealtimeDeltaTicks());
+             } catch (Throwable var12) {
+                 CrashReport report = CrashReport.forThrowable(var12, "Rendering screen");
+                 CrashReportCategory category = report.addCategory("Screen render details");
+@@ -674,6 +_,10 @@
+                         Registry<Block> blockRegistry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
+                         renderOutline = !itemStack.isEmpty()
+                             && (itemStack.canBreakBlockInAdventureMode(blockInWorld) || itemStack.canPlaceOnBlockInAdventureMode(blockInWorld));
++                        if (!renderOutline && blockState.hasBlockEntity()) {
++                            var blockEntity = this.minecraft.level.getBlockEntity(pos);
++                            renderOutline = blockEntity != null && blockEntity.hasCustomOutlineRendering();
 +                        }
                      }
                  }
              }
-@@ -696,6 +_,9 @@
-         if (optionsrenderstate.bobView) {
-             this.bobView(camerarenderstate, posestack);
+@@ -698,6 +_,9 @@
+         if (optionsState.bobView) {
+             this.bobView(cameraState, bobStack);
          }
 +
-+        var cameraSetup = net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeCameraAngles(this, this.mainCamera, f);
++        var cameraSetup = net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeCameraAngles(this, this.mainCamera, worldPartialTicks);
 +        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
  
-         matrix4f.mul(posestack.last().pose());
-         float f2 = optionsrenderstate.screenEffectScale;
+         projectionMatrix.mul(bobStack.last().pose());
+         float screenEffectScale = optionsState.screenEffectScale;

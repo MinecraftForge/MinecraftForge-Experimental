@@ -3,10 +3,10 @@
 @@ -208,6 +_,17 @@
  
      public void spawnChildFromBreeding(final ServerLevel level, final Animal partner) {
-         AgeableMob ageablemob = this.getBreedOffspring(level, partner);
-+        final var event = new net.minecraftforge.event.entity.living.BabyEntitySpawnEvent(this, partner, ageablemob);
+         AgeableMob offspring = this.getBreedOffspring(level, partner);
++        final var event = new net.minecraftforge.event.entity.living.BabyEntitySpawnEvent(this, partner, offspring);
 +        final boolean cancelled = net.minecraftforge.event.entity.living.BabyEntitySpawnEvent.BUS.post(event);
-+        ageablemob = event.getChild();
++        offspring = event.getChild();
 +        if (cancelled) {
 +            //Reset the "inLove" state for the animals
 +            this.setAge(6000);
@@ -15,6 +15,6 @@
 +            partner.resetLove();
 +            return;
 +        }
-         if (ageablemob != null) {
-             ageablemob.setBaby(true);
-             ageablemob.snapTo(this.getX(), this.getY(), this.getZ(), 0.0F, 0.0F);
+         if (offspring != null) {
+             offspring.setBaby(true);
+             offspring.snapTo(this.getX(), this.getY(), this.getZ(), 0.0F, 0.0F);

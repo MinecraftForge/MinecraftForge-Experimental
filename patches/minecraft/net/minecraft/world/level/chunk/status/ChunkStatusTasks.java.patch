@@ -1,18 +1,18 @@
 --- a/net/minecraft/world/level/chunk/status/ChunkStatusTasks.java
 +++ b/net/minecraft/world/level/chunk/status/ChunkStatusTasks.java
-@@ -215,9 +_,15 @@
-                 levelchunk.setFullStatus(generationchunkholder::getFullStatus);
-                 levelchunk.runPostLoad();
-                 levelchunk.setLoaded(true);
-+                try {
-+                    generationchunkholder.currentlyLoading = levelchunk; // Forge - bypass the future chain when getChunk is called, this prevents deadlocks.
-                 levelchunk.registerAllBlockEntitiesAfterLevelLoad();
-                 levelchunk.registerTickContainerInLevel(serverlevel);
-                 levelchunk.setUnsavedListener(context.unsavedListener());
-+                    net.minecraftforge.event.ForgeEventFactory.onChunkLoad(levelchunk, !(protochunk instanceof ImposterProtoChunk));
-+                } finally {
-+                    generationchunkholder.currentlyLoading = null; // Forge - Stop bypassing the future chain.
-+                }
-                 return levelchunk;
-             },
-             context.mainThreadExecutor()
+@@ -201,9 +_,15 @@
+             levelChunk.setFullStatus(holder::getFullStatus);
+             levelChunk.runPostLoad();
+             levelChunk.setLoaded(true);
++            try {
++                holder.currentlyLoading = levelChunk; // Forge - bypass the future chain when getChunk is called, this prevents deadlocks.
+             levelChunk.registerAllBlockEntitiesAfterLevelLoad();
+             levelChunk.registerTickContainerInLevel(level);
+             levelChunk.setUnsavedListener(context.unsavedListener());
++                net.minecraftforge.event.ForgeEventFactory.onChunkLoad(levelChunk, !(protoChunk instanceof ImposterProtoChunk));
++            } finally {
++                holder.currentlyLoading = null; // Forge - Stop bypassing the future chain.
++            }
+             return levelChunk;
+         }, context.mainThreadExecutor());
+     }

@@ -13,23 +13,23 @@
 +    }
 +
 +    public void findBlocks(final java.util.function.BiPredicate<BlockState, BlockPos> predicate, final BiConsumer<BlockPos, BlockState> consumer) {
-         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
  
-         for (int i = this.getMinSectionY(); i <= this.getMaxSectionY(); i++) {
-             LevelChunkSection levelchunksection = this.getSection(this.getSectionIndexFromSectionY(i));
--            if (levelchunksection.maybeHas(predicate)) {
-+            if (levelchunksection.maybeHas(state -> predicate.test(state, BlockPos.ZERO))) {
-                 BlockPos blockpos = SectionPos.of(this.chunkPos, i).origin();
+         for (int sectionY = this.getMinSectionY(); sectionY <= this.getMaxSectionY(); sectionY++) {
+             LevelChunkSection section = this.getSection(this.getSectionIndexFromSectionY(sectionY));
+-            if (section.maybeHas(predicate)) {
++            if (section.maybeHas(state -> predicate.test(state, BlockPos.ZERO))) {
+                 BlockPos origin = SectionPos.of(this.chunkPos, sectionY).origin();
  
-                 for (int j = 0; j < 16; j++) {
-                     for (int k = 0; k < 16; k++) {
-                         for (int l = 0; l < 16; l++) {
-                             BlockState blockstate = levelchunksection.getBlockState(l, j, k);
--                            if (predicate.test(blockstate)) {
--                                consumer.accept(blockpos$mutableblockpos.setWithOffset(blockpos, l, j, k), blockstate);
-+                            blockpos$mutableblockpos.setWithOffset(blockpos, l, j, k);
-+                            if (predicate.test(blockstate, blockpos$mutableblockpos.immutable())) {
-+                                consumer.accept(blockpos$mutableblockpos, blockstate);
+                 for (int y = 0; y < 16; y++) {
+                     for (int z = 0; z < 16; z++) {
+                         for (int x = 0; x < 16; x++) {
+                             BlockState state = section.getBlockState(x, y, z);
+-                            if (predicate.test(state)) {
+-                                consumer.accept(mutablePos.setWithOffset(origin, x, y, z), state);
++                            mutablePos.setWithOffset(origin, x, y, z);
++                            if (predicate.test(state, mutablePos.immutable())) {
++                                consumer.accept(mutablePos, state);
                              }
                          }
                      }

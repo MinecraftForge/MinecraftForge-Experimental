@@ -1,7 +1,7 @@
 --- a/net/minecraft/server/advancements/AdvancementVisibilityEvaluator.java
 +++ b/net/minecraft/server/advancements/AdvancementVisibilityEvaluator.java
 @@ -71,6 +_,16 @@
-         evaluateVisibility(advancementnode, stack, isDone, output);
+         evaluateVisibility(root, visibilityStack, isDone, output);
      }
  
 +    public static boolean isVisible(AdvancementNode advancement, Predicate<AdvancementNode> test) {

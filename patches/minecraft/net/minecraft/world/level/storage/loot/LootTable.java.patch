@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/storage/loot/LootTable.java
 +++ b/net/minecraft/world/level/storage/loot/LootTable.java
-@@ -40,7 +_,7 @@
+@@ -39,7 +_,7 @@
              i -> i.group(
                      LootContextParamSets.CODEC.lenientOptionalFieldOf("type", DEFAULT_PARAM_SET).forGetter(t -> t.paramSet),
                      Identifier.CODEC.optionalFieldOf("random_sequence").forGetter(t -> t.randomSequence),
@@ -9,7 +9,7 @@
                      LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(t -> t.functions)
                  )
                  .apply(i, LootTable::new)
-@@ -59,7 +_,7 @@
+@@ -58,7 +_,7 @@
      ) {
          this.paramSet = paramSet;
          this.randomSequence = randomSequence;
@@ -18,7 +18,7 @@
          this.functions = functions;
          this.compositeFunction = LootItemFunctions.compose(functions);
      }
-@@ -82,10 +_,12 @@
+@@ -81,10 +_,12 @@
          };
      }
  
@@ -29,9 +29,9 @@
  
 +    @Deprecated // Use a non-'Raw' version of 'getRandomItems', so that the Forge Global Loot Modifiers will be applied
      public void getRandomItemsRaw(final LootContext context, final Consumer<ItemStack> output) {
-         LootContext.VisitedEntry<?> visitedentry = LootContext.createVisitedEntry(this);
-         if (context.pushVisitedElement(visitedentry)) {
-@@ -102,18 +_,19 @@
+         LootContext.VisitedEntry<?> breadcrumb = LootContext.createVisitedEntry(this);
+         if (context.pushVisitedElement(breadcrumb)) {
+@@ -101,18 +_,19 @@
      }
  
      public void getRandomItems(final LootParams params, final long optionalLootTableSeed, final Consumer<ItemStack> output) {
@@ -55,17 +55,17 @@
      }
  
      public ObjectArrayList<ItemStack> getRandomItems(final LootParams params, final RandomSource randomSource) {
-@@ -130,7 +_,8 @@
+@@ -129,7 +_,8 @@
  
      private ObjectArrayList<ItemStack> getRandomItems(final LootContext context) {
-         ObjectArrayList<ItemStack> objectarraylist = new ObjectArrayList<>();
--        this.getRandomItems(context, objectarraylist::add);
-+        this.getRandomItemsRaw(context, createStackSplitter(context.getLevel(), objectarraylist::add));
-+        objectarraylist = net.minecraftforge.common.ForgeHooks.modifyLoot(this, objectarraylist, context);
-         return objectarraylist;
+         ObjectArrayList<ItemStack> result = new ObjectArrayList<>();
+-        this.getRandomItems(context, result::add);
++        this.getRandomItemsRaw(context, createStackSplitter(context.getLevel(), result::add));
++        result = net.minecraftforge.common.ForgeHooks.modifyLoot(this, result, context);
+         return result;
      }
  
-@@ -215,6 +_,68 @@
+@@ -214,6 +_,68 @@
  
      public static LootTable.Builder lootTable() {
          return new LootTable.Builder();

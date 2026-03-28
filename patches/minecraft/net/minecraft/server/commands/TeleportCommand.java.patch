@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/commands/TeleportCommand.java
 +++ b/net/minecraft/server/commands/TeleportCommand.java
-@@ -237,14 +_,17 @@
+@@ -236,14 +_,17 @@
          final CommandSourceStack source,
          final Entity victim,
          final ServerLevel level,
@@ -18,6 +18,6 @@
 +        var event = net.minecraftforge.event.ForgeEventFactory.onEntityTeleportCommand(victim, x, y, z);
 +        if (event == null) return;
 +        x = event.getTargetX(); y = event.getTargetY(); z = event.getTargetZ();
-         BlockPos blockpos = BlockPos.containing(x, y, z);
-         if (!Level.isInSpawnableBounds(blockpos)) {
+         BlockPos blockPos = BlockPos.containing(x, y, z);
+         if (!Level.isInSpawnableBounds(blockPos)) {
              throw INVALID_POSITION.create();

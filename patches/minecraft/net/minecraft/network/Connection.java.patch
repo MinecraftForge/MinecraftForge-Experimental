@@ -28,12 +28,12 @@
          }
 @@ -151,6 +_,7 @@
              } else {
-                 if (packetlistener.shouldHandleMessage(packet)) {
+                 if (packetListener.shouldHandleMessage(packet)) {
                      try {
 +                        packetLogger.recv(packet);
-                         genericsFtw(packet, packetlistener);
-                     } catch (RunningOnDifferentThreadException runningondifferentthreadexception) {
-                     } catch (RejectedExecutionException rejectedexecutionexception) {
+                         genericsFtw(packet, packetListener);
+                     } catch (RunningOnDifferentThreadException var5) {
+                     } catch (RejectedExecutionException var6) {
 @@ -200,6 +_,7 @@
          if (protocol.flow() != this.getReceiving()) {
              throw new IllegalStateException("Invalid inbound protocol: " + protocol.id());
@@ -41,17 +41,17 @@
 +            this.inboundProtocol = protocol;
              this.packetListener = packetListener;
              this.disconnectListener = null;
-             UnconfiguredPipelineHandler.InboundConfigurationTask unconfiguredpipelinehandler$inboundconfigurationtask = UnconfiguredPipelineHandler.setupInboundProtocol(
-@@ -223,6 +_,8 @@
+             UnconfiguredPipelineHandler.InboundConfigurationTask configMessage = UnconfiguredPipelineHandler.setupInboundProtocol(protocol);
+@@ -217,7 +_,7 @@
+         if (protocol.flow() != this.getSending()) {
+             throw new IllegalStateException("Invalid outbound protocol: " + protocol.id());
          } else {
-             UnconfiguredPipelineHandler.OutboundConfigurationTask unconfiguredpipelinehandler$outboundconfigurationtask = UnconfiguredPipelineHandler.setupOutboundProtocol(
-                 protocol
-+            ).andThen(
-+                f -> this.outboundProtocol = protocol
-             );
-             BundlerInfo bundlerinfo = protocol.bundlerInfo();
-             if (bundlerinfo != null) {
-@@ -274,7 +_,8 @@
+-            UnconfiguredPipelineHandler.OutboundConfigurationTask configMessage = UnconfiguredPipelineHandler.setupOutboundProtocol(protocol);
++            UnconfiguredPipelineHandler.OutboundConfigurationTask configMessage = UnconfiguredPipelineHandler.setupOutboundProtocol(protocol).andThen(_ -> this.outboundProtocol = protocol);
+             BundlerInfo bundlerInfo = protocol.bundlerInfo();
+             if (bundlerInfo != null) {
+                 PacketBundleUnpacker newUnbundler = new PacketBundleUnpacker(bundlerInfo);
+@@ -264,7 +_,8 @@
              this.disconnectListener = listener;
              this.runOnceConnected(connection -> {
                  this.setupInboundProtocol(inbound, listener);
@@ -61,11 +61,11 @@
                  this.setupOutboundProtocol(outbound);
              });
          }
-@@ -319,10 +_,13 @@
+@@ -309,10 +_,13 @@
          if (listener != null) {
-             ChannelFuture channelfuture = flush ? this.channel.writeAndFlush(packet) : this.channel.write(packet);
-             channelfuture.addListener(listener);
-+            channelfuture.addListener(f -> packetLogger.send(packet));
+             ChannelFuture future = flush ? this.channel.writeAndFlush(packet) : this.channel.write(packet);
+             future.addListener(listener);
++            future.addListener(f -> packetLogger.send(packet));
          } else if (flush) {
              this.channel.writeAndFlush(packet, this.channel.voidPromise());
 +            packetLogger.send(packet);
@@ -75,7 +75,7 @@
          }
      }
  
-@@ -391,7 +_,7 @@
+@@ -381,7 +_,7 @@
          if (this.address == null) {
              return "local";
          } else {
@@ -84,7 +84,7 @@
          }
      }
  
-@@ -436,7 +_,9 @@
+@@ -426,7 +_,9 @@
      }
  
      public static ChannelFuture connect(final InetSocketAddress address, final EventLoopGroupHolder eventLoopGroupHolder, final Connection connection) {
@@ -95,7 +95,7 @@
              @Override
              protected void initChannel(final Channel channel) {
                  try {
-@@ -503,7 +_,8 @@
+@@ -499,7 +_,8 @@
  
      public static Connection connectToLocalServer(final SocketAddress address) {
          final Connection connection = new Connection(PacketFlow.CLIENTBOUND);
@@ -104,8 +104,8 @@
 +        new Bootstrap().group(EventLoopGroupHolder.local().eventLoopGroup(true)).handler(new ChannelInitializer<Channel>() {
              @Override
              protected void initChannel(final Channel channel) {
-                 ChannelPipeline channelpipeline = channel.pipeline();
-@@ -594,6 +_,22 @@
+                 ChannelPipeline pipeline = channel.pipeline();
+@@ -590,6 +_,22 @@
  
      public float getAverageSentPackets() {
          return this.averageSentPackets;

@@ -1,39 +1,39 @@
 --- a/net/minecraft/client/gui/screens/inventory/EffectsInInventory.java
 +++ b/net/minecraft/client/gui/screens/inventory/EffectsInInventory.java
 @@ -47,12 +_,16 @@
-         int j = this.screen.width - i;
-         Collection<MobEffectInstance> collection = this.minecraft.player.getActiveEffects();
-         if (!collection.isEmpty() && j >= 32) {
--            int k = j >= 120 ? j - 7 : 32;
-+            var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenEffectSize(this.screen, j, j < 120, i);
+         int availableWidth = this.screen.width - xo;
+         Collection<MobEffectInstance> activeEffects = this.minecraft.player.getActiveEffects();
+         if (!activeEffects.isEmpty() && availableWidth >= 32) {
+-            int maxWidth = availableWidth >= 120 ? availableWidth - 7 : 32;
++            var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenEffectSize(this.screen, availableWidth, availableWidth < 120, xo);
 +            if (event == null) return;
-+            int k = !event.isCompact() ? j - 7 : 32;
-+            i = event.getHorizontalOffset();
-             int l = 33;
-             if (collection.size() > 5) {
-                 l = 132 / (collection.size() - 1);
++            int maxWidth = !event.isCompact() ? availableWidth - 7 : 32;
++            xo = event.getHorizontalOffset();
+             int yStep = 33;
+             if (activeEffects.size() > 5) {
+                 yStep = 132 / (activeEffects.size() - 1);
              }
  
-+            Iterable<MobEffectInstance> iterable = collection.stream().filter(net.minecraftforge.client.ForgeHooksClient::shouldRenderEffect).sorted().toList();
-             this.extractEffects(graphics, collection, i, l, mouseX, mouseY, k);
++            Iterable<MobEffectInstance> iterable = activeEffects.stream().filter(net.minecraftforge.client.ForgeHooksClient::shouldRenderEffect).sorted().toList();
+             this.extractEffects(graphics, activeEffects, xo, yStep, mouseX, mouseY, maxWidth);
          }
      }
 @@ -72,6 +_,11 @@
  
-         for (MobEffectInstance mobeffectinstance : iterable) {
-             boolean flag = mobeffectinstance.isAmbient();
-+            var renderer = net.minecraftforge.client.extensions.common.IClientMobEffectExtensions.of(mobeffectinstance);
-+            if (renderer.extractInventory(mobeffectinstance, this, graphics, x0, i, 0)) {
-+                i += yStep;
+         for (MobEffectInstance effect : sortedEffects) {
+             boolean isAmbient = effect.isAmbient();
++            var renderer = net.minecraftforge.client.extensions.common.IClientMobEffectExtensions.of(effect);
++            if (renderer.extractInventory(effect, this, graphics, x0, y0, 0)) {
++                y0 += yStep;
 +                continue;
 +            }
-             Component component = this.getEffectName(mobeffectinstance);
-             Component component1 = MobEffectUtil.formatDuration(mobeffectinstance, 1.0F, this.minecraft.level.tickRateManager().tickrate());
-             int j = this.extractBackground(graphics, font, component, component1, x0, i, flag, maxWidth);
+             Component effectText = this.getEffectName(effect);
+             Component duration = MobEffectUtil.formatDuration(effect, 1.0F, this.minecraft.level.tickRateManager().tickrate());
+             int textureWidth = this.extractBackground(graphics, font, effectText, duration, x0, y0, isAmbient, maxWidth);
 @@ -136,5 +_,9 @@
          }
  
-         return mutablecomponent;
+         return name;
 +    }
 +
 +    public AbstractContainerScreen<?> getScreen() {

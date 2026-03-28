@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -151,6 +_,10 @@
+@@ -150,6 +_,10 @@
      public void handleBlockBreakAction(
          final BlockPos pos, final ServerboundPlayerActionPacket.Action action, final Direction direction, final int maxY, final int sequence
      ) {
@@ -11,73 +11,73 @@
          if (!this.player.isWithinBlockInteractionRange(pos, 1.0)) {
              this.debugLogging(pos, false, sequence, "too far");
          } else if (pos.getY() > maxY) {
-@@ -185,6 +_,7 @@
-                 float f = 1.0F;
-                 BlockState blockstate = this.level.getBlockState(pos);
-                 if (!blockstate.isAir()) {
+@@ -184,6 +_,7 @@
+                 float progress = 1.0F;
+                 BlockState blockState = this.level.getBlockState(pos);
+                 if (!blockState.isAir()) {
 +                    if (!event.getUseBlock().isDenied()) {
                      EnchantmentHelper.onHitBlock(
                          this.level,
                          this.player.getMainHandItem(),
-@@ -196,6 +_,7 @@
+@@ -195,6 +_,7 @@
                          item -> this.player.onEquippedItemBroken(item, EquipmentSlot.MAINHAND)
                      );
-                     blockstate.attack(this.level, pos, this.player);
+                     blockState.attack(this.level, pos, this.player);
 +                    }
-                     f = blockstate.getDestroyProgress(this.player, this.player.level(), pos);
+                     progress = blockState.getDestroyProgress(this.player, this.player.level(), pos);
                  }
  
-@@ -262,7 +_,8 @@
+@@ -261,7 +_,8 @@
  
      public boolean destroyBlock(final BlockPos pos) {
-         BlockState blockstate1 = this.level.getBlockState(pos);
--        if (!this.player.getMainHandItem().canDestroyBlock(blockstate1, this.level, pos, this.player)) {
+         BlockState state = this.level.getBlockState(pos);
+-        if (!this.player.getMainHandItem().canDestroyBlock(state, this.level, pos, this.player)) {
 +        int exp = net.minecraftforge.common.ForgeHooks.onBlockBreakEvent(level, gameModeForPlayer, player, pos);
 +        if (exp == -1) {
              return false;
          } else {
-             BlockEntity blockentity = this.level.getBlockEntity(pos);
-@@ -270,34 +_,50 @@
+             BlockEntity blockEntity = this.level.getBlockEntity(pos);
+@@ -269,34 +_,50 @@
              if (block instanceof GameMasterBlock && !this.player.canUseGameMasterBlocks()) {
-                 this.level.sendBlockUpdated(pos, blockstate1, blockstate1, 3);
+                 this.level.sendBlockUpdated(pos, state, state, 3);
                  return false;
 +            } else if (player.getMainHandItem().onBlockStartBreak(pos, player)) {
 +               return false;
              } else if (this.player.blockActionRestricted(this.level, pos, this.gameModeForPlayer)) {
                  return false;
              } else {
--                BlockState blockstate = block.playerWillDestroy(this.level, pos, blockstate1, this.player);
--                boolean flag1 = this.level.removeBlock(pos, false);
+-                BlockState adjustedState = block.playerWillDestroy(this.level, pos, state, this.player);
+-                boolean changed = this.level.removeBlock(pos, false);
 -                if (SharedConstants.DEBUG_BLOCK_BREAK) {
--                    LOGGER.info("server broke {} {} -> {}", pos, blockstate, this.level.getBlockState(pos));
+-                    LOGGER.info("server broke {} {} -> {}", pos, adjustedState, this.level.getBlockState(pos));
 -                }
 -
--                if (flag1) {
--                    block.destroy(this.level, pos, blockstate);
+-                if (changed) {
+-                    block.destroy(this.level, pos, adjustedState);
 -                }
 -
-+                BlockState blockstate = blockstate1;
++                BlockState adjustedState = state;
                  if (this.player.preventsBlockDrops()) {
 +                    removeBlock(pos, false);
                      return true;
                  } else {
-                     ItemStack itemstack = this.player.getMainHandItem();
-                     ItemStack itemstack1 = itemstack.copy();
--                    boolean flag = this.player.hasCorrectToolForDrops(blockstate);
-+                    boolean flag = blockstate.canHarvestBlock(this.level, pos, this.player); // previously player.hasCorrectToolForDrops(blockstate)
-                     itemstack.mineBlock(this.level, blockstate, pos, this.player);
+                     ItemStack itemStack = this.player.getMainHandItem();
+                     ItemStack destroyedWith = itemStack.copy();
+-                    boolean canDestroy = this.player.hasCorrectToolForDrops(adjustedState);
++                    boolean canDestroy = adjustedState.canHarvestBlock(this.level, pos, this.player); // previously player.hasCorrectToolForDrops(blockstate)
+                     itemStack.mineBlock(this.level, adjustedState, pos, this.player);
 +
-+                    if (itemstack.isEmpty() && !itemstack1.isEmpty()) {
-+                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this.player, itemstack1, InteractionHand.MAIN_HAND);
++                    if (itemStack.isEmpty() && !destroyedWith.isEmpty()) {
++                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(this.player, destroyedWith, InteractionHand.MAIN_HAND);
 +                    }
-+                    boolean flag1 = removeBlock(pos, flag);
++                    boolean changed = removeBlock(pos, canDestroy);
 +
-                     if (flag1 && flag) {
-                         block.playerDestroy(this.level, this.player, pos, blockstate, blockentity, itemstack1);
+                     if (changed && canDestroy) {
+                         block.playerDestroy(this.level, this.player, pos, adjustedState, blockEntity, destroyedWith);
                      }
  
-+                    if (flag && exp > 0) {
-+                        blockstate1.getBlock().popExperience(level, pos, exp);
++                    if (canDestroy && exp > 0) {
++                        state.getBlock().popExperience(level, pos, exp);
 +                    }
 +
                      return true;
@@ -99,53 +99,53 @@
      }
  
      public InteractionResult useItem(final ServerPlayer player, final Level level, final ItemStack itemStack, final InteractionHand hand) {
-@@ -306,6 +_,8 @@
+@@ -305,6 +_,8 @@
          } else if (player.getCooldowns().isOnCooldown(itemStack)) {
              return InteractionResult.PASS;
          } else {
 +            InteractionResult cancelResult = net.minecraftforge.common.ForgeHooks.onItemRightClick(player, hand);
 +            if (cancelResult != null) return cancelResult;
-             int i = itemStack.getCount();
-             int j = itemStack.getDamageValue();
-             InteractionResult interactionresult = itemStack.use(level, player, hand);
-@@ -346,6 +_,11 @@
-         if (!blockstate.getBlock().isEnabled(level.enabledFeatures())) {
+             int oldCount = itemStack.getCount();
+             int oldDamage = itemStack.getDamageValue();
+             InteractionResult result = itemStack.use(level, player, hand);
+@@ -348,6 +_,11 @@
+         if (!state.getBlock().isEnabled(level.enabledFeatures())) {
              return InteractionResult.FAIL;
          } else if (this.gameModeForPlayer == GameType.SPECTATOR) {
 +        }
 +
-+        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player, hand, blockpos, hitResult);
++        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player, hand, pos, hitResult);
 +        if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock.BUS.post(event)) return event.getCancellationResult();
 +        if (this.gameModeForPlayer == GameType.SPECTATOR) {
-             MenuProvider menuprovider = blockstate.getMenuProvider(level, blockpos);
-             if (menuprovider != null) {
-                 player.openMenu(menuprovider);
-@@ -354,10 +_,16 @@
+             MenuProvider menuProvider = state.getMenuProvider(level, pos);
+             if (menuProvider != null) {
+                 player.openMenu(menuProvider);
+@@ -356,10 +_,16 @@
                  return InteractionResult.PASS;
              }
          } else {
-+            UseOnContext useoncontext = new UseOnContext(player, hand, hitResult);
++            UseOnContext context = new UseOnContext(player, hand, hitResult);
 +            if (!event.getUseItem().isDenied()) {
-+                InteractionResult result = itemStack.onItemUseFirst(useoncontext);
++                InteractionResult result = itemStack.onItemUseFirst(context);
 +                if (result != InteractionResult.PASS) return result;
 +            }
-             boolean flag = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
-             boolean flag1 = player.isSecondaryUseActive() && flag;
-+            flag1 &= !(player.getMainHandItem().doesSneakBypassUse(level, blockpos, player) && player.getOffhandItem().doesSneakBypassUse(level, blockpos, player));
-             ItemStack itemstack = itemStack.copy();
--            if (!flag1) {
-+            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !flag1)) {
-                 InteractionResult interactionresult = blockstate.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
-                 if (interactionresult.consumesAction()) {
-                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, blockpos, itemstack);
-@@ -373,8 +_,8 @@
+             boolean haveSomethingInOurHands = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
+             boolean suppressUsingBlock = player.isSecondaryUseActive() && haveSomethingInOurHands;
++            suppressUsingBlock &= !(player.getMainHandItem().doesSneakBypassUse(level, pos, player) && player.getOffhandItem().doesSneakBypassUse(level, pos, player));
+             ItemStack usedItemStack = itemStack.copy();
+-            if (!suppressUsingBlock) {
++            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !suppressUsingBlock)) {
+                 InteractionResult itemUse = state.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
+                 if (itemUse.consumesAction()) {
+                     CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, pos, usedItemStack);
+@@ -375,8 +_,8 @@
                  }
              }
  
 -            if (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack)) {
--                UseOnContext useoncontext = new UseOnContext(player, hand, hitResult);
+-                UseOnContext context = new UseOnContext(player, hand, hitResult);
 +            if (event.getUseItem().isAllowed() || (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack))) {
 +                if (event.getUseItem().isDenied()) return InteractionResult.PASS;
-                 InteractionResult interactionresult2;
+                 InteractionResult success;
                  if (player.hasInfiniteMaterials()) {
-                     int i = itemStack.getCount();
+                     int count = itemStack.getCount();

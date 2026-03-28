@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/inventory/EnchantmentMenu.java
 +++ b/net/minecraft/world/inventory/EnchantmentMenu.java
-@@ -75,7 +_,7 @@
+@@ -74,7 +_,7 @@
  
              @Override
              public boolean mayPlace(final ItemStack itemStack) {
@@ -9,40 +9,40 @@
              }
  
              @Override
-@@ -103,23 +_,24 @@
-             if (!itemstack.isEmpty() && itemstack.isEnchantable()) {
+@@ -102,23 +_,24 @@
+             if (!itemStack.isEmpty() && itemStack.isEnchantable()) {
                  this.access.execute((level, pos) -> {
-                     IdMap<Holder<Enchantment>> idmap = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
--                    int j = 0;
-+                    float j = 0;
+                     IdMap<Holder<Enchantment>> holders = level.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).asHolderIdMap();
+-                    int bookcases = 0;
++                    float bookcases = 0;
  
-                     for (BlockPos blockpos : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
-                         if (EnchantingTableBlock.isValidBookShelf(level, pos, blockpos)) {
--                            j++;
-+                            j += level.getBlockState(pos.offset(blockpos)).getEnchantPowerBonus(level, pos.offset(blockpos));
+                     for (BlockPos offset : EnchantingTableBlock.BOOKSHELF_OFFSETS) {
+                         if (EnchantingTableBlock.isValidBookShelf(level, pos, offset)) {
+-                            bookcases++;
++                            bookcases += level.getBlockState(pos.offset(offset)).getEnchantPowerBonus(level, pos.offset(offset));
                          }
                      }
  
                      this.random.setSeed(this.enchantmentSeed.get());
  
-                     for (int k = 0; k < 3; k++) {
--                        this.costs[k] = EnchantmentHelper.getEnchantmentCost(this.random, k, j, itemstack);
-+                        this.costs[k] = EnchantmentHelper.getEnchantmentCost(this.random, k, (int)j, itemstack);
-                         this.enchantClue[k] = -1;
-                         this.levelClue[k] = -1;
-                         if (this.costs[k] < k + 1) {
-                             this.costs[k] = 0;
+                     for (int ixx = 0; ixx < 3; ixx++) {
+-                        this.costs[ixx] = EnchantmentHelper.getEnchantmentCost(this.random, ixx, bookcases, itemStack);
++                        this.costs[ixx] = EnchantmentHelper.getEnchantmentCost(this.random, ixx, (int)bookcases, itemStack);
+                         this.enchantClue[ixx] = -1;
+                         this.levelClue[ixx] = -1;
+                         if (this.costs[ixx] < ixx + 1) {
+                             this.costs[ixx] = 0;
                          }
-+                        this.costs[k] = net.minecraftforge.event.ForgeEventFactory.onEnchantmentLevelSet(level, pos, k, (int)j, itemstack, costs[k]);
++                        this.costs[ixx] = net.minecraftforge.event.ForgeEventFactory.onEnchantmentLevelSet(level, pos, ixx, (int)bookcases, itemStack, costs[ixx]);
                      }
  
-                     for (int l = 0; l < 3; l++) {
-@@ -246,7 +_,7 @@
-                 if (!this.moveItemStackTo(itemstack1, 2, 38, true)) {
+                     for (int ix = 0; ix < 3; ix++) {
+@@ -245,7 +_,7 @@
+                 if (!this.moveItemStackTo(stack, 2, 38, true)) {
                      return ItemStack.EMPTY;
                  }
--            } else if (itemstack1.is(Items.LAPIS_LAZULI)) {
-+            } else if (itemstack1.is(net.minecraftforge.common.Tags.Items.ENCHANTING_FUELS)) {
-                 if (!this.moveItemStackTo(itemstack1, 1, 2, true)) {
+-            } else if (stack.is(Items.LAPIS_LAZULI)) {
++            } else if (stack.is(net.minecraftforge.common.Tags.Items.ENCHANTING_FUELS)) {
+                 if (!this.moveItemStackTo(stack, 1, 2, true)) {
                      return ItemStack.EMPTY;
                  }

@@ -1,16 +1,16 @@
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -181,7 +_,7 @@
+@@ -180,7 +_,7 @@
          if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
              Block block = state.getBlock();
-             boolean flag = explosion.getIndirectSourceEntity() instanceof Player;
+             boolean doDropExperienceHack = explosion.getIndirectSourceEntity() instanceof Player;
 -            if (block.dropFromExplosion(explosion)) {
 +            if (state.canDropFromExplosion(level, pos, explosion)) {
-                 BlockEntity blockentity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
-                 LootParams.Builder lootparams$builder = new LootParams.Builder(level)
+                 BlockEntity blockEntity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
+                 LootParams.Builder params = new LootParams.Builder(level)
                      .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-@@ -196,8 +_,7 @@
-                 state.getDrops(lootparams$builder).forEach(stack -> onHit.accept(stack, pos));
+@@ -195,8 +_,7 @@
+                 state.getDrops(params).forEach(stack -> onHit.accept(stack, pos));
              }
  
 -            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
@@ -19,14 +19,14 @@
          }
      }
  
-@@ -358,12 +_,15 @@
-         if (f == -1.0F) {
+@@ -357,12 +_,15 @@
+         if (destroySpeed == -1.0F) {
              return 0.0F;
          } else {
--            int i = player.hasCorrectToolForDrops(state) ? 30 : 100;
--            return player.getDestroySpeed(state) / f / i;
-+            int i = net.minecraftforge.common.ForgeHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
-+            return player.getDestroySpeed(state, pos) / f / (float)i;
+-            int modifier = player.hasCorrectToolForDrops(state) ? 30 : 100;
+-            return player.getDestroySpeed(state) / destroySpeed / modifier;
++            int modifier = net.minecraftforge.common.ForgeHooks.isCorrectToolForDrops(state, player) ? 30 : 100;
++            return player.getDestroySpeed(state, pos) / destroySpeed / (float)modifier;
          }
      }
  
@@ -37,7 +37,7 @@
      }
  
      protected void attack(final BlockState state, final Level level, final BlockPos pos, final Player player) {
-@@ -406,6 +_,8 @@
+@@ -405,6 +_,8 @@
          return this.isRandomlyTicking;
      }
  
@@ -46,7 +46,7 @@
      protected SoundType getSoundType(final BlockState state) {
          return this.soundType;
      }
-@@ -426,6 +_,10 @@
+@@ -425,6 +_,10 @@
          return this.properties.destroyTime;
      }
  
@@ -57,7 +57,7 @@
      public abstract static class BlockStateBase extends StateHolder<Block, BlockState> implements TypedInstance<Block> {
          private static final Direction[] DIRECTIONS = Direction.values();
          private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[DIRECTIONS.length], s -> Arrays.fill(s, Shapes.empty()));
-@@ -577,12 +_,14 @@
+@@ -576,12 +_,14 @@
              return this.useShapeForLightOcclusion;
          }
  
@@ -73,7 +73,7 @@
          }
  
          public boolean ignitedByLava() {
-@@ -595,9 +_,11 @@
+@@ -594,9 +_,11 @@
          }
  
          public MapColor getMapColor(final BlockGetter level, final BlockPos pos) {
@@ -86,7 +86,7 @@
          public BlockState rotate(final Rotation rotation) {
              return this.getBlock().rotate(this.asState(), rotation);
          }
-@@ -651,6 +_,8 @@
+@@ -650,6 +_,8 @@
          }
  
          public PushReaction getPistonPushReaction() {
@@ -95,7 +95,7 @@
              return this.pushReaction;
          }
  
-@@ -1005,7 +_,7 @@
+@@ -1004,7 +_,7 @@
          private BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn = (state, level, pos, entityType) -> state.isFaceSturdy(
                  level, pos, Direction.UP
              )

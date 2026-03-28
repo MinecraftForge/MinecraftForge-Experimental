@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/LevelSettings.java
 +++ b/net/minecraft/world/level/LevelSettings.java
-@@ -7,8 +_,12 @@
+@@ -6,8 +_,12 @@
  import net.minecraft.world.Difficulty;
  
  public record LevelSettings(
@@ -12,12 +12,12 @@
 +    }
 +
      public static LevelSettings parse(final Dynamic<?> input, final WorldDataConfiguration loadConfig) {
-         GameType gametype = GameType.byId(input.get("GameType").asInt(0));
+         GameType gameType = GameType.byId(input.get("GameType").asInt(0));
          return new LevelSettings(
-@@ -16,12 +_,13 @@
-             gametype,
+@@ -15,12 +_,13 @@
+             gameType,
              input.get("difficulty_settings").read(LevelSettings.DifficultySettings.CODEC).result().orElse(LevelSettings.DifficultySettings.DEFAULT),
-             input.get("allowCommands").asBoolean(gametype == GameType.CREATIVE),
+             input.get("allowCommands").asBoolean(gameType == GameType.CREATIVE),
 -            loadConfig
 +            loadConfig,
 +            net.minecraftforge.common.ForgeHooks.parseLifecycle(input.get("forgeLifecycle").asString("stable"))
@@ -30,7 +30,7 @@
      }
  
      public LevelSettings withDifficulty(final Difficulty difficulty) {
-@@ -30,7 +_,8 @@
+@@ -29,7 +_,8 @@
              this.gameType,
              new LevelSettings.DifficultySettings(difficulty, this.difficultySettings.hardcore(), this.difficultySettings.locked()),
              this.allowCommands,
@@ -40,7 +40,7 @@
          );
      }
  
-@@ -40,16 +_,21 @@
+@@ -39,16 +_,21 @@
              this.gameType,
              new LevelSettings.DifficultySettings(this.difficultySettings.difficulty(), this.difficultySettings.hardcore(), locked),
              this.allowCommands,

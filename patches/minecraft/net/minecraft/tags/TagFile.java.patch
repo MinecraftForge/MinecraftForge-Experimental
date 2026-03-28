@@ -1,7 +1,7 @@
 --- a/net/minecraft/tags/TagFile.java
 +++ b/net/minecraft/tags/TagFile.java
-@@ -5,11 +_,16 @@
- import com.mojang.serialization.codecs.RecordCodecBuilder.Instance;
+@@ -4,11 +_,16 @@
+ import com.mojang.serialization.codecs.RecordCodecBuilder;
  import java.util.List;
  
 -public record TagFile(List<TagEntry> entries, boolean replace) {

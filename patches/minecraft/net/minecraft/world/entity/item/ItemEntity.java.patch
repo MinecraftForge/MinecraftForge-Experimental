@@ -30,7 +30,7 @@
 @@ -127,6 +_,10 @@
              this.yo = this.getY();
              this.zo = this.getZ();
-             Vec3 vec3 = this.getDeltaMovement();
+             Vec3 oldMovement = this.getDeltaMovement();
 +            var fluidType = this.getMaxHeightFluidType();
 +            if (!fluidType.isAir() && !fluidType.isVanilla() && this.getFluidTypeHeight(fluidType) > 0.1F) {
 +                fluidType.setItemMovement(this);
@@ -40,14 +40,14 @@
              } else if (this.isInLava() && this.getFluidHeight(FluidTags.LAVA) > 0.1F) {
 @@ -151,7 +_,8 @@
                  this.applyEffectsFromBlocks();
-                 float f = 0.98F;
+                 float friction = 0.98F;
                  if (this.onGround()) {
--                    f = this.level().getBlockState(this.getBlockPosBelowThatAffectsMyMovement()).getBlock().getFriction() * 0.98F;
+-                    friction = this.level().getBlockState(this.getBlockPosBelowThatAffectsMyMovement()).getBlock().getFriction() * 0.98F;
 +                    BlockPos groundPos = getBlockPosBelowThatAffectsMyMovement();
-+                    f = this.level().getBlockState(groundPos).getFriction(level(), groundPos, this) * 0.98F;
++                    friction = this.level().getBlockState(groundPos).getFriction(level(), groundPos, this) * 0.98F;
                  }
  
-                 this.setDeltaMovement(this.getDeltaMovement().multiply(f, 0.98, f));
+                 this.setDeltaMovement(this.getDeltaMovement().multiply(friction, 0.98, friction));
 @@ -183,7 +_,16 @@
                  }
              }
@@ -96,19 +96,19 @@
      public void playerTouch(final Player player) {
          if (!this.level().isClientSide()) {
 +            if (this.pickupDelay > 0) return;
-             ItemStack itemstack = this.getItem();
-             Item item = itemstack.getItem();
-             int i = itemstack.getCount();
--            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID())) && player.getInventory().add(itemstack)) {
+             ItemStack itemStack = this.getItem();
+             Item item = itemStack.getItem();
+             int orgCount = itemStack.getCount();
+-            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID())) && player.getInventory().add(itemStack)) {
 +            int hook = net.minecraftforge.event.ForgeEventFactory.onItemPickup(this, player);
 +            if (hook < 0) return;
-+            ItemStack copy = itemstack.copy();
-+            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID())) && (hook == 1 || i <= 0 || player.getInventory().add(itemstack))) {
-+                i = copy.getCount() - itemstack.getCount();
-+                copy.setCount(i);
++            ItemStack copy = itemStack.copy();
++            if (this.pickupDelay == 0 && (this.target == null || this.target.equals(player.getUUID())) && (hook == 1 || orgCount <= 0 || player.getInventory().add(itemStack))) {
++                orgCount = copy.getCount() - itemStack.getCount();
++                copy.setCount(orgCount);
 +                net.minecraftforge.event.ForgeEventFactory.firePlayerItemPickupEvent(player, this, copy);
-                 player.take(this, i);
-                 if (itemstack.isEmpty()) {
+                 player.take(this, orgCount);
+                 if (itemStack.isEmpty()) {
                      this.discard();
 @@ -421,7 +_,7 @@
  

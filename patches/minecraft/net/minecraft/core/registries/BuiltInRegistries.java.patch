@@ -8,20 +8,20 @@
 +        final ResourceKey<? extends Registry<T>> name, R registry, final BuiltInRegistries.RegistryBootstrap<T> loader
      ) {
          Bootstrap.checkBootstrapCalled(() -> "registry " + name.identifier());
-         Identifier identifier = name.identifier();
--        LOADERS.put(identifier, () -> loader.run(registry));
+         Identifier key = name.identifier();
+-        LOADERS.put(key, () -> loader.run(registry));
 +        var maybeWrapped = net.minecraftforge.registries.GameData.getWrapper(name, registry);
 +        registry = maybeWrapped;
-+        LOADERS.put(identifier, () -> loader.run(maybeWrapped));
++        LOADERS.put(key, () -> loader.run(maybeWrapped));
          WRITABLE_REGISTRY.register((ResourceKey)name, registry, RegistrationInfo.BUILT_IN);
          return registry;
      }
 @@ -425,7 +_,7 @@
  
              if (r instanceof DefaultedRegistry) {
-                 Identifier identifier = ((DefaultedRegistry)r).getDefaultKey();
--                Objects.requireNonNull(r.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + identifier);
-+                Objects.requireNonNull(r.getValue(identifier), "Missing default of DefaultedMappedRegistry: " + r.key() + " - " + identifier);
+                 Identifier key = ((DefaultedRegistry)r).getDefaultKey();
+-                Objects.requireNonNull(r.getValue(key), "Missing default of DefaultedMappedRegistry: " + key);
++                Objects.requireNonNull(r.getValue(key), "Missing default of DefaultedMappedRegistry: " + r.key() + " - " + key);
              }
          });
      }

@@ -3,11 +3,11 @@
 @@ -114,8 +_,8 @@
              CrashReport.preload();
              logger = LogUtils.getLogger();
-             s1 = "Bootstrap";
+             stage = "Bootstrap";
 -            Bootstrap.bootStrap();
 -            ClientBootstrap.bootstrap();
 +            net.minecraftforge.fml.loading.BackgroundWaiter.runAndTick(Bootstrap::bootStrap, net.minecraftforge.fml.loading.FMLLoader.progressWindowTick);
 +            net.minecraftforge.fml.loading.BackgroundWaiter.runAndTick(ClientBootstrap::bootstrap, net.minecraftforge.fml.loading.FMLLoader.progressWindowTick);
              GameLoadTimesEvent.INSTANCE.setBootstrapTime(Bootstrap.bootstrapDuration.get());
              Bootstrap.validate();
-             s1 = "Argument parsing";
+             stage = "Argument parsing";

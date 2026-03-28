@@ -1,22 +1,22 @@
 --- a/net/minecraft/world/level/block/MushroomBlock.java
 +++ b/net/minecraft/world/level/block/MushroomBlock.java
-@@ -86,7 +_,7 @@
-         BlockState blockstate = level.getBlockState(blockpos);
-         return blockstate.is(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT)
-             ? true
--            : level.getRawBrightness(pos, 0) < 13 && this.mayPlaceOn(blockstate, level, blockpos);
-+            : level.getRawBrightness(pos, 0) < 13 && blockstate.canSustainPlant(level, blockpos, net.minecraft.core.Direction.UP, this);
+@@ -83,7 +_,7 @@
+     protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
+         BlockPos belowPos = pos.below();
+         BlockState below = level.getBlockState(belowPos);
+-        return below.is(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT) ? true : level.getRawBrightness(pos, 0) < 13 && this.mayPlaceOn(below, level, belowPos);
++        return below.is(BlockTags.OVERRIDES_MUSHROOM_LIGHT_REQUIREMENT) ? true : level.getRawBrightness(pos, 0) < 13 && below.canSustainPlant(level, belowPos, net.minecraft.core.Direction.UP, this);
      }
  
      public boolean growMushroom(final ServerLevel level, final BlockPos pos, final BlockState state, final RandomSource random) {
-@@ -94,8 +_,10 @@
-         if (optional.isEmpty()) {
+@@ -91,8 +_,10 @@
+         if (feature.isEmpty()) {
              return false;
          } else {
-+            var event = net.minecraftforge.event.ForgeEventFactory.blockGrowFeature(level, random, pos, optional.get());
++            var event = net.minecraftforge.event.ForgeEventFactory.blockGrowFeature(level, random, pos, feature.get());
 +            if (event.getResult().isDenied()) return false;
              level.removeBlock(pos, false);
--            if (optional.get().value().place(level, level.getChunkSource().getGenerator(), random, pos)) {
+-            if (feature.get().value().place(level, level.getChunkSource().getGenerator(), random, pos)) {
 +            if (event.getFeature().value().place(level, level.getChunkSource().getGenerator(), random, pos)) {
                  return true;
              } else {

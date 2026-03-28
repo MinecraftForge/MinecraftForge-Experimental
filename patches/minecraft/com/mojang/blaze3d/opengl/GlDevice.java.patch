@@ -24,31 +24,39 @@
 +    @Override
 +    public GpuTexture createTexture(@Nullable String label, @GpuTexture.Usage final int usage, final TextureFormat format, final int width, final int height, final int depthOrLayers, final int mipLevels, boolean stencil) {
          GlStateManager.clearGlErrors();
-         int i = GlStateManager._genTexture();
+         int id = GlStateManager._genTexture();
          if (label == null) {
-@@ -169,14 +_,14 @@
-             for (int k : GlConst.CUBEMAP_TARGETS) {
-                 for (int l = 0; l < mipLevels; l++) {
+@@ -171,12 +_,12 @@
                      GlStateManager._texImage2D(
--                        k, l, GlConst.toGlInternalId(format), width >> l, height >> l, 0, GlConst.toGlExternalId(format), GlConst.toGlType(format), null
-+                        k, l, GlConst.toGlInternalId(format, stencil), width >> l, height >> l, 0, GlConst.toGlExternalId(format, stencil), GlConst.toGlType(format, stencil), null
+                         cubeTarget,
+                         i,
+-                        GlConst.toGlInternalId(format),
++                        GlConst.toGlInternalId(format, stencil),
+                         width >> i,
+                         height >> i,
+                         0,
+-                        GlConst.toGlExternalId(format),
+-                        GlConst.toGlType(format),
++                        GlConst.toGlExternalId(format, stencil),
++                        GlConst.toGlType(format, stencil),
+                         null
                      );
                  }
-             }
+@@ -184,7 +_,7 @@
          } else {
-             for (int i1 = 0; i1 < mipLevels; i1++) {
+             for (int i = 0; i < mipLevels; i++) {
                  GlStateManager._texImage2D(
--                    j, i1, GlConst.toGlInternalId(format), width >> i1, height >> i1, 0, GlConst.toGlExternalId(format), GlConst.toGlType(format), null
-+                    j, i1, GlConst.toGlInternalId(format, stencil), width >> i1, height >> i1, 0, GlConst.toGlExternalId(format, stencil), GlConst.toGlType(format, stencil), null
+-                    target, i, GlConst.toGlInternalId(format), width >> i, height >> i, 0, GlConst.toGlExternalId(format), GlConst.toGlType(format), null
++                    target, i, GlConst.toGlInternalId(format, stencil), width >> i, height >> i, 0, GlConst.toGlExternalId(format, stencil), GlConst.toGlType(format, stencil), null
                  );
              }
          }
-@@ -187,7 +_,7 @@
-         } else if (j1 != 0) {
-             throw new IllegalStateException("OpenGL error " + j1);
+@@ -195,7 +_,7 @@
+         } else if (error != 0) {
+             throw new IllegalStateException("OpenGL error " + error);
          } else {
--            GlTexture gltexture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, i);
-+            GlTexture gltexture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, i, stencil);
-             this.debugLabels.applyLabel(gltexture);
-             return gltexture;
+-            GlTexture texture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, id);
++            GlTexture texture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, id, stencil);
+             this.debugLabels.applyLabel(texture);
+             return texture;
          }

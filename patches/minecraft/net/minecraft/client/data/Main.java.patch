@@ -1,22 +1,22 @@
 --- a/net/minecraft/client/data/Main.java
 +++ b/net/minecraft/client/data/Main.java
 @@ -28,13 +_,18 @@
-         OptionSpec<Void> optionspec1 = optionparser.accepts("client", "Include client generators");
-         OptionSpec<Void> optionspec2 = optionparser.accepts("all", "Include all generators");
-         OptionSpec<String> optionspec3 = optionparser.accepts("output", "Output folder").withRequiredArg().defaultsTo("generated");
-+        OptionSpec<String> inputSpec = optionparser.accepts("input", "Input folder").withRequiredArg();
-+        var loader = net.minecraftforge.data.loading.DatagenModLoader.setup(optionparser, true);
-         OptionSet optionset = optionparser.parse(args);
--        if (!optionset.has(optionspec) && optionset.hasOptions()) {
-+        if (!optionset.has(optionspec) && optionset.hasOptions() && loader.hasArgs(optionset)) {
-+            var input = optionset.valuesOf(inputSpec).stream().map(Paths::get).toList();
-             Path path = Paths.get(optionspec3.value(optionset));
-             boolean flag = optionset.has(optionspec2);
-             boolean flag1 = flag || optionset.has(optionspec1);
+         OptionSpec<Void> clientOption = parser.accepts("client", "Include client generators");
+         OptionSpec<Void> allOption = parser.accepts("all", "Include all generators");
+         OptionSpec<String> outputOption = parser.accepts("output", "Output folder").withRequiredArg().defaultsTo("generated");
++        OptionSpec<String> inputSpec = parser.accepts("input", "Input folder").withRequiredArg();
++        var loader = net.minecraftforge.data.loading.DatagenModLoader.setup(parser, true);
+         OptionSet optionSet = parser.parse(args);
+-        if (!optionSet.has(helpOption) && optionSet.hasOptions()) {
++        if (!optionSet.has(helpOption) && optionSet.hasOptions() && loader.hasArgs(optionSet)) {
++            var input = optionSet.valuesOf(inputSpec).stream().map(Paths::get).toList();
+             Path output = Paths.get(outputOption.value(optionSet));
+             boolean allOptions = optionSet.has(allOption);
+             boolean client = allOptions || optionSet.has(clientOption);
              Bootstrap.bootStrap();
              ClientBootstrap.bootstrap();
-+            if (!loader.run(optionset, path, input, flag, flag1, flag, flag))
++            if (!loader.run(optionSet, output, input, allOptions, client, allOptions, allOptions))
 +                return;
-             DataGenerator datagenerator = new DataGenerator.Cached(path, SharedConstants.getCurrentVersion(), true);
-             addClientProviders(datagenerator, flag1);
-             datagenerator.run();
+             DataGenerator generator = new DataGenerator.Cached(output, SharedConstants.getCurrentVersion(), true);
+             addClientProviders(generator, client);
+             generator.run();

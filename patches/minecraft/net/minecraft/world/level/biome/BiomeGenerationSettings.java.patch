@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/biome/BiomeGenerationSettings.java
 +++ b/net/minecraft/world/level/biome/BiomeGenerationSettings.java
-@@ -93,6 +_,17 @@
+@@ -92,6 +_,17 @@
          protected final List<Holder<ConfiguredWorldCarver<?>>> carvers = new ArrayList<>();
          protected final List<List<Holder<PlacedFeature>>> features = new ArrayList<>();
  
@@ -18,7 +18,7 @@
          public BiomeGenerationSettings.PlainBuilder addFeature(final GenerationStep.Decoration step, final Holder<PlacedFeature> feature) {
              return this.addFeature(step.ordinal(), feature);
          }
-@@ -101,6 +_,11 @@
+@@ -100,6 +_,11 @@
              this.addFeatureStepsUpTo(index);
              this.features.get(index).add(feature);
              return this;

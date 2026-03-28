@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/storage/LevelStorageSource.java
 +++ b/net/minecraft/world/level/storage/LevelStorageSource.java
-@@ -571,6 +_,11 @@
-             return dynamic;
+@@ -572,6 +_,11 @@
+             return unfixedDataTag;
          }
  
 +        public CompoundTag getDataTagRaw(final boolean useFallback) throws IOException {
@@ -11,16 +11,16 @@
 +
          public Dynamic<?> getUnfixedDataTag(final boolean useFallback) throws IOException {
              this.checkLock();
-             Path path = this.getDataFile(useFallback);
-@@ -590,6 +_,7 @@
-             CompoundTag compoundtag = levelData.createTag(singleplayerUUID);
-             CompoundTag compoundtag1 = new CompoundTag();
-             compoundtag1.put("Data", compoundtag);
-+            net.minecraftforge.common.ForgeHooks.writeAdditionalLevelSaveData(levelData, compoundtag1);
-             this.saveLevelData(compoundtag1);
+             Path dataFile = this.getDataFile(useFallback);
+@@ -591,6 +_,7 @@
+             CompoundTag dataTag = levelData.createTag(singleplayerUUID);
+             CompoundTag root = new CompoundTag();
+             root.put("Data", dataTag);
++            net.minecraftforge.common.ForgeHooks.writeAdditionalLevelSaveData(levelData, root);
+             this.saveLevelData(root);
          }
  
-@@ -616,6 +_,10 @@
+@@ -617,6 +_,10 @@
  
          public Optional<Path> getIconFile() {
              return !this.lock.isValid() ? Optional.empty() : Optional.of(this.levelDirectory.iconFile());

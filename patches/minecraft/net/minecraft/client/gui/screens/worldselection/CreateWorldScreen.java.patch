@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/gui/screens/worldselection/CreateWorldScreen.java
 +++ b/net/minecraft/client/gui/screens/worldselection/CreateWorldScreen.java
-@@ -177,6 +_,7 @@
-         WorldDataConfiguration worlddataconfiguration = SharedConstants.IS_RUNNING_IN_IDE
+@@ -174,6 +_,7 @@
+         WorldDataConfiguration dataConfig = SharedConstants.IS_RUNNING_IN_IDE
              ? new WorldDataConfiguration(new DataPackConfig(List.of("vanilla", "tests"), List.of()), FeatureFlags.DEFAULT_FLAGS)
              : WorldDataConfiguration.DEFAULT;
-+        net.minecraftforge.event.ForgeEventFactory.addPackFindersServer(packrepository::addPackFinder);
-         WorldLoader.InitConfig worldloader$initconfig = createDefaultLoadConfig(packrepository, worlddataconfiguration);
-         CompletableFuture<WorldCreationContext> completablefuture = WorldLoader.load(
-             worldloader$initconfig,
-@@ -520,7 +_,7 @@
++        net.minecraftforge.event.ForgeEventFactory.addPackFindersServer(vanillaOnlyPackRepository::addPackFinder);
+         WorldLoader.InitConfig loadConfig = createDefaultLoadConfig(vanillaOnlyPackRepository, dataConfig);
+         CompletableFuture<WorldCreationContext> loadResult = WorldLoader.load(
+             loadConfig,
+@@ -509,7 +_,7 @@
                                          if (retry) {
                                              onAbort.accept(this.uiState.getSettings().dataConfiguration());
                                          } else {
@@ -17,10 +17,10 @@
                                          }
                                      },
                                      Component.translatable("dataPack.validation.failed"),
-@@ -634,6 +_,7 @@
-         if (path != null) {
+@@ -623,6 +_,7 @@
+         if (dataPackDir != null) {
              if (this.tempDataPackRepository == null) {
-                 this.tempDataPackRepository = ServerPacksSource.createPackRepository(path, this.packValidator);
+                 this.tempDataPackRepository = ServerPacksSource.createPackRepository(dataPackDir, this.packValidator);
 +                net.minecraftforge.resource.ResourcePackLoader.loadResourcePacks(this.tempDataPackRepository, false);
                  this.tempDataPackRepository.reload();
              }

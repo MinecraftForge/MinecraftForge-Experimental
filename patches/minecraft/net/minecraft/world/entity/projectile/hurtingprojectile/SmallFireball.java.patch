@@ -2,10 +2,10 @@
 +++ b/net/minecraft/world/entity/projectile/hurtingprojectile/SmallFireball.java
 @@ -51,7 +_,7 @@
          super.onHitBlock(hitResult);
-         if (this.level() instanceof ServerLevel serverlevel) {
-             Entity entity = this.getOwner();
--            if (!(entity instanceof Mob) || serverlevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+            if (!(entity instanceof Mob) || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, entity)) {
-                 BlockPos blockpos = hitResult.getBlockPos().relative(hitResult.getDirection());
-                 if (this.level().isEmptyBlock(blockpos)) {
-                     this.level().setBlockAndUpdate(blockpos, BaseFireBlock.getState(this.level(), blockpos));
+         if (this.level() instanceof ServerLevel serverLevel) {
+             Entity owner = this.getOwner();
+-            if (!(owner instanceof Mob) || serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
++            if (!(owner instanceof Mob) || net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverLevel, owner)) {
+                 BlockPos pos = hitResult.getBlockPos().relative(hitResult.getDirection());
+                 if (this.level().isEmptyBlock(pos)) {
+                     this.level().setBlockAndUpdate(pos, BaseFireBlock.getState(this.level(), pos));

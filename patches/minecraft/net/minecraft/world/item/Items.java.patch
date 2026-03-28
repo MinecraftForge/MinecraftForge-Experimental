@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/Items.java
 +++ b/net/minecraft/world/item/Items.java
-@@ -2359,7 +_,25 @@
+@@ -2358,7 +_,25 @@
      }
  
      private static Item registerBlock(final Block block, final Block... alternatives) {
@@ -25,14 +25,14 @@
 +            };
 +        });
  
-         for (Block blockx : alternatives) {
-             Item.BY_BLOCK.put(blockx, item);
-@@ -2402,10 +_,6 @@
+         for (Block alternative : alternatives) {
+             Item.BY_BLOCK.put(alternative, item);
+@@ -2401,10 +_,6 @@
  
      private static Item registerItem(final ResourceKey<Item> key, final Function<Item.Properties, Item> itemFactory, final Item.Properties properties) {
          Item item = itemFactory.apply(properties.setId(key));
--        if (item instanceof BlockItem blockitem) {
--            blockitem.registerBlocks(Item.BY_BLOCK, item);
+-        if (item instanceof BlockItem blockItem) {
+-            blockItem.registerBlocks(Item.BY_BLOCK, item);
 -        }
 -
          return Registry.register(BuiltInRegistries.ITEM, key, item);

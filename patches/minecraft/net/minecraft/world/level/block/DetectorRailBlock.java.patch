@@ -12,16 +12,16 @@
      }
  
 @@ -154,7 +_,10 @@
-                 return list.get(0).getCommandBlock().getSuccessCount();
+                 return commandBlocks.get(0).getCommandBlock().getSuccessCount();
              }
  
--            List<AbstractMinecart> list1 = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, EntitySelector.CONTAINER_ENTITY_SELECTOR);
+-            List<AbstractMinecart> entities = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, EntitySelector.CONTAINER_ENTITY_SELECTOR);
 +            List<AbstractMinecart> carts = this.getInteractingMinecartOfType(level, pos, AbstractMinecart.class, e -> e.isAlive());
 +            if (!carts.isEmpty() && carts.get(0).getComparatorLevel() > -1) return carts.get(0).getComparatorLevel();
-+            List<AbstractMinecart> list1 = carts.stream().filter(EntitySelector.CONTAINER_ENTITY_SELECTOR).toList();
++            List<AbstractMinecart> entities = carts.stream().filter(EntitySelector.CONTAINER_ENTITY_SELECTOR).toList();
 +
-             if (!list1.isEmpty()) {
-                 return AbstractContainerMenu.getRedstoneSignalFromContainer((Container)list1.get(0));
+             if (!entities.isEmpty()) {
+                 return AbstractContainerMenu.getRedstoneSignalFromContainer((Container)entities.get(0));
              }
 @@ -190,6 +_,6 @@
  

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/equine/AbstractHorse.java
 +++ b/net/minecraft/world/entity/animal/equine/AbstractHorse.java
-@@ -144,6 +_,7 @@
+@@ -143,6 +_,7 @@
          }
  
          this.addBehaviourGoals();
@@ -8,7 +8,7 @@
      }
  
      protected void addBehaviourGoals() {
-@@ -279,16 +_,19 @@
+@@ -278,16 +_,19 @@
  
      @Override
      public boolean causeFallDamage(final double fallDistance, final float damageModifier, final DamageSource damageSource) {
@@ -20,38 +20,38 @@
              this.playSound(this.isBaby() ? SoundEvents.HORSE_LAND_BABY : SoundEvents.HORSE_LAND, 0.4F, 1.0F);
          }
  
--        int i = this.calculateFallDamage(fallDistance, damageModifier);
-+        int i = this.calculateFallDamage(event.getDistance(), event.getDamageMultiplier());
-         if (i <= 0) {
+-        int dmg = this.calculateFallDamage(fallDistance, damageModifier);
++        int dmg = this.calculateFallDamage(event.getDistance(), event.getDamageMultiplier());
+         if (dmg <= 0) {
              return false;
          } else {
-             this.hurt(damageSource, i);
+             this.hurt(damageSource, dmg);
 -            this.propagateFallToPassengers(fallDistance, damageModifier, damageSource);
 +            this.propagateFallToPassengers(event.getDistance(), event.getDamageMultiplier(), damageSource);
              this.playBlockFallSound();
              return true;
          }
-@@ -344,9 +_,9 @@
+@@ -343,9 +_,9 @@
      protected void playStepSound(final BlockPos pos, final BlockState blockState) {
          if (!blockState.liquid()) {
-             BlockState blockstate = this.level().getBlockState(pos.above());
--            SoundType soundtype = blockState.getSoundType();
-+            SoundType soundtype = blockState.getSoundType(level(), pos, this);
-             if (blockstate.is(Blocks.SNOW)) {
--                soundtype = blockstate.getSoundType();
-+                soundtype = blockstate.getSoundType(level(), pos.above(), this);
+             BlockState aboveState = this.level().getBlockState(pos.above());
+-            SoundType soundType = blockState.getSoundType();
++            SoundType soundType = blockState.getSoundType(level(), pos, this);
+             if (aboveState.is(Blocks.SNOW)) {
+-                soundType = aboveState.getSoundType();
++                soundType = aboveState.getSoundType(level(), pos.above(), this);
              }
  
              if (this.isVehicle() && this.canGallop) {
-@@ -778,6 +_,7 @@
-             float f1 = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
-             this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * f * amount, 0.0, 0.4F * f1 * amount));
+@@ -777,6 +_,7 @@
+             float cos = Mth.cos(this.getYRot() * (float) (Math.PI / 180.0));
+             this.setDeltaMovement(this.getDeltaMovement().add(-0.4F * sin * amount, 0.0, 0.4F * cos * amount));
          }
 +        net.minecraftforge.common.ForgeHooks.onLivingJump(this);
      }
  
      protected void playJumpSound() {
-@@ -1028,6 +_,26 @@
+@@ -1027,6 +_,26 @@
  
      public boolean hasInventoryChanged(final Container oldInventory) {
          return this.inventory != oldInventory;

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/crafting/Ingredient.java
 +++ b/net/minecraft/world/item/crafting/Ingredient.java
-@@ -24,18 +_,26 @@
+@@ -23,18 +_,26 @@
  import net.minecraft.world.level.ItemLike;
  
  public class Ingredient implements Predicate<ItemStack>, StackedContents.IngredientInfo<Holder<Item>> {
@@ -33,9 +33,9 @@
          values.unwrap().ifRight(directValues -> {
              if (directValues.isEmpty()) {
                  throw new UnsupportedOperationException("Ingredients can't be empty");
-@@ -107,5 +_,50 @@
+@@ -106,5 +_,50 @@
          } else {
-             return slotdisplay;
+             return inputDisplay;
          }
 +    }
 +

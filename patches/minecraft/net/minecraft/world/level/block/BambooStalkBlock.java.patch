@@ -16,18 +16,18 @@
 -            if (random.nextInt(3) == 0 && level.isEmptyBlock(pos.above()) && level.getRawBrightness(pos.above(), 0) >= 9) {
 +            boolean vanilla = random.nextInt(3) == 0;
 +            if (level.isEmptyBlock(pos.above()) && level.getRawBrightness(pos.above(), 0) >= 9) {
-                 int i = this.getHeightBelowUpToMax(level, pos) + 1;
--                if (i < 16) {
-+                if (i < 16 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, vanilla)) {
-                     this.growBamboo(state, level, pos, random, i);
+                 int height = this.getHeightBelowUpToMax(level, pos) + 1;
+-                if (height < 16) {
++                if (height < 16 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, vanilla)) {
+                     this.growBamboo(state, level, pos, random, height);
 +                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
                  }
              }
          }
-@@ -227,5 +_,11 @@
+@@ -230,5 +_,11 @@
          }
  
-         return i;
+         return height;
 +    }
 +
 +    @Override

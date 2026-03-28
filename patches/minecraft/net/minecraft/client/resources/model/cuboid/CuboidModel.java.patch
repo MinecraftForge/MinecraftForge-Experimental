@@ -23,13 +23,13 @@
      static final Gson GSON = new GsonBuilder()
          .registerTypeAdapter(CuboidModel.class, new CuboidModel.Deserializer())
 @@ -62,8 +_,9 @@
-                 unbakedmodel$guilight = UnbakedModel.GuiLight.getByName(GsonHelper.getAsString(jsonobject, "gui_light"));
+                 guiLight = UnbakedModel.GuiLight.getByName(GsonHelper.getAsString(object, "gui_light"));
              }
  
-+            var forgeData = net.minecraftforge.client.ForgeHooksClient.deserializeBlockModel(jsonobject, context);
-             Identifier identifier = s.isEmpty() ? null : Identifier.parse(s);
--            return new CuboidModel(unbakedgeometry, unbakedmodel$guilight, obool, itemtransforms, textureslots$data, identifier);
-+            return new CuboidModel(unbakedgeometry, unbakedmodel$guilight, obool, itemtransforms, textureslots$data, identifier, forgeData);
++            var forgeData = net.minecraftforge.client.ForgeHooksClient.deserializeBlockModel(object, context);
+             Identifier parentLocation = parentName.isEmpty() ? null : Identifier.parse(parentName);
+-            return new CuboidModel(elements, guiLight, hasAmbientOcclusion, transforms, textureMap, parentLocation);
++            return new CuboidModel(elements, guiLight, hasAmbientOcclusion, transforms, textureMap, parentLocation, forgeData);
          }
  
          private TextureSlots.Data getTextureMap(final JsonObject object) {

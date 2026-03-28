@@ -1,24 +1,24 @@
 --- a/net/minecraft/world/level/material/FlowingFluid.java
 +++ b/net/minecraft/world/level/material/FlowingFluid.java
-@@ -172,7 +_,7 @@
-             BlockState blockstate = level.getBlockState(blockpos);
-             FluidState fluidstate = blockstate.getFluidState();
-             if (fluidstate.getType().isSame(this) && canPassThroughWall(direction, level, pos, state, blockpos, blockstate)) {
--                if (fluidstate.isSource()) {
-+                if (fluidstate.isSource() && net.minecraftforge.event.ForgeEventFactory.canCreateFluidSource(level, blockpos, blockstate, fluidstate.canConvertToSource(level, blockpos))) {
-                     j++;
+@@ -169,7 +_,7 @@
+             BlockState blockState = level.getBlockState(relativePos);
+             FluidState fluidState = blockState.getFluidState();
+             if (fluidState.getType().isSame(this) && canPassThroughWall(direction, level, pos, state, relativePos, blockState)) {
+-                if (fluidState.isSource()) {
++                if (fluidState.isSource() && net.minecraftforge.event.ForgeEventFactory.canCreateFluidSource(level, relativePos, blockState, fluidState.canConvertToSource(level, relativePos))) {
+                     neighbourSources++;
                  }
  
-@@ -180,7 +_,7 @@
+@@ -177,7 +_,7 @@
              }
          }
  
--        if (j >= 2 && this.canConvertToSource(level)) {
-+        if (j >= 2) {
-             BlockState blockstate1 = level.getBlockState(blockpos$mutableblockpos.setWithOffset(pos, Direction.DOWN));
-             FluidState fluidstate1 = blockstate1.getFluidState();
-             if (blockstate1.isSolid() || this.isSourceBlockOfThisType(fluidstate1)) {
-@@ -265,6 +_,15 @@
+-        if (neighbourSources >= 2 && this.canConvertToSource(level)) {
++        if (neighbourSources >= 2) {
+             BlockState belowState = level.getBlockState(mutablePos.setWithOffset(pos, Direction.DOWN));
+             FluidState belowFluid = belowState.getFluidState();
+             if (belowState.isSolid() || this.isSourceBlockOfThisType(belowFluid)) {
+@@ -262,6 +_,15 @@
          return this.getSource().defaultFluidState().setValue(FALLING, falling);
      }
  

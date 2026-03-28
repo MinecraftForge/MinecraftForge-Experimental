@@ -10,31 +10,31 @@
      private static final byte PUMPKIN_FLAG = 16;
      private static final boolean DEFAULT_PUMPKIN = true;
 @@ -95,7 +_,7 @@
-                 this.hurtServer(serverlevel, this.damageSources().onFire(), 1.0F);
+                 this.hurtServer(serverLevel, this.damageSources().onFire(), 1.0F);
              }
  
--            if (!serverlevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+            if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, this)) {
+-            if (!serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
++            if (!net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverLevel, this)) {
                  return;
              }
  
 @@ -106,7 +_,7 @@
-                 int k = Mth.floor(this.getY());
-                 int l = Mth.floor(this.getZ() + (i / 2 % 2 * 2 - 1) * 0.25F);
-                 BlockPos blockpos = new BlockPos(j, k, l);
--                if (this.level().getBlockState(blockpos).isAir() && blockstate.canSurvive(this.level(), blockpos)) {
-+                if (this.level().isEmptyBlock(blockpos) && blockstate.canSurvive(this.level(), blockpos)) {
-                     this.level().setBlockAndUpdate(blockpos, blockstate);
-                     this.level().gameEvent(GameEvent.BLOCK_PLACE, blockpos, GameEvent.Context.of(this, blockstate));
+                 int yy = Mth.floor(this.getY());
+                 int zz = Mth.floor(this.getZ() + (i / 2 % 2 * 2 - 1) * 0.25F);
+                 BlockPos snowPos = new BlockPos(xx, yy, zz);
+-                if (this.level().getBlockState(snowPos).isAir() && snow.canSurvive(this.level(), snowPos)) {
++                if (this.level().isEmptyBlock(snowPos) && snow.canSurvive(this.level(), snowPos)) {
+                     this.level().setBlockAndUpdate(snowPos, snow);
+                     this.level().gameEvent(GameEvent.BLOCK_PLACE, snowPos, GameEvent.Context.of(this, snow));
                  }
 @@ -136,7 +_,7 @@
      @Override
      protected InteractionResult mobInteract(final Player player, final InteractionHand hand) {
-         ItemStack itemstack = player.getItemInHand(hand);
--        if (itemstack.is(Items.SHEARS) && this.readyForShearing()) {
-+        if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) { //Forge: Moved to onSheared
-             if (this.level() instanceof ServerLevel serverlevel) {
-                 this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
+         ItemStack itemStack = player.getItemInHand(hand);
+-        if (itemStack.is(Items.SHEARS) && this.readyForShearing()) {
++        if (false && itemStack.is(Items.SHEARS) && this.readyForShearing()) { //Forge: Moved to onSheared
+             if (this.level() instanceof ServerLevel level) {
+                 this.shear(level, SoundSource.PLAYERS, itemStack);
                  this.gameEvent(GameEvent.SHEAR, player);
 @@ -193,4 +_,17 @@
      public Vec3 getLeashOffset() {

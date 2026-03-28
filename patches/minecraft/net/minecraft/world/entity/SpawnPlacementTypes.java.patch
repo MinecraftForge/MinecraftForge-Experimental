@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/entity/SpawnPlacementTypes.java
 +++ b/net/minecraft/world/entity/SpawnPlacementTypes.java
 @@ -28,7 +_,7 @@
-                 BlockPos blockpos = blockPos.above();
-                 BlockPos blockpos1 = blockPos.below();
-                 BlockState blockstate = level.getBlockState(blockpos1);
--                return !blockstate.isValidSpawn(level, blockpos1, type)
-+                return !blockstate.isValidSpawn(level, blockpos1, this, type)
+                 BlockPos above = blockPos.above();
+                 BlockPos below = blockPos.below();
+                 BlockState belowState = level.getBlockState(below);
+-                return !belowState.isValidSpawn(level, below, type)
++                return !belowState.isValidSpawn(level, below, this, type)
                      ? false
-                     : this.isValidEmptySpawnBlock(level, blockPos, type) && this.isValidEmptySpawnBlock(level, blockpos, type);
+                     : this.isValidEmptySpawnBlock(level, blockPos, type) && this.isValidEmptySpawnBlock(level, above, type);
              } else {

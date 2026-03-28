@@ -2,10 +2,10 @@
 +++ b/net/minecraft/world/entity/EntityEquipment.java
 @@ -49,7 +_,7 @@
          for (Entry<EquipmentSlot, ItemStack> entry : this.items.entrySet()) {
-             ItemStack itemstack = entry.getValue();
-             if (!itemstack.isEmpty()) {
--                itemstack.inventoryTick(owner.level(), owner, entry.getKey());
-+                itemstack.inventoryTick(owner.level(), owner, entry.getKey(), -1);
+             ItemStack item = entry.getValue();
+             if (!item.isEmpty()) {
+-                item.inventoryTick(owner.level(), owner, entry.getKey());
++                item.inventoryTick(owner.level(), owner, entry.getKey(), -1);
              }
          }
      }

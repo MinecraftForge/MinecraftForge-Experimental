@@ -1,28 +1,28 @@
 --- a/net/minecraft/client/renderer/texture/MipmapGenerator.java
 +++ b/net/minecraft/client/renderer/texture/MipmapGenerator.java
 @@ -122,12 +_,16 @@
-             float f = mipmapStrategy == MipmapStrategy.STRICT_CUTOUT ? 0.3F : 0.5F;
-             float f1 = flag ? alphaTestCoverage(currentMips[0], f, 1.0F) : 0.0F;
+             float cutoutRef = mipmapStrategy == MipmapStrategy.STRICT_CUTOUT ? 0.3F : 0.5F;
+             float originalCoverage = isCutoutMip ? alphaTestCoverage(currentMips[0], cutoutRef, 1.0F) : 0.0F;
  
-+            int maxMipmapLevel = net.minecraftforge.client.ForgeHooksClient.getMaxMipmapLevel(anativeimage[0].getWidth(), anativeimage[0].getHeight());
-             for (int i = 1; i <= newMipLevel; i++) {
-                 if (i < currentMips.length) {
-                     anativeimage[i] = currentMips[i];
++            int maxMipmapLevel = net.minecraftforge.client.ForgeHooksClient.getMaxMipmapLevel(result[0].getWidth(), result[0].getHeight());
+             for (int level = 1; level <= newMipLevel; level++) {
+                 if (level < currentMips.length) {
+                     result[level] = currentMips[level];
                  } else {
-                     NativeImage nativeimage = anativeimage[i - 1];
--                    NativeImage nativeimage1 = new NativeImage(nativeimage.getWidth() >> 1, nativeimage.getHeight() >> 1, false);
+                     NativeImage lastData = result[level - 1];
+-                    NativeImage data = new NativeImage(lastData.getWidth() >> 1, lastData.getHeight() >> 1, false);
 +                    // Forge: Guard against invalid texture size, because we allow generating mipmaps regardless of texture sizes
-+                    NativeImage nativeimage1 = new NativeImage(Math.max(1, nativeimage.getWidth() >> 1), Math.max(1, nativeimage.getHeight() >> 1), false);
-+                    if (i <= maxMipmapLevel) {
++                    NativeImage data = new NativeImage(Math.max(1, lastData.getWidth() >> 1), Math.max(1, lastData.getHeight() >> 1), false);
++                    if (level <= maxMipmapLevel) {
 +
-                     int j = nativeimage1.getWidth();
-                     int k = nativeimage1.getHeight();
+                     int width = data.getWidth();
+                     int height = data.getHeight();
  
 @@ -146,6 +_,7 @@
  
-                             nativeimage1.setPixel(l, i1, j2);
+                             data.setPixel(x, y, color);
                          }
 +                    }
                      }
  
-                     anativeimage[i] = nativeimage1;
+                     result[level] = data;

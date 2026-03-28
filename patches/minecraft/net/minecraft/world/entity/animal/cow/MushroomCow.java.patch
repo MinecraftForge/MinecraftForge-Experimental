@@ -2,12 +2,12 @@
 +++ b/net/minecraft/world/entity/animal/cow/MushroomCow.java
 @@ -114,7 +_,7 @@
  
-             this.playSound(soundevent, 1.0F, 1.0F);
+             this.playSound(milkSound, 1.0F, 1.0F);
              return InteractionResult.SUCCESS;
--        } else if (itemstack.is(Items.SHEARS) && this.readyForShearing()) {
-+        } else if (false && itemstack.is(Items.SHEARS) && this.readyForShearing()) {
-             if (this.level() instanceof ServerLevel serverlevel) {
-                 this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
+-        } else if (itemStack.is(Items.SHEARS) && this.readyForShearing()) {
++        } else if (false && itemStack.is(Items.SHEARS) && this.readyForShearing()) {
+             if (this.level() instanceof ServerLevel level) {
+                 this.shear(level, SoundSource.PLAYERS, itemStack);
                  this.gameEvent(GameEvent.SHEAR, player);
 @@ -170,15 +_,26 @@
  
@@ -42,7 +42,7 @@
 @@ -254,6 +_,15 @@
          }
  
-         return mushroomcow$variant2;
+         return babyVariant;
 +    }
 +
 +    @Override

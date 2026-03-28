@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/npc/villager/VillagerType.java
 +++ b/net/minecraft/world/entity/npc/villager/VillagerType.java
-@@ -80,4 +_,9 @@
+@@ -79,4 +_,9 @@
      public static ResourceKey<VillagerType> byBiome(final Holder<Biome> biome) {
          return biome.unwrapKey().map(BY_BIOME::get).orElse(PLAINS);
      }

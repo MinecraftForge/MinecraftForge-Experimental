@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/SessionSearchTrees.java
 +++ b/net/minecraft/client/multiplayer/SessionSearchTrees.java
-@@ -34,8 +_,8 @@
+@@ -33,8 +_,8 @@
      private static final SessionSearchTrees.Key RECIPE_COLLECTIONS = new SessionSearchTrees.Key();
      public static final SessionSearchTrees.Key CREATIVE_NAMES = new SessionSearchTrees.Key();
      public static final SessionSearchTrees.Key CREATIVE_TAGS = new SessionSearchTrees.Key();
@@ -11,7 +11,7 @@
      private CompletableFuture<SearchTree<RecipeCollection>> recipeSearch = CompletableFuture.completedFuture(SearchTree.empty());
      private final Map<SessionSearchTrees.Key, Runnable> reloaders = new IdentityHashMap<>();
  
-@@ -90,44 +_,52 @@
+@@ -89,44 +_,52 @@
      }
  
      public void updateCreativeTags(final List<ItemStack> items) {
@@ -20,16 +20,16 @@
 -            CREATIVE_TAGS,
 +            entry.getValue(),
              () -> {
--                CompletableFuture<?> completablefuture = this.creativeByTagSearch;
+-                CompletableFuture<?> previous = this.creativeByTagSearch;
 -                this.creativeByTagSearch = CompletableFuture.supplyAsync(
 -                    () -> new IdSearchTree<>(itemStack -> itemStack.tags().map(TagKey::location), items), Util.backgroundExecutor()
 -                );
 +                var tabItems = entry.getKey() == net.minecraft.world.item.CreativeModeTabs.searchTab() ? items : List.copyOf(entry.getKey().getDisplayItems());
-+                CompletableFuture<?> completablefuture = this.creativeSearch.getOrDefault(entry.getValue(), EMPTY);
++                CompletableFuture<?> previous = this.creativeSearch.getOrDefault(entry.getValue(), EMPTY);
 +                this.creativeSearch.put(entry.getValue(), CompletableFuture.supplyAsync(
 +                    () -> new IdSearchTree<>(itemStack -> itemStack.tags().map(TagKey::location), tabItems), Util.backgroundExecutor()
 +                ));
-                 completablefuture.cancel(true);
+                 previous.cancel(true);
              }
          );
      }
@@ -46,14 +46,14 @@
 +            entry.getValue(),
              () -> {
 +                var items = entry.getKey() == net.minecraft.world.item.CreativeModeTabs.searchTab() ? itemStacks : List.copyOf(entry.getKey().getDisplayItems());
-                 Item.TooltipContext item$tooltipcontext = Item.TooltipContext.of(registries);
-                 TooltipFlag tooltipflag = TooltipFlag.Default.NORMAL.asCreative();
--                CompletableFuture<?> completablefuture = this.creativeByNameSearch;
+                 Item.TooltipContext tooltipContext = Item.TooltipContext.of(registries);
+                 TooltipFlag tooltipFlag = TooltipFlag.Default.NORMAL.asCreative();
+-                CompletableFuture<?> previous = this.creativeByNameSearch;
 -                this.creativeByNameSearch = CompletableFuture.supplyAsync(
-+                CompletableFuture<?> completablefuture = this.creativeSearch.getOrDefault(entry.getValue(), EMPTY);
++                CompletableFuture<?> previous = this.creativeSearch.getOrDefault(entry.getValue(), EMPTY);
 +                this.creativeSearch.put(entry.getValue(), CompletableFuture.supplyAsync(
                      () -> new FullTextSearchTree<>(
-                         itemStack -> getTooltipLines(Stream.of(itemStack), item$tooltipcontext, tooltipflag),
+                         itemStack -> getTooltipLines(Stream.of(itemStack), tooltipContext, tooltipFlag),
                          itemStack -> itemStack.typeHolder().unwrapKey().map(ResourceKey::identifier).stream(),
 -                        itemStacks
 +                        items
@@ -61,7 +61,7 @@
                      Util.backgroundExecutor()
 -                );
 +                ));
-                 completablefuture.cancel(true);
+                 previous.cancel(true);
              }
          );
      }

@@ -33,13 +33,13 @@
  
      @Deprecated
 @@ -354,7 +_,9 @@
-         if (this.sleepStatus.areEnoughSleeping(i) && this.sleepStatus.areEnoughDeepSleeping(i, this.players)) {
-             Optional<Holder<WorldClock>> optional = this.dimensionType().defaultClock();
-             if (this.getGameRules().get(GameRules.ADVANCE_TIME) && optional.isPresent()) {
--                this.server.clockManager().moveToTimeMarker(optional.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
-+                long minTime = this.server.clockManager().getTotalTicks(optional.get());
-+                long newTime = this.server.clockManager().getTimeMarker(optional.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
-+                this.server.clockManager().setTotalTicks(optional.get(), net.minecraftforge.event.ForgeEventFactory.onSleepFinished(this, newTime, minTime));
+         if (this.sleepStatus.areEnoughSleeping(percentage) && this.sleepStatus.areEnoughDeepSleeping(percentage, this.players)) {
+             Optional<Holder<WorldClock>> defaultClock = this.dimensionType().defaultClock();
+             if (this.getGameRules().get(GameRules.ADVANCE_TIME) && defaultClock.isPresent()) {
+-                this.server.clockManager().moveToTimeMarker(defaultClock.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
++                long minTime = this.server.clockManager().getTotalTicks(defaultClock.get());
++                long newTime = this.server.clockManager().getTimeMarker(defaultClock.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
++                this.server.clockManager().setTotalTicks(defaultClock.get(), net.minecraftforge.event.ForgeEventFactory.onSleepFinished(this, newTime, minTime));
              }
  
              this.wakeUpAllPlayers();
@@ -48,16 +48,16 @@
                                      }
  
 +                                    if (entity.isRemoved() || entity instanceof net.minecraftforge.entity.PartEntity) return;
-                                     profilerfiller.push("tick");
+                                     profiler.push("tick");
                                      this.guardEntityTick(this::tickNonPassenger, entity);
-                                     profilerfiller.pop();
+                                     profiler.pop();
 @@ -569,6 +_,7 @@
-         BlockPos blockpos = this.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
-         BlockPos blockpos1 = blockpos.below();
-         Biome biome = this.getBiome(blockpos).value();
-+        if (this.isAreaLoaded(blockpos1, 1)) // Forge: check area to avoid loading neighbors in unloaded chunks
-         if (biome.shouldFreeze(this, blockpos1)) {
-             this.setBlockAndUpdate(blockpos1, Blocks.ICE.defaultBlockState());
+         BlockPos topPos = this.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
+         BlockPos belowPos = topPos.below();
+         Biome biome = this.getBiome(topPos).value();
++        if (this.isAreaLoaded(belowPos, 1)) // Forge: check area to avoid loading neighbors in unloaded chunks
+         if (biome.shouldFreeze(this, belowPos)) {
+             this.setBlockAndUpdate(belowPos, Blocks.ICE.defaultBlockState());
          }
 @@ -778,8 +_,8 @@
                  this.server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
@@ -72,19 +72,19 @@
  
 @@ -817,6 +_,7 @@
          entity.tickCount++;
-         profilerfiller.push(entity.typeHolder()::getRegisteredName);
-         profilerfiller.incrementCounter("tickNonPassenger");
+         profiler.push(entity.typeHolder()::getRegisteredName);
+         profiler.incrementCounter("tickNonPassenger");
 +        if (entity.canUpdate())
          entity.tick();
-         profilerfiller.pop();
+         profiler.pop();
  
 @@ -834,6 +_,7 @@
-             ProfilerFiller profilerfiller = Profiler.get();
-             profilerfiller.push(entity.typeHolder()::getRegisteredName);
-             profilerfiller.incrementCounter("tickPassenger");
+             ProfilerFiller profiler = Profiler.get();
+             profiler.push(entity.typeHolder()::getRegisteredName);
+             profiler.incrementCounter("tickPassenger");
 +            if (entity.canUpdate())
              entity.rideTick();
-             profilerfiller.pop();
+             profiler.pop();
  
 @@ -880,6 +_,7 @@
              } else {
@@ -99,11 +99,11 @@
  
      private void addPlayer(final ServerPlayer player) {
 +        if (net.minecraftforge.event.ForgeEventFactory.onEntityJoinLevel(player, this)) return;
-         Entity entity = this.getEntity(player.getUUID());
-         if (entity != null) {
+         Entity existing = this.getEntity(player.getUUID());
+         if (existing != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", player.getUUID());
 @@ -978,7 +_,8 @@
-             this.removePlayerImmediately((ServerPlayer)entity, Entity.RemovalReason.DISCARDED);
+             this.removePlayerImmediately((ServerPlayer)existing, Entity.RemovalReason.DISCARDED);
          }
  
 -        this.entityManager.addNewEntity(player);
@@ -201,7 +201,7 @@
      }
  
 @@ -1214,7 +_,7 @@
-         Explosion.BlockInteraction explosion$blockinteraction = switch (interactionType) {
+         Explosion.BlockInteraction blockInteraction = switch (interactionType) {
              case NONE -> Explosion.BlockInteraction.KEEP;
              case BLOCK -> this.getDestroyType(GameRules.BLOCK_EXPLOSION_DROP_DECAY);
 -            case MOB -> this.getGameRules().get(GameRules.MOB_GRIEFING)
@@ -211,12 +211,12 @@
              case TNT -> this.getDestroyType(GameRules.TNT_EXPLOSION_DROP_DECAY);
 @@ -1222,6 +_,8 @@
          };
-         Vec3 vec3 = new Vec3(x, y, z);
-         ServerExplosion serverexplosion = new ServerExplosion(this, source, damageSource, damageCalculator, vec3, r, fire, explosion$blockinteraction);
-+        if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this, serverexplosion))
+         Vec3 center = new Vec3(x, y, z);
+         ServerExplosion explosion = new ServerExplosion(this, source, damageSource, damageCalculator, center, r, fire, blockInteraction);
++        if (net.minecraftforge.event.ForgeEventFactory.onExplosionStart(this, explosion))
 +            return;
-         int i = serverexplosion.explode();
-         ParticleOptions particleoptions = serverexplosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
+         int blockCount = explosion.explode();
+         ParticleOptions explosionParticle = explosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
  
 @@ -1888,6 +_,11 @@
          return this.getGameRules().get(GameRules.SPAWNER_BLOCKS_WORK);

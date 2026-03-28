@@ -3,14 +3,14 @@
 @@ -31,6 +_,13 @@
      @Override
      public void tick() {
-         ServerLevel serverlevel = (ServerLevel)this.horse.level();
+         ServerLevel level = (ServerLevel)this.horse.level();
 +        // Forge: Trigger the trap in a tick task to avoid crashes when mods add goals to skeleton horses
 +        // (MC-206338/Forge PR #7509)
-+        serverlevel.getServer().schedule(serverlevel.getServer().wrapRunnable(() -> this.convert(serverlevel)));
++        level.getServer().schedule(level.getServer().wrapRunnable(() -> this.convert(level)));
 +    }
 +
-+    private void convert(ServerLevel serverlevel) {
++    private void convert(ServerLevel level) {
 +        if (!this.horse.isAlive()) return;
-         DifficultyInstance difficultyinstance = serverlevel.getCurrentDifficultyAt(this.horse.blockPosition());
+         DifficultyInstance difficulty = level.getCurrentDifficultyAt(this.horse.blockPosition());
          this.horse.setTrap(false);
          this.horse.setTamed(true);

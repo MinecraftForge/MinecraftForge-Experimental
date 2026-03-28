@@ -1,53 +1,53 @@
 --- a/net/minecraft/server/Main.java
 +++ b/net/minecraft/server/Main.java
-@@ -83,6 +_,17 @@
-         OptionSpec<Void> optionspec13 = optionparser.accepts("jfrProfile");
-         OptionSpec<Path> optionspec14 = optionparser.accepts("pidFile").withRequiredArg().withValuesConvertedBy(new PathConverter());
-         OptionSpec<String> optionspec15 = optionparser.nonOptions();
-+        optionparser.accepts("allowUpdates").withRequiredArg().ofType(Boolean.class).defaultsTo(Boolean.TRUE); // Forge: allow mod updates to proceed
-+        optionparser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File(".")); //Forge: Consume this argument, we use it in the launcher, and the client side.
+@@ -82,6 +_,17 @@
+         OptionSpec<Void> jfrProfilingOption = parser.accepts("jfrProfile");
+         OptionSpec<Path> pidFile = parser.accepts("pidFile").withRequiredArg().withValuesConvertedBy(new PathConverter());
+         OptionSpec<String> nonOptions = parser.nonOptions();
++        parser.accepts("allowUpdates").withRequiredArg().ofType(Boolean.class).defaultsTo(Boolean.TRUE); // Forge: allow mod updates to proceed
++        parser.accepts("gameDir").withRequiredArg().ofType(File.class).defaultsTo(new File(".")); //Forge: Consume this argument, we use it in the launcher, and the client side.
 +        final OptionSpec<net.minecraft.core.BlockPos> spawnPosOpt;
 +        OptionSpec<Void> uniqueWorld = null;
 +        boolean gametestEnabled = Boolean.getBoolean("forge.gameTestServer");
 +        if (gametestEnabled) {
-+            spawnPosOpt = optionparser.accepts("spawnPos").withRequiredArg().withValuesConvertedBy(new net.minecraftforge.gametest.BlockPosValueConverter()).defaultsTo(new net.minecraft.core.BlockPos(0, 60, 0));
-+            uniqueWorld = optionparser.accepts("uniqueWorld");
++            spawnPosOpt = parser.accepts("spawnPos").withRequiredArg().withValuesConvertedBy(new net.minecraftforge.gametest.BlockPosValueConverter()).defaultsTo(new net.minecraft.core.BlockPos(0, 60, 0));
++            uniqueWorld = parser.accepts("uniqueWorld");
 +        } else {
 +            spawnPosOpt = null;
 +        }
  
          try {
-             OptionSet optionset = optionparser.parse(args);
-@@ -91,6 +_,14 @@
+             OptionSet options = parser.parse(args);
+@@ -90,6 +_,14 @@
                  return;
              }
  
-+            Path path2 = Paths.get("eula.txt");
-+            Eula eula = new Eula(path2);
++            Path eulaFile = Paths.get("eula.txt");
++            Eula eula = new Eula(eulaFile);
 +
 +            if (!eula.hasAgreedToEULA()) {
 +               LOGGER.info("You need to agree to the EULA in order to run the server. Go to eula.txt for more info.");
 +               return;
 +            }
 +
-             Path path = optionset.valueOf(optionspec14);
-             if (path != null) {
-                 writePidFile(path);
-@@ -105,24 +_,28 @@
+             Path pidFilePath = options.valueOf(pidFile);
+             if (pidFilePath != null) {
+                 writePidFile(pidFilePath);
+@@ -104,24 +_,28 @@
              Bootstrap.validate();
              Util.startTimerHackThread();
-             Path path1 = Paths.get("server.properties");
-+            if (!optionset.has(optionspec1)) {
+             Path settingsFile = Paths.get("server.properties");
++            if (!options.has(initSettings)) {
 +                // Load mods before we load almost anything else anymore. Single spot now. Only loads if they haven't passed the initserver param
 +                net.minecraftforge.server.loading.ServerModLoader.load();
 +            }
-             DedicatedServerSettings dedicatedserversettings = new DedicatedServerSettings(path1);
-             dedicatedserversettings.forceSave();
-             RegionFileVersion.configure(dedicatedserversettings.getProperties().regionFileComression);
--            Path path2 = Paths.get("eula.txt");
--            Eula eula = new Eula(path2);
-             if (optionset.has(optionspec1)) {
-                 LOGGER.info("Initialized '{}' and '{}'", path1.toAbsolutePath(), path2.toAbsolutePath());
+             DedicatedServerSettings settings = new DedicatedServerSettings(settingsFile);
+             settings.forceSave();
+             RegionFileVersion.configure(settings.getProperties().regionFileComression);
+-            Path eulaFile = Paths.get("eula.txt");
+-            Eula eula = new Eula(eulaFile);
+             if (options.has(initSettings)) {
+                 LOGGER.info("Initialized '{}' and '{}'", settingsFile.toAbsolutePath(), eulaFile.toAbsolutePath());
                  return;
              }
  
@@ -56,52 +56,52 @@
 -                return;
 -            }
 -
-             File file1 = new File(optionset.valueOf(optionspec9));
-             Services services = Services.create(new YggdrasilAuthenticationService(Proxy.NO_PROXY), file1);
-             String s = Optional.ofNullable(optionset.valueOf(optionspec10)).orElse(dedicatedserversettings.getProperties().levelName);
+             File universePath = new File(options.valueOf(universe));
+             Services services = Services.create(new YggdrasilAuthenticationService(Proxy.NO_PROXY), universePath);
+             String levelName = Optional.ofNullable(options.valueOf(worldName)).orElse(settings.getProperties().levelName);
 +            // Forge: make each gametest use a timestamped world name
-+            if (uniqueWorld != null && optionset.has(uniqueWorld))
-+                s = "gametest_world\\" + java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss.SSS").format(java.time.LocalDateTime.now());
-+            if (s == null || s.isEmpty() || new File(file1, s).getAbsolutePath().equals(new File(s).getAbsolutePath())) {
-+                LOGGER.error("Invalid world directory specified, must not be null, empty or the same directory as your universe! " + s);
++            if (uniqueWorld != null && options.has(uniqueWorld))
++                levelName = "gametest_world\\" + java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss.SSS").format(java.time.LocalDateTime.now());
++            if (levelName == null || levelName.isEmpty() || new File(universePath, levelName).getAbsolutePath().equals(new File(levelName).getAbsolutePath())) {
++                LOGGER.error("Invalid world directory specified, must not be null, empty or the same directory as your universe! " + levelName);
 +                return;
 +            }
-             LevelStorageSource levelstoragesource = LevelStorageSource.createDefault(file1.toPath());
-             LevelStorageSource.LevelStorageAccess levelstoragesource$levelstorageaccess = levelstoragesource.validateAndCreateAccess(s);
-             Dynamic<?> dynamic;
-@@ -158,6 +_,10 @@
+             LevelStorageSource levelStorageSource = LevelStorageSource.createDefault(universePath.toPath());
+             LevelStorageSource.LevelStorageAccess access = levelStorageSource.validateAndCreateAccess(levelName);
+             Dynamic<?> levelDataTag;
+@@ -157,6 +_,10 @@
  
-             PackRepository packrepository = ServerPacksSource.createPackRepository(levelstoragesource$levelstorageaccess);
+             PackRepository packRepository = ServerPacksSource.createPackRepository(access);
  
-+            if (dynamic != null) {
-+                net.minecraftforge.common.ForgeHooks.readAdditionalLevelSaveData(levelstoragesource$levelstorageaccess, levelstoragesource$levelstorageaccess.getLevelDirectory());
++            if (levelDataTag != null) {
++                net.minecraftforge.common.ForgeHooks.readAdditionalLevelSaveData(access, access.getLevelDirectory());
 +            }
 +
-             WorldStem worldstem;
+             WorldStem worldStem;
              try {
-                 WorldLoader.InitConfig worldloader$initconfig = loadOrCreateConfig(dedicatedserversettings.getProperties(), dynamic, flag1, packrepository);
-@@ -231,6 +_,7 @@
+                 WorldLoader.InitConfig worldLoadConfig = loadOrCreateConfig(settings.getProperties(), levelDataTag, safeModeEnabled, packRepository);
+@@ -219,6 +_,7 @@
                  @Override
                  public void run() {
-                     dedicatedserver.halt(true);
+                     dedicatedServer.halt(true);
 +                    org.apache.logging.log4j.LogManager.shutdown(); // we're manually managing the logging shutdown on the server. Make sure we do it here at the end.
                  }
              };
-             thread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER));
-@@ -266,6 +_,16 @@
-             worldoptions = bonusChest ? dedicatedserverproperties.worldOptions.withBonusChest(true) : dedicatedserverproperties.worldOptions;
-             worlddimensions = dedicatedserverproperties.createDimensions(context.datapackWorldgen());
+             shutdownThread.setUncaughtExceptionHandler(new DefaultUncaughtExceptionHandler(LOGGER));
+@@ -254,6 +_,16 @@
+             worldOptions = bonusChest ? properties.worldOptions.withBonusChest(true) : properties.worldOptions;
+             dimensions = properties.createDimensions(context.datapackWorldgen());
          }
 +
 +        //Forge: Do a write-read-cycle to inject modded dimensions on first start of a dedicated server into its generated world dimensions list.
 +        var dynamicops = net.minecraft.resources.RegistryOps.create(net.minecraft.nbt.NbtOps.INSTANCE, context.datapackWorldgen());
-+        worlddimensions = WorldDimensions.CODEC.encoder()
-+            .encodeStart(dynamicops, worlddimensions)
++        dimensions = WorldDimensions.CODEC.encoder()
++            .encodeStart(dynamicops, dimensions)
 +            .flatMap((writtenPayloadWithModdedDimensions) ->
 +                WorldDimensions.CODEC.decoder().parse(dynamicops, writtenPayloadWithModdedDimensions)
 +            )
 +            .resultOrPartial(LOGGER::error)
-+            .orElse(worlddimensions);
++            .orElse(dimensions);
  
-         WorldDimensions.Complete worlddimensions$complete = worlddimensions.bake(datapackDimensions);
-         Lifecycle lifecycle = worlddimensions$complete.lifecycle().add(context.datapackWorldgen().allRegistriesLifecycle());
+         WorldDimensions.Complete finalDimensions = dimensions.bake(datapackDimensions);
+         Lifecycle lifecycle = finalDimensions.lifecycle().add(context.datapackWorldgen().allRegistriesLifecycle());

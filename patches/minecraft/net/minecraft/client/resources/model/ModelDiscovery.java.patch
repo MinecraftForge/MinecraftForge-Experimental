@@ -15,20 +15,20 @@
          @Override
          public String debugName() {
              return this.id.toString();
-@@ -233,14 +_,14 @@
-             QuadCollection quadcollection = this.getSlot(KEY_DEFAULT_GEOMETRY);
-             return quadcollection != null
-                 ? quadcollection
--                : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this));
-+                : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this, getContext()));
+@@ -229,14 +_,14 @@
+ 
+         private QuadCollection bakeDefaultState(final TextureSlots textureSlots, final ModelBaker baker, final ModelState state) {
+             QuadCollection result = this.getSlot(KEY_DEFAULT_GEOMETRY);
+-            return result != null ? result : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this));
++            return result != null ? result : this.updateSlot(KEY_DEFAULT_GEOMETRY, this.getTopGeometry().bake(textureSlots, baker, state, this, getContext()));
          }
  
          @Override
          public QuadCollection bakeTopGeometry(final TextureSlots textureSlots, final ModelBaker baker, final ModelState state) {
              return state == BlockModelRotation.IDENTITY ? this.bakeDefaultState(textureSlots, baker, state) : this.modelBakeCache.computeIfAbsent(state, s -> {
-                 UnbakedGeometry unbakedgeometry = this.getTopGeometry();
--                return unbakedgeometry.bake(textureSlots, baker, s, this);
-+                return unbakedgeometry.bake(textureSlots, baker, s, this, getContext());
+                 UnbakedGeometry topGeometry = this.getTopGeometry();
+-                return topGeometry.bake(textureSlots, baker, s, this);
++                return topGeometry.bake(textureSlots, baker, s, this, getContext());
              });
          }
      }

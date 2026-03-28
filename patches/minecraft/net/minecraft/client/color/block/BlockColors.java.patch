@@ -1,15 +1,15 @@
 --- a/net/minecraft/client/color/block/BlockColors.java
 +++ b/net/minecraft/client/color/block/BlockColors.java
 @@ -45,6 +_,7 @@
-         blockcolors.register(List.of(BlockTintSources.constant(-2046180)), Blocks.ATTACHED_MELON_STEM, Blocks.ATTACHED_PUMPKIN_STEM);
-         blockcolors.register(List.of(BlockTintSources.stem()), Blocks.MELON_STEM, Blocks.PUMPKIN_STEM);
-         blockcolors.register(List.of(BlockTintSources.constant(-9321636, -14647248)), Blocks.LILY_PAD);
-+        net.minecraftforge.client.ForgeHooksClient.onBlockColorsInit(blockcolors);
-         return blockcolors;
+         colors.register(List.of(BlockTintSources.constant(-2046180)), Blocks.ATTACHED_MELON_STEM, Blocks.ATTACHED_PUMPKIN_STEM);
+         colors.register(List.of(BlockTintSources.stem()), Blocks.MELON_STEM, Blocks.PUMPKIN_STEM);
+         colors.register(List.of(BlockTintSources.constant(-9321636, -14647248)), Blocks.LILY_PAD);
++        net.minecraftforge.client.ForgeHooksClient.onBlockColorsInit(colors);
+         return colors;
      }
  
 @@ -57,6 +_,8 @@
-         return layer >= list.size() ? null : list.get(layer);
+         return layer >= layers.size() ? null : layers.get(layer);
      }
  
 +    /** @deprecated Register via {@link net.minecraftforge.client.event.RegisterColorHandlersEvent.Block} */

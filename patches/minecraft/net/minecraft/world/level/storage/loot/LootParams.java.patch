@@ -18,8 +18,8 @@
          }
 @@ -92,6 +_,10 @@
          public LootParams create(final ContextKeySet contextKeySet) {
-             ContextMap contextmap = this.params.create(contextKeySet);
-             return new LootParams(this.level, contextmap, this.dynamicDrops, this.luck);
+             ContextMap keySet = this.params.create(contextKeySet);
+             return new LootParams(this.level, keySet, this.dynamicDrops, this.luck);
 +        }
 +
 +        public LootParams create() {

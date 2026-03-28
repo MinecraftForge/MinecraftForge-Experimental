@@ -30,9 +30,9 @@
                  );
              }
  
-+            map.putAll(this.texturesWithSamplers);
++            result.putAll(this.texturesWithSamplers);
 +
-             return map;
+             return result;
          }
      }
 @@ -150,6 +_,7 @@

@@ -1,30 +1,30 @@
 --- a/net/minecraft/client/renderer/texture/SpriteLoader.java
 +++ b/net/minecraft/client/renderer/texture/SpriteLoader.java
 @@ -72,7 +_,7 @@
-             int j1 = Math.min(j, k);
-             int k1 = Mth.log2(j1);
-             int l1;
--            if (k1 < maxMipmapLevels) {
-+            if (k1 < maxMipmapLevels && net.minecraftforge.common.ForgeConfig.CLIENT.allowMipmapLowering()) { // Forge: Do not lower the mipmap level
-                 LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", this.location, maxMipmapLevels, k1, j1);
-                 l1 = k1;
+             int minSize = Math.min(minTexelSize, lowestOneBit);
+             int minPowerOfTwo = Mth.log2(minSize);
+             int mipLevel;
+-            if (minPowerOfTwo < maxMipmapLevels) {
++            if (minPowerOfTwo < maxMipmapLevels && net.minecraftforge.common.ForgeConfig.CLIENT.allowMipmapLowering()) { // Forge: Do not lower the mipmap level
+                 LOGGER.warn("{}: dropping miplevel from {} to {}, because of minimum power of two: {}", this.location, maxMipmapLevels, minPowerOfTwo, minSize);
+                 mipLevel = minPowerOfTwo;
              } else {
-@@ -130,7 +_,8 @@
+@@ -132,7 +_,8 @@
          final Executor taskExecutor,
          final Set<MetadataSectionType<?>> additionalMetadata
      ) {
--        SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(additionalMetadata);
+-        SpriteResourceLoader spriteResourceLoader = SpriteResourceLoader.create(additionalMetadata);
 +        var sections = net.minecraftforge.client.ForgeHooksClient.getAtlastMetadataSections(atlasInfoLocation, additionalMetadata);
-+        SpriteResourceLoader spriteresourceloader = SpriteResourceLoader.create(sections);
++        SpriteResourceLoader spriteResourceLoader = SpriteResourceLoader.create(sections);
          return CompletableFuture.<List<SpriteSource.Loader>>supplyAsync(() -> SpriteSourceList.load(manager, atlasInfoLocation).list(manager), taskExecutor)
-             .thenCompose(sprites -> runSpriteSuppliers(spriteresourceloader, (List<SpriteSource.Loader>)sprites, taskExecutor))
+             .thenCompose(sprites -> runSpriteSuppliers(spriteResourceLoader, (List<SpriteSource.Loader>)sprites, taskExecutor))
              .thenApply(resources -> this.stitch((List<SpriteContents>)resources, maxMipmapLevels, taskExecutor));
-@@ -139,7 +_,7 @@
+@@ -141,7 +_,7 @@
      private Map<Identifier, TextureAtlasSprite> getStitchedSprites(final Stitcher<SpriteContents> stitcher, final int atlasWidth, final int atlasHeight) {
-         Map<Identifier, TextureAtlasSprite> map = new HashMap<>();
+         Map<Identifier, TextureAtlasSprite> result = new HashMap<>();
          stitcher.gatherSprites(
--            (contents, x, y, padding) -> map.put(contents.name(), new TextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
-+            (contents, x, y, padding) -> map.put(contents.name(), net.minecraftforge.client.ForgeHooksClient.loadTextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
+-            (contents, x, y, padding) -> result.put(contents.name(), new TextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
++            (contents, x, y, padding) -> result.put(contents.name(), net.minecraftforge.client.ForgeHooksClient.loadTextureAtlasSprite(this.location, contents, atlasWidth, atlasHeight, x, y, padding))
          );
-         return map;
+         return result;
      }

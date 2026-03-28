@@ -11,9 +11,9 @@
          return ImmutableSet.copyOf(block.getStateDefinition().getPossibleStates());
 @@ -95,7 +_,6 @@
      ) {
-         PoiType poitype = new PoiType(matchingStates, maxTickets, validRange);
-         Registry.register(registry, id, poitype);
+         PoiType value = new PoiType(matchingStates, maxTickets, validRange);
+         Registry.register(registry, id, value);
 -        registerBlockStates(registry.getOrThrow(id), matchingStates);
-         return poitype;
+         return value;
      }
  

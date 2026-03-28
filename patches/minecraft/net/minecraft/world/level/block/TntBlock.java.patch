@@ -38,8 +38,8 @@
  
 +    @Deprecated //Forge: Prefer using IForgeBlock#onCaughtFire
      private static boolean prime(final Level level, final BlockPos pos, final @Nullable LivingEntity source) {
-         if (level instanceof ServerLevel serverlevel && serverlevel.getGameRules().get(GameRules.TNT_EXPLODES)) {
-             PrimedTnt primedtnt = new PrimedTnt(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, source);
+         if (level instanceof ServerLevel serverLevel && serverLevel.getGameRules().get(GameRules.TNT_EXPLODES)) {
+             PrimedTnt tnt = new PrimedTnt(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, source);
 @@ -110,7 +_,7 @@
          if (!itemStack.is(Items.FLINT_AND_STEEL) && !itemStack.is(Items.FIRE_CHARGE)) {
              return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
@@ -50,12 +50,12 @@
                  Item item = itemStack.getItem();
                  if (itemStack.is(Items.FLINT_AND_STEEL)) {
 @@ -136,7 +_,7 @@
-             Entity entity = projectile.getOwner();
+             Entity owner = projectile.getOwner();
              if (projectile.isOnFire()
-                 && projectile.mayInteract(serverlevel, blockpos)
--                && prime(level, blockpos, entity instanceof LivingEntity ? (LivingEntity)entity : null)) {
-+                && onCaughtFire(state, level, blockpos, null, entity instanceof LivingEntity ? (LivingEntity)entity : null)) {
-                 level.removeBlock(blockpos, false);
+                 && projectile.mayInteract(serverLevel, pos)
+-                && prime(level, pos, owner instanceof LivingEntity ? (LivingEntity)owner : null)) {
++                && onCaughtFire(state, level, pos, null, owner instanceof LivingEntity livingOwner ? livingOwner : null)) {
+                 level.removeBlock(pos, false);
              }
          }
 @@ -150,5 +_,9 @@

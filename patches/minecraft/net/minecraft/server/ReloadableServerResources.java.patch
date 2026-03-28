@@ -26,8 +26,8 @@
                              );
                              return SimpleReloadInstance.create(
                                      resourceManager,
--                                    reloadableserverresources.listeners(),
-+                                    net.minecraftforge.event.ForgeEventFactory.onResourceReload(reloadableserverresources, fullRegistries.lookupWithUpdatedTags(), reloadableserverresources.listeners()),
+-                                    result.listeners(),
++                                    net.minecraftforge.event.ForgeEventFactory.onResourceReload(result, fullRegistries.lookupWithUpdatedTags(), result.listeners()),
                                      backgroundExecutor,
                                      mainThreadExecutor,
                                      DATA_RELOAD_INITIAL_TASK,

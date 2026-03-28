@@ -11,7 +11,7 @@
      @Override
      public void generate(final BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
          this.generate();
-         Set<ResourceKey<LootTable>> set = new HashSet<>();
+         Set<ResourceKey<LootTable>> seen = new HashSet<>();
  
 -        for (Block block : BuiltInRegistries.BLOCK) {
 +        for (Block block : getKnownBlocks()) {

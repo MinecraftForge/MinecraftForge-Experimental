@@ -16,11 +16,11 @@
      }
  
      private static void forAllKeyMappings(final InputConstants.Key key, final Consumer<KeyMapping> operation) {
--        List<KeyMapping> list = MAP.get(key);
-+        List<KeyMapping> list = MAP.getAll(key);
-         if (list != null && !list.isEmpty()) {
-             for (KeyMapping keymapping : list) {
-                 operation.accept(keymapping);
+-        List<KeyMapping> keyMappings = MAP.get(key);
++        List<KeyMapping> keyMappings = MAP.getAll(key);
+         if (keyMappings != null && !keyMappings.isEmpty()) {
+             for (KeyMapping keyMapping : keyMappings) {
+                 operation.accept(keyMapping);
 @@ -106,7 +_,7 @@
      }
  

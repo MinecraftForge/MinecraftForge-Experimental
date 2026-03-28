@@ -1,10 +1,10 @@
 --- a/net/minecraft/client/Screenshot.java
 +++ b/net/minecraft/client/Screenshot.java
-@@ -45,6 +_,13 @@
-                     file2 = new File(file1, forceName);
+@@ -44,6 +_,13 @@
+                     file = new File(picDir, forceName);
                  }
  
-+                var event = new net.minecraftforge.client.event.ScreenshotEvent(image, file2);
++                var event = new net.minecraftforge.client.event.ScreenshotEvent(image, file);
 +                if (net.minecraftforge.client.event.ScreenshotEvent.BUS.post(event)) {
 +                    callback.accept(event.getCancelMessage());
 +                    return;
@@ -14,19 +14,19 @@
                  Util.ioPool()
                      .execute(
                          () -> {
-@@ -52,10 +_,13 @@
-                                 NativeImage nativeimage = image;
+@@ -51,10 +_,13 @@
+                                 NativeImage twrVar0$ = image;
  
                                  try {
--                                    image.writeToFile(file2);
--                                    Component component = Component.literal(file2.getName())
+-                                    image.writeToFile(file);
+-                                    Component component = Component.literal(file.getName())
 +                                    image.writeToFile(outputFile);
 +                                    Component component = Component.literal(outputFile.getName())
                                          .withStyle(ChatFormatting.UNDERLINE)
-                                         .withStyle(s -> s.withClickEvent(new ClickEvent.OpenFile(file2.getAbsoluteFile())));
+                                         .withStyle(s -> s.withClickEvent(new ClickEvent.OpenFile(file.getAbsoluteFile())));
 +                                    if (event.getResultMessage() != null)
 +                                        callback.accept(event.getResultMessage());
 +                                    else
                                      callback.accept(Component.translatable("screenshot.success", component));
-                                 } catch (Throwable throwable1) {
+                                 } catch (Throwable var7) {
                                      if (image != null) {

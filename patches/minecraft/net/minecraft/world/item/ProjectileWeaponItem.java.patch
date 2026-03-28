@@ -2,27 +2,27 @@
 +++ b/net/minecraft/world/item/ProjectileWeaponItem.java
 @@ -95,6 +_,7 @@
      ) {
-         ArrowItem arrowitem = projectile.getItem() instanceof ArrowItem arrowitem1 ? arrowitem1 : (ArrowItem)Items.ARROW;
-         AbstractArrow abstractarrow = arrowitem.createArrow(level, projectile, shooter, weapon);
-+        abstractarrow = customArrow(abstractarrow);
+         ArrowItem arrowItem = projectile.getItem() instanceof ArrowItem arrow ? arrow : (ArrowItem)Items.ARROW;
+         AbstractArrow arrowx = arrowItem.createArrow(level, projectile, shooter, weapon);
++        arrowx = customArrow(arrowx);
          if (isCrit) {
-             abstractarrow.setCritArrow(true);
+             arrowx.setCritArrow(true);
          }
-@@ -109,9 +_,10 @@
-             int i = shooter.level() instanceof ServerLevel serverlevel ? EnchantmentHelper.processProjectileCount(serverlevel, weapon, shooter, 1) : 1;
-             List<ItemStack> list = new ArrayList<>(i);
-             ItemStack itemstack1 = projectile.copy();
+@@ -111,9 +_,10 @@
+                 : 1;
+             List<ItemStack> drawn = new ArrayList<>(numProjectiles);
+             ItemStack projectileCopy = projectile.copy();
 +            boolean infinite = projectile.getItem() instanceof ArrowItem arrow && arrow.isInfinite(projectile, weapon, shooter);
  
-             for (int j = 0; j < i; j++) {
--                ItemStack itemstack = useAmmo(weapon, j == 0 ? projectile : itemstack1, shooter, j > 0);
-+                ItemStack itemstack = useAmmo(weapon, j == 0 ? projectile : itemstack1, shooter, j > 0 || infinite);
-                 if (!itemstack.isEmpty()) {
-                     list.add(itemstack);
+             for (int i = 0; i < numProjectiles; i++) {
+-                ItemStack drawnStack = useAmmo(weapon, i == 0 ? projectile : projectileCopy, shooter, i > 0);
++                ItemStack drawnStack = useAmmo(weapon, i == 0 ? projectile : projectileCopy, shooter, i > 0 || infinite);
+                 if (!drawnStack.isEmpty()) {
+                     drawn.add(drawnStack);
                  }
-@@ -139,5 +_,9 @@
+@@ -141,5 +_,9 @@
  
-             return itemstack;
+             return used;
          }
 +    }
 +

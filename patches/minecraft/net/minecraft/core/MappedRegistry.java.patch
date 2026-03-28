@@ -18,23 +18,23 @@
          Objects.requireNonNull(key);
          Objects.requireNonNull(value);
 @@ -104,6 +_,8 @@
-                 reference.bindKey(key);
+                 holder.bindKey(key);
              } else {
-                 reference = this.byKey.computeIfAbsent(key, k -> Holder.Reference.createStandAlone(this, (ResourceKey<T>)k));
+                 holder = this.byKey.computeIfAbsent(key, k -> Holder.Reference.createStandAlone(this, (ResourceKey<T>)k));
 +                // Forge: Bind the value immediately so it can be queried while the registry is not frozen
-+                reference.bindValue(value);
++                holder.bindValue(value);
              }
  
-             this.byKey.put(key, reference);
+             this.byKey.put(key, holder);
 @@ -275,7 +_,6 @@
              return this;
          } else {
              this.frozen = true;
 -            this.byValue.forEach((value, holder) -> holder.bindValue((T)value));
-             List<Identifier> list = this.byKey.entrySet().stream().filter(e -> !e.getValue().isBound()).map(e -> e.getKey().identifier()).sorted().toList();
-             if (!list.isEmpty()) {
-                 throw new IllegalStateException("Unbound values in registry " + this.key() + ": " + list);
-@@ -285,7 +_,8 @@
+             List<Identifier> unboundEntries = this.byKey
+                 .entrySet()
+                 .stream()
+@@ -291,7 +_,8 @@
                          throw new IllegalStateException("Some intrusive holders were not registered: " + this.unregisteredIntrusiveHolders.values());
                      }
  
@@ -44,19 +44,19 @@
                  }
  
                  if (this.allTags.isBound()) {
-@@ -299,8 +_,9 @@
+@@ -305,8 +_,9 @@
                          .sorted()
                          .toList();
-                     if (!list1.isEmpty()) {
--                        throw new IllegalStateException("Unbound tags in registry " + this.key() + ": " + list1);
+                     if (!unboundTags.isEmpty()) {
+-                        throw new IllegalStateException("Unbound tags in registry " + this.key() + ": " + unboundTags);
 -                    } else {
-+                        LOGGER.debug(MARKER, "Unbound tags in registry " + this.key() + ": " + list1);
++                        LOGGER.debug(MARKER, "Unbound tags in registry " + this.key() + ": " + unboundTags);
 +                        bindAllUnboundTagsToEmpty();
 +                    } /* else */ {
                          this.componentLookup = new DataComponentLookup<>(this.byId);
                          this.allTags = MappedRegistry.TagSet.fromMap(this.frozenTags);
                          this.refreshTagsInHolders();
-@@ -311,6 +_,13 @@
+@@ -317,6 +_,13 @@
          }
      }
  
@@ -70,7 +70,7 @@
      @Override
      public Holder.Reference<T> createIntrusiveHolder(final T value) {
          if (this.unregisteredIntrusiveHolders == null) {
-@@ -389,6 +_,31 @@
+@@ -395,6 +_,31 @@
          };
      }
  
@@ -102,15 +102,15 @@
      @Override
      public Registry.PendingTags<T> prepareTagReload(final TagLoader.LoadResult<T> tags) {
          if (!this.frozen) {
-@@ -444,6 +_,11 @@
+@@ -450,6 +_,11 @@
                  @Override
                  public HolderLookup.RegistryLookup<T> lookup() {
-                     return registrylookup;
+                     return patchedHolder;
 +                }
 +
 +                @Override
 +                public List<Holder<T>> getPending(TagKey<T> key) {
-+                    return map.getOrDefault(key, List.of());
++                    return pendingContents.getOrDefault(key, List.of());
                  }
  
                  @Override

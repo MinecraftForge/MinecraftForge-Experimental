@@ -9,13 +9,11 @@
              return false;
          } else if (this.nextStartTick > 0) {
              this.nextStartTick--;
-@@ -142,7 +_,8 @@
-         );
-         return chunkaccess == null
+@@ -139,6 +_,6 @@
+         ChunkAccess chunk = level.getChunk(SectionPos.blockToSectionCoord(pos.getX()), SectionPos.blockToSectionCoord(pos.getZ()), ChunkStatus.FULL, false);
+         return chunk == null
              ? false
--            : chunkaccess.getBlockState(pos).is(this.blockToRemove)
-+            : !chunkaccess.getBlockState(pos).canEntityDestroy(level, pos, this.removerMob) ? false
-+                : chunkaccess.getBlockState(pos).is(this.blockToRemove)
-                 && chunkaccess.getBlockState(pos.above()).isAir()
-                 && chunkaccess.getBlockState(pos.above(2)).isAir();
+-            : chunk.getBlockState(pos).is(this.blockToRemove) && chunk.getBlockState(pos.above()).isAir() && chunk.getBlockState(pos.above(2)).isAir();
++            : chunk.getBlockState(pos).canEntityDestroy(level, pos, this.removerMob) && chunk.getBlockState(pos).is(this.blockToRemove) && chunk.getBlockState(pos.above()).isAir() && chunk.getBlockState(pos.above(2)).isAir();
      }
+ }

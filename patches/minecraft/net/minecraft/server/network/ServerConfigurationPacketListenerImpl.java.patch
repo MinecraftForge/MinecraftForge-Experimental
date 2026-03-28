@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerConfigurationPacketListenerImpl.java
-@@ -47,17 +_,20 @@
+@@ -46,17 +_,20 @@
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final Component DISCONNECT_REASON_INVALID_DATA = Component.translatable("multiplayer.disconnect.invalid_player_data");
      private static final Component DISCONNECT_REASON_CONFIGURATION_ERROR = Component.translatable("multiplayer.disconnect.configuration_error");
@@ -21,16 +21,16 @@
      }
  
      @Override
-@@ -81,22 +_,27 @@
+@@ -80,22 +_,27 @@
          return this.connection.isConnected();
      }
  
 -    public void startConfiguration() {
 +    public void vanillaStart() {
          this.send(new ClientboundCustomPayloadPacket(new BrandPayload(this.server.getServerModName())));
-         ServerLinks serverlinks = this.server.serverLinks();
-         if (!serverlinks.isEmpty()) {
-             this.send(new ClientboundServerLinksPacket(serverlinks.untrust()));
+         ServerLinks serverLinks = this.server.serverLinks();
+         if (!serverLinks.isEmpty()) {
+             this.send(new ClientboundServerLinksPacket(serverLinks.untrust()));
          }
  
 +        this.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(this.server.getWorldData().enabledFeatures())));
@@ -38,25 +38,25 @@
 +
 +    public void startConfiguration() {
 +        net.minecraftforge.event.ForgeEventFactory.gatherLoginConfigTasks(this.connection, this.configurationTasks::add);
-         LayeredRegistryAccess<RegistryLayer> layeredregistryaccess = this.server.registries();
-         List<KnownPack> list = this.server
+         LayeredRegistryAccess<RegistryLayer> registries = this.server.registries();
+         List<KnownPack> knownPacks = this.server
              .getResourceManager()
              .listPacks()
              .flatMap(packResources -> packResources.location().knownPackInfo().stream())
              .toList();
 -        this.send(new ClientboundUpdateEnabledFeaturesPacket(FeatureFlags.REGISTRY.toNames(this.server.getWorldData().enabledFeatures())));
-         this.synchronizeRegistriesTask = new SynchronizeRegistriesTask(list, layeredregistryaccess);
+         this.synchronizeRegistriesTask = new SynchronizeRegistriesTask(knownPacks, registries);
          this.configurationTasks.add(this.synchronizeRegistriesTask);
 +        this.configurationTasks.add(new net.minecraftforge.network.config.SimpleConfigurationTask(VANILLA_START, this::vanillaStart));
          this.addOptionalTasks();
          this.returnToWorld();
      }
-@@ -212,7 +_,7 @@
-                 this.currentTask = configurationtask;
+@@ -211,7 +_,7 @@
+                 this.currentTask = task;
  
                  try {
--                    configurationtask.start(this::send);
-+                    configurationtask.start(this.taskContext);
-                 } catch (Exception exception) {
-                     LOGGER.error("Failed to start configuration task {}", configurationtask.type(), exception);
+-                    task.start(this::send);
++                    task.start(this.taskContext);
+                 } catch (Exception var3) {
+                     LOGGER.error("Failed to start configuration task {}", task.type(), var3);
                      this.disconnect(DISCONNECT_REASON_CONFIGURATION_ERROR);

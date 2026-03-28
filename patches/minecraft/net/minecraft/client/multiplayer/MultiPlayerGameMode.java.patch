@@ -9,15 +9,15 @@
              return false;
          } else {
 @@ -128,9 +_,8 @@
-                 } else if (blockstate.isAir()) {
+                 } else if (oldState.isAir()) {
                      return false;
                  } else {
--                    block.playerWillDestroy(level, pos, blockstate, this.minecraft.player);
-                     FluidState fluidstate = level.getFluidState(pos);
--                    boolean flag = level.setBlock(pos, fluidstate.createLegacyBlock(), 11);
-+                    boolean flag = blockstate.onDestroyedByPlayer(level, pos, minecraft.player, false, fluidstate);
-                     if (flag) {
-                         block.destroy(level, pos, blockstate);
+-                    oldBlock.playerWillDestroy(level, pos, oldState, this.minecraft.player);
+                     FluidState fluidState = level.getFluidState(pos);
+-                    boolean changed = level.setBlock(pos, fluidState.createLegacyBlock(), 11);
++                    boolean changed = oldState.onDestroyedByPlayer(level, pos, minecraft.player, false, fluidState);
+                     if (changed) {
+                         oldBlock.destroy(level, pos, oldState);
                      }
 @@ -159,6 +_,7 @@
                  }
@@ -33,18 +33,18 @@
                  }
 +                var event = net.minecraftforge.event.ForgeEventFactory.onLeftClickBlock(this.minecraft.player, pos, direction, ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK);
  
-                 BlockState blockstate1 = this.minecraft.level.getBlockState(pos);
-                 this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, blockstate1, 0.0F);
+                 BlockState state = this.minecraft.level.getBlockState(pos);
+                 this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, state, 0.0F);
 @@ -182,9 +_,11 @@
                  this.startPrediction(this.minecraft.level, sequence -> {
-                     boolean flag = !blockstate1.isAir();
-                     if (flag && this.destroyProgress == 0.0F) {
+                     boolean notAir = !state.isAir();
+                     if (notAir && this.destroyProgress == 0.0F) {
 +                        if (event != null && !event.getUseBlock().isDenied())
-                         blockstate1.attack(this.minecraft.level, pos, this.minecraft.player);
+                         state.attack(this.minecraft.level, pos, this.minecraft.player);
                      }
  
 +                    if (event != null && !event.getUseItem().isDenied()) {
-                     if (flag && blockstate1.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos) >= 1.0F) {
+                     if (notAir && state.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos) >= 1.0F) {
                          this.destroyBlock(pos);
                      } else {
 @@ -195,6 +_,7 @@
@@ -65,17 +65,17 @@
              });
 @@ -247,7 +_,7 @@
              } else {
-                 this.destroyProgress = this.destroyProgress + blockstate.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos);
+                 this.destroyProgress = this.destroyProgress + state.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos);
                  if (this.destroyTicks % 4.0F == 0.0F) {
--                    SoundType soundtype = blockstate.getSoundType();
-+                    SoundType soundtype = blockstate.getSoundType(this.minecraft.level, pos, this.minecraft.player);
+-                    SoundType soundType = state.getSoundType();
++                    SoundType soundType = state.getSoundType(this.minecraft.level, pos, this.minecraft.player);
                      this.minecraft
                          .getSoundManager()
                          .play(
 @@ -264,6 +_,7 @@
  
                  this.destroyTicks++;
-                 this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, blockstate, Mth.clamp(this.destroyProgress, 0.0F, 1.0F));
+                 this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, state, Mth.clamp(this.destroyProgress, 0.0F, 1.0F));
 +                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, pos, direction).getUseItem().isDenied()) return true;
                  if (this.destroyProgress >= 1.0F) {
                      this.isDestroying = false;
@@ -83,81 +83,81 @@
 @@ -306,7 +_,7 @@
  
      private boolean sameDestroyTarget(final BlockPos pos) {
-         ItemStack itemstack = this.minecraft.player.getMainHandItem();
--        return pos.equals(this.destroyBlockPos) && ItemStack.isSameItemSameComponents(itemstack, this.destroyingItem);
-+        return pos.equals(this.destroyBlockPos) && !destroyingItem.shouldCauseBlockBreakReset(itemstack);
+         ItemStack selected = this.minecraft.player.getMainHandItem();
+-        return pos.equals(this.destroyBlockPos) && ItemStack.isSameItemSameComponents(selected, this.destroyingItem);
++        return pos.equals(this.destroyBlockPos) && !destroyingItem.shouldCauseBlockBreakReset(selected);
      }
  
      private void ensureHasSentCarriedItem() {
 @@ -334,12 +_,23 @@
      private InteractionResult performUseItemOn(final LocalPlayer player, final InteractionHand hand, final BlockHitResult blockHit) {
-         BlockPos blockpos = blockHit.getBlockPos();
-         ItemStack itemstack = player.getItemInHand(hand);
-+        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player, hand, blockpos, blockHit);
+         BlockPos pos = blockHit.getBlockPos();
+         ItemStack itemStack = player.getItemInHand(hand);
++        var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock(player, hand, pos, blockHit);
 +        if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock.BUS.post(event)) {
 +            return event.getCancellationResult();
 +        }
          if (this.localPlayerMode == GameType.SPECTATOR) {
              return InteractionResult.CONSUME;
          } else {
--            boolean flag = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
-+            UseOnContext useoncontext = new UseOnContext(player, hand, blockHit);
+-            boolean haveSomethingInOurHands = !player.getMainHandItem().isEmpty() || !player.getOffhandItem().isEmpty();
++            UseOnContext context = new UseOnContext(player, hand, blockHit);
 +            if (!event.getUseItem().isDenied()) {
-+               InteractionResult result = itemstack.onItemUseFirst(useoncontext);
++               InteractionResult result = itemStack.onItemUseFirst(context);
 +               if (result != InteractionResult.PASS) {
 +                  return result;
 +               }
 +            }
-+            boolean flag = !player.getMainHandItem().doesSneakBypassUse(player.level(), blockpos, player) || !player.getOffhandItem().doesSneakBypassUse(player.level(), blockpos, player);
-             boolean flag1 = player.isSecondaryUseActive() && flag;
--            if (!flag1) {
-+            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !flag1)) {
-                 BlockState blockstate = this.minecraft.level.getBlockState(blockpos);
-                 if (!this.connection.isFeatureEnabled(blockstate.getBlock().requiredFeatures())) {
++            boolean haveSomethingInOurHands = !player.getMainHandItem().doesSneakBypassUse(player.level(), pos, player) || !player.getOffhandItem().doesSneakBypassUse(player.level(), pos, player);
+             boolean suppressUsingBlock = player.isSecondaryUseActive() && haveSomethingInOurHands;
+-            if (!suppressUsingBlock) {
++            if (event.getUseBlock().isAllowed() || (!event.getUseBlock().isDenied() && !suppressUsingBlock)) {
+                 BlockState blockState = this.minecraft.level.getBlockState(pos);
+                 if (!this.connection.isFeatureEnabled(blockState.getBlock().requiredFeatures())) {
                      return InteractionResult.FAIL;
 @@ -358,8 +_,10 @@
                  }
              }
  
--            if (!itemstack.isEmpty() && !player.getCooldowns().isOnCooldown(itemstack)) {
--                UseOnContext useoncontext = new UseOnContext(player, hand, blockHit);
+-            if (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack)) {
+-                UseOnContext context = new UseOnContext(player, hand, blockHit);
 +            if (event.getUseItem().isDenied()) {
 +               return InteractionResult.PASS;
 +            }
-+            if (event.getUseItem().isAllowed() || (!itemstack.isEmpty() && !player.getCooldowns().isOnCooldown(itemstack))) {
-                 InteractionResult interactionresult2;
++            if (event.getUseItem().isAllowed() || (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack))) {
+                 InteractionResult success;
                  if (player.hasInfiniteMaterials()) {
-                     int i = itemstack.getCount();
+                     int count = itemStack.getCount();
 @@ -389,6 +_,11 @@
-                     mutableobject.setValue(InteractionResult.PASS);
-                     return serverbounduseitempacket;
+                     interactionResult.setValue(InteractionResult.PASS);
+                     return packet;
                  } else {
 +                    var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem(player, hand);
 +                    if (net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem.BUS.post(event)) {
-+                       mutableobject.setValue(event.getCancellationResult());
-+                       return serverbounduseitempacket;
++                        interactionResult.setValue(event.getCancellationResult());
++                        return packet;
 +                    }
-                     InteractionResult interactionresult = itemstack.use(this.minecraft.level, player, hand);
-                     ItemStack itemstack1;
-                     if (interactionresult instanceof InteractionResult.Success interactionresult$success) {
+                     InteractionResult resultHolder = itemStack.use(this.minecraft.level, player, hand);
+                     ItemStack result;
+                     if (resultHolder instanceof InteractionResult.Success success) {
 @@ -399,6 +_,9 @@
  
-                     if (itemstack1 != itemstack) {
-                         player.setItemInHand(hand, itemstack1);
-+                        if (itemstack1.isEmpty()) {
-+                            net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, itemstack, hand);
+                     if (result != itemStack) {
+                         player.setItemInHand(hand, result);
++                        if (result.isEmpty()) {
++                            net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, itemStack, hand);
 +                        }
                      }
  
-                     mutableobject.setValue(interactionresult);
+                     interactionResult.setValue(resultHolder);
 @@ -434,6 +_,10 @@
          this.ensureHasSentCarriedItem();
-         Vec3 vec3 = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
-         this.connection.send(new ServerboundInteractPacket(entity.getId(), hand, vec3, player.isShiftKeyDown()));
+         Vec3 location = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
+         this.connection.send(new ServerboundInteractPacket(entity.getId(), hand, location, player.isShiftKeyDown()));
 +        if (this.localPlayerMode != GameType.SPECTATOR) {
-+            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, vec3);
++            var event = new net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific(player, hand, entity, location);
 +            if (net.minecraftforge.event.entity.player.PlayerInteractEvent.EntityInteractSpecific.BUS.post(event)) return event.getCancellationResult();
 +        }
-         return (InteractionResult)(this.localPlayerMode == GameType.SPECTATOR ? InteractionResult.PASS : player.interactOn(entity, hand, vec3));
+         return (InteractionResult)(this.localPlayerMode == GameType.SPECTATOR ? InteractionResult.PASS : player.interactOn(entity, hand, location));
      }
  

@@ -1,21 +1,21 @@
 --- a/net/minecraft/data/Main.java
 +++ b/net/minecraft/data/Main.java
 @@ -78,14 +_,17 @@
-         OptionSpec<Void> optionspec4 = optionparser.accepts("all", "Include all generators");
-         OptionSpec<String> optionspec5 = optionparser.accepts("output", "Output folder").withRequiredArg().defaultsTo("generated");
-         OptionSpec<String> optionspec6 = optionparser.accepts("input", "Input folder").withRequiredArg();
-+        var loader = net.minecraftforge.data.loading.DatagenModLoader.setup(optionparser, false);
-         OptionSet optionset = optionparser.parse(args);
--        if (!optionset.has(optionspec) && optionset.hasOptions()) {
-+        if (!optionset.has(optionspec) && optionset.hasOptions() && loader.hasArgs(optionset)) {
-             Path path = Paths.get(optionspec5.value(optionset));
-             boolean flag = optionset.has(optionspec4);
-             boolean flag1 = flag || optionset.has(optionspec1);
-             boolean flag2 = flag || optionset.has(optionspec2);
-             boolean flag3 = flag || optionset.has(optionspec3);
-             Collection<Path> collection = optionset.valuesOf(optionspec6).stream().map(x$0 -> Paths.get(x$0)).toList();
-+            if (!loader.run(optionset, path, collection, flag1, flag, flag2, flag3))
+         OptionSpec<Void> allOption = parser.accepts("all", "Include all generators");
+         OptionSpec<String> outputOption = parser.accepts("output", "Output folder").withRequiredArg().defaultsTo("generated");
+         OptionSpec<String> inputOption = parser.accepts("input", "Input folder").withRequiredArg();
++        var loader = net.minecraftforge.data.loading.DatagenModLoader.setup(parser, false);
+         OptionSet optionSet = parser.parse(args);
+-        if (!optionSet.has(helpOption) && optionSet.hasOptions()) {
++        if (!optionSet.has(helpOption) && optionSet.hasOptions() && loader.hasArgs(optionSet)) {
+             Path output = Paths.get(outputOption.value(optionSet));
+             boolean allOptions = optionSet.has(allOption);
+             boolean server = allOptions || optionSet.has(serverOption);
+             boolean dev = allOptions || optionSet.has(devOption);
+             boolean reports = allOptions || optionSet.has(reportsOption);
+             Collection<Path> input = optionSet.valuesOf(inputOption).stream().map(x$0 -> Paths.get(x$0)).toList();
++            if (!loader.run(optionSet, output, input, server, allOptions, dev, reports))
 +                return;
-             DataGenerator datagenerator = new DataGenerator.Cached(path, SharedConstants.getCurrentVersion(), true);
-             addServerDefinitionProviders(datagenerator, flag1, flag3);
-             addServerConverters(datagenerator, collection, flag1, flag2);
+             DataGenerator generator = new DataGenerator.Cached(output, SharedConstants.getCurrentVersion(), true);
+             addServerDefinitionProviders(generator, server, reports);
+             addServerConverters(generator, input, server, dev);

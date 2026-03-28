@@ -21,12 +21,12 @@
 +    }
 +
      private void powerLightningRod() {
-         BlockPos blockpos = this.getStrikePosition();
-         BlockState blockstate = this.level().getBlockState(blockpos);
+         BlockPos strikePosition = this.getStrikePosition();
+         BlockState stateBelow = this.level().getBlockState(strikePosition);
 @@ -150,6 +_,7 @@
                      );
  
-                 for (Entity entity : list1) {
+                 for (Entity entity : entities) {
 +                    if (!net.minecraftforge.event.ForgeEventFactory.onEntityStruckByLightning(entity, this))
                      entity.thunderHit((ServerLevel)this.level(), this);
                  }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/packs/resources/SimpleJsonResourceReloadListener.java
 +++ b/net/minecraft/server/packs/resources/SimpleJsonResourceReloadListener.java
-@@ -33,6 +_,10 @@
+@@ -32,6 +_,10 @@
          this(registries.createSerializationContext(JsonOps.INSTANCE), codec, FileToIdConverter.registry(registryKey));
      }
  
@@ -11,20 +11,20 @@
      protected SimpleJsonResourceReloadListener(final Codec<T> codec, final FileToIdConverter lister) {
          this(JsonOps.INSTANCE, codec, lister);
      }
-@@ -67,7 +_,15 @@
-             Identifier identifier1 = lister.fileToId(identifier);
+@@ -66,7 +_,15 @@
+             Identifier id = lister.fileToId(location);
  
              try (Reader reader = entry.getValue().openAsReader()) {
 -                codec.parse(ops, StrictJsonParser.parse(reader)).ifSuccess(parsed -> {
 +                var json = StrictJsonParser.parse(reader);
 +                json = net.minecraftforge.common.ForgeHooks.readConditional(ops, json);
 +                if (json == null) {
-+                    LOGGER.debug("Skipping loading {} as its conditions were not met", identifier);
++                    LOGGER.debug("Skipping loading {} as its conditions were not met", location);
 +                    continue;
 +                }
 +                codec.parse(ops, json).ifSuccess(parsed -> {
-+                    parsed = net.minecraftforge.common.ForgeHooks.onJsonDataParsed(codec, identifier1, parsed);
++                    parsed = net.minecraftforge.common.ForgeHooks.onJsonDataParsed(codec, location, parsed);
 +                    if (parsed == null) return;
-                     if (result.putIfAbsent(identifier1, (T)parsed) != null) {
-                         throw new IllegalStateException("Duplicate data file ignored with ID " + identifier1);
+                     if (result.putIfAbsent(id, (T)parsed) != null) {
+                         throw new IllegalStateException("Duplicate data file ignored with ID " + id);
                      }

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/biome/BiomeSpecialEffects.java
 +++ b/net/minecraft/world/level/biome/BiomeSpecialEffects.java
-@@ -29,6 +_,10 @@
+@@ -28,6 +_,10 @@
              .apply(i, BiomeSpecialEffects::new)
      );
  
@@ -11,7 +11,7 @@
      public static class Builder {
          protected OptionalInt waterColor = OptionalInt.empty();
          protected Optional<Integer> foliageColorOverride = Optional.empty();
-@@ -36,6 +_,10 @@
+@@ -35,6 +_,10 @@
          protected Optional<Integer> grassColorOverride = Optional.empty();
          protected BiomeSpecialEffects.GrassColorModifier grassColorModifier = BiomeSpecialEffects.GrassColorModifier.NONE;
  
@@ -22,7 +22,7 @@
          public BiomeSpecialEffects.Builder waterColor(final int waterColor) {
              this.waterColor = OptionalInt.of(waterColor);
              return this;
-@@ -72,7 +_,7 @@
+@@ -71,7 +_,7 @@
          }
      }
  
@@ -31,7 +31,7 @@
          NONE("none") {
              @Override
              public int modifyColor(final double x, final double z, final int baseColor) {
-@@ -94,9 +_,16 @@
+@@ -93,9 +_,16 @@
          };
  
          private final String name;
@@ -50,7 +50,7 @@
  
          private GrassColorModifier(final String name) {
              this.name = name;
-@@ -109,6 +_,30 @@
+@@ -108,6 +_,30 @@
          @Override
          public String getSerializedName() {
              return this.name;

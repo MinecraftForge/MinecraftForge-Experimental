@@ -17,9 +17,9 @@
 -
 -    static {
 -        for (Block block : BuiltInRegistries.BLOCK) {
--            for (BlockState blockstate : block.getStateDefinition().getPossibleStates()) {
--                Block.BLOCK_STATE_REGISTRY.add(blockstate);
--                blockstate.initCache();
+-            for (BlockState state : block.getStateDefinition().getPossibleStates()) {
+-                Block.BLOCK_STATE_REGISTRY.add(state);
+-                state.initCache();
 -            }
 -        }
      }

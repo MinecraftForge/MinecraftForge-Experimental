@@ -1,10 +1,10 @@
 --- a/net/minecraft/world/item/CrossbowItem.java
 +++ b/net/minecraft/world/item/CrossbowItem.java
-@@ -177,6 +_,7 @@
+@@ -185,6 +_,7 @@
          final @Nullable LivingEntity targetOverride
      ) {
-         if (level instanceof ServerLevel serverlevel) {
+         if (level instanceof ServerLevel serverLevel) {
 +            if (shooter instanceof Player player && net.minecraftforge.event.ForgeEventFactory.onArrowLoose(weapon, shooter.level(), player, 1, true) < 0) return;
-             ChargedProjectiles chargedprojectiles = weapon.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
-             if (chargedprojectiles != null && !chargedprojectiles.isEmpty()) {
-                 this.shoot(serverlevel, shooter, hand, weapon, chargedprojectiles.itemCopies(), power, uncertainty, shooter instanceof Player, targetOverride);
+             ChargedProjectiles charged = weapon.set(DataComponents.CHARGED_PROJECTILES, ChargedProjectiles.EMPTY);
+             if (charged != null && !charged.isEmpty()) {
+                 this.shoot(serverLevel, shooter, hand, weapon, charged.itemCopies(), power, uncertainty, shooter instanceof Player, targetOverride);

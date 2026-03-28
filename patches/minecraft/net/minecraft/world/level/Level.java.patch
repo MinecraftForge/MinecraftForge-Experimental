@@ -32,7 +32,7 @@
          } else if (!this.isClientSide() && this.isDebug()) {
 @@ -222,11 +_,35 @@
          } else {
-             LevelChunk levelchunk = this.getChunkAt(pos);
+             LevelChunk chunk = this.getChunkAt(pos);
              Block block = blockState.getBlock();
 +
 +            pos = pos.immutable(); // Forge - prevent mutable BlockPos leaks
@@ -42,14 +42,14 @@
 +                this.capturedBlockSnapshots.add(blockSnapshot);
 +            }
 +
-             BlockState blockstate = levelchunk.setBlockState(pos, blockState, updateFlags);
-             if (blockstate == null) {
+             BlockState oldState = chunk.setBlockState(pos, blockState, updateFlags);
+             if (oldState == null) {
 +                if (blockSnapshot != null) this.capturedBlockSnapshots.remove(blockSnapshot);
                  return false;
              } else {
-                 BlockState blockstate1 = this.getBlockState(pos);
+                 BlockState newState = this.getBlockState(pos);
 +                if (blockSnapshot == null) { // Don't notify clients or update physics while capturing blockstates
-+                    this.markAndNotifyBlock(pos, levelchunk, blockstate, blockState, updateFlags, updateLimit);
++                    this.markAndNotifyBlock(pos, chunk, oldState, blockState, updateFlags, updateLimit);
 +                }
 +
 +                return true;
@@ -58,19 +58,19 @@
 +    }
 +
 +    // Split off from original setBlockState(BlockPos, BlockState, int, int) method in order to directly send client and physic updates
-+    public void markAndNotifyBlock(final BlockPos pos, final @Nullable LevelChunk levelchunk, final BlockState blockstate, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
++    public void markAndNotifyBlock(final BlockPos pos, final @Nullable LevelChunk chunk, final BlockState oldState, final BlockState blockState, @Block.UpdateFlags final int updateFlags, final int updateLimit) {
 +        Block block = blockState.getBlock();
-+        BlockState blockstate1 = getBlockState(pos);
++        BlockState newState = getBlockState(pos);
 +        {
 +            {
-                 if (blockstate1 == blockState) {
-                     if (blockstate != blockstate1) {
-                         this.setBlocksDirty(pos, blockstate, blockstate1);
+                 if (newState == blockState) {
+                     if (oldState != newState) {
+                         this.setBlocksDirty(pos, oldState, newState);
 @@ -253,9 +_,8 @@
                      }
  
-                     this.updatePOIOnBlockStateChange(pos, blockstate, blockstate1);
-+                    blockState.onBlockStateChange(this, pos, blockstate);
+                     this.updatePOIOnBlockStateChange(pos, oldState, newState);
++                    blockState.onBlockStateChange(this, pos, oldState);
                  }
 -
 -                return true;
@@ -111,15 +111,15 @@
          try {
 +            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackStart(entity);
              tick.accept(entity);
-         } catch (Throwable throwable) {
-             CrashReport crashreport = CrashReport.forThrowable(throwable, "Ticking entity");
-             CrashReportCategory crashreportcategory = crashreport.addCategory("Entity being ticked");
-             entity.fillCrashReportCategory(crashreportcategory);
+         } catch (Throwable var6) {
+             CrashReport report = CrashReport.forThrowable(var6, "Ticking entity");
+             CrashReportCategory category = report.addCategory("Entity being ticked");
+             entity.fillCrashReportCategory(category);
 +            if (net.minecraftforge.common.ForgeConfig.SERVER.removeErroringEntities.get()) {
-+                com.mojang.logging.LogUtils.getLogger().error("{}", crashreport.getFriendlyReport(net.minecraft.ReportType.CRASH));
++                com.mojang.logging.LogUtils.getLogger().error("{}", report.getFriendlyReport(net.minecraft.ReportType.CRASH));
 +                entity.discard();
 +            } else
-             throw new ReportedException(crashreport);
+             throw new ReportedException(report);
 +        } finally {
 +            net.minecraftforge.server.timings.TimeTracker.ENTITY_UPDATE.trackEnd(entity);
          }
@@ -133,53 +133,52 @@
      }
  
      public boolean isLoaded(final BlockPos pos) {
-@@ -776,9 +_,9 @@
+@@ -774,8 +_,8 @@
              }
          });
  
--        for (EnderDragonPart enderdragonpart : this.dragonParts()) {
-+        for (var enderdragonpart : this.getPartEntities()) {
-             if (enderdragonpart != except
--                && enderdragonpart.parentMob != except
-+                && enderdragonpart.getParent() != except
-                 && selector.test(enderdragonpart)
-                 && bb.intersects(enderdragonpart.getBoundingBox())) {
-                 list.add(enderdragonpart);
-@@ -813,8 +_,8 @@
+-        for (EnderDragonPart dragonPart : this.dragonParts()) {
+-            if (dragonPart != except && dragonPart.parentMob != except && selector.test(dragonPart) && bb.intersects(dragonPart.getBoundingBox())) {
++        for (var dragonPart : this.getPartEntities()) {
++            if (dragonPart != except && dragonPart.getParent() != except && selector.test(dragonPart) && bb.intersects(dragonPart.getBoundingBox())) {
+                 output.add(dragonPart);
+             }
+         }
+@@ -808,8 +_,8 @@
                  }
              }
  
--            if (e instanceof EnderDragon enderdragon) {
--                for (EnderDragonPart enderdragonpart : enderdragon.getSubEntities()) {
+-            if (e instanceof EnderDragon enderDragon) {
+-                for (EnderDragonPart subEntity : enderDragon.getSubEntities()) {
 +            if (e.isMultipartEntity()) {
-+                for (var enderdragonpart : e.getParts()) {
-                     T t = type.tryCast(enderdragonpart);
-                     if (t != null && selector.test(t)) {
-                         output.add(t);
-@@ -1000,17 +_,16 @@
++                for (var subEntity : e.getParts()) {
+                     T castSubPart = type.tryCast(subEntity);
+                     if (castSubPart != null && selector.test(castSubPart)) {
+                         output.add(castSubPart);
+@@ -993,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
      public void updateNeighbourForOutputSignal(final BlockPos pos, final Block changedBlock) {
 -        for (Direction direction : Direction.Plane.HORIZONTAL) {
 +        for (Direction direction : Direction.getUpdateOrder()) {
-             BlockPos blockpos = pos.relative(direction);
-             if (this.hasChunkAt(blockpos)) {
-                 BlockState blockstate = this.getBlockState(blockpos);
--                if (blockstate.is(Blocks.COMPARATOR)) {
--                    this.neighborChanged(blockstate, blockpos, changedBlock, null, false);
--                } else if (blockstate.isRedstoneConductor(this, blockpos)) {
-+                blockstate.onNeighborChange(this, blockpos, pos);
-+                if (blockstate.isRedstoneConductor(this, blockpos)) {
-                     blockpos = blockpos.relative(direction);
-                     blockstate = this.getBlockState(blockpos);
--                    if (blockstate.is(Blocks.COMPARATOR)) {
--                        this.neighborChanged(blockstate, blockpos, changedBlock, null, false);
-+                    if (blockstate.getWeakChanges(this, blockpos)) {
-+                        blockstate.onNeighborChange(this, blockpos, pos);
+             BlockPos relativePos = pos.relative(direction);
+             if (this.hasChunkAt(relativePos)) {
+                 BlockState state = this.getBlockState(relativePos);
+-                if (state.is(Blocks.COMPARATOR)) {
+-                    this.neighborChanged(state, relativePos, changedBlock, null, false);
+-                } else if (state.isRedstoneConductor(this, relativePos)) {
++                state.onNeighborChange(this, relativePos, pos);
++                if (state.isRedstoneConductor(this, relativePos)) {
+                     relativePos = relativePos.relative(direction);
+                     state = this.getBlockState(relativePos);
+-                    if (state.is(Blocks.COMPARATOR)) {
+-                        this.neighborChanged(state, relativePos, changedBlock, null, false);
++                    if (state.getWeakChanges(this, relativePos)) {
++                        state.onNeighborChange(this, relativePos, pos);
                      }
                  }
              }
-@@ -1095,6 +_,20 @@
+@@ -1088,6 +_,20 @@
      }
  
      public abstract ClockManager clockManager();

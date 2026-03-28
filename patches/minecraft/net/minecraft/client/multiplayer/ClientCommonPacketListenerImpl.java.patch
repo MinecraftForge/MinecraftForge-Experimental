@@ -5,6 +5,6 @@
      @Override
      public void handleCustomPayload(final ClientboundCustomPayloadPacket packet) {
 +        if (net.minecraftforge.common.ForgeHooks.onCustomPayload(packet.payload(), this.connection)) return;
-         CustomPacketPayload custompacketpayload = packet.payload();
-         if (!(custompacketpayload instanceof DiscardedPayload)) {
+         CustomPacketPayload payload = packet.payload();
+         if (!(payload instanceof DiscardedPayload)) {
              PacketUtils.ensureRunningOnSameThread(packet, this, this.minecraft.packetProcessor());

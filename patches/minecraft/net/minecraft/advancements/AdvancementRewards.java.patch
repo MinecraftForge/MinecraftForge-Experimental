@@ -1,10 +1,10 @@
 --- a/net/minecraft/advancements/AdvancementRewards.java
 +++ b/net/minecraft/advancements/AdvancementRewards.java
-@@ -44,6 +_,7 @@
-         LootParams lootparams = new LootParams.Builder(serverlevel)
+@@ -43,6 +_,7 @@
+         LootParams params = new LootParams.Builder(level)
              .withParameter(LootContextParams.THIS_ENTITY, player)
              .withParameter(LootContextParams.ORIGIN, player.position())
 +            .withLuck(player.getLuck())
              .create(LootContextParamSets.ADVANCEMENT_REWARD);
-         boolean flag = false;
+         boolean changes = false;
  

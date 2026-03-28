@@ -3,10 +3,10 @@
 @@ -878,6 +_,17 @@
          @Override
          protected void breed() {
-             Fox fox = (Fox)this.animal.getBreedOffspring(this.level, this.partner);
-+            var event = new net.minecraftforge.event.entity.living.BabyEntitySpawnEvent(animal, partner, fox);
+             Fox offspring = (Fox)this.animal.getBreedOffspring(this.level, this.partner);
++            var event = new net.minecraftforge.event.entity.living.BabyEntitySpawnEvent(animal, partner, offspring);
 +            var eventWasCancelled = net.minecraftforge.event.entity.living.BabyEntitySpawnEvent.BUS.post(event);
-+            fox = (Fox)event.getChild();
++            offspring = (Fox)event.getChild();
 +            if (eventWasCancelled) {
 +                //Reset the "inLove" state for the animals
 +                this.animal.setAge(6000);
@@ -15,18 +15,18 @@
 +                this.partner.resetLove();
 +                return;
 +            }
-             if (fox != null) {
-                 ServerPlayer serverplayer = this.animal.getLoveCause();
-                 ServerPlayer serverplayer1 = this.partner.getLoveCause();
+             if (offspring != null) {
+                 ServerPlayer animalLoveCause = this.animal.getLoveCause();
+                 ServerPlayer partnerLoveCause = this.partner.getLoveCause();
 @@ -956,7 +_,7 @@
          }
  
          protected void onReachedTarget() {
 -            if (getServerLevel(Fox.this.level()).getGameRules().get(GameRules.MOB_GRIEFING)) {
 +            if (net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(getServerLevel(Fox.this.level()), Fox.this)) {
-                 BlockState blockstate = Fox.this.level().getBlockState(this.blockPos);
-                 if (blockstate.is(Blocks.SWEET_BERRY_BUSH)) {
-                     this.pickSweetBerries(blockstate);
+                 BlockState state = Fox.this.level().getBlockState(this.blockPos);
+                 if (state.is(Blocks.SWEET_BERRY_BUSH)) {
+                     this.pickSweetBerries(state);
 @@ -1016,7 +_,7 @@
  
          @Override

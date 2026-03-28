@@ -4,8 +4,8 @@
              }
          }
  
--        return Mth.lerp(effectScale, 1.0F, f);
-+        return net.minecraftforge.client.event.ForgeEventFactoryClient.fireFovModifierEvent(this, f, effectScale).getNewFovModifier();
+-        return Mth.lerp(effectScale, 1.0F, modifier);
++        return net.minecraftforge.client.event.ForgeEventFactoryClient.fireFovModifierEvent(this, modifier, effectScale).getNewFovModifier();
      }
  
      @Override

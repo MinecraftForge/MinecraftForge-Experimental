@@ -1,10 +1,10 @@
 --- a/net/minecraft/server/level/ThreadedLevelLightEngine.java
 +++ b/net/minecraft/server/level/ThreadedLevelLightEngine.java
 @@ -175,6 +_,7 @@
-         }, () -> "lightChunk " + chunkpos + " " + lighted));
+         }, () -> "lightChunk " + pos + " " + lighted));
          return CompletableFuture.supplyAsync(() -> {
              centerChunk.setLightCorrect(true);
 +            net.minecraftforge.common.ForgeHooks.fireLightingCalculatedEvent(centerChunk);
              return centerChunk;
-         }, r -> this.addTask(chunkpos.x(), chunkpos.z(), ThreadedLevelLightEngine.TaskType.POST_UPDATE, r));
+         }, r -> this.addTask(pos.x(), pos.z(), ThreadedLevelLightEngine.TaskType.POST_UPDATE, r));
      }

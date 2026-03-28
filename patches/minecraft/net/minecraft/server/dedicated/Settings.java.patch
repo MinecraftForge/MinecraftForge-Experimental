@@ -3,9 +3,9 @@
 @@ -66,7 +_,7 @@
  
      public void store(final Path output) {
-         try (Writer writer = Files.newBufferedWriter(output, StandardCharsets.UTF_8)) {
--            this.properties.store(writer, "Minecraft server properties");
-+            net.minecraftforge.common.util.SortedProperties.store(this.properties, writer, "Minecraft server properties");
-         } catch (IOException ioexception) {
+         try (Writer os = Files.newBufferedWriter(output, StandardCharsets.UTF_8)) {
+-            this.properties.store(os, "Minecraft server properties");
++            net.minecraftforge.common.util.SortedProperties.store(this.properties, os, "Minecraft server properties");
+         } catch (IOException var7) {
              LOGGER.error("Failed to store properties to file: {}", output);
          }

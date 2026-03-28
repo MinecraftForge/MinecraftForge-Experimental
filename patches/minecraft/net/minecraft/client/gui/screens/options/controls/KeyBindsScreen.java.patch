@@ -3,9 +3,9 @@
 @@ -42,7 +_,7 @@
      protected void addFooter() {
          this.resetButton = Button.builder(Component.translatable("controls.resetAll"), button -> {
-             for (KeyMapping keymapping : this.options.keyMappings) {
--                keymapping.setKey(keymapping.getDefaultKey());
-+                keymapping.setToDefault();
+             for (KeyMapping key : this.options.keyMappings) {
+-                key.setKey(key.getDefaultKey());
++                key.setToDefault();
              }
  
              this.keyBindsList.resetMappingAndUpdateButtons();
@@ -27,7 +27,7 @@
 @@ -101,5 +_,18 @@
          }
  
-         this.resetButton.active = flag;
+         this.resetButton.active = canReset;
 +    }
 +
 +    @Override

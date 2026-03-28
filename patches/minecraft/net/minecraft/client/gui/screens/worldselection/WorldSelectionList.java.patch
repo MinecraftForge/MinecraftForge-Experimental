@@ -8,7 +8,7 @@
      private static final Component FROM_NEWER_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.fromNewerVersion1").withStyle(ChatFormatting.RED);
      private static final Component FROM_NEWER_TOOLTIP_2 = Component.translatable("selectWorld.tooltip.fromNewerVersion2").withStyle(ChatFormatting.RED);
      private static final Component SNAPSHOT_TOOLTIP_1 = Component.translatable("selectWorld.tooltip.snapshot1").withStyle(ChatFormatting.GOLD);
-@@ -493,6 +_,19 @@
+@@ -486,6 +_,19 @@
              }
          }
  
@@ -27,12 +27,12 @@
 +
          @Override
          public Component getNarration() {
-             Component component = Component.translatable(
-@@ -522,6 +_,7 @@
-             this.infoText.setPosition(i, this.getContentY() + 9 + 9 + 3);
+             Component entryNarration = Component.translatable(
+@@ -515,6 +_,7 @@
+             this.infoText.setPosition(textX, this.getContentY() + 9 + 9 + 3);
              this.infoText.extractRenderState(graphics, mouseX, mouseY, a);
              graphics.blit(RenderPipelines.GUI_TEXTURED, this.icon.textureLocation(), this.getContentX(), this.getContentY(), 0.0F, 0.0F, 32, 32, 32, 32);
 +            renderExperimentalWarning(graphics, mouseX, mouseY, this.getContentY(), this.getContentX());
              if (this.list.entryType == WorldSelectionList.EntryType.SINGLEPLAYER && (this.minecraft.options.touchscreen().get() || hovered)) {
                  graphics.fill(this.getContentX(), this.getContentY(), this.getContentX() + 32, this.getContentY() + 32, -1601138544);
-                 int j = mouseX - this.getContentX();
+                 int relX = mouseX - this.getContentX();

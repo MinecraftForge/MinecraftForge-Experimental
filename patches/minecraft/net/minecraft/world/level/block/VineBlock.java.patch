@@ -15,6 +15,6 @@
          if (level.getGameRules().get(GameRules.SPREAD_VINES)) {
 -            if (random.nextInt(4) == 0) {
 +            if (random.nextInt(4) == 0 && level.isAreaLoaded(pos, 4)) { // Forge: check area to prevent loading unloaded chunks
-                 Direction direction = Direction.getRandom(random);
-                 BlockPos blockpos = pos.above();
-                 if (direction.getAxis().isHorizontal() && !state.getValue(getPropertyForFace(direction))) {
+                 Direction testDirection = Direction.getRandom(random);
+                 BlockPos abovePos = pos.above();
+                 if (testDirection.getAxis().isHorizontal() && !state.getValue(getPropertyForFace(testDirection))) {

@@ -1,23 +1,23 @@
 --- a/net/minecraft/client/renderer/fog/FogRenderer.java
 +++ b/net/minecraft/client/renderer/fog/FogRenderer.java
 @@ -153,6 +_,12 @@
-                 f2 = Mth.lerp(f6, f2, f2 * f7);
+                 fogBlue = Mth.lerp(brightenFactor, fogBlue, fogBlue * targetScale);
              }
  
-+            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(camera, partialTicks, level, renderDistance, darkenWorldAmount, f5, f1, f2);
++            var fogColor = net.minecraftforge.client.ForgeHooksClient.getFogColor(camera, partialTicks, level, renderDistance, darkenWorldAmount, fogRed, fogGreen, fogBlue);
 +
-+            f5 = fogColor.x();
-+            f1 = fogColor.y();
-+            f2 = fogColor.z();
++            fogRed = fogColor.x();
++            fogGreen = fogColor.y();
++            fogBlue = fogColor.z();
 +
-             dest.set(f5, f1, f2, 1.0F);
+             dest.set(fogRed, fogGreen, fogBlue, 1.0F);
          }
      }
 @@ -181,6 +_,7 @@
-         float f2 = Mth.clamp(f1 / 10.0F, 4.0F, 64.0F);
-         fogdata.renderDistanceStart = f1 - f2;
-         fogdata.renderDistanceEnd = f1;
-+        fogdata.color = net.minecraftforge.client.ForgeHooksClient.setupFog(fogtype, camera, deltaTracker, fogdata, fogdata.color);
-         return fogdata;
+         float renderDistanceFogSpan = Mth.clamp(renderDistanceInBlocks / 10.0F, 4.0F, 64.0F);
+         fog.renderDistanceStart = renderDistanceInBlocks - renderDistanceFogSpan;
+         fog.renderDistanceEnd = renderDistanceInBlocks;
++        fog.color = net.minecraftforge.client.ForgeHooksClient.setupFog(fogType, camera, deltaTracker, fog, fog.color);
+         return fog;
      }
  

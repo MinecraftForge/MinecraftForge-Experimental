@@ -1,48 +1,48 @@
 --- a/net/minecraft/world/inventory/AnvilMenu.java
 +++ b/net/minecraft/world/inventory/AnvilMenu.java
-@@ -79,6 +_,8 @@
+@@ -77,6 +_,8 @@
              player.giveExperienceLevels(-this.cost.get());
          }
  
 +        float breakChance = net.minecraftforge.event.ForgeEventFactory.onAnvilRepair(player, carried, AnvilMenu.this.inputSlots.getItem(0), AnvilMenu.this.inputSlots.getItem(1)).getBreakChance();
 +
          if (this.repairItemCountCost > 0) {
-             ItemStack itemstack = this.inputSlots.getItem(1);
-             if (!itemstack.isEmpty() && itemstack.getCount() > this.repairItemCountCost) {
-@@ -101,7 +_,7 @@
+             ItemStack addition = this.inputSlots.getItem(1);
+             if (!addition.isEmpty() && addition.getCount() > this.repairItemCountCost) {
+@@ -99,7 +_,7 @@
          this.inputSlots.setItem(0, ItemStack.EMPTY);
          this.access.execute((level, pos) -> {
-             BlockState blockstate = level.getBlockState(pos);
--            if (!player.hasInfiniteMaterials() && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < 0.12F) {
-+            if (!player.hasInfiniteMaterials() && blockstate.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
-                 BlockState blockstate1 = AnvilBlock.damage(blockstate);
-                 if (blockstate1 == null) {
+             BlockState state = level.getBlockState(pos);
+-            if (!player.hasInfiniteMaterials() && state.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < 0.12F) {
++            if (!player.hasInfiniteMaterials() && state.is(BlockTags.ANVIL) && player.getRandom().nextFloat() < breakChance) {
+                 BlockState newBlockState = AnvilBlock.damage(state);
+                 if (newBlockState == null) {
                      level.removeBlock(pos, false);
-@@ -130,8 +_,11 @@
-             ItemEnchantments.Mutable itemenchantments$mutable = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(itemstack1));
-             j += (long)itemstack.getOrDefault(DataComponents.REPAIR_COST, 0).intValue() + itemstack2.getOrDefault(DataComponents.REPAIR_COST, 0).intValue();
+@@ -128,8 +_,11 @@
+             ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(result));
+             tax += (long)input.getOrDefault(DataComponents.REPAIR_COST, 0).intValue() + addition.getOrDefault(DataComponents.REPAIR_COST, 0).intValue();
              this.repairItemCountCost = 0;
-+            boolean flag = false;
++            boolean usingBook = false;
 +
-+            if (!net.minecraftforge.common.ForgeHooks.onAnvilChange(this, itemstack, itemstack2, resultSlots, itemName, j, this.player)) return;
-             if (!itemstack2.isEmpty()) {
--                boolean flag = itemstack2.has(DataComponents.STORED_ENCHANTMENTS);
-+                flag = itemstack2.has(DataComponents.STORED_ENCHANTMENTS);
-                 if (itemstack1.isDamageableItem() && itemstack.isValidRepairItem(itemstack2)) {
-                     int l2 = Math.min(itemstack1.getDamageValue(), itemstack1.getMaxDamage() / 4);
-                     if (l2 <= 0) {
-@@ -235,6 +_,10 @@
-                 itemstack1.remove(DataComponents.CUSTOM_NAME);
++            if (!net.minecraftforge.common.ForgeHooks.onAnvilChange(this, input, addition, resultSlots, itemName, tax, this.player)) return;
+             if (!addition.isEmpty()) {
+-                boolean usingBook = addition.has(DataComponents.STORED_ENCHANTMENTS);
++                usingBook = addition.has(DataComponents.STORED_ENCHANTMENTS);
+                 if (result.isDamageableItem() && input.isValidRepairItem(addition)) {
+                     int repairAmount = Math.min(result.getDamageValue(), result.getMaxDamage() / 4);
+                     if (repairAmount <= 0) {
+@@ -233,6 +_,10 @@
+                 result.remove(DataComponents.CUSTOM_NAME);
              }
  
-+            if (flag && !itemstack1.isBookEnchantable(itemstack2)) {
-+                itemstack1 = ItemStack.EMPTY;
++            if (usingBook && !result.isBookEnchantable(addition)) {
++                result = ItemStack.EMPTY;
 +            }
 +
-             int k2 = i <= 0 ? 0 : (int)Mth.clamp(j + i, 0L, 2147483647L);
-             this.cost.set(k2);
-             if (i <= 0) {
-@@ -306,5 +_,9 @@
+             int finalPrice = price <= 0 ? 0 : (int)Mth.clamp(tax + price, 0L, 2147483647L);
+             this.cost.set(finalPrice);
+             if (price <= 0) {
+@@ -304,5 +_,9 @@
  
      public int getCost() {
          return this.cost.get();

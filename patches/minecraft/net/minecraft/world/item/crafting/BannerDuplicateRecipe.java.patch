@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java
 +++ b/net/minecraft/world/item/crafting/BannerDuplicateRecipe.java
-@@ -98,7 +_,7 @@
-         for (int i = 0; i < nonnulllist.size(); i++) {
-             ItemStack itemstack = input.getItem(i);
-             if (!itemstack.isEmpty()) {
--                ItemStackTemplate itemstacktemplate = itemstack.getItem().getCraftingRemainder();
-+                ItemStackTemplate itemstacktemplate = itemstack.getCraftingRemainder();
-                 if (itemstacktemplate != null) {
-                     nonnulllist.set(i, itemstacktemplate.create());
-                 } else if (!itemstack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY).layers().isEmpty()) {
+@@ -97,7 +_,7 @@
+         for (int slot = 0; slot < result.size(); slot++) {
+             ItemStack itemStack = input.getItem(slot);
+             if (!itemStack.isEmpty()) {
+-                ItemStackTemplate remainder = itemStack.getItem().getCraftingRemainder();
++                ItemStackTemplate remainder = itemStack.getCraftingRemainder();
+                 if (remainder != null) {
+                     result.set(slot, remainder.create());
+                 } else if (!itemStack.getOrDefault(DataComponents.BANNER_PATTERNS, BannerPatternLayers.EMPTY).layers().isEmpty()) {

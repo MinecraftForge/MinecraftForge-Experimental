@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/blockentity/SkullBlockRenderer.java
 +++ b/net/minecraft/client/renderer/blockentity/SkullBlockRenderer.java
-@@ -44,6 +_,7 @@
+@@ -43,6 +_,7 @@
      public static final WallAndGroundTransformations<Transformation> TRANSFORMATIONS = new WallAndGroundTransformations<>(
          SkullBlockRenderer::createWallTransformation, SkullBlockRenderer::createGroundTransformation, 16
      );
@@ -8,7 +8,7 @@
      private final Function<SkullBlock.Type, SkullModelBase> modelByType;
      public static final Map<SkullBlock.Type, Identifier> SKIN_BY_TYPE = Util.make(Maps.newHashMap(), map -> {
          map.put(SkullBlock.Types.SKELETON, Identifier.withDefaultNamespace("textures/entity/skeleton/skeleton.png"));
-@@ -68,7 +_,9 @@
+@@ -67,7 +_,9 @@
                  case PIGLIN -> new PiglinHeadModel(modelSet.bakeLayer(ModelLayers.PIGLIN_HEAD));
              });
          } else {

@@ -6,6 +6,6 @@
      public boolean isVisible(final AABB bb) {
 +        // Forge: exit early for infinite bounds, these would otherwise fail in the intersection test at certain camera angles (GH-9321)
 +        if (bb.equals(net.minecraftforge.common.extensions.IForgeBlockEntity.INFINITE_EXTENT_AABB)) return true;
-         int i = this.cubeInFrustum(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
-         return i == -2 || i == -1;
+         int intersectionResult = this.cubeInFrustum(bb.minX, bb.minY, bb.minZ, bb.maxX, bb.maxY, bb.maxZ);
+         return intersectionResult == -2 || intersectionResult == -1;
      }

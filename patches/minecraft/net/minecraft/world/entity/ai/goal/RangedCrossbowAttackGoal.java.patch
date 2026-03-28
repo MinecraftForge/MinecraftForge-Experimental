@@ -10,9 +10,9 @@
  
      @Override
 @@ -99,7 +_,7 @@
-             this.mob.getLookControl().setLookAt(livingentity, 30.0F, 30.0F);
+             this.mob.getLookControl().setLookAt(target, 30.0F, 30.0F);
              if (this.crossbowState == RangedCrossbowAttackGoal.CrossbowState.UNCHARGED) {
-                 if (!flag2) {
+                 if (!needsToMove) {
 -                    this.mob.startUsingItem(ProjectileUtil.getWeaponHoldingHand(this.mob, Items.CROSSBOW));
 +                    this.mob.startUsingItem(ProjectileUtil.getWeaponHoldingHand(this.mob, item -> item instanceof CrossbowItem));
                      this.crossbowState = RangedCrossbowAttackGoal.CrossbowState.CHARGING;

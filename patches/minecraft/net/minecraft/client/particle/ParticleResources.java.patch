@@ -20,10 +20,10 @@
  
 +    /** @deprecated Register via {@link net.minecraftforge.client.event.RegisterParticleProvidersEvent} */
      public <T extends ParticleOptions> void register(final ParticleType<T> type, final ParticleResources.SpriteParticleRegistration<T> provider) {
-         ParticleResources.MutableSpriteSet particleresources$mutablespriteset = new ParticleResources.MutableSpriteSet();
-         this.spriteSets.put(BuiltInRegistries.PARTICLE_TYPE.getKey(type), particleresources$mutablespriteset);
--        this.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(type), provider.create(particleresources$mutablespriteset));
-+        register(type, provider.create(particleresources$mutablespriteset));
+         ParticleResources.MutableSpriteSet spriteSet = new ParticleResources.MutableSpriteSet();
+         this.spriteSets.put(BuiltInRegistries.PARTICLE_TYPE.getKey(type), spriteSet);
+-        this.providers.put(BuiltInRegistries.PARTICLE_TYPE.getId(type), provider.create(spriteSet));
++        register(type, provider.create(spriteSet));
      }
  
      @Override

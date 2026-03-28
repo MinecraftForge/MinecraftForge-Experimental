@@ -27,24 +27,24 @@
      }
  
      public EventLoopGroup eventLoopGroup() {
--        EventLoopGroup eventloopgroup = this.group;
+-        EventLoopGroup result = this.group;
 +        return eventLoopGroup(false);
 +    }
 +
 +    public EventLoopGroup eventLoopGroup(boolean client) {
-+        EventLoopGroup eventloopgroup = client ? this.groupClient : this.group;
-         if (eventloopgroup == null) {
++        EventLoopGroup result = client ? this.groupClient : this.group;
+         if (result == null) {
              synchronized (this) {
--                eventloopgroup = this.group;
-+                eventloopgroup = client ? this.groupClient : this.group;
-                 if (eventloopgroup == null) {
--                    eventloopgroup = this.createEventLoopGroup();
--                    this.group = eventloopgroup;
-+                    eventloopgroup = this.createEventLoopGroup(client);
+-                result = this.group;
++                result = client ? this.groupClient : this.group;
+                 if (result == null) {
+-                    result = this.createEventLoopGroup();
+-                    this.group = result;
++                    result = this.createEventLoopGroup(client);
 +                    if (client)
-+                        this.groupClient = eventloopgroup;
++                        this.groupClient = result;
 +                    else
-+                        this.group = eventloopgroup;
++                        this.group = result;
                  }
              }
          }

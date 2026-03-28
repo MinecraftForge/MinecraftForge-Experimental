@@ -7,6 +7,6 @@
 +        if (BuiltInRegistries.STRUCTURE_PIECE.getKey(this.getType()) == null) { // FORGE: Friendlier error then the Null String error below.
 +            throw new RuntimeException("StructurePiece \"" + this.getClass().getName() + "\": \"" + this.getType() + "\" unregistered, serializing impossible.");
 +        }
-         CompoundTag compoundtag = new CompoundTag();
-         compoundtag.putString("id", BuiltInRegistries.STRUCTURE_PIECE.getKey(this.getType()).toString());
-         compoundtag.store("BB", BoundingBox.CODEC, this.boundingBox);
+         CompoundTag tag = new CompoundTag();
+         tag.putString("id", BuiltInRegistries.STRUCTURE_PIECE.getKey(this.getType()).toString());
+         tag.store("BB", BoundingBox.CODEC, this.boundingBox);

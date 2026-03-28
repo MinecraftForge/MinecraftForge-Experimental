@@ -5,29 +5,29 @@
      ) {
          Direction direction = blockState.getValue(ORIENTATION).front();
 +        var itemhandler = net.minecraftforge.items.VanillaInventoryCodeHooks.getItemHandler(level, pos.relative(direction), direction.getOpposite()).orElse(null);
-         Container container = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
-         ItemStack itemstack = results.copy();
-         if (container != null && (container instanceof CrafterBlockEntity || results.getCount() > container.getMaxStackSize(results))) {
-             while (!itemstack.isEmpty()) {
-                 ItemStack itemstack2 = itemstack.copyWithCount(1);
-                 ItemStack itemstack1 = HopperBlockEntity.addItem(blockEntity, container, itemstack2, direction.getOpposite());
-+                if (itemhandler != null && !itemstack1.isEmpty()) // Vanilla insert failed, try IItemHandler
-+                    itemstack1 = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, itemstack1, false);
-                 if (!itemstack1.isEmpty()) {
+         Container into = HopperBlockEntity.getContainerAt(level, pos.relative(direction));
+         ItemStack remaining = results.copy();
+         if (into != null && (into instanceof CrafterBlockEntity || results.getCount() > into.getMaxStackSize(results))) {
+             while (!remaining.isEmpty()) {
+                 ItemStack copy = remaining.copyWithCount(1);
+                 ItemStack itemStack = HopperBlockEntity.addItem(blockEntity, into, copy, direction.getOpposite());
++                if (itemhandler != null && !itemStack.isEmpty()) // Vanilla insert failed, try IItemHandler
++                    itemStack = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, itemStack, false);
+                 if (!itemStack.isEmpty()) {
                      break;
                  }
 @@ -209,10 +_,14 @@
-             while (!itemstack.isEmpty()) {
-                 int i = itemstack.getCount();
-                 itemstack = HopperBlockEntity.addItem(blockEntity, container, itemstack, direction.getOpposite());
-+                if (itemhandler != null && i == itemstack.getCount()) // Vanilla insert failed, try IItemHandler
-+                    itemstack = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, itemstack, false);
-                 if (i == itemstack.getCount()) {
+             while (!remaining.isEmpty()) {
+                 int oldSize = remaining.getCount();
+                 remaining = HopperBlockEntity.addItem(blockEntity, into, remaining, direction.getOpposite());
++                if (itemhandler != null && oldSize == remaining.getCount()) // Vanilla insert failed, try IItemHandler
++                    remaining = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, remaining, false);
+                 if (oldSize == remaining.getCount()) {
                      break;
                  }
              }
 +        } else {
-+            itemstack = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, itemstack, false);
++            remaining = net.minecraftforge.items.ItemHandlerHelper.insertItem(itemhandler, remaining, false);
          }
  
-         if (!itemstack.isEmpty()) {
+         if (!remaining.isEmpty()) {

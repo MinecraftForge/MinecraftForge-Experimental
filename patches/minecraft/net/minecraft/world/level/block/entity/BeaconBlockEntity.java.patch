@@ -1,13 +1,13 @@
 --- a/net/minecraft/world/level/block/entity/BeaconBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BeaconBlockEntity.java
-@@ -141,8 +_,8 @@
+@@ -140,8 +_,8 @@
  
-         for (int i1 = 0; i1 < 10 && blockpos.getY() <= l; i1++) {
-             BlockState blockstate = level.getBlockState(blockpos);
--            if (blockstate.getBlock() instanceof BeaconBeamBlock beaconbeamblock) {
--                int j1 = beaconbeamblock.getColor().getTextureDiffuseColor();
-+            int j1 = blockstate.getBeaconColorMultiplier(level, blockpos, pos);
-+            if (j1 != -1) {
+         for (int i = 0; i < 10 && checkPos.getY() <= lastSetBlock; i++) {
+             BlockState state = level.getBlockState(checkPos);
+-            if (state.getBlock() instanceof BeaconBeamBlock beaconBeamBlock) {
+-                int color = beaconBeamBlock.getColor().getTextureDiffuseColor();
++            int color = state.getBeaconColorMultiplier(level, checkPos, pos);
++            if (color != -1) {
                  if (entity.checkingBeamSections.size() <= 1) {
-                     beaconbeamowner$section = new BeaconBeamOwner.Section(j1);
-                     entity.checkingBeamSections.add(beaconbeamowner$section);
+                     lastBeamSection = new BeaconBeamOwner.Section(color);
+                     entity.checkingBeamSections.add(lastBeamSection);

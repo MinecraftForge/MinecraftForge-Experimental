@@ -13,9 +13,9 @@
          final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
      ) {
          if (!level.isClientSide() && level.getBlockState(pos).is(this)) {
--            RailShape railshape = state.getValue(this.getShapeProperty());
-+            RailShape railshape = getRailDirection(state, level, pos, null);
-             if (shouldBeRemoved(pos, level, railshape)) {
+-            RailShape shape = state.getValue(this.getShapeProperty());
++            RailShape shape = getRailDirection(state, level, pos, null);
+             if (shouldBeRemoved(pos, level, shape)) {
                  dropResources(state, level, pos);
                  level.removeBlock(pos, movedByPiston);
 @@ -125,7 +_,7 @@
@@ -28,7 +28,7 @@
              }
  
 @@ -146,6 +_,11 @@
-         return blockstate.setValue(this.getShapeProperty(), flag1 ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH).setValue(WATERLOGGED, flag);
+         return state.setValue(this.getShapeProperty(), isEastWest ? RailShape.EAST_WEST : RailShape.NORTH_SOUTH).setValue(WATERLOGGED, isWaterSource);
      }
  
 +    /**

@@ -21,11 +21,11 @@
          return uvs.getVertexU(rotation.rotateVertexIndex(vertex)) / 16.0F;
      }
 @@ -38,7 +_,7 @@
-             String s = getTexture(jsonobject);
-             CuboidFace.UVs cuboidface$uvs = getUVs(jsonobject);
-             Quadrant quadrant = getRotation(jsonobject);
--            return new CuboidFace(direction, i, s, cuboidface$uvs, quadrant);
-+            return new CuboidFace(direction, i, s, cuboidface$uvs, quadrant, net.minecraftforge.client.model.ForgeFaceData.read(jsonobject.get("forge_data"), null));
+             String texture = getTexture(object);
+             CuboidFace.UVs uvs = getUVs(object);
+             Quadrant rotation = getRotation(object);
+-            return new CuboidFace(cullDirection, tintIndex, texture, uvs, rotation);
++            return new CuboidFace(cullDirection, tintIndex, texture, uvs, rotation, net.minecraftforge.client.model.ForgeFaceData.read(object.get("forge_data"), null));
          }
  
          private static int getTintIndex(final JsonObject object) {

@@ -1,11 +1,11 @@
 --- a/net/minecraft/client/renderer/LevelEventHandler.java
 +++ b/net/minecraft/client/renderer/LevelEventHandler.java
-@@ -384,7 +_,7 @@
+@@ -302,7 +_,7 @@
              case 2001:
-                 BlockState blockstate1 = Block.stateById(data);
-                 if (!blockstate1.isAir()) {
--                    SoundType soundtype = blockstate1.getSoundType();
-+                    SoundType soundtype = blockstate1.getSoundType(this.level, pos, null);
+                 BlockState blockState = Block.stateById(data);
+                 if (!blockState.isAir()) {
+-                    SoundType soundType = blockState.getSoundType();
++                    SoundType soundType = blockState.getSoundType(this.level, pos, null);
                      this.level
                          .playLocalSound(
-                             pos, soundtype.getBreakSound(), SoundSource.BLOCKS, (soundtype.getVolume() + 1.0F) / 2.0F, soundtype.getPitch() * 0.8F, false
+                             pos, soundType.getBreakSound(), SoundSource.BLOCKS, (soundType.getVolume() + 1.0F) / 2.0F, soundType.getPitch() * 0.8F, false

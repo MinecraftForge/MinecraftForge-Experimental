@@ -1,10 +1,10 @@
 --- a/net/minecraft/world/level/levelgen/feature/treedecorators/AlterGroundDecorator.java
 +++ b/net/minecraft/world/level/levelgen/feature/treedecorators/AlterGroundDecorator.java
 @@ -58,6 +_,7 @@
-             BlockPos blockpos = pos.above(i);
-             BlockState blockstate = this.provider.getOptionalState(context.level(), context.random(), blockpos);
-             if (blockstate != null) {
-+                blockstate = net.minecraftforge.event.ForgeEventFactory.alterGround(context.level(), context.random(), blockpos, blockstate);
-                 context.setBlock(blockpos, blockstate);
+             BlockPos cursor = pos.above(dy);
+             BlockState replaceWith = this.provider.getOptionalState(context.level(), context.random(), cursor);
+             if (replaceWith != null) {
++                replaceWith = net.minecraftforge.event.ForgeEventFactory.alterGround(context.level(), context.random(), cursor, replaceWith);
+                 context.setBlock(cursor, replaceWith);
                  break;
              }

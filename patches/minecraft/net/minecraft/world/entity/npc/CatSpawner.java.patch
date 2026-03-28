@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/npc/CatSpawner.java
 +++ b/net/minecraft/world/entity/npc/CatSpawner.java
-@@ -66,12 +_,12 @@
+@@ -65,12 +_,12 @@
      private void spawnCat(final BlockPos spawnPos, final ServerLevel level, final boolean makePersistent) {
          Cat cat = EntityType.CAT.create(level, EntitySpawnReason.NATURAL);
          if (cat != null) {

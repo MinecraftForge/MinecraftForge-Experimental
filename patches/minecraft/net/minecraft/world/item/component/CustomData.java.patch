@@ -9,5 +9,5 @@
 +    }
 +
      public static void update(final DataComponentType<CustomData> component, final ItemStack itemStack, final Consumer<CompoundTag> consumer) {
-         CustomData customdata = itemStack.getOrDefault(component, EMPTY).update(consumer);
-         if (customdata.tag.isEmpty()) {
+         CustomData newData = itemStack.getOrDefault(component, EMPTY).update(consumer);
+         if (newData.tag.isEmpty()) {

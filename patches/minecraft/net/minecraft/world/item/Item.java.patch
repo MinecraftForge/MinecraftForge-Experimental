@@ -19,7 +19,7 @@
      public static final Identifier BASE_ATTACK_SPEED_ID = Identifier.withDefaultNamespace("base_attack_speed");
      public static final int DEFAULT_MAX_STACK_SIZE = 64;
 @@ -145,6 +_,7 @@
-                 LOGGER.error("Item classes should end with Item and {} doesn't.", s);
+                 LOGGER.error("Item classes should end with Item and {} doesn't.", className);
              }
          }
 +        initClient();

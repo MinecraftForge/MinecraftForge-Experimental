@@ -48,14 +48,14 @@
          }
 @@ -395,9 +_,13 @@
                  PersistentEntitySectionManager.this.removeSectionIfEmpty(this.currentSectionKey, this.currentSection);
-                 EntitySection<T> entitysection = PersistentEntitySectionManager.this.sectionStorage.getOrCreateSection(i);
-                 entitysection.add(this.entity);
+                 EntitySection<T> newSection = PersistentEntitySectionManager.this.sectionStorage.getOrCreateSection(newSectionPos);
+                 newSection.add(this.entity);
 +                long oldSectionKey = currentSectionKey;
-                 this.currentSection = entitysection;
-                 this.currentSectionKey = i;
-                 this.updateStatus(visibility, entitysection.getStatus());
+                 this.currentSection = newSection;
+                 this.currentSectionKey = newSectionPos;
+                 this.updateStatus(previousStatus, newSection.getStatus());
 +                if (this.realEntity != null) {
-+                    net.minecraftforge.event.ForgeEventFactory.onEntityEnterSection(this.realEntity, oldSectionKey, i);
++                    net.minecraftforge.event.ForgeEventFactory.onEntityEnterSection(this.realEntity, oldSectionKey, newSectionPos);
 +                }
              }
          }

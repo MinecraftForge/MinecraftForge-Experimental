@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/multiplayer/ServerStatusPinger.java
 +++ b/net/minecraft/client/multiplayer/ServerStatusPinger.java
-@@ -124,6 +_,7 @@
+@@ -123,6 +_,7 @@
                                  onPersistentDataChange.run();
                              }
                          });
-+                        net.minecraftforge.client.ForgeHooksClient.processForgeListPingData(serverstatus, data);
++                        net.minecraftforge.client.ForgeHooksClient.processForgeListPingData(status, data);
                          this.pingStart = Util.getMillis();
                          connection.send(new ServerboundPingRequestPacket(this.pingStart));
                          this.success = true;
-@@ -180,7 +_,7 @@
+@@ -179,7 +_,7 @@
      private void pingLegacyServer(
          final InetSocketAddress resolvedAddress, final ServerAddress rawAddress, final ServerData data, final EventLoopGroupHolder eventLoopGroupHolder
      ) {

@@ -6,10 +6,10 @@
      protected void randomTick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
 -        if (level.getRandom().nextInt(5) == 0) {
 +        {
-             int i = state.getValue(AGE);
--            if (i < 2) {
-+            if (i < 2 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, level.getRandom().nextInt(5) == 0)) {
-                 level.setBlock(pos, state.setValue(AGE, i + 1), 2);
+             int age = state.getValue(AGE);
+-            if (age < 2) {
++            if (age < 2 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, level.getRandom().nextInt(5) == 0)) {
+                 level.setBlock(pos, state.setValue(AGE, age + 1), 2);
 +                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos, state);
              }
          }

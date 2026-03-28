@@ -11,15 +11,15 @@
      private static final VoxelShape SHAPE = Block.column(12.0, 0.0, 16.0);
 @@ -57,12 +_,15 @@
  
-             if (i < 3) {
-                 int j = state.getValue(AGE);
+             if (height < 3) {
+                 int age = state.getValue(AGE);
 +                if (net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, pos, state, true)) {
-                 if (j == 15) {
+                 if (age == 15) {
                      level.setBlockAndUpdate(pos.above(), this.defaultBlockState());
 +                    net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, pos.above(), this.defaultBlockState());
                      level.setBlock(pos, state.setValue(AGE, 0), 260);
                  } else {
-                     level.setBlock(pos, state.setValue(AGE, j + 1), 260);
+                     level.setBlock(pos, state.setValue(AGE, age + 1), 260);
                  }
 +                }
              }
@@ -31,15 +31,15 @@
      protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
 +        BlockState soil = level.getBlockState(pos.below());
 +        if (soil.canSustainPlant(level, pos.below(), Direction.UP, this)) return true;
-         BlockState blockstate = level.getBlockState(pos.below());
-         if (blockstate.is(this)) {
+         BlockState stateBelow = level.getBlockState(pos.below());
+         if (stateBelow.is(this)) {
              return true;
 @@ -97,7 +_,7 @@
                  for (Direction direction : Direction.Plane.HORIZONTAL) {
-                     BlockState blockstate1 = level.getBlockState(blockpos.relative(direction));
-                     FluidState fluidstate = level.getFluidState(blockpos.relative(direction));
--                    if (fluidstate.is(FluidTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || blockstate1.is(BlockTags.SUPPORTS_SUGAR_CANE_ADJACENTLY)) {
-+                    if (fluidstate.is(FluidTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || blockstate1.is(BlockTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || state.canBeHydrated(level, pos, fluidstate, blockpos.relative(direction))) {
+                     BlockState blockState = level.getBlockState(below.relative(direction));
+                     FluidState fluidState = level.getFluidState(below.relative(direction));
+-                    if (fluidState.is(FluidTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || blockState.is(BlockTags.SUPPORTS_SUGAR_CANE_ADJACENTLY)) {
++                    if (fluidState.is(FluidTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || blockState.is(BlockTags.SUPPORTS_SUGAR_CANE_ADJACENTLY) || state.canBeHydrated(level, pos, fluidState, below.relative(direction))) {
                          return true;
                      }
                  }

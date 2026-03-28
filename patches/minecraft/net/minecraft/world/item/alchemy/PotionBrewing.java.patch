@@ -57,8 +57,8 @@
  
 +    /** @deprecated Forge: use hasMix(ItemStack, ItemStack)*/
      public boolean hasPotionMix(final ItemStack source, final ItemStack ingredient) {
-         Optional<Holder<Potion>> optional = source.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion();
-         if (optional.isEmpty()) {
+         Optional<Holder<Potion>> potion = source.getOrDefault(DataComponents.POTION_CONTENTS, PotionContents.EMPTY).potion();
+         if (potion.isEmpty()) {
 @@ -102,6 +_,19 @@
      }
  
@@ -103,10 +103,10 @@
 +    }
 +
      public static PotionBrewing bootstrap(final FeatureFlagSet enabledFeatures) {
-         PotionBrewing.Builder potionbrewing$builder = new PotionBrewing.Builder(enabledFeatures);
-         addVanillaMixes(potionbrewing$builder);
-+        net.minecraftforge.event.ForgeEventFactory.onBrewingRecipeRegister(potionbrewing$builder, enabledFeatures);
-         return potionbrewing$builder.build();
+         PotionBrewing.Builder builder = new PotionBrewing.Builder(enabledFeatures);
+         addVanillaMixes(builder);
++        net.minecraftforge.event.ForgeEventFactory.onBrewingRecipeRegister(builder, enabledFeatures);
+         return builder.build();
      }
  
 @@ -197,6 +_,7 @@

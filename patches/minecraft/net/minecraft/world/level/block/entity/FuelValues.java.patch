@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/entity/FuelValues.java
 +++ b/net/minecraft/world/level/block/entity/FuelValues.java
-@@ -25,7 +_,11 @@
+@@ -24,7 +_,11 @@
      }
  
      public boolean isFuel(final ItemStack itemStack) {
@@ -13,7 +13,7 @@
      }
  
      public SequencedSet<Item> fuelItems() {
-@@ -33,7 +_,16 @@
+@@ -32,7 +_,16 @@
      }
  
      public int burnDuration(final ItemStack itemStack) {

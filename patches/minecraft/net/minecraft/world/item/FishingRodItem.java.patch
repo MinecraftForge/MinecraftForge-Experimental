@@ -3,10 +3,10 @@
 @@ -24,7 +_,11 @@
          if (player.fishing != null) {
              if (!level.isClientSide()) {
-                 int i = player.fishing.retrieve(itemstack);
-+                ItemStack original = itemstack.copy();
-                 itemstack.hurtAndBreak(i, player, hand.asEquipmentSlot());
-+                if (itemstack.isEmpty()) {
+                 int dmg = player.fishing.retrieve(itemStack);
++                ItemStack original = itemStack.copy();
+                 itemStack.hurtAndBreak(dmg, player, hand.asEquipmentSlot());
++                if (itemStack.isEmpty()) {
 +                    net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, original, hand.asEquipmentSlot());
 +                }
              }

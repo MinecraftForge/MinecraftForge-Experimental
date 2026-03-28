@@ -1,14 +1,14 @@
 --- a/net/minecraft/client/player/LocalPlayer.java
 +++ b/net/minecraft/client/player/LocalPlayer.java
-@@ -324,6 +_,7 @@
-         ServerboundPlayerActionPacket.Action serverboundplayeractionpacket$action = all
+@@ -318,6 +_,7 @@
+         ServerboundPlayerActionPacket.Action action = all
              ? ServerboundPlayerActionPacket.Action.DROP_ALL_ITEMS
              : ServerboundPlayerActionPacket.Action.DROP_ITEM;
 +        if (isUsingItem() && getUsedItemHand() == InteractionHand.MAIN_HAND && (all || getUseItem().getCount() == 1)) stopUsingItem(); // Forge: fix MC-231097 on the clientside
-         ItemStack itemstack = this.getInventory().removeFromSelected(all);
-         this.connection.send(new ServerboundPlayerActionPacket(serverboundplayeractionpacket$action, BlockPos.ZERO, Direction.DOWN));
-         return !itemstack.isEmpty();
-@@ -551,7 +_,10 @@
+         ItemStack prediction = this.getInventory().removeFromSelected(all);
+         this.connection.send(new ServerboundPlayerActionPacket(action, BlockPos.ZERO, Direction.DOWN));
+         return !prediction.isEmpty();
+@@ -545,7 +_,10 @@
  
      @Override
      public void playSound(final SoundEvent sound, final float volume, final float pitch) {
@@ -20,15 +20,15 @@
      }
  
      @Override
-@@ -793,6 +_,7 @@
+@@ -787,6 +_,7 @@
              && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING)
              && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
          this.input.tick();
 +        net.minecraftforge.client.ForgeHooksClient.onMovementInputUpdate(this, this.input);
          this.minecraft.getTutorial().onInput(this.input);
-         boolean flag3 = false;
+         boolean wasAutoJump = false;
          if (this.autoJumpTime > 0) {
-@@ -865,8 +_,9 @@
+@@ -859,8 +_,9 @@
          }
  
          this.wasFallFlying = this.isFallFlying();
@@ -40,7 +40,7 @@
          }
  
          if (this.isEyeInFluid(FluidTags.WATER)) {
-@@ -934,7 +_,7 @@
+@@ -928,7 +_,7 @@
      }
  
      private boolean shouldStopSwimSprinting() {
@@ -49,16 +49,16 @@
      }
  
      public Portal.Transition getActivePortalLocalTransition() {
-@@ -979,6 +_,8 @@
+@@ -973,6 +_,8 @@
      @Override
      public void rideTick() {
          super.rideTick();
 +        if (this.wantsToStopRiding() && this.isPassenger())
 +            this.input.keyPresses = this.input.keyPresses.jump(false);
          this.handsBusy = false;
-         if (this.getControlledVehicle() instanceof AbstractBoat abstractboat) {
-             abstractboat.setInput(
-@@ -1154,7 +_,7 @@
+         if (this.getControlledVehicle() instanceof AbstractBoat boat) {
+             boat.setInput(this.input.keyPresses.left(), this.input.keyPresses.right(), this.input.keyPresses.forward(), this.input.keyPresses.backward());
+@@ -1146,7 +_,7 @@
              && this.isSprintingPossible(this.getAbilities().flying)
              && !this.isSlowDueToUsingItem()
              && (!this.isFallFlying() || this.isUnderWater())
@@ -67,7 +67,7 @@
      }
  
      private boolean vehicleCanSprint(final Entity vehicle) {
-@@ -1230,6 +_,17 @@
+@@ -1222,6 +_,17 @@
      @Override
      public float getVisualRotationYInDegrees() {
          return this.getYRot();

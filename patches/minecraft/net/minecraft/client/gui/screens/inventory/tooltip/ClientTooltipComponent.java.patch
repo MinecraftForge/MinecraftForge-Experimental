@@ -1,9 +1,9 @@
 --- a/net/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent.java
 +++ b/net/minecraft/client/gui/screens/inventory/tooltip/ClientTooltipComponent.java
-@@ -20,7 +_,7 @@
-             case ClientActivePlayersTooltip.ActivePlayersTooltip clientactiveplayerstooltip$activeplayerstooltip -> new ClientActivePlayersTooltip(
-                 clientactiveplayerstooltip$activeplayerstooltip
-             );
+@@ -18,7 +_,7 @@
+         return (ClientTooltipComponent)(switch (component) {
+             case BundleTooltip bundleTooltip -> new ClientBundleTooltip(bundleTooltip.contents());
+             case ClientActivePlayersTooltip.ActivePlayersTooltip activePlayersTooltip -> new ClientActivePlayersTooltip(activePlayersTooltip);
 -            default -> throw new IllegalArgumentException("Unknown TooltipComponent");
 +            default -> net.minecraftforge.client.gui.ClientTooltipComponentManager.createClientTooltipComponent(component);
          });

@@ -2,19 +2,19 @@
 +++ b/net/minecraft/world/entity/ExperienceOrb.java
 @@ -136,7 +_,8 @@
              this.applyEffectsFromBlocks();
-             float f = 0.98F;
+             float friction = 0.98F;
              if (this.onGround()) {
--                f = this.level().getBlockState(this.getBlockPosBelowThatAffectsMyMovement()).getBlock().getFriction() * 0.98F;
+-                friction = this.level().getBlockState(this.getBlockPosBelowThatAffectsMyMovement()).getBlock().getFriction() * 0.98F;
 +                BlockPos pos = getBlockPosBelowThatAffectsMyMovement();
-+                f = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
++                friction = this.level().getBlockState(pos).getFriction(this.level(), pos, this) * 0.98F;
              }
  
-             this.setDeltaMovement(this.getDeltaMovement().scale(f));
-@@ -278,6 +_,7 @@
+             this.setDeltaMovement(this.getDeltaMovement().scale(friction));
+@@ -277,6 +_,7 @@
      public void playerTouch(final Player player) {
-         if (player instanceof ServerPlayer serverplayer) {
+         if (player instanceof ServerPlayer serverPlayer) {
              if (player.takeXpDelay == 0) {
 +                if (net.minecraftforge.event.ForgeEventFactory.onPlayerPickupXp(player, this)) return;
                  player.takeXpDelay = 2;
                  player.take(this, 1);
-                 int i = this.repairPlayerItems(serverplayer, this.getValue());
+                 int remaining = this.repairPlayerItems(serverPlayer, this.getValue());

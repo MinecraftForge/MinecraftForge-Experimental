@@ -8,10 +8,10 @@
 +        var vanilla = random.nextDouble() < this.growPerTickProbability;
 +        var target = pos.relative(this.growthDirection);
 +        if (state.getValue(AGE) < 25 && net.minecraftforge.common.ForgeHooks.onCropsGrowPre(level, target, level.getBlockState(target), vanilla)) {
-             BlockPos blockpos = pos.relative(this.growthDirection);
-             if (this.canGrowInto(level.getBlockState(blockpos))) {
-                 level.setBlockAndUpdate(blockpos, this.getGrowIntoState(state, level.getRandom()));
-+                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, blockpos, level.getBlockState(blockpos));
+             BlockPos growthPos = pos.relative(this.growthDirection);
+             if (this.canGrowInto(level.getBlockState(growthPos))) {
+                 level.setBlockAndUpdate(growthPos, this.getGrowIntoState(state, level.getRandom()));
++                net.minecraftforge.common.ForgeHooks.onCropsGrowPost(level, growthPos, level.getBlockState(growthPos));
              }
          }
      }

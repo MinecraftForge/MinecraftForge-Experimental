@@ -3,11 +3,11 @@
 @@ -137,7 +_,7 @@
      @Override
      public InteractionResult mobInteract(final Player player, final InteractionHand hand) {
-         ItemStack itemstack = player.getItemInHand(hand);
--        if (itemstack.is(Items.SHEARS)) {
-+        if (false && itemstack.is(Items.SHEARS)) { // Forge: Moved to onSheared
-             if (this.level() instanceof ServerLevel serverlevel && this.readyForShearing()) {
-                 this.shear(serverlevel, SoundSource.PLAYERS, itemstack);
+         ItemStack itemStack = player.getItemInHand(hand);
+-        if (itemStack.is(Items.SHEARS)) {
++        if (false && itemStack.is(Items.SHEARS)) { // Forge: Moved to onSheared
+             if (this.level() instanceof ServerLevel level && this.readyForShearing()) {
+                 this.shear(level, SoundSource.PLAYERS, itemStack);
                  this.gameEvent(GameEvent.SHEAR, player);
 @@ -153,12 +_,27 @@
  
@@ -35,8 +35,8 @@
 +            // double indented to make the patch look nicer
 +            for (var drop : items) {
                  for (int i = 0; i < drop.getCount(); i++) {
-                     ItemEntity itementity = this.spawnAtLocation(l, drop.copyWithCount(1), 1.0F);
-                     if (itementity != null) {
+                     ItemEntity entity = this.spawnAtLocation(l, drop.copyWithCount(1), 1.0F);
+                     if (entity != null) {
 @@ -173,8 +_,14 @@
                      }
                  }

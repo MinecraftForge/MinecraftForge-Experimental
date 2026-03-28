@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/BucketItem.java
 +++ b/net/minecraft/world/item/BucketItem.java
-@@ -34,9 +_,21 @@
+@@ -34,15 +_,29 @@
  public class BucketItem extends Item implements DispensibleContainerItem {
      private final Fluid content;
  
@@ -22,36 +22,35 @@
      }
  
      @Override
-@@ -45,6 +_,8 @@
-         BlockHitResult blockhitresult = getPlayerPOVHitResult(
-             level, player, this.content == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE
-         );
-+        var ret = net.minecraftforge.event.ForgeEventFactory.onBucketUse(player, level, itemstack, blockhitresult);
+     public InteractionResult use(final Level level, final Player player, final InteractionHand hand) {
+         ItemStack itemStack = player.getItemInHand(hand);
+         BlockHitResult hitResult = getPlayerPOVHitResult(level, player, this.content == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE);
++        var ret = net.minecraftforge.event.ForgeEventFactory.onBucketUse(player, level, itemStack, hitResult);
 +        if (ret != null) return ret;
-         if (blockhitresult.getType() == HitResult.Type.MISS) {
+         if (hitResult.getType() == HitResult.Type.MISS) {
              return InteractionResult.PASS;
-         } else if (blockhitresult.getType() != HitResult.Type.BLOCK) {
-@@ -61,7 +_,7 @@
-                     ItemStack itemstack3 = bucketpickup.pickupBlock(player, level, blockpos, blockstate1);
-                     if (!itemstack3.isEmpty()) {
+         } else if (hitResult.getType() != HitResult.Type.BLOCK) {
+@@ -59,7 +_,7 @@
+                     ItemStack taken = bucketPickupBlock.pickupBlock(player, level, pos, blockState);
+                     if (!taken.isEmpty()) {
                          player.awardStat(Stats.ITEM_USED.get(this));
--                        bucketpickup.getPickupSound().ifPresent(soundEvent -> player.playSound(soundEvent, 1.0F, 1.0F));
-+                        bucketpickup.getPickupSound(blockstate1).ifPresent(soundEvent -> player.playSound(soundEvent, 1.0F, 1.0F));
-                         level.gameEvent(player, GameEvent.FLUID_PICKUP, blockpos);
-                         ItemStack itemstack2 = ItemUtils.createFilledResult(itemstack, player, itemstack3);
+-                        bucketPickupBlock.getPickupSound().ifPresent(soundEvent -> player.playSound(soundEvent, 1.0F, 1.0F));
++                        bucketPickupBlock.getPickupSound(blockState).ifPresent(soundEvent -> player.playSound(soundEvent, 1.0F, 1.0F));
+                         level.gameEvent(player, GameEvent.FLUID_PICKUP, pos);
+                         ItemStack result = ItemUtils.createFilledResult(itemStack, player, taken);
                          if (!level.isClientSide()) {
-@@ -75,8 +_,8 @@
+@@ -73,8 +_,8 @@
                  return InteractionResult.FAIL;
              } else {
-                 BlockState blockstate = level.getBlockState(blockpos);
--                BlockPos blockpos2 = blockstate.getBlock() instanceof LiquidBlockContainer && this.content == Fluids.WATER ? blockpos : blockpos1;
--                if (this.emptyContents(player, level, blockpos2, blockhitresult)) {
-+                BlockPos blockpos2 = canBlockContainFluid(level, blockpos, blockstate) ? blockpos : blockpos1;
-+                if (this.emptyContents(player, level, blockpos2, blockhitresult, itemstack)) {
-                     this.checkExtraContent(player, level, itemstack, blockpos2);
+                 BlockState clicked = level.getBlockState(pos);
+-                BlockPos placePos = clicked.getBlock() instanceof LiquidBlockContainer && this.content == Fluids.WATER ? pos : directionOffsetPos;
+-                if (this.emptyContents(player, level, placePos, hitResult)) {
++                BlockPos placePos = canBlockContainFluid(level, pos, clicked) ? pos : directionOffsetPos;
++                if (this.emptyContents(player, level, placePos, hitResult, itemStack)) {
+                     this.checkExtraContent(player, level, itemStack, placePos);
                      if (player instanceof ServerPlayer) {
-                         CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer)player, blockpos2, itemstack);
-@@ -100,8 +_,13 @@
+                         CriteriaTriggers.PLACED_BLOCK.trigger((ServerPlayer)player, placePos, itemStack);
+@@ -98,8 +_,13 @@
      public void checkExtraContent(final @Nullable LivingEntity user, final Level level, final ItemStack itemStack, final BlockPos pos) {
      }
  
@@ -61,42 +60,42 @@
 +        return this.emptyContents(user, level, pos, hitResult, null);
 +    }
 +
-+    public boolean emptyContents(final @Nullable LivingEntity user, final Level level, final BlockPos pos, final @Nullable BlockHitResult hitResult, final @Nullable ItemStack container) {
-         if (!(this.content instanceof FlowingFluid flowingfluid)) {
++    public boolean emptyContents(final @Nullable LivingEntity user, final Level level, final BlockPos pos, final @Nullable BlockHitResult hitResult, final @Nullable ItemStack containerItem) {
+         if (!(this.content instanceof FlowingFluid flowingFluid)) {
              return false;
          } else {
-@@ -113,8 +_,12 @@
-                 || block instanceof LiquidBlockContainer liquidblockcontainer
-                     && liquidblockcontainer.canPlaceLiquid(user, level, pos, blockstate, this.content);
-             boolean flag3 = blockstate.isAir() || flag2 && (!flag1 || hitResult == null);
-+            java.util.Optional<net.minecraftforge.fluids.FluidStack> containedFluidStack = java.util.Optional.ofNullable(container).flatMap(net.minecraftforge.fluids.FluidUtil::getFluidContained);
-             if (!flag3) {
+@@ -110,8 +_,12 @@
+             boolean placeLiquid = mayReplace
+                 || block instanceof LiquidBlockContainer container && container.canPlaceLiquid(user, level, pos, blockState, this.content);
+             boolean canPlaceFluidInsideBlock = blockState.isAir() || placeLiquid && (!shiftKeyDown || hitResult == null);
++            var containedFluidStack = java.util.Optional.ofNullable(containerItem).flatMap(net.minecraftforge.fluids.FluidUtil::getFluidContained);
+             if (!canPlaceFluidInsideBlock) {
 -                return hitResult != null && this.emptyContents(user, level, hitResult.getBlockPos().relative(hitResult.getDirection()), null);
-+                return hitResult != null && this.emptyContents(user, level, hitResult.getBlockPos().relative(hitResult.getDirection()), null, container);
++                return hitResult != null && this.emptyContents(user, level, hitResult.getBlockPos().relative(hitResult.getDirection()), null, containerItem);
 +            } else if (containedFluidStack.isPresent() && this.content.getFluidType().isVaporizedOnPlacement(level, pos, containedFluidStack.get())) {
 +                this.content.getFluidType().onVaporize(user, level, pos, containedFluidStack.get());
 +                return true;
              } else if (level.environmentAttributes().getValue(EnvironmentAttributes.WATER_EVAPORATES, pos) && this.content.is(FluidTags.WATER)) {
-                 int l = pos.getX();
-                 int i = pos.getY();
-@@ -131,7 +_,7 @@
+                 int x = pos.getX();
+                 int y = pos.getY();
+@@ -124,7 +_,7 @@
                  }
  
                  return true;
--            } else if (block instanceof LiquidBlockContainer liquidblockcontainer1 && this.content == Fluids.WATER) {
-+            } else if (block instanceof LiquidBlockContainer liquidblockcontainer1 && liquidblockcontainer1.canPlaceLiquid(user, level, pos, blockstate, content) && this.content == Fluids.WATER) {
-                 liquidblockcontainer1.placeLiquid(level, pos, blockstate, flowingfluid.getSource(false));
+-            } else if (block instanceof LiquidBlockContainer containerx && this.content == Fluids.WATER) {
++            } else if (block instanceof LiquidBlockContainer containerx && containerx.canPlaceLiquid(user, level, pos, blockState, content) && this.content == Fluids.WATER) {
+                 containerx.placeLiquid(level, pos, blockState, flowingFluid.getSource(false));
                  this.playEmptySound(user, level, pos);
                  return true;
-@@ -152,8 +_,33 @@
+@@ -145,8 +_,33 @@
  
      protected void playEmptySound(final @Nullable LivingEntity user, final LevelAccessor level, final BlockPos pos) {
-         SoundEvent soundevent = this.content.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+         SoundEvent soundEvent = this.content.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
 +        var custom = this.content.getFluidType().getSound(user, level, pos, net.minecraftforge.common.SoundActions.BUCKET_EMPTY);
 +        if (custom != null) {
-+            soundevent = custom;
++            soundEvent = custom;
 +        }
-         level.playSound(user, pos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
+         level.playSound(user, pos, soundEvent, SoundSource.BLOCKS, 1.0F, 1.0F);
          level.gameEvent(user, GameEvent.FLUID_PLACE, pos);
 +    }
 +

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/inventory/GrindstoneMenu.java
 +++ b/net/minecraft/world/inventory/GrindstoneMenu.java
-@@ -43,6 +_,7 @@
+@@ -42,6 +_,7 @@
          }
      };
      private final ContainerLevelAccess access;
@@ -8,7 +8,7 @@
  
      public GrindstoneMenu(final int containerId, final Inventory inventory) {
          this(containerId, inventory, ContainerLevelAccess.NULL);
-@@ -58,7 +_,7 @@
+@@ -57,7 +_,7 @@
  
              @Override
              public boolean mayPlace(final ItemStack itemStack) {
@@ -17,7 +17,7 @@
              }
          });
          this.addSlot(new Slot(this.repairSlots, 1, 49, 40) {
-@@ -68,7 +_,7 @@
+@@ -67,7 +_,7 @@
  
              @Override
              public boolean mayPlace(final ItemStack itemStack) {
@@ -26,7 +26,7 @@
              }
          });
          this.addSlot(new Slot(this.resultSlots, 2, 129, 34) {
-@@ -83,6 +_,7 @@
+@@ -82,6 +_,7 @@
  
              @Override
              public void onTake(final Player player, final ItemStack carried) {
@@ -34,15 +34,15 @@
                  access.execute((level, pos) -> {
                      if (level instanceof ServerLevel) {
                          ExperienceOrb.award((ServerLevel)level, Vec3.atCenterOf(pos), this.getExperienceAmount(level));
-@@ -95,6 +_,7 @@
+@@ -94,6 +_,7 @@
              }
  
              private int getExperienceAmount(final Level level) {
 +                if (xp > -1) return xp;
-                 int i = 0;
-                 i += this.getExperienceFromItem(GrindstoneMenu.this.repairSlots.getItem(0));
-                 i += this.getExperienceFromItem(GrindstoneMenu.this.repairSlots.getItem(1));
-@@ -138,6 +_,17 @@
+                 int amount = 0;
+                 amount += this.getExperienceFromItem(GrindstoneMenu.this.repairSlots.getItem(0));
+                 amount += this.getExperienceFromItem(GrindstoneMenu.this.repairSlots.getItem(1));
+@@ -137,6 +_,17 @@
      }
  
      private ItemStack computeResult(final ItemStack input, final ItemStack additional) {
@@ -57,6 +57,6 @@
 +            this.xp = Integer.MIN_VALUE;
 +        }
 +
-         boolean flag = !input.isEmpty() || !additional.isEmpty();
-         if (!flag) {
+         boolean hasAnItem = !input.isEmpty() || !additional.isEmpty();
+         if (!hasAnItem) {
              return ItemStack.EMPTY;

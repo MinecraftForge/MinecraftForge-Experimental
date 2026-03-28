@@ -4,30 +4,30 @@
          Player player = this.minecraft.player;
          if (isFirstPerson && !isSleeping) {
              if (!player.noPhysics) {
--                BlockState blockstate = getViewBlockingState(player);
+-                BlockState blockState = getViewBlockingState(player);
 +                var overlay = getOverlayBlock(player);
-+                BlockState blockstate = overlay == null ? null : overlay.getLeft();
-                 if (blockstate != null) {
-+                    if (!net.minecraftforge.client.ForgeHooksClient.renderBlockOverlay(player, posestack, net.minecraftforge.client.event.RenderBlockScreenEffectEvent.OverlayType.BLOCK, overlay.getLeft(), overlay.getRight()))
-                     renderTex(this.minecraft.getModelManager().getBlockStateModelSet().getParticleMaterial(blockstate).sprite(), posestack, this.bufferSource);
++                BlockState blockState = overlay == null ? null : overlay.getLeft();
+                 if (blockState != null) {
++                    if (!net.minecraftforge.client.ForgeHooksClient.renderBlockOverlay(player, poseStack, net.minecraftforge.client.event.RenderBlockScreenEffectEvent.OverlayType.BLOCK, overlay.getLeft(), overlay.getRight()))
+                     renderTex(this.minecraft.getModelManager().getBlockStateModelSet().getParticleMaterial(blockState).sprite(), poseStack, this.bufferSource);
                  }
              }
  
              if (!this.minecraft.player.isSpectator()) {
                  if (this.minecraft.player.isEyeInFluid(FluidTags.WATER)) {
-+                    if (!net.minecraftforge.client.ForgeHooksClient.renderWaterOverlay(player, posestack))
-                     renderWater(this.minecraft, posestack, this.bufferSource);
++                    if (!net.minecraftforge.client.ForgeHooksClient.renderWaterOverlay(player, poseStack))
+                     renderWater(this.minecraft, poseStack, this.bufferSource);
 +                } else if (!player.getEyeInFluidType().isAir()) {
-+                    net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(player.getEyeInFluidType()).renderOverlay(this.minecraft, posestack, this.bufferSource);
++                    net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(player.getEyeInFluidType()).renderOverlay(this.minecraft, poseStack, this.bufferSource);
                  }
  
                  if (this.minecraft.player.isOnFire()) {
-                     TextureAtlasSprite textureatlassprite = this.sprites.get(ModelBakery.FIRE_1);
-+                    if (!net.minecraftforge.client.ForgeHooksClient.renderFireOverlay(player, posestack))
-                     renderFire(posestack, this.bufferSource, textureatlassprite);
+                     TextureAtlasSprite fireSprite = this.sprites.get(ModelBakery.FIRE_1);
++                    if (!net.minecraftforge.client.ForgeHooksClient.renderFireOverlay(player, poseStack))
+                     renderFire(poseStack, this.bufferSource, fireSprite);
                  }
              }
-@@ -126,6 +_,11 @@
+@@ -124,6 +_,11 @@
      }
  
      private static @Nullable BlockState getViewBlockingState(final Player player) {
@@ -36,19 +36,19 @@
 +    }
 +
 +    private static org.apache.commons.lang3.tuple.@Nullable Pair<BlockState, BlockPos> getOverlayBlock(Player player) {
-         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();
+         BlockPos.MutableBlockPos testPos = new BlockPos.MutableBlockPos();
  
          for (int i = 0; i < 8; i++) {
-@@ -135,7 +_,7 @@
-             blockpos$mutableblockpos.set(d0, d1, d2);
-             BlockState blockstate = player.level().getBlockState(blockpos$mutableblockpos);
-             if (blockstate.getRenderShape() != RenderShape.INVISIBLE && blockstate.isViewBlocking(player.level(), blockpos$mutableblockpos)) {
--                return blockstate;
-+                return org.apache.commons.lang3.tuple.Pair.of(blockstate, blockpos$mutableblockpos.immutable());
+@@ -133,7 +_,7 @@
+             testPos.set(xo, yo, zo);
+             BlockState blockState = player.level().getBlockState(testPos);
+             if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.isViewBlocking(player.level(), testPos)) {
+-                return blockState;
++                return org.apache.commons.lang3.tuple.Pair.of(blockState, testPos.immutable());
              }
          }
  
-@@ -163,6 +_,10 @@
+@@ -161,6 +_,10 @@
      }
  
      private static void renderWater(final Minecraft minecraft, final PoseStack poseStack, final MultiBufferSource bufferSource) {
@@ -56,15 +56,15 @@
 +    }
 +
 +    public static void renderFluid(Minecraft minecraft, PoseStack poseStack, MultiBufferSource bufferSource, Identifier texture) {
-         BlockPos blockpos = BlockPos.containing(minecraft.player.getX(), minecraft.player.getEyeY(), minecraft.player.getZ());
-         float f = Lightmap.getBrightness(minecraft.player.level().dimensionType(), minecraft.player.level().getMaxLocalRawBrightness(blockpos));
-         int i = ARGB.colorFromFloat(0.1F, f, f, f);
-@@ -175,7 +_,7 @@
-         float f7 = -minecraft.player.getYRot() / 64.0F;
-         float f8 = minecraft.player.getXRot() / 64.0F;
-         Matrix4f matrix4f = poseStack.last().pose();
--        VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderTypes.blockScreenEffect(UNDERWATER_LOCATION));
-+        VertexConsumer vertexconsumer = bufferSource.getBuffer(RenderTypes.blockScreenEffect(texture));
-         vertexconsumer.addVertex(matrix4f, -1.0F, -1.0F, -0.5F).setUv(4.0F + f7, 4.0F + f8).setColor(i);
-         vertexconsumer.addVertex(matrix4f, 1.0F, -1.0F, -0.5F).setUv(0.0F + f7, 4.0F + f8).setColor(i);
-         vertexconsumer.addVertex(matrix4f, 1.0F, 1.0F, -0.5F).setUv(0.0F + f7, 0.0F + f8).setColor(i);
+         BlockPos pos = BlockPos.containing(minecraft.player.getX(), minecraft.player.getEyeY(), minecraft.player.getZ());
+         float br = Lightmap.getBrightness(minecraft.player.level().dimensionType(), minecraft.player.level().getMaxLocalRawBrightness(pos));
+         int color = ARGB.colorFromFloat(0.1F, br, br, br);
+@@ -173,7 +_,7 @@
+         float uo = -minecraft.player.getYRot() / 64.0F;
+         float vo = minecraft.player.getXRot() / 64.0F;
+         Matrix4f pose = poseStack.last().pose();
+-        VertexConsumer builder = bufferSource.getBuffer(RenderTypes.blockScreenEffect(UNDERWATER_LOCATION));
++        VertexConsumer builder = bufferSource.getBuffer(RenderTypes.blockScreenEffect(texture));
+         builder.addVertex(pose, -1.0F, -1.0F, -0.5F).setUv(4.0F + uo, 4.0F + vo).setColor(color);
+         builder.addVertex(pose, 1.0F, -1.0F, -0.5F).setUv(0.0F + uo, 4.0F + vo).setColor(color);
+         builder.addVertex(pose, 1.0F, 1.0F, -0.5F).setUv(0.0F + uo, 0.0F + vo).setColor(color);

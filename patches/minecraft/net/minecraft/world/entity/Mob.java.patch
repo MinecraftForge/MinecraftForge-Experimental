@@ -51,27 +51,27 @@
              && this.canPickUpLoot()
              && this.isAlive()
              && !this.dead
--            && serverlevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
-+            && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverlevel, this)) {
-             Vec3i vec3i = this.getPickupReach();
+-            && serverLevel.getGameRules().get(GameRules.MOB_GRIEFING)) {
++            && net.minecraftforge.event.ForgeEventFactory.getMobGriefingEvent(serverLevel, this)) {
+             Vec3i pickupReach = this.getPickupReach();
  
-             for (ItemEntity itementity : this.level()
-@@ -658,6 +_,14 @@
+             for (ItemEntity entity : this.level()
+@@ -657,6 +_,14 @@
              this.discard();
          } else if (!this.isPersistenceRequired() && !this.requiresCustomPersistence()) {
-             Entity entity = this.level().getNearestPlayer(this, -1.0);
+             Entity player = this.level().getNearestPlayer(this, -1.0);
 +            var result = net.minecraftforge.event.ForgeEventFactory.canEntityDespawn(this, (ServerLevel)this.level());
 +            if (result.isDenied()) {
 +                noActionTime = 0;
-+                entity = null;
++                player = null;
 +            } else if (result.isAllowed()) {
 +                this.discard();
-+                entity = null;
++                player = null;
 +            }
-             if (entity != null) {
-                 double d0 = entity.distanceToSqr(this);
-                 int i = this.getType().getCategory().getDespawnDistance();
-@@ -1059,6 +_,16 @@
+             if (player != null) {
+                 double distSqr = player.distanceToSqr(this);
+                 int instantDespawnDistance = this.getType().getCategory().getDespawnDistance();
+@@ -1058,6 +_,16 @@
          }
      }
  
@@ -88,16 +88,16 @@
      public @Nullable SpawnGroupData finalizeSpawn(
          final ServerLevelAccessor level, final DifficultyInstance difficulty, final EntitySpawnReason spawnReason, final @Nullable SpawnGroupData groupData
      ) {
-@@ -1071,6 +_,7 @@
+@@ -1070,6 +_,7 @@
          }
  
-         this.setLeftHanded(randomsource.nextFloat() < 0.05F);
+         this.setLeftHanded(random.nextFloat() < 0.05F);
 +        this.spawnReason = spawnReason;
          return groupData;
      }
  
-@@ -1382,15 +_,25 @@
-         return flag;
+@@ -1383,15 +_,25 @@
+         return wasHurt;
      }
  
 +    @Deprecated // FORGE: use jumpInFluid instead
@@ -123,7 +123,7 @@
      @VisibleForTesting
      public void removeFreeWill() {
          this.removeAllGoals(goal -> true);
-@@ -1416,6 +_,41 @@
+@@ -1417,6 +_,41 @@
      @Override
      public @Nullable ItemStack getPickResult() {
          return SpawnEggItem.byId(this.getType()).map(ItemStack::new).orElse(null);

@@ -3,9 +3,9 @@
 @@ -25,7 +_,7 @@
  
      protected boolean checkExtraStartConditions(final ServerLevel level, final E body) {
-         LivingEntity livingentity = getAttackTarget(body);
--        return body.isHolding(Items.CROSSBOW) && BehaviorUtils.canSee(body, livingentity) && BehaviorUtils.isWithinAttackRange(body, livingentity, 0);
-+        return body.isHolding(is -> is.getItem() instanceof CrossbowItem) && BehaviorUtils.canSee(body, livingentity) && BehaviorUtils.isWithinAttackRange(body, livingentity, 0);
+         LivingEntity attackTarget = getAttackTarget(body);
+-        return body.isHolding(Items.CROSSBOW) && BehaviorUtils.canSee(body, attackTarget) && BehaviorUtils.isWithinAttackRange(body, attackTarget, 0);
++        return body.isHolding(is -> is.getItem() instanceof CrossbowItem) && BehaviorUtils.canSee(body, attackTarget) && BehaviorUtils.isWithinAttackRange(body, attackTarget, 0);
      }
  
      protected boolean canStillUse(final ServerLevel level, final E body, final long timestamp) {

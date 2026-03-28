@@ -1,28 +1,28 @@
 --- a/net/minecraft/world/level/block/RedStoneWireBlock.java
 +++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
-@@ -244,7 +_,7 @@
-         BlockState blockstate = level.getBlockState(blockpos);
+@@ -242,7 +_,7 @@
+         BlockState relativeState = level.getBlockState(relativePos);
          if (canConnectUp) {
-             boolean flag = blockstate.getBlock() instanceof TrapDoorBlock || this.canSurviveOn(level, blockpos, blockstate);
--            if (flag && shouldConnectTo(level.getBlockState(blockpos.above()))) {
-+            if (flag && level.getBlockState(blockpos.above()).canRedstoneConnectTo(level, blockpos.above(), null)) {
-                 if (blockstate.isFaceSturdy(level, blockpos, direction.getOpposite())) {
+             boolean isPlaceableAbove = relativeState.getBlock() instanceof TrapDoorBlock || this.canSurviveOn(level, relativePos, relativeState);
+-            if (isPlaceableAbove && shouldConnectTo(level.getBlockState(relativePos.above()))) {
++            if (isPlaceableAbove && level.getBlockState(relativePos.above()).canRedstoneConnectTo(level, relativePos.above(), null)) {
+                 if (relativeState.isFaceSturdy(level, relativePos, direction.getOpposite())) {
                      return RedstoneSide.UP;
                  }
-@@ -253,10 +_,14 @@
+@@ -251,10 +_,14 @@
              }
          }
  
--        return !shouldConnectTo(blockstate, direction)
--                && (blockstate.isRedstoneConductor(level, blockpos) || !shouldConnectTo(level.getBlockState(blockpos.below())))
+-        return !shouldConnectTo(relativeState, direction)
+-                && (relativeState.isRedstoneConductor(level, relativePos) || !shouldConnectTo(level.getBlockState(relativePos.below())))
 -            ? RedstoneSide.NONE
 -            : RedstoneSide.SIDE;
-+        if (blockstate.canRedstoneConnectTo(level, blockpos, direction)) {
++        if (relativeState.canRedstoneConnectTo(level, relativePos, direction)) {
 +            return RedstoneSide.SIDE;
-+        } else if (blockstate.isRedstoneConductor(level, blockpos)) {
++        } else if (relativeState.isRedstoneConductor(level, relativePos)) {
 +            return RedstoneSide.NONE;
 +        } else {
-+            BlockPos blockPosBelow = blockpos.below();
++            BlockPos blockPosBelow = relativePos.below();
 +            return level.getBlockState(blockPosBelow).canRedstoneConnectTo(level, blockPosBelow, null) ? RedstoneSide.SIDE : RedstoneSide.NONE;
 +        }
      }

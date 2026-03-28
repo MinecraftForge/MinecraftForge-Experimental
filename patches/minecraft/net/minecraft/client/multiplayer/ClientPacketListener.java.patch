@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientPacketListener.java
 +++ b/net/minecraft/client/multiplayer/ClientPacketListener.java
-@@ -536,6 +_,7 @@
+@@ -531,6 +_,7 @@
          this.debugSubscriber.clear();
          this.minecraft.levelRenderer.debugRenderer.refreshRendererList();
          this.minecraft.player.resetPos();
@@ -8,25 +8,25 @@
          this.minecraft.player.setId(packet.playerId());
          this.level.addEntity(this.minecraft.player);
          this.minecraft.player.input = new KeyboardInput(this.minecraft.options);
-@@ -1345,6 +_,8 @@
-             localplayer1.getAttributes().assignBaseValues(localplayer.getAttributes());
+@@ -1325,6 +_,8 @@
+             newPlayer.getAttributes().assignBaseValues(oldPlayer.getAttributes());
          }
  
-+        localplayer1.updateSyncFields(localplayer); // Forge: fix MC-10657
-+        net.minecraftforge.client.event.ForgeEventFactoryClient.firePlayerRespawn(this.minecraft.gameMode, localplayer, localplayer1, localplayer1.connection.connection);
-         this.level.addEntity(localplayer1);
-         localplayer1.input = new KeyboardInput(this.minecraft.options);
-         this.minecraft.gameMode.adjustPlayer(localplayer1);
-@@ -1504,7 +_,7 @@
-             ProblemReporter.ScopedCollector problemreporter$scopedcollector = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER);
++        newPlayer.updateSyncFields(oldPlayer); // Forge: fix MC-10657
++        net.minecraftforge.client.event.ForgeEventFactoryClient.firePlayerRespawn(this.minecraft.gameMode, oldPlayer, newPlayer, newPlayer.connection.connection);
+         this.level.addEntity(newPlayer);
+         newPlayer.input = new KeyboardInput(this.minecraft.options);
+         this.minecraft.gameMode.adjustPlayer(newPlayer);
+@@ -1480,7 +_,7 @@
+             ProblemReporter.ScopedCollector reporter = new ProblemReporter.ScopedCollector(blockEntity.problemPath(), LOGGER);
  
              try {
--                blockEntity.loadWithComponents(TagValueInput.create(problemreporter$scopedcollector, this.registryAccess, packet.getTag()));
-+                blockEntity.onDataPacket(connection, TagValueInput.create(problemreporter$scopedcollector, this.registryAccess, packet.getTag()), this.registryAccess);
-             } catch (Throwable throwable1) {
+-                blockEntity.loadWithComponents(TagValueInput.create(reporter, this.registryAccess, packet.getTag()));
++                blockEntity.onDataPacket(connection, TagValueInput.create(reporter, this.registryAccess, packet.getTag()), this.registryAccess);
+             } catch (Throwable var7) {
                  try {
-                     problemreporter$scopedcollector.close();
-@@ -1727,7 +_,9 @@
+                     reporter.close();
+@@ -1687,7 +_,9 @@
      @Override
      public void handleCommands(final ClientboundCommandsPacket packet) {
          PacketUtils.ensureRunningOnSameThread(packet, this, this.minecraft.packetProcessor());
@@ -37,24 +37,24 @@
      }
  
      @Override
-@@ -1828,6 +_,7 @@
-         if (this.minecraft.screen instanceof RecipeUpdateListener recipeupdatelistener) {
-             recipeupdatelistener.recipesUpdated();
+@@ -1788,6 +_,7 @@
+         if (this.minecraft.screen instanceof RecipeUpdateListener updateListener) {
+             updateListener.recipesUpdated();
          }
 +        net.minecraftforge.client.event.ForgeEventFactoryClient.onRecipesUpdated(recipeBook);
      }
  
      @Override
-@@ -1872,6 +_,8 @@
+@@ -1832,6 +_,8 @@
          this.fuelValues = FuelValues.vanillaBurnTimes(this.registryAccess, this.enabledFeatures);
-         List<ItemStack> list1 = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
-         this.searchTrees.updateCreativeTags(list1);
+         List<ItemStack> searchItems = List.copyOf(CreativeModeTabs.searchTab().getDisplayItems());
+         this.searchTrees.updateCreativeTags(searchItems);
 +
 +        net.minecraftforge.event.ForgeEventFactory.onTagsUpdated(this.registryAccess, true, this.connection.isMemoryConnection());
      }
  
      @Override
-@@ -2688,7 +_,9 @@
+@@ -2650,7 +_,9 @@
          }
      }
  
@@ -62,18 +62,18 @@
 +    public void sendChat(String content) {
 +        content = net.minecraftforge.client.ForgeHooksClient.onClientSendMessage(content);
 +        if (content.isEmpty()) return;
-         Instant instant = Instant.now();
-         long i = Crypt.SaltSupplier.getLong();
-         LastSeenMessagesTracker.Update lastseenmessagestracker$update = this.lastSeenMessages.generateAndApplyUpdate();
-@@ -2698,6 +_,7 @@
+         Instant timeStamp = Instant.now();
+         long salt = Crypt.SaltSupplier.getLong();
+         LastSeenMessagesTracker.Update lastSeenUpdate = this.lastSeenMessages.generateAndApplyUpdate();
+@@ -2659,6 +_,7 @@
      }
  
      public void sendCommand(final String command) {
 +        if (net.minecraftforge.client.ClientCommandHandler.runCommand(command)) return;
-         SignableCommand<ClientSuggestionProvider> signablecommand = SignableCommand.of(this.commands.parse(command, this.suggestionsProvider));
-         if (signablecommand.arguments().isEmpty()) {
+         SignableCommand<ClientSuggestionProvider> signableCommand = SignableCommand.of(this.commands.parse(command, this.suggestionsProvider));
+         if (signableCommand.arguments().isEmpty()) {
              this.send(new ServerboundChatCommandPacket(command));
-@@ -2714,6 +_,7 @@
+@@ -2675,6 +_,7 @@
      }
  
      public void sendUnattendedCommand(final String command, final @Nullable Screen screenAfterCommand) {

@@ -1,20 +1,20 @@
 --- a/net/minecraft/util/datafix/fixes/StructuresBecomeConfiguredFix.java
 +++ b/net/minecraft/util/datafix/fixes/StructuresBecomeConfiguredFix.java
 @@ -178,7 +_,16 @@
-         String s = dynamicKey.asString("UNKNOWN").toLowerCase(Locale.ROOT);
-         StructuresBecomeConfiguredFix.Conversion structuresbecomeconfiguredfix$conversion = CONVERSION_MAP.get(s);
-         if (structuresbecomeconfiguredfix$conversion == null) {
+         String key = dynamicKey.asString("UNKNOWN").toLowerCase(Locale.ROOT);
+         StructuresBecomeConfiguredFix.Conversion conversion = CONVERSION_MAP.get(key);
+         if (conversion == null) {
 -            return null;
 +            // Forge: hook for mods to register conversions through RegisterStructureConversionsEvent
-+            structuresbecomeconfiguredfix$conversion = net.minecraftforge.common.ForgeHooks.getStructureConversion(s);
++            conversion = net.minecraftforge.common.ForgeHooks.getStructureConversion(key);
 +        }
-+        if (structuresbecomeconfiguredfix$conversion == null) {
-+            if (net.minecraftforge.common.ForgeHooks.checkStructureNamespace(s)) {
++        if (conversion == null) {
++            if (net.minecraftforge.common.ForgeHooks.checkStructureNamespace(key)) {
 +                // Forge: pass-through structure IDs which have a non-"minecraft" namespace
-+                return chunk.createString(s);
++                return chunk.createString(key);
 +            }
 +            // Forge: Pass-through with "unknown." prefix, so deserializer logs and ignores rather than fixer throwing an exception and dropping chunk data
-+            return chunk.createString("unknown." + s);
++            return chunk.createString("unknown." + key);
          } else {
-             String s1 = structuresbecomeconfiguredfix$conversion.fallback;
-             if (!structuresbecomeconfiguredfix$conversion.biomeMapping().isEmpty()) {
+             String resultingId = conversion.fallback;
+             if (!conversion.biomeMapping().isEmpty()) {

@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/sounds/SoundEngine.java
 +++ b/net/minecraft/client/sounds/SoundEngine.java
-@@ -84,6 +_,7 @@
+@@ -82,6 +_,7 @@
          this.options = options;
          this.soundBuffers = new SoundBufferLibrary(resourceProvider);
          this.lastSeenDevices = this.deviceTracker.currentDevices();
@@ -8,7 +8,7 @@
      }
  
      public void reload() {
-@@ -101,6 +_,7 @@
+@@ -99,6 +_,7 @@
  
          this.destroy();
          this.loadLibrary();
@@ -16,7 +16,7 @@
      }
  
      private synchronized void loadLibrary() {
-@@ -342,12 +_,15 @@
+@@ -340,12 +_,15 @@
          }
      }
  
@@ -30,22 +30,22 @@
 +            instance = net.minecraftforge.client.ForgeHooksClient.playSound(this, instance);
 +            if (instance == null || !instance.canPlaySound())
 +                return SoundEngine.PlayResult.NOT_STARTED;
-             WeighedSoundEvents weighedsoundevents = instance.resolve(this.soundManager);
-             Identifier identifier = instance.getIdentifier();
-             if (weighedsoundevents == null) {
-@@ -427,15 +_,18 @@
-                         channel.setSelfPosition(vec3);
-                         channel.setRelative(flag);
+             WeighedSoundEvents soundEvent = instance.resolve(this.soundManager);
+             Identifier eventLocation = instance.getIdentifier();
+             if (soundEvent == null) {
+@@ -425,15 +_,18 @@
+                         channel.setSelfPosition(position);
+                         channel.setRelative(isRelative);
                      });
 +                    SoundInstance soundinstance = instance;
-                     if (!flag1) {
-                         this.soundBuffers.getCompleteBuffer(sound.getPath()).thenAccept(soundBuffer -> channelaccess$channelhandle.execute(channel -> {
+                     if (!isStreaming) {
+                         this.soundBuffers.getCompleteBuffer(sound.getPath()).thenAccept(soundBuffer -> handle.execute(channel -> {
                              channel.attachStaticBuffer(soundBuffer);
                              channel.play();
 +                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlaySoundSource(this, soundinstance, channel);
                          }));
                      } else {
-                         this.soundBuffers.getStream(sound.getPath(), flag3).thenAccept(stream -> channelaccess$channelhandle.execute(channel -> {
+                         this.soundBuffers.getStream(sound.getPath(), isLooping).thenAccept(stream -> handle.execute(channel -> {
                              channel.attachBufferStream(stream);
                              channel.play();
 +                            net.minecraftforge.client.event.ForgeEventFactoryClient.onPlayStreamingSource(this, soundinstance, channel);

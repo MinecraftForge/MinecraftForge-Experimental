@@ -3,19 +3,19 @@
 @@ -32,6 +_,9 @@
                  return false;
              } else {
-                 int i = this.getUseDuration(itemStack, entity) - remainingTime;
-+                i = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(itemStack, level, player, i, true);
-+                if (i < 0) return false;
+                 int timeHeld = this.getUseDuration(itemStack, entity) - remainingTime;
++                timeHeld = net.minecraftforge.event.ForgeEventFactory.onArrowLoose(itemStack, level, player, timeHeld, true);
++                if (timeHeld < 0) return false;
 +
-                 float f = getPowerForTime(i);
-                 if (f < 0.1) {
+                 float pow = getPowerForTime(timeHeld);
+                 if (pow < 0.1) {
                      return false;
 @@ -95,6 +_,8 @@
      public InteractionResult use(final Level level, final Player player, final InteractionHand hand) {
-         ItemStack itemstack = player.getItemInHand(hand);
-         boolean flag = !player.getProjectile(itemstack).isEmpty();
-+        var ret = net.minecraftforge.event.ForgeEventFactory.onArrowNock(itemstack, level, player, hand, flag);
+         ItemStack itemStack = player.getItemInHand(hand);
+         boolean foundProjectile = !player.getProjectile(itemStack).isEmpty();
++        var ret = net.minecraftforge.event.ForgeEventFactory.onArrowNock(itemStack, level, player, hand, foundProjectile);
 +        if (ret != null) return ret;
-         if (!player.hasInfiniteMaterials() && !flag) {
+         if (!player.hasInfiniteMaterials() && !foundProjectile) {
              return InteractionResult.FAIL;
          } else {

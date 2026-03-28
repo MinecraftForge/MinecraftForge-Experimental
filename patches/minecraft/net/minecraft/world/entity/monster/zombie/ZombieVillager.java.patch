@@ -2,8 +2,8 @@
 +++ b/net/minecraft/world/entity/monster/zombie/ZombieVillager.java
 @@ -156,7 +_,7 @@
          if (!this.level().isClientSide() && this.isAlive() && this.isConverting()) {
-             int i = this.getConversionProgress();
-             this.villagerConversionTime -= i;
+             int amount = this.getConversionProgress();
+             this.villagerConversionTime -= amount;
 -            if (this.villagerConversionTime <= 0) {
 +            if (this.villagerConversionTime <= 0 && net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.VILLAGER, (timer) -> this.villagerConversionTime = timer)) {
                  this.finishConversion((ServerLevel)this.level());

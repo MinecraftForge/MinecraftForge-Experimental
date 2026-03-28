@@ -3,17 +3,17 @@
 @@ -161,6 +_,7 @@
          if (!oldState.is(state.getBlock())) {
              if (inPortalDimension(level)) {
-                 Optional<PortalShape> optional = PortalShape.findEmptyPortalShape(level, pos, Direction.Axis.X);
-+                optional = net.minecraftforge.event.ForgeEventFactory.onTrySpawnPortal(level, pos, optional);
-                 if (optional.isPresent()) {
-                     optional.get().createPortalBlocks(level);
+                 Optional<PortalShape> optionalShape = PortalShape.findEmptyPortalShape(level, pos, Direction.Axis.X);
++                optionalShape = net.minecraftforge.event.ForgeEventFactory.onTrySpawnPortal(level, pos, optionalShape);
+                 if (optionalShape.isPresent()) {
+                     optionalShape.get().createPortalBlocks(level);
                      return;
 @@ -203,7 +_,7 @@
-             boolean flag = false;
+             boolean hasObsidian = false;
  
-             for (Direction direction : Direction.values()) {
--                if (level.getBlockState(blockpos$mutableblockpos.set(pos).move(direction)).is(Blocks.OBSIDIAN)) {
-+                if (level.getBlockState(blockpos$mutableblockpos.set(pos).move(direction)).isPortalFrame(level, blockpos$mutableblockpos)) {
-                     flag = true;
+             for (Direction face : Direction.values()) {
+-                if (level.getBlockState(testPos.set(pos).move(face)).is(Blocks.OBSIDIAN)) {
++                if (level.getBlockState(testPos.set(pos).move(face)).isPortalFrame(level, testPos)) {
+                     hasObsidian = true;
                      break;
                  }

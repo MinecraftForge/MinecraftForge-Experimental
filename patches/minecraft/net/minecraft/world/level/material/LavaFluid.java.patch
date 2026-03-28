@@ -1,22 +1,22 @@
 --- a/net/minecraft/world/level/material/LavaFluid.java
 +++ b/net/minecraft/world/level/material/LavaFluid.java
 @@ -93,7 +_,7 @@
-                     BlockState blockstate = level.getBlockState(blockpos);
-                     if (blockstate.isAir()) {
-                         if (this.hasFlammableNeighbours(level, blockpos)) {
--                            level.setBlockAndUpdate(blockpos, BaseFireBlock.getState(level, blockpos));
-+                            level.setBlockAndUpdate(blockpos, net.minecraftforge.event.ForgeEventFactory.fireFluidPlaceBlockEvent(level, blockpos, pos, Blocks.FIRE.defaultBlockState()));
+                     BlockState blockState = level.getBlockState(testPos);
+                     if (blockState.isAir()) {
+                         if (this.hasFlammableNeighbours(level, testPos)) {
+-                            level.setBlockAndUpdate(testPos, BaseFireBlock.getState(level, testPos));
++                            level.setBlockAndUpdate(testPos, net.minecraftforge.event.ForgeEventFactory.fireFluidPlaceBlockEvent(level, testPos, pos, Blocks.FIRE.defaultBlockState()));
                              return;
                          }
-                     } else if (blockstate.blocksMotion()) {
+                     } else if (blockState.blocksMotion()) {
 @@ -107,8 +_,8 @@
                          return;
                      }
  
--                    if (level.isEmptyBlock(blockpos1.above()) && this.isFlammable(level, blockpos1)) {
--                        level.setBlockAndUpdate(blockpos1.above(), BaseFireBlock.getState(level, blockpos1));
-+                    if (level.isEmptyBlock(blockpos1.above()) && this.isFlammable(level, blockpos1, Direction.UP)) {
-+                        level.setBlockAndUpdate(blockpos1.above(), net.minecraftforge.event.ForgeEventFactory.fireFluidPlaceBlockEvent(level, blockpos1.above(), pos, Blocks.FIRE.defaultBlockState()));
+-                    if (level.isEmptyBlock(testPos.above()) && this.isFlammable(level, testPos)) {
+-                        level.setBlockAndUpdate(testPos.above(), BaseFireBlock.getState(level, testPos));
++                    if (level.isEmptyBlock(testPos.above()) && this.isFlammable(level, testPos, Direction.UP)) {
++                        level.setBlockAndUpdate(testPos.above(), net.minecraftforge.event.ForgeEventFactory.fireFluidPlaceBlockEvent(level, testPos.above(), pos, Blocks.FIRE.defaultBlockState()));
                      }
                  }
              }
@@ -47,13 +47,12 @@
      @Override
      public @Nullable ParticleOptions getDripParticle() {
          return ParticleTypes.DRIPPING_LAVA;
-@@ -206,7 +_,8 @@
-             FluidState fluidstate = level.getFluidState(pos);
-             if (this.is(FluidTags.LAVA) && fluidstate.is(FluidTags.WATER)) {
+@@ -206,7 +_,7 @@
+             FluidState fluidState = level.getFluidState(pos);
+             if (this.is(FluidTags.LAVA) && fluidState.is(FluidTags.WATER)) {
                  if (state.getBlock() instanceof LiquidBlock) {
 -                    level.setBlock(pos, Blocks.STONE.defaultBlockState(), 3);
 +                    level.setBlock(pos, net.minecraftforge.event.ForgeEventFactory.fireFluidPlaceBlockEvent(level, pos, pos, Blocks.STONE.defaultBlockState()), 3);
-+
                  }
  
                  this.fizz(level, pos);

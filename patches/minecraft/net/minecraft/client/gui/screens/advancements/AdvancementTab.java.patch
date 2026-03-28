@@ -27,11 +27,11 @@
 @@ -155,8 +_,8 @@
              return null;
          } else {
-             for (AdvancementTabType advancementtabtype : AdvancementTabType.values()) {
--                if (index < advancementtabtype.getMax()) {
--                    return new AdvancementTab(minecraft, screen, advancementtabtype, index, root, optional.get());
-+                if ((index % AdvancementTabType.MAX_TABS) < advancementtabtype.getMax()) {
-+                    return new AdvancementTab(minecraft, screen, advancementtabtype, index % AdvancementTabType.MAX_TABS, index / AdvancementTabType.MAX_TABS, root, optional.get());
+             for (AdvancementTabType type : AdvancementTabType.values()) {
+-                if (index < type.getMax()) {
+-                    return new AdvancementTab(minecraft, screen, type, index, root, display.get());
++                if ((index % AdvancementTabType.MAX_TABS) < type.getMax()) {
++                    return new AdvancementTab(minecraft, screen, type, index % AdvancementTabType.MAX_TABS, index / AdvancementTabType.MAX_TABS, root, display.get());
                  }
  
-                 index -= advancementtabtype.getMax();
+                 index -= type.getMax();

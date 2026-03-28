@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/FenceGateBlock.java
 +++ b/net/minecraft/world/level/block/FenceGateBlock.java
-@@ -58,6 +_,8 @@
+@@ -57,6 +_,8 @@
          Util.mapValues(SHAPE_OCCLUSION, v -> v.move(0.0, -0.1875, 0.0).optimize())
      );
      private final WoodType type;
@@ -9,7 +9,7 @@
  
      @Override
      public MapCodec<FenceGateBlock> codec() {
-@@ -65,8 +_,14 @@
+@@ -64,8 +_,14 @@
      }
  
      public FenceGateBlock(final WoodType type, final BlockBehaviour.Properties properties) {
@@ -25,30 +25,30 @@
          this.registerDefaultState(this.stateDefinition.any().setValue(OPEN, false).setValue(POWERED, false).setValue(IN_WALL, false));
      }
  
-@@ -162,7 +_,7 @@
+@@ -160,7 +_,7 @@
  
-         boolean flag = state.getValue(OPEN);
+         boolean opens = state.getValue(OPEN);
          level.playSound(
--            player, pos, flag ? this.type.fenceGateOpen() : this.type.fenceGateClose(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
-+            player, pos, flag ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
+-            player, pos, opens ? this.type.fenceGateOpen() : this.type.fenceGateClose(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
++            player, pos, opens ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
          );
-         level.gameEvent(player, flag ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
+         level.gameEvent(player, opens ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
          return InteractionResult.SUCCESS;
-@@ -176,7 +_,7 @@
-             boolean flag = state.getValue(OPEN);
-             level.setBlockAndUpdate(pos, state.setValue(OPEN, !flag));
+@@ -174,7 +_,7 @@
+             boolean open = state.getValue(OPEN);
+             level.setBlockAndUpdate(pos, state.setValue(OPEN, !open));
              level.playSound(
--                null, pos, flag ? this.type.fenceGateClose() : this.type.fenceGateOpen(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
-+                null, pos, flag ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
+-                null, pos, open ? this.type.fenceGateClose() : this.type.fenceGateOpen(), SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
++                null, pos, open ? this.openSound : this.closeSound, SoundSource.BLOCKS, 1.0F, level.getRandom().nextFloat() * 0.1F + 0.9F
              );
-             level.gameEvent(flag ? GameEvent.BLOCK_CLOSE : GameEvent.BLOCK_OPEN, pos, GameEvent.Context.of(state));
+             level.gameEvent(open ? GameEvent.BLOCK_CLOSE : GameEvent.BLOCK_OPEN, pos, GameEvent.Context.of(state));
          }
-@@ -196,7 +_,7 @@
+@@ -194,7 +_,7 @@
                      level.playSound(
                          null,
                          pos,
--                        flag ? this.type.fenceGateOpen() : this.type.fenceGateClose(),
-+                        flag ? this.openSound : this.closeSound,
+-                        hasPower ? this.type.fenceGateOpen() : this.type.fenceGateClose(),
++                        hasPower ? this.openSound : this.closeSound,
                          SoundSource.BLOCKS,
                          1.0F,
                          level.getRandom().nextFloat() * 0.1F + 0.9F

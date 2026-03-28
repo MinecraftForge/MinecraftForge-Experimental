@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -102,7 +_,7 @@
+@@ -100,7 +_,7 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
@@ -9,7 +9,7 @@
      private static final List<Component> OP_NBT_WARNING = List.of(
          Component.translatable("item.op_warning.line1").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
          Component.translatable("item.op_warning.line2").withStyle(ChatFormatting.RED),
-@@ -260,12 +_,15 @@
+@@ -258,12 +_,15 @@
      }
  
      private ItemStack(final Holder<Item> item, final int count, final PatchedDataComponentMap components) {
@@ -25,7 +25,7 @@
          this.item = null;
          this.components = new PatchedDataComponentMap(DataComponentMap.EMPTY);
      }
-@@ -358,13 +_,22 @@
+@@ -356,13 +_,22 @@
      }
  
      public InteractionResult useOn(final UseOnContext context) {
@@ -39,25 +39,25 @@
 +
 +    private InteractionResult onItemUse(UseOnContext context, java.util.function.Function<UseOnContext, InteractionResult> callback) {
          Player player = context.getPlayer();
-         BlockPos blockpos = context.getClickedPos();
-         if (player != null && !player.getAbilities().mayBuild && !this.canPlaceOnBlockInAdventureMode(new BlockInWorld(context.getLevel(), blockpos, false))) {
+         BlockPos pos = context.getClickedPos();
+         if (player != null && !player.getAbilities().mayBuild && !this.canPlaceOnBlockInAdventureMode(new BlockInWorld(context.getLevel(), pos, false))) {
              return InteractionResult.PASS;
          } else {
-             Item item = this.getItem();
--            InteractionResult interactionresult = item.useOn(context);
-+            InteractionResult interactionresult = callback.apply(context);
-             if (player != null
-                 && interactionresult instanceof InteractionResult.Success interactionresult$success
-                 && interactionresult$success.wasItemInteraction()) {
-@@ -447,18 +_,26 @@
+             Item usedItem = this.getItem();
+-            InteractionResult result = usedItem.useOn(context);
++            InteractionResult result = callback.apply(context);
+             if (player != null && result instanceof InteractionResult.Success success && success.wasItemInteraction()) {
+                 player.awardStat(Stats.ITEM_USED.get(usedItem));
+             }
+@@ -443,18 +_,26 @@
      }
  
      public void hurtAndBreak(final int amount, final ServerLevel level, final @Nullable ServerPlayer player, final Consumer<Item> onBreak) {
--        int i = this.processDurabilityChange(amount, level, player);
+-        int newAmount = this.processDurabilityChange(amount, level, player);
 +        // FORGE: use context-sensitive sister of processDurabilityChange that calls IForgeItem.damageItem
-+        int i = this.processDurabilityChange(amount, level, player, true, onBreak);
-         if (i != 0) {
-             this.applyDamage(this.getDamageValue() + i, player, onBreak);
++        int newAmount = this.processDurabilityChange(amount, level, player, true, onBreak);
+         if (newAmount != 0) {
+             this.applyDamage(this.getDamageValue() + newAmount, player, onBreak);
          }
      }
  
@@ -77,30 +77,30 @@
              return amount > 0 ? EnchantmentHelper.processDurabilityChange(level, this, amount) : amount;
          }
      }
-@@ -498,7 +_,13 @@
-                 amount,
-                 serverlevel,
-                 owner instanceof ServerPlayer serverplayer ? serverplayer : null,
--                brokenItem -> owner.onEquippedItemBroken(brokenItem, slot)
-+                brokenItem -> {
-+                    if (owner instanceof Player player) {
-+                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(player, this, slot);
-+                        if (player.getUseItem() == this) player.stopUsingItem(); // Forge: fix MC-168573
+@@ -491,7 +_,13 @@
+     public void hurtAndBreak(final int amount, final LivingEntity owner, final EquipmentSlot slot) {
+         if (owner.level() instanceof ServerLevel serverLevel) {
+             this.hurtAndBreak(
+-                amount, serverLevel, owner instanceof ServerPlayer player ? player : null, brokenItem -> owner.onEquippedItemBroken(brokenItem, slot)
++                amount, serverLevel, owner instanceof ServerPlayer player ? player : null, brokenItem -> {
++                    if (owner instanceof Player ownerPlayer) {
++                        net.minecraftforge.event.ForgeEventFactory.onPlayerDestroyItem(ownerPlayer, this, slot);
++                        if (ownerPlayer.getUseItem() == this) ownerPlayer.stopUsingItem(); // Forge: fix MC-168573
 +                    }
 +                    owner.onEquippedItemBroken(brokenItem, slot);
 +                }
              );
          }
      }
-@@ -857,6 +_,7 @@
-             List<Component> list = Lists.newArrayList();
-             list.add(this.getStyledHoverName());
-             this.addDetailsToTooltip(context, tooltipdisplay, player, tooltipFlag, list::add);
-+            net.minecraftforge.event.ForgeEventFactory.onItemTooltip(this, player, list, tooltipFlag);
-             return list;
+@@ -850,6 +_,7 @@
+             List<Component> lines = Lists.newArrayList();
+             lines.add(this.getStyledHoverName());
+             this.addDetailsToTooltip(context, display, player, tooltipFlag, lines::add);
++            net.minecraftforge.event.ForgeEventFactory.onItemTooltip(this, player, lines, tooltipFlag);
+             return lines;
          }
      }
-@@ -1105,6 +_,7 @@
+@@ -1097,6 +_,7 @@
          }
      }
  

@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/clock/ServerClockManager.java
 +++ b/net/minecraft/world/clock/ServerClockManager.java
 @@ -97,6 +_,12 @@
-         return mutableboolean.booleanValue();
+         return set.booleanValue();
      }
  
 +    public long getTimeMarker(final Holder<WorldClock> clock, final ResourceKey<ClockTimeMarker> timeMarkerId) {

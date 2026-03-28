@@ -4,65 +4,65 @@
                  this.activeButton = null;
              }
  
-+            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPre(mousebuttoninfo, action)) return;
++            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPre(buttonInfo, action)) return;
              if (this.minecraft.getOverlay() == null) {
                  if (this.minecraft.screen == null) {
-                     if (!this.mouseGrabbed && flag) {
+                     if (!this.mouseGrabbed && pressed) {
 @@ -106,7 +_,7 @@
-                                 && i - this.lastClick.time() < 250L
+                                 && currentTime - this.lastClick.time() < 250L
                                  && this.lastClick.screen() == screen
-                                 && this.lastClickButton == mousebuttonevent.button();
--                            if (screen.mouseClicked(mousebuttonevent, flag1)) {
-+                            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseClicked(screen, d0, d1, mousebuttonevent, flag1)) {
-                                 this.lastClick = new MouseHandler.LastClick(i, screen);
-                                 this.lastClickButton = mousebuttoninfo.button();
+                                 && this.lastClickButton == event.button();
+-                            if (screen.mouseClicked(event, doubleClick)) {
++                            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseClicked(screen, xm, ym, event, doubleClick)) {
+                                 this.lastClick = new MouseHandler.LastClick(currentTime, screen);
+                                 this.lastClickButton = buttonInfo.button();
                                  return;
 @@ -121,7 +_,7 @@
                          }
                      } else {
                          try {
--                            if (screen.mouseReleased(mousebuttonevent)) {
-+                            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseReleased(screen, d0, d1, mousebuttonevent)) {
+-                            if (screen.mouseReleased(event)) {
++                            if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseReleased(screen, xm, ym, event)) {
                                  return;
                              }
-                         } catch (Throwable throwable) {
+                         } catch (Throwable var17) {
 @@ -151,6 +_,7 @@
-                     KeyMapping.click(inputconstants$key);
+                     KeyMapping.click(mouseKey);
                  }
              }
-+            net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPost(mousebuttoninfo, action);
++            net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseButtonPost(buttonInfo, action);
          }
      }
  
 @@ -202,7 +_,9 @@
                  if (this.minecraft.screen != null) {
-                     double d3 = this.getScaledXPos(this.minecraft.getWindow());
-                     double d4 = this.getScaledYPos(this.minecraft.getWindow());
--                    this.minecraft.screen.mouseScrolled(d3, d4, d1, d2);
-+                    if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseScrollPre(this.minecraft.screen, d3, d4, d1, d2)) return;
-+                    if (this.minecraft.screen.mouseScrolled(d3, d4, d1, d2)) return;
-+                    net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseScrollPost(this.minecraft.screen, d3, d4, d1, d2);
+                     double xm = this.getScaledXPos(this.minecraft.getWindow());
+                     double ym = this.getScaledYPos(this.minecraft.getWindow());
+-                    this.minecraft.screen.mouseScrolled(xm, ym, scaledXOffset, scaledYOffset);
++                    if (net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseScrollPre(this.minecraft.screen, xm, ym, scaledXOffset, scaledYOffset)) return;
++                    if (this.minecraft.screen.mouseScrolled(xm, ym, scaledXOffset, scaledYOffset)) return;
++                    net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenMouseScrollPost(this.minecraft.screen, xm, ym, scaledXOffset, scaledYOffset);
                      this.minecraft.screen.afterMouseAction();
                  } else if (this.minecraft.player != null) {
-                     Vector2i vector2i = this.scrollWheelHandler.onMouseScroll(d1, d2);
+                     Vector2i wheelXY = this.scrollWheelHandler.onMouseScroll(scaledXOffset, scaledYOffset);
 @@ -211,6 +_,7 @@
                      }
  
-                     int i = vector2i.y == 0 ? -vector2i.x : vector2i.y;
-+                    if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseScroll(this, d1, d2)) return;
+                     int wheel = wheelXY.y == 0 ? -wheelXY.x : wheelXY.y;
++                    if (net.minecraftforge.client.event.ForgeEventFactoryClient.onMouseScroll(this, scaledXOffset, scaledYOffset)) return;
                      if (this.minecraft.player.isSpectator()) {
                          if (this.minecraft.gui.getSpectatorGui().isMenuActive()) {
-                             this.minecraft.gui.getSpectatorGui().onMouseScrolled(-i);
-@@ -315,7 +_,7 @@
-                     double d5 = getScaledYPos(window, this.accumulatedDY);
+                             this.minecraft.gui.getSpectatorGui().onMouseScrolled(-wheel);
+@@ -317,7 +_,7 @@
+                     double dy = getScaledYPos(window, this.accumulatedDY);
  
                      try {
--                        screen.mouseDragged(new MouseButtonEvent(d2, d3, this.activeButton), d4, d5);
-+                        net.minecraftforge.client.ForgeHooksClient.onScreenMouseDrag(screen, new MouseButtonEvent(d2, d3, this.activeButton), d4, d5);
-                     } catch (Throwable throwable) {
-                         CrashReport crashreport1 = CrashReport.forThrowable(throwable, "mouseDragged event handler");
-                         screen.fillCrashDetails(crashreport1);
-@@ -400,6 +_,14 @@
+-                        screen.mouseDragged(new MouseButtonEvent(xm, ym, this.activeButton), dx, dy);
++                        net.minecraftforge.client.ForgeHooksClient.onScreenMouseDrag(screen, new MouseButtonEvent(xm, ym, this.activeButton), dx, dy);
+                     } catch (Throwable var19) {
+                         CrashReport report = CrashReport.forThrowable(var19, "mouseDragged event handler");
+                         screen.fillCrashDetails(report);
+@@ -402,6 +_,14 @@
  
      public double ypos() {
          return this.ypos;

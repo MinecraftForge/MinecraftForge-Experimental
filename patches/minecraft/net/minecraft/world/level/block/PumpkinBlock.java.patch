@@ -7,5 +7,5 @@
 -        if (!itemStack.is(Items.SHEARS)) {
 +        if (!itemStack.canPerformAction(net.minecraftforge.common.ToolActions.SHEARS_CARVE)) {
              return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
-         } else if (level instanceof ServerLevel serverlevel) {
-             Direction direction = hitResult.getDirection();
+         } else if (level instanceof ServerLevel serverLevel) {
+             Direction clickedDirection = hitResult.getDirection();

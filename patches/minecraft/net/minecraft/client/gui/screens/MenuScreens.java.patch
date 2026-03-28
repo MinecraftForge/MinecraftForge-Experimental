@@ -8,13 +8,13 @@
 +    }
 +
 +    public static <T extends AbstractContainerMenu> java.util.Optional<ScreenConstructor<T, ?>> getScreenFactory(@Nullable MenuType<T> type, Minecraft minecraft, int containerId, Component title) {
-         MenuScreens.ScreenConstructor<T, ?> screenconstructor = getConstructor(type);
-         if (screenconstructor == null) {
+         MenuScreens.ScreenConstructor<T, ?> constructor = getConstructor(type);
+         if (constructor == null) {
              LOGGER.warn("Failed to create screen for menu type: {}", BuiltInRegistries.MENU.getKey(type));
 +            return java.util.Optional.empty();
          } else {
--            screenconstructor.fromPacket(title, type, minecraft, containerId);
-+            return java.util.Optional.of(screenconstructor);
+-            constructor.fromPacket(title, type, minecraft, containerId);
++            return java.util.Optional.of(constructor);
          }
      }
  

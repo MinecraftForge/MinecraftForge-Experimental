@@ -1,9 +1,9 @@
 --- a/net/minecraft/client/particle/FlyTowardsPositionParticle.java
 +++ b/net/minecraft/client/particle/FlyTowardsPositionParticle.java
 @@ -107,6 +_,7 @@
-             this.x = this.xStart + this.xd * f;
-             this.y = this.yStart + this.yd * f - f1 * 1.2F;
-             this.z = this.zStart + this.zd * f;
+             this.x = this.xStart + this.xd * pos;
+             this.y = this.yStart + this.yd * pos - pp * 1.2F;
+             this.z = this.zStart + this.zd * pos;
 +            this.setPos(this.x, this.y, this.z); // FORGE: update the particle's bounding box
          }
      }

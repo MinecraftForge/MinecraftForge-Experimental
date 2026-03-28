@@ -9,8 +9,8 @@
      private VertexFormat(final List<VertexFormatElement> elements, final List<String> names, final IntList offsets, final int vertexSize) {
          this.elements = elements;
 @@ -41,6 +_,11 @@
-             int j = vertexformatelement != null ? elements.indexOf(vertexformatelement) : -1;
-             this.offsetsByElement[i] = j != -1 ? offsets.getInt(j) : -1;
+             int index = element != null ? elements.indexOf(element) : -1;
+             this.offsetsByElement[id] = index != -1 ? offsets.getInt(index) : -1;
          }
 +
 +        ImmutableMap.Builder<String, VertexFormatElement> elementMapping = ImmutableMap.builder();

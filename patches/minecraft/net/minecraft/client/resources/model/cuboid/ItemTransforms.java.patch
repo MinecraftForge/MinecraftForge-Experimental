@@ -26,22 +26,22 @@
      }
  
 @@ -70,6 +_,19 @@
-             ItemTransform itemtransform6 = this.getTransform(context, jsonobject, ItemDisplayContext.GROUND);
-             ItemTransform itemtransform7 = this.getTransform(context, jsonobject, ItemDisplayContext.FIXED);
-             ItemTransform itemtransform8 = this.getTransform(context, jsonobject, ItemDisplayContext.ON_SHELF);
+             ItemTransform ground = this.getTransform(context, object, ItemDisplayContext.GROUND);
+             ItemTransform fixed = this.getTransform(context, object, ItemDisplayContext.FIXED);
+             ItemTransform fixedFromBottom = this.getTransform(context, object, ItemDisplayContext.ON_SHELF);
 +            var builder = com.google.common.collect.ImmutableMap.<ItemDisplayContext, ItemTransform>builder();
 +            for (ItemDisplayContext type : ItemDisplayContext.values()) {
 +               if (type.isModded()) {
-+                  var transform = this.getTransform(context, jsonobject, type);
++                  var transform = this.getTransform(context, object, type);
 +                  var fallbackType = type;
 +                  while (transform == ItemTransform.NO_TRANSFORM && fallbackType.fallback() != null) {
 +                     fallbackType = fallbackType.fallback();
-+                     transform = this.getTransform(context, jsonobject, fallbackType);
++                     transform = this.getTransform(context, object, fallbackType);
 +                  }
 +                  if (transform != ItemTransform.NO_TRANSFORM)
 +                     builder.put(type, transform);
 +               }
 +            }
              return new ItemTransforms(
-                 itemtransform1, itemtransform, itemtransform3, itemtransform2, itemtransform4, itemtransform5, itemtransform6, itemtransform7, itemtransform8
+                 thirdPersonLeftHand, thirdPersonRightHand, firstPersonLeftHand, firstPersonRightHand, head, gui, ground, fixed, fixedFromBottom
              );

@@ -21,11 +21,11 @@
 @@ -43,6 +_,9 @@
      @Override
      protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
-         BlockPos blockpos = pos.below();
+         BlockPos below = pos.below();
 +        if (state.getBlock() == this) { //Forge: This function is called during world gen and placement, before this block is set, so if we are not 'here' then assume it's the pre-check.
-+            return level.getBlockState(blockpos).canSustainPlant(level, blockpos, Direction.UP, this);
++            return level.getBlockState(below).canSustainPlant(level, below, Direction.UP, this);
 +        }
-         return this.mayPlaceOn(level.getBlockState(blockpos), level, blockpos);
+         return this.mayPlaceOn(level.getBlockState(below), level, below);
      }
  
 @@ -54,5 +_,11 @@

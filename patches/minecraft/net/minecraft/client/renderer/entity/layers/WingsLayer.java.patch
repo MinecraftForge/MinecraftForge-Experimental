@@ -6,6 +6,6 @@
  
 -    protected static @Nullable Identifier getPlayerElytraTexture(final HumanoidRenderState state) {
 +    protected @Nullable Identifier getPlayerElytraTexture(final HumanoidRenderState state) {
-         if (state instanceof AvatarRenderState avatarrenderstate) {
-             PlayerSkin playerskin = avatarrenderstate.skin;
-             if (playerskin.elytra() != null) {
+         if (state instanceof AvatarRenderState playerState) {
+             PlayerSkin skin = playerState.skin;
+             if (skin.elytra() != null) {

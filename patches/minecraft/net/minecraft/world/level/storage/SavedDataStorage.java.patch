@@ -3,11 +3,11 @@
 @@ -122,6 +_,10 @@
              }
  
-             int i = NbtUtils.getDataVersion(compoundtag, 1343);
+             int version = NbtUtils.getDataVersion(tag, 1343);
 +            // Forge: Allow the data fixer to be null, leaving the modder responsible for keeping track of their own data formats
 +            if (type == null)
-+                compoundtag1 = compoundtag;
++                var8 = tag;
 +            else
-             compoundtag1 = type.update(this.fixerUpper, compoundtag, i, newVersion);
+             var8 = type.update(this.fixerUpper, tag, version, newVersion);
          }
  

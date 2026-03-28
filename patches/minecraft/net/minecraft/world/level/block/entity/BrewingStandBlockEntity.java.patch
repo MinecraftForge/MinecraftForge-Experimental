@@ -1,21 +1,21 @@
 --- a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 @@ -180,9 +_,10 @@
-         for (int i = 0; i < 3; i++) {
-             items.set(i, potionbrewing.mix(itemstack, items.get(i)));
+         for (int dest = 0; dest < 3; dest++) {
+             items.set(dest, potionBrewing.mix(ingredient, items.get(dest)));
          }
 +        net.minecraftforge.event.ForgeEventFactory.onPotionBrewed(items);
  
-+        ItemStackTemplate itemstacktemplate = itemstack.getCraftingRemainder();
-         itemstack.shrink(1);
--        ItemStackTemplate itemstacktemplate = itemstack.getItem().getCraftingRemainder();
-         if (itemstacktemplate != null) {
-             if (itemstack.isEmpty()) {
-                 itemstack = itemstacktemplate.create();
++        ItemStackTemplate remainder = ingredient.getCraftingRemainder();
+         ingredient.shrink(1);
+-        ItemStackTemplate remainder = ingredient.getItem().getCraftingRemainder();
+         if (remainder != null) {
+             if (ingredient.isEmpty()) {
+                 ingredient = remainder.create();
 @@ -221,6 +_,9 @@
          if (slot == 3) {
-             PotionBrewing potionbrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
-             return potionbrewing.isIngredient(itemStack);
+             PotionBrewing potionBrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
+             return potionBrewing.isIngredient(itemStack);
 +        } else if (slot != 4) {
 +            PotionBrewing potionbrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
 +            return this.getItem(slot).isEmpty() && potionbrewing.isValidInput(itemStack);

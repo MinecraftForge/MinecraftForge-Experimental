@@ -2,11 +2,11 @@
 +++ b/net/minecraft/world/level/levelgen/structure/StructureStart.java
 @@ -103,6 +_,9 @@
      public CompoundTag createTag(final StructurePieceSerializationContext context, final ChunkPos chunkPos) {
-         CompoundTag compoundtag = new CompoundTag();
+         CompoundTag tag = new CompoundTag();
          if (this.isValid()) {
 +            if (context.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(this.getStructure()) == null) { // FORGE: This is just a more friendly error instead of the 'Null String' below
 +               throw new RuntimeException("StructureStart \"" + this.getClass().getName() + "\": \"" + this.getStructure() + "\" unregistered, serializing impossible.");
 +            }
-             compoundtag.putString("id", context.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(this.structure).toString());
-             compoundtag.putInt("ChunkX", chunkPos.x());
-             compoundtag.putInt("ChunkZ", chunkPos.z());
+             tag.putString("id", context.registryAccess().lookupOrThrow(Registries.STRUCTURE).getKey(this.structure).toString());
+             tag.putInt("ChunkX", chunkPos.x());
+             tag.putInt("ChunkZ", chunkPos.z());

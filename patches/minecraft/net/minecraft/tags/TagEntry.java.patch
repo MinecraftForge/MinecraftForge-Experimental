@@ -1,7 +1,7 @@
 --- a/net/minecraft/tags/TagEntry.java
 +++ b/net/minecraft/tags/TagEntry.java
-@@ -108,6 +_,18 @@
-         return stringbuilder.toString();
+@@ -107,6 +_,18 @@
+         return result.toString();
      }
  
 +    public Identifier getId() {

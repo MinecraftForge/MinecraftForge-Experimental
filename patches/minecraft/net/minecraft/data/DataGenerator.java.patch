@@ -9,8 +9,8 @@
      public DataGenerator(final Path output) {
          this.vanillaPackOutput = new PackOutput(output);
 @@ -34,6 +_,35 @@
-         Path path = this.vanillaPackOutput.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("minecraft").resolve("datapacks").resolve(packId);
-         return new DataGenerator.PackGenerator(toRun, packId, new PackOutput(path));
+         Path packOutputDir = this.vanillaPackOutput.getOutputFolder(PackOutput.Target.DATA_PACK).resolve("minecraft").resolve("datapacks").resolve(packId);
+         return new DataGenerator.PackGenerator(toRun, packId, new PackOutput(packOutputDir));
      }
 +    public Map<String, DataProvider> getProvidersView() {
 +        return this.providersView;
@@ -49,14 +49,14 @@
                  } else {
                      DataGenerator.LOGGER.info("Starting provider: {}", providerId);
 +                    net.minecraftforge.fml.StartupMessageManager.addModMessage("Generating: " + providerId);
-                     stopwatch1.start();
-                     hashcache.applyUpdate(hashcache.generateUpdate(providerId, provider::run).join());
-                     stopwatch1.stop();
+                     stopwatch.start();
+                     cache.applyUpdate(cache.generateUpdate(providerId, provider::run).join());
+                     stopwatch.stop();
 @@ -112,6 +_,7 @@
-             Stopwatch stopwatch1 = Stopwatch.createUnstarted();
+             Stopwatch stopwatch = Stopwatch.createUnstarted();
              this.providersToRun.forEach((providerId, provider) -> {
                  DataGenerator.LOGGER.info("Starting uncached provider: {}", providerId);
 +                net.minecraftforge.fml.StartupMessageManager.addModMessage("Generating: " + providerId);
-                 stopwatch1.start();
+                 stopwatch.start();
                  provider.run(CachedOutput.NO_CACHE).join();
-                 stopwatch1.stop();
+                 stopwatch.stop();

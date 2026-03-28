@@ -45,23 +45,23 @@
 @@ -86,6 +_,22 @@
              @Override
              public TagAppender<U, T> addOptionalTag(final TagKey<T> tag) {
-                 tagappender.addOptionalTag(tag);
+                 original.addOptionalTag(tag);
 +                return this;
 +            }
 +
 +            @Override
 +            public TagBuilder getInternalBuilder() {
-+                return tagappender.getInternalBuilder();
++                return original.getInternalBuilder();
 +            }
 +
 +            @Override
 +            public String getSourceName() {
-+                return tagappender.getSourceName();
++                return original.getSourceName();
 +            }
 +
 +            @Override
 +            public TagAppender<U, T> remove(U value) {
-+                tagappender.remove(converter.apply(value));
++                original.remove(converter.apply(value));
                  return this;
              }
          };

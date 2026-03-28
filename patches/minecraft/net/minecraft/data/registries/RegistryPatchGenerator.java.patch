@@ -2,10 +2,10 @@
 +++ b/net/minecraft/data/registries/RegistryPatchGenerator.java
 @@ -21,7 +_,7 @@
              parent -> {
-                 RegistryAccess.Frozen registryaccess$frozen = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
-                 Cloner.Factory cloner$factory = new Cloner.Factory();
--                RegistryDataLoader.WORLDGEN_REGISTRIES.forEach(registryData -> registryData.runWithArguments(cloner$factory::addCodec));
-+                RegistryDataLoader.getWorldGenAndDimensionStream().forEach(registryData -> registryData.runWithArguments(cloner$factory::addCodec));
-                 RegistrySetBuilder.PatchedRegistries registrysetbuilder$patchedregistries = packBuilder.buildPatch(
-                     registryaccess$frozen, parent, cloner$factory
-                 );
+                 RegistryAccess.Frozen staticRegistries = RegistryAccess.fromRegistryOfRegistries(BuiltInRegistries.REGISTRY);
+                 Cloner.Factory cloner = new Cloner.Factory();
+-                RegistryDataLoader.WORLDGEN_REGISTRIES.forEach(registryData -> registryData.runWithArguments(cloner::addCodec));
++                RegistryDataLoader.getWorldGenAndDimensionStream().forEach(registryData -> registryData.runWithArguments(cloner::addCodec));
+                 RegistrySetBuilder.PatchedRegistries newRegistries = packBuilder.buildPatch(staticRegistries, parent, cloner);
+                 HolderLookup.Provider fullPatchedRegistry = newRegistries.full();
+                 Optional<? extends HolderLookup.RegistryLookup<Biome>> biomes = fullPatchedRegistry.lookup(Registries.BIOME);

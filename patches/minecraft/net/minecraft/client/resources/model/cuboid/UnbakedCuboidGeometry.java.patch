@@ -4,7 +4,7 @@
          final ModelState modelState,
          final ModelDebugName name
      ) {
--        QuadCollection.Builder quadcollection$builder = new QuadCollection.Builder();
+-        QuadCollection.Builder builder = new QuadCollection.Builder();
 +        var builder = new QuadCollection.Builder();
 +        bake(builder, elements, textures, modelBaker, modelState, name, id -> modelBaker.materials().resolveSlot(textures, id, name));
 +        return builder.build();
@@ -19,35 +19,23 @@
 +        final ModelDebugName name,
 +        final java.util.function.Function<String, Material.Baked> materialMapper //Forge: Allow overwriting textures
 +    ) {
-         for (CuboidModelElement cuboidmodelelement : elements) {
-             boolean flag = true;
-             boolean flag1 = true;
+         for (CuboidModelElement element : elements) {
+             boolean drawXFaces = true;
+             boolean drawYFaces = true;
 @@ -63,7 +_,7 @@
-                         case Z -> flag2;
+                         case Z -> drawZFaces;
                      };
-                     if (flag3) {
--                        Material.Baked material$baked = modelBaker.materials().resolveSlot(textures, cuboidface.texture(), name);
-+                        Material.Baked material$baked = materialMapper.apply(cuboidface.texture());
-                         BakedQuad bakedquad = FaceBakery.bakeQuad(
-                             modelBaker,
-                             vector3fc,
-@@ -77,9 +_,9 @@
-                             cuboidmodelelement.lightEmission()
+                     if (shouldDrawFace) {
+-                        Material.Baked material = modelBaker.materials().resolveSlot(textures, face.texture(), name);
++                        Material.Baked material = materialMapper.apply(face.texture());
+                         BakedQuad quad = FaceBakery.bakeQuad(
+                             modelBaker, from, to, face, material, facing, modelState, element.rotation(), element.shade(), element.lightEmission()
                          );
-                         if (cuboidface.cullForDirection() == null) {
--                            quadcollection$builder.addUnculledFace(bakedquad);
-+                            builder.addUnculledFace(bakedquad);
-                         } else {
--                            quadcollection$builder.addCulledFace(
-+                            builder.addCulledFace(
-                                 Direction.rotate(modelState.transformation().getMatrix(), cuboidface.cullForDirection()), bakedquad
-                             );
-                         }
-@@ -87,7 +_,5 @@
+@@ -76,7 +_,5 @@
                  }
              }
          }
 -
--        return quadcollection$builder.build();
+-        return builder.build();
      }
  }

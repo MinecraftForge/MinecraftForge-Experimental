@@ -5,6 +5,6 @@
              Bootstrap.bootStrap();
              Util.startTimerHackThread();
 +            net.minecraftforge.server.loading.ServerModLoader.load();
-             String s = optionset.valueOf(universe);
-             createOrResetDir(s);
-             onUniverseCreated.accept(s);
+             String universePath = options.valueOf(universe);
+             createOrResetDir(universePath);
+             onUniverseCreated.accept(universePath);

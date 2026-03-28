@@ -37,8 +37,8 @@
 +    }
 +
      protected TagAppender<T, T> tag(final TagKey<T> tag) {
-         TagBuilder tagbuilder = this.getOrCreateRawBuilder(tag);
--        return TagAppender.<T>forBuilder(tagbuilder).map(this.keyExtractor);
-+        return TagAppender.<T>forBuilder(tagbuilder, this.modId).map(this.keyExtractor);
+         TagBuilder builder = this.getOrCreateRawBuilder(tag);
+-        return TagAppender.<T>forBuilder(builder).map(this.keyExtractor);
++        return TagAppender.<T>forBuilder(builder, this.modId).map(this.keyExtractor);
      }
  }
