@@ -1,15 +1,13 @@
 --- a/net/minecraft/client/resources/model/cuboid/ItemModelGenerator.java
 +++ b/net/minecraft/client/resources/model/cuboid/ItemModelGenerator.java
-@@ -52,8 +_,10 @@
+@@ -52,8 +_,8 @@
          QuadCollection singleResult = null;
          QuadCollection.Builder builder = null;
  
 -        for (int layerIndex = 0; layerIndex < LAYERS.size(); layerIndex++) {
 -            String textureReference = LAYERS.get(layerIndex);
-+        // Forge: Allow for more layers
-+        int layerIndex = 0;
-+        while (true) {
-+            String textureReference = String.format(java.util.Locale.ROOT, "layer%d", layerIndex++);
++        for (int layerIndex = 0; true; layerIndex++) { // Forge: Allow for more layers
++            String textureReference = String.format(java.util.Locale.ROOT, "layer%d", layerIndex);
              Material material = textureSlots.getMaterial(textureReference);
              if (material == null) {
                  break;
