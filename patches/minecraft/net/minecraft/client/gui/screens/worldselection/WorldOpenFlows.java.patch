@@ -9,3 +9,21 @@
          WorldStem worldStem;
          try {
              worldStem = this.loadWorldStem(worldAccess, levelDataTag, safeMode, packRepository);
+@@ -530,6 +_,8 @@
+         WorldData data = worldDataAndGenSettings.data();
+         boolean oldCustomized = worldDataAndGenSettings.genSettings().options().isOldCustomizedWorld();
+         boolean unstable = data.worldGenSettingsLifecycle() != Lifecycle.stable();
++        if (unstable && data instanceof PrimaryLevelData primaryData)
++            unstable = !primaryData.hasConfirmedExperimentalWarning();
+         if (!oldCustomized && !unstable) {
+             this.openWorldLoadBundledResourcePack(worldAccess, worldStem, packRepository, onCancel);
+         } else {
+@@ -546,6 +_,8 @@
+     private void openWorldLoadBundledResourcePack(
+         final LevelStorageSource.LevelStorageAccess worldAccess, final WorldStem worldStem, final PackRepository packRepository, final Runnable onCancel
+     ) {
++        if (worldStem.worldDataAndGenSettings().data() instanceof PrimaryLevelData primaryLevelData)
++            primaryLevelData.withConfirmedWarning(worldStem.worldDataAndGenSettings().data().worldGenSettingsLifecycle() != Lifecycle.stable());
+         DownloadedPackSource packSource = this.minecraft.getDownloadedPackSource();
+         this.loadBundledResourcePack(packSource, worldAccess).thenApply(unused -> true).exceptionallyComposeAsync(t -> {
+             LOGGER.warn("Failed to load pack: ", t);
