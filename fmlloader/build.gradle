@@ -128,11 +128,13 @@ publishing {
     @TaskAction
     @CompileDynamic
     void exec() {
-        this.outputFile.asFile.get().json = [
-            forge: this.forgeVersion.get(),
-            mc   : this.minecraftVersion.get(),
-            mcp  : this.mcpVersion.get()
-        ]
+        var json = new groovy.json.JsonBuilder()
+        json {
+            forge this.forgeVersion.get()
+            mc    this.minecraftVersion.get()
+            mcp   this.mcpVersion.get()
+        }
+        this.outputFile.asFile.get().text = json.toPrettyString()
     }
 }
 
