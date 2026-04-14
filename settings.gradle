@@ -21,7 +21,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }
-        //mavenLocal()
+        mavenLocal()
     }
 }
 
@@ -48,7 +48,10 @@ gradle.beforeProject { Project project ->
         //@formatter:off
         project.ext.javaVersion          = project.gradleutils.unpack(project.bootLibs.versions.java)
         project.ext.minecraftVersion     = project.gradleutils.unpack(project.bootLibs.versions.minecraft)
-        project.version                  = project.gitversion.getMCTagOffsetBranch(project.ext.minecraftVersion)
+        // The new versioning sceme is <MCVersion>-<ForgeMC>.<RB>.<CommitsSinceRB>
+        // ForgeMC is a unique identifier for every MC version we have supported.
+        // Essentially, the same as the old, except dropping the first number, and the builds are no longer unique.
+        project.version                  = '1.21.11-61.1.0' //project.gitversion.getMCTagOffsetBranch(project.ext.minecraftVersion)
         project.ext.forgeVersion         = project.version.substring(project.ext.minecraftVersion.length() + 1)
         project.ext.minecraftNextVersion = project.gradleutils.unpack(project.bootLibs.versions.minecraft.next)
         project.ext.mcpVersion           = project.gradleutils.unpack(project.bootLibs.versions.mcp)
@@ -61,8 +64,9 @@ gradle.beforeProject { Project project ->
     // Applying forgedev in settings will break IDE linting support, which makes it very hard to work with.
     // We can reconsider this if/when switching to Kotlin DSL, or if JetBrains gets their shit together.
     project.repositories {
-        mavenCentral()
+        // Libraries has to be before maven central because Mojang hosts a classifer that central doesn't (org.lwjgl:lwjgl-freetype:3.3.3:natives-macos-patch)
         maven { url = 'https://libraries.minecraft.net/' }
+        mavenCentral()
 
         project.pluginManager.withPlugin('net.minecraftforge.gradleutils') {
             maven project.gradleutils.forgeMaven
@@ -101,7 +105,8 @@ dependencyResolutionManagement.versionCatalogs {
         plugin 'versions',    'com.github.ben-manes.versions'      version '0.53.0'
         plugin 'gradleutils', 'net.minecraftforge.gradleutils'     version '3.3.35'
         plugin 'gitversion',  'net.minecraftforge.gitversion'      version '3.1.7'
-        plugin 'changelog',   'net.minecraftforge.changelog'       version '3.2.1'
+        plugin 'changelog',   'net.minecraftforge.changelog'       version '3.2.2'
+        plugin 'renamer',     'net.minecraftforge.renamer'         version '1.0.14'
         plugin 'download',    'de.undercouch.download'             version '5.6.0'
         plugin 'jarsigner',   'net.minecraftforge.gradlejarsigner' version '1.2.1'
         plugin 'apt',         'com.diffplug.eclipse.apt'           version '4.4.1'

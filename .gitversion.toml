@@ -1,0 +1,21 @@
+[fmlcore]
+path = "fmlcore"
+tag = ""
+[fmlearlydisplay]
+path = "fmlearlydisplay"
+tag = ""
+[fmlloader]
+path = "fmlloader"
+tag = ""
+[forge-transformers]
+path = "forge-transformers"
+tag = ""
+[javafmllanguage]
+path = "javafmllanguage"
+tag = ""
+[lowcodelanguage]
+path = "lowcodelanguage"
+tag = ""
+[mclanguage]
+path = "mclanguage"
+tag = ""
