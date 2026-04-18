@@ -4,6 +4,7 @@ plugins {
     alias libs.plugins.licenser
     alias libs.plugins.gradleutils
     alias libs.plugins.gitversion
+    alias libs.plugins.changelog
     id 'net.minecraftforge.forge.build.convention'
 }
 
@@ -27,6 +28,9 @@ java {
 
 license {
     header = rootProject.file('LICENSE-header.txt')
+}
+changelog {
+    from changelogBase
 }
 
 tasks.withType(JavaCompile).configureEach {
@@ -56,6 +60,9 @@ publishing {
     }
 
     publications.register('mavenJava', MavenPublication) {
+        changelog.publish(it)
+        gradleutils.promote(it)
+
         from components.java
 
         pom {

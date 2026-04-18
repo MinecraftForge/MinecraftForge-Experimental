@@ -39,20 +39,22 @@ fdtools {
     configure('mavenizer') {
         version = '0.4.58'
     }
-    configure('srg2source') {
-        version = buildLibs.srg2source.get().version
-        javaLauncher = javaToolchains.launcherFor(java.toolchain)
-    }
     configure('binpatcher') {
         version = buildLibs.binarypatcher.get().version
     }
     configure('installertools') {
         version = buildLibs.installertools.get().version
     }
+    configure('jarcompatibilitychecker') {
+        javaLauncher = javaToolchains.launcherFor(java.toolchain)
+    }
+}
+renamerTools {
     configure('renamer') {
         version = buildLibs.renamer.get().version
     }
-    configure('jarcompatibilitychecker') {
+    configure('srg2source') {
+        version = buildLibs.srg2source.get().version
         javaLauncher = javaToolchains.launcherFor(java.toolchain)
     }
 }
@@ -78,11 +80,8 @@ forgedev.patches {
     base = mcpBase
     patches = file('patches/minecraft')
     patched = file('src/minecraft/java')
-    // This is used when remapping parameters for generating smaller patches
-    // This only matters for versions where parchment is a potential thing in end-modder's workspaces.
-    // This is used when making SRG patches hence why i moved to the pathcer section
-    //excs.from file('src/main/resources/forge.exc')
 }
+
 tasks.register('setup') {
     dependsOn forgedev.patches.apply
 }
@@ -115,8 +114,7 @@ license {
 }
 
 changelog {
-    from '47.999'
-    publishAll = true
+    from changelogBase
 }
 
 // TODO [ForgeDev] Support compileOnlyApi, runtimeOnly, and a consumable annotation processor configuration
@@ -204,7 +202,7 @@ var EXTRA_TXTS = [
     file('LICENSE.txt'),
     changelog.task.flatMap(task -> task.outputFile)
 ]
-var runs = forgedev.runs {
+forgedev.runs {
     configureEach {
         options {
             workingDir = layout.projectDirectory.dir("runs/$name")
@@ -298,16 +296,10 @@ var runs = forgedev.runs {
     }
 }
 tasks.register('genAllData') {
-    dependsOn runs.data.run, runs.data.runTest, runs.clientData.run, runs.clientData.runTest
+    dependsOn forgedev.runs.data.run, forgedev.runs.data.runTest, forgedev.runs.clientData.run, forgedev.runs.clientData.runTest
 }
 
-def reobfSources = renamer.sources(sourceSets.main) {
-    apply {
-        archiveClassifier = 'sources-srg'
-    }
-}
-
-def userdev = forgedev.userdev {
+forgedev.userDev {
     base(mcpBase)
     config {
         addLibraries(configurations.installer)
@@ -329,13 +321,13 @@ def userdev = forgedev.userdev {
                 environment 'MCP_MAPPINGS', '{mcp_mappings}'
             }
 
-            clientData {
+            register('clientData') {
                 args '--launchTarget', "forge_userdev_client_data"
                 args '--assetIndex', '{asset_index}'
                 args '--assetsDir', '{assets_root}'
             }
 
-            client {
+            register('client') {
                 property 'forge.enableGameTest', 'true'
                 args '--launchTarget', "forge_userdev_client"
                 args '--version', 'MOD_DEV'
@@ -343,16 +335,16 @@ def userdev = forgedev.userdev {
                 args '--assetsDir', '{assets_root}'
             }
 
-            server {
+            register('server') {
                 property 'forge.enableGameTest', 'true'
                 args '--launchTarget', "forge_userdev_server"
             }
 
-            gameTestServer {
+            register('gameTestServer') {
                 args '--launchTarget', "forge_userdev_server_gametest"
             }
 
-            data {
+            register('data') {
                 args '--launchTarget', "forge_userdev_data"
                 args '--assetIndex', '{asset_index}'
                 args '--assetsDir', '{assets_root}'
@@ -395,8 +387,7 @@ forgedev.checks() {
         mappings = mcpBase.map2Srg
     }
     sas {}
-    // This is not needed anymore as we're not generating SRG patches in repo.
-    //execs { }
+    execs { }
 
     patches {
         dependsOn forgedev.patches.make
@@ -408,7 +399,7 @@ forgedev.checks() {
     }
 
     fix {
-        dependsOn findFinalizeSpawnTargets
+        dependsOn finalizeSpawn
     }
 }
 
@@ -460,18 +451,50 @@ def universalJar = tasks.register('universalJar', Jar) {
 }
 
 def reobfJar = renamer.classes('srgJar', tasks.named('jar', Jar)) {
-    libraries.setFrom(configurations.implementation)
+    libraries.setFrom(configurations.compileClasspath)
     mappings mcpBase.map2Srg
     archiveClassifier = 'srg'
 }
-
 def universalJarSrg = tasks.register('universalJarSrg', Jar) {
-    from (zipTree(reobfJar.flatMap { it.archiveFile } )) {
-        exclude(forgedev.filterVanilla(mcpBase.classesRaw))
+    from (zipTree(reobfJar.flatMap { it.output } )) {
+        exclude(forgedev.filterVanilla(mcpBase.classes))
     }
     manifest = universalJar.get().manifest
     archiveClassifier = 'universal-srg'
     jarSigner.sign(it)
+}
+def sourcesSrg = renamer.sources(sourceSets.main) {
+    apply {
+        archiveClassifier = 'sources-srg'
+        mappings mcpBase.map2Srg
+        excFiles.from files('src/main/resources/forge.exc')
+    }
+}
+def sourcesJar = tasks.register('sourcesJar', Jar) {
+    archiveClassifier = 'sources'
+    // If we don't need to reobf we can just do this
+    //from(sourceSets.main.allJava.srcDirs - forgedev.patches.patched.asFile.get())
+    dependsOn(sourcesSrg.apply)
+    from(zipTree(sourcesSrg.apply.flatMap{ it.output })) {
+        exclude { forgedev.patches.patched.file(it.path).get().asFile.exists() }
+    }
+    from(forgedev.patches.patches) {
+        into 'patches/'
+    }
+}
+
+forgedev.userDev {
+    config {
+        universal universalJarSrg
+        sources sourcesJar
+    }
+    patches {
+        modified.setFrom(sourcesSrg.apply.flatMap{ it.output })
+    }
+    binaryPatches {
+        patches.setFrom(forgedev.patches.patches)
+        dirty.setFrom(reobfJar.flatMap { it.output })
+    }
 }
 
 forgedev.userdevCompatibility(minecraftVersion) {
@@ -479,24 +502,39 @@ forgedev.userdevCompatibility(minecraftVersion) {
     dirty = reobfJar
 }
 
+// region Installer tasks, Not needed when we simplify the installer/remove obf
+def clientOfficial = renamer.classes('renameClientOfficial') {
+    additionalArgs = ['--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse']
+    input.fileProvider(minecraftFiles.client)
+    libraries = mcpBase.dependencyConfiguration
+    mappings minecraftFiles.clientMappings
+}
+def serverOfficial = renamer.classes('renameServerOfficial') {
+    additionalArgs = ['--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse']
+    input.fileProvider(minecraftFiles.serverExtracted)
+    libraries = mcpBase.dependencyConfiguration
+    mappings minecraftFiles.serverMappings
+}
 def clientBinPatches = forgedev.binaryPatches('client') {
-    clean = minecraftFiles.client
-    dirty = reobfJar.flatMap { it.output }
+    clean = clientOfficial.flatMap { it.output }
 }
 def serverBinPatches = forgedev.binaryPatches('server') {
-    clean = minecraftFiles.serverExtracted
-    dirty = reobfJar.flatMap { it.output }
+    clean = serverOfficial.flatMap { it.output }
 }
+def sanitizedClientMappings = renamer.convert("cleanClientMappings", minecraftFiles.clientMappings)
+def sanitizedServerMappings = renamer.convert("cleanServerMappings", minecraftFiles.serverMappings)
+// endregion
 
 forgedev.installer {
     dev = !forgedev.ci
     offline = false
+    baseVersion = buildLibs.installer.get().version.toString()
 
     // Add extra libraries
     pack serverShim.jar // The Server executable jar IS needed to be packed, as the installer would need a spec bump in order to download it
     pack universalJar // I don't think this is strictly needed to be packed anymore, will need to double check later
     // This isn't actually needed, but its here for some reason, probably wasn't deleted when then installer process was cleaned up
-    library mcpBase.mcpArtifact
+    library mcpBase.mcpArtifact.get()
 
     launcherLibrary universalJar
     // We configure the launcher here to keep the order for easier diff, after publishing, move this to the LauncherJson configuration below
@@ -511,6 +549,7 @@ forgedev.installer {
     var launcherId = "${minecraftVersion}-${project.name}-${forgeVersion}"
     var installertools = tool(buildLibs.installertools)
     var binarypatcher = tool(buildLibs.binarypatcher)
+    var renamer = tool(buildLibs.renamer)
 
     jar {
         from(EXTRA_TXTS)
@@ -557,13 +596,13 @@ forgedev.installer {
         var projectArtifact = "${project.group}:${project.name}:${project.version}"
 
         data 'MOJMAPS', "[net.minecraft:client:${minecraftVersion}:mappings@tsrg]", "[net.minecraft:server:${minecraftVersion}:mappings@tsrg]"
-        data 'MOJMAPS_SHA', minecraftFiles.clientMappings, minecraftFiles.serverMappings
+        data 'MOJMAPS_SHA', sanitizedClientMappings.flatMap{ it.output }, sanitizedServerMappings.flatMap{ it.output }
 
         data 'MC_UNPACKED', "[net.minecraft:client:${minecraftVersion}]", "[net.minecraft:server:${minecraftVersion}:unpacked]"
         data 'MC_UNPACKED_SHA', minecraftFiles.client, minecraftFiles.serverExtracted
 
         data 'MC_OFF', "[net.minecraft:client:${minecraftVersion}:official]", "[net.minecraft:server:${minecraftVersion}:official]"
-        data 'MC_OFF_SHA', createClientOfficial.output, createServerOfficial.output
+        data 'MC_OFF_SHA', clientOfficial.flatMap { it.output } ,serverOfficial.flatMap { it.output }
 
         data 'BINPATCH', '/data/client.lzma', '/data/server.lzma'
         data 'PATCHED', "[$projectArtifact:client]", "[$projectArtifact:server]"
@@ -647,7 +686,7 @@ final mdkGradleWrapper = tasks.register('mdkGradleWrapper', Wrapper) {
     jarFile = layout.buildDirectory.dir("wrapper/" + gradleVersion + "/gradle/wrapper/gradle-wrapper.jar")
 }
 
-tasks.register('mdkZip', Zip) {
+final mdkZip = tasks.register('mdkZip', Zip) {
     dependsOn mdkGradleWrapper
 
     archiveBaseName = project.name
@@ -774,12 +813,15 @@ publishing {
     }
 
     publications.register('mavenJava', MavenPublication) {
+        changelog.publish(it)
+        gradleutils.promote(it)
+
         artifact universalJar
         artifact universalJarSrg
-        artifact installerJar
+        artifact forgedev.installer.jar
         artifact mdkZip
-        artifact userdevJar
-        artifact reobfSources.apply
+        artifact forgedev.userDev.jar
+        artifact sourcesJar
         artifact serverShim.jar
 
         pom {
@@ -797,7 +839,7 @@ publishing {
 def all = tasks.register('all') {}
 afterEvaluate {
     if (gradle.startParameter.taskNames.contains('all')) {
-	    tasks.forEach { task -> // This forces everything to be realized, which is why we hve the startParameter check
+	    tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
 	        if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
             if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init']) return
             if (task.name.startsWith('clean')) return
