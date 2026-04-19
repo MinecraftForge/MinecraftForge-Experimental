@@ -80,6 +80,7 @@ forgedev.patches {
     base = mcpBase
     patches = file('patches/minecraft')
     patched = file('src/minecraft/java')
+    sourceSets.main.java.srcDir patched
 }
 
 tasks.register('setup') {
@@ -88,7 +89,6 @@ tasks.register('setup') {
 
 sourceSets {
     named('main') {
-        java.srcDir forgedev.patches.patched
         resources.srcDir 'src/main/generated'
     }
     named('test') {
@@ -187,9 +187,9 @@ dependencies {
     installer projects.forgeTransformers
 
     // Get the zip file with csv's of srg->mapepd for Runtime SRG->Mapped reflection remapping
-    // We don't need this anymore since we use official runtime names.
     // This is also only needed during dev time, and automatically added to the dep list by Mavenizer for userdev
-    //runtimeOnly mcpBase.mappingZip
+    // We shouldn't need this anymore now that we use runtime official mappings, but some of our code still references SRG names via reflection at dev time
+    runtimeOnly files(mcpBase.mappingZip)
     runtimeOnly files(mcpBase.extra)
 
     runtimeOnly libs.bootstrap
@@ -220,7 +220,7 @@ forgedev.runs {
         }
     }
 
-    register('client') {
+    create('client') {
         options {
             systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
             systemProperty 'org.lwjgl.system.SharedLibraryExtractDirectory', 'lwjgl_dll'
@@ -236,20 +236,20 @@ forgedev.runs {
         }
     }
 
-    register('server') {
+    create('server') {
         options {
             args '--launchTarget', 'forge_dev_server'
         }
     }
 
-    register('gameTestServer') {
+    create('gameTestServer') {
         options {
             args '--launchTarget', 'forge_dev_server_gametest'
             args '--uniqueWorld' // Unique world is used so that the world regenerates, as well as the world config isn't influenced by other runs
         }
     }
 
-    register('data') {
+    create('data') {
         options {
             args '--launchTarget', 'forge_dev_data',
                 '--all',
@@ -270,7 +270,7 @@ forgedev.runs {
         }
     }
 
-    register('clientData') {
+    create('clientData') {
         options {
             args '--all',
                 '--existing', sourceSets.main.resources.srcDirs[0],
@@ -299,60 +299,6 @@ tasks.register('genAllData') {
     dependsOn forgedev.runs.data.run, forgedev.runs.data.runTest, forgedev.runs.clientData.run, forgedev.runs.clientData.runTest
 }
 
-forgedev.userDev {
-    base(mcpBase)
-    config {
-        addLibraries(configurations.installer)
-        // TODO [ForgeDev][UserDev] Split API/Runtime elements in userdev config
-        //      so we don't gotta keep making exceptions for MixinExtras
-        addCompileDependency(libs.mixinextras.common)
-        addAnnotationProcessorDependency(libs.mixinextras.common)
-
-        inject = '' // We don't have a userdev sourceset anymore. Empty as a gradle workaround...
-
-        // TODO [ForgeDev] Consolidate Patcher + UserDev Config runs in a sane way
-        runs {
-            configureEach {
-                parents = []
-                main = 'net.minecraftforge.bootstrap.ForgeBootstrap'
-                args '--gameDir', '.'
-                jvmArgs '-Djava.net.preferIPv6Addresses=system'
-                client = it.name.containsIgnoreCase('client')
-                environment 'MCP_MAPPINGS', '{mcp_mappings}'
-            }
-
-            register('clientData') {
-                args '--launchTarget', "forge_userdev_client_data"
-                args '--assetIndex', '{asset_index}'
-                args '--assetsDir', '{assets_root}'
-            }
-
-            register('client') {
-                property 'forge.enableGameTest', 'true'
-                args '--launchTarget', "forge_userdev_client"
-                args '--version', 'MOD_DEV'
-                args '--assetIndex', '{asset_index}'
-                args '--assetsDir', '{assets_root}'
-            }
-
-            register('server') {
-                property 'forge.enableGameTest', 'true'
-                args '--launchTarget', "forge_userdev_server"
-            }
-
-            register('gameTestServer') {
-                args '--launchTarget', "forge_userdev_server_gametest"
-            }
-
-            register('data') {
-                args '--launchTarget', "forge_userdev_data"
-                args '--assetIndex', '{asset_index}'
-                args '--assetsDir', '{assets_root}'
-            }
-        }
-    }
-}
-
 def serverShim = forgedev.shim {
     config {
         mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
@@ -373,18 +319,20 @@ def serverShim = forgedev.shim {
 
 def finalizeSpawn = forgedev.methodCallFinder('findFinalizeSpawnTargets') {
     allowEmpty = true // Old implementation bug, remove when moved to production
-    jar.fileProvider(mcpBase.classes)
+    jar = tasks.named('renameClientOfficial').flatMap{ it.output } //.fileProvider(mcpBase.classes)
     output = rootProject.file('forge-transformers/src/main/resources/coremods/finalize_spawn_targets.json')
     blacklist 'net/minecraft/world/level/BaseSpawner' // Ignore this class as we special case it.
     invokeVirtual('finalizeSpawn', '(Lnet/minecraft/world/level/ServerLevelAccessor;Lnet/minecraft/world/DifficultyInstance;Lnet/minecraft/world/entity/EntitySpawnReason;Lnet/minecraft/world/entity/SpawnGroupData;)Lnet/minecraft/world/entity/SpawnGroupData;')
 }
 
-forgedev.validateDeprecations(tasks.named('jar', Jar))
+forgedev.validateDeprecations(tasks.named('jar', Jar)) {
+    mcVersion = minecraftVersion
+}
 
 forgedev.checks() {
     base = mcpBase
     ats {
-        mappings = mcpBase.map2Srg
+        mappings.fileProvider(mcpBase.map2Srg)
     }
     sas {}
     execs { }
@@ -401,10 +349,10 @@ forgedev.checks() {
     fix {
         dependsOn finalizeSpawn
     }
-}
 
-forgedev.patches.make.configure {
-    finalizedBy forgedev.checks.patches.fix
+    forgedev.patches.make.configure {
+        finalizedBy forgedev.checks.patches.fix
+    }
 }
 
 def crowdin = forgedev.crowdin // Create the crowdin tasks
@@ -469,6 +417,9 @@ def sourcesSrg = renamer.sources(sourceSets.main) {
         mappings mcpBase.map2Srg
         excFiles.from files('src/main/resources/forge.exc')
     }
+    extract {
+        mustRunAfter(forgedev.patches.apply)
+    }
 }
 def sourcesJar = tasks.register('sourcesJar', Jar) {
     archiveClassifier = 'sources'
@@ -478,21 +429,69 @@ def sourcesJar = tasks.register('sourcesJar', Jar) {
     from(zipTree(sourcesSrg.apply.flatMap{ it.output })) {
         exclude { forgedev.patches.patched.file(it.path).get().asFile.exists() }
     }
-    from(forgedev.patches.patches) {
+    from(forgedev.userDev.patches.flatMap{ it.output }) {
         into 'patches/'
     }
 }
 
 forgedev.userDev {
+    base(mcpBase)
+
     config {
         universal universalJarSrg
         sources sourcesJar
+        addLibraries(configurations.installer)
+        // TODO [ForgeDev][UserDev] Split API/Runtime elements in userdev config
+        //      so we don't gotta keep making exceptions for MixinExtras
+        addCompileDependency(libs.mixinextras.common)
+        addAnnotationProcessorDependency(libs.mixinextras.common)
+
+        // TODO [ForgeDev] Consolidate Patcher + UserDev Config runs in a sane way
+        runs {
+            configureEach {
+                parents = []
+                main = 'net.minecraftforge.bootstrap.ForgeBootstrap'
+                args '--gameDir', '.'
+                jvmArgs '-Djava.net.preferIPv6Addresses=system'
+                client = it.name.containsIgnoreCase('client')
+                environment 'MCP_MAPPINGS', '{mcp_mappings}'
+            }
+
+            register('clientData') {
+                args '--launchTarget', "forge_userdev_client_data"
+                args '--assetIndex', '{asset_index}'
+                args '--assetsDir', '{assets_root}'
+            }
+
+            register('client') {
+                property 'forge.enableGameTest', 'true'
+                args '--launchTarget', "forge_userdev_client"
+                args '--version', 'MOD_DEV'
+                args '--assetIndex', '{asset_index}'
+                args '--assetsDir', '{assets_root}'
+            }
+
+            register('server') {
+                property 'forge.enableGameTest', 'true'
+                args '--launchTarget', "forge_userdev_server"
+            }
+
+            register('gameTestServer') {
+                args '--launchTarget', "forge_userdev_server_gametest"
+            }
+
+            register('data') {
+                args '--launchTarget', "forge_userdev_data"
+                args '--assetIndex', '{asset_index}'
+                args '--assetsDir', '{assets_root}'
+            }
+        }
     }
     patches {
         modified.setFrom(sourcesSrg.apply.flatMap{ it.output })
     }
     binaryPatches {
-        patches.setFrom(forgedev.patches.patches)
+        patches.setFrom(forgedev.patches.apply.flatMap { it.output })
         dirty.setFrom(reobfJar.flatMap { it.output })
     }
 }
@@ -836,12 +835,18 @@ publishing {
     }
 }
 
+
+// These are debugging tasks that are only used when developing ForgeDevPlugin, to bulk test task's config/caching
+// region ForgeDev Tests
 def all = tasks.register('all') {}
 afterEvaluate {
     if (gradle.startParameter.taskNames.contains('all')) {
 	    tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
 	        if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
-            if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init']) return
+            if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init', 'buildEnvironment', 'idea',
+                'eclipse', 'javaToolchains', 'outgoingVariants', 'projects', 'properties', 'resolvableConfigurations', 'tasks', 'updateDaemonJvm',
+                'generateActionsWorkflow'
+            ]) return
             if (task.name.startsWith('clean')) return
             if (task.name == 'checkJarCompatibility') return // This doesn't work in FG6 dev, I think it's cuz we check vs srg names. Will need to look at later
         	all.configure { dependsOn(task) }
@@ -852,5 +857,11 @@ afterEvaluate {
 tasks.withType(AbstractTestTask).configureEach {
     failOnNoDiscoveredTests = false
 }
-forgedev.patches.make { mustRunAfter forgedev.patches.apply }
+[ 'makePatches', 'compileJava', 'checkLicenseMain', 'updateLicenseMain', 'sourcesJar' ]
+    .each{ tasks.named(it).configure{ mustRunAfter forgedev.patches.apply }}
+forgedev.runs.configureEach {
+    run.configure { dependsOn finalizeSpawn}
+    runTest.configure { dependsOn finalizeSpawn}
+}
+// endregion
 

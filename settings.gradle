@@ -96,7 +96,7 @@ dependencyResolutionManagement.versionCatalogs {
         library 'installer',      'net.minecraftforge', 'installer'             version '2.2.15'
         library 'installertools', 'net.minecraftforge', 'installertools'        version '1.4.3'
         library 'renamer',        'net.minecraftforge', 'ForgeAutoRenamingTool' version '1.0.6'
-        library 'srg2source',     'net.minecraftforge', 'Srg2Source'            version '8.2.2'
+        library 'srg2source',     'net.minecraftforge', 'Srg2Source'            version '8.2.3'
     }
 
     //@formatter:off
