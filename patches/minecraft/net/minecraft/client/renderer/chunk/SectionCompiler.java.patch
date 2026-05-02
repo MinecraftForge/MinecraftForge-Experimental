@@ -8,13 +8,25 @@
          SectionCompiler.Results results = new SectionCompiler.Results();
          BlockPos minPos = sectionPos.origin();
          BlockPos maxPos = minPos.offset(15, 15, 15);
-@@ -109,7 +_,8 @@
+@@ -100,6 +_,9 @@
+                     }
+ 
+                     if (blockState.getRenderShape() == RenderShape.MODEL) {
++                        var model = this.blockModelSet.get(blockState);
++                        var modelData = modelDataMap.getOrDefault(pos, net.minecraftforge.client.model.data.ModelData.EMPTY);
++                        modelData = model.getModelData(region, pos, blockState, modelData);
+                         blockRenderer.tesselateBlock(
+                             ModelBlockRenderer.forceOpaque(this.cutoutLeaves, blockState) ? opaqueQuadOutput : quadOutput,
+                             SectionPos.sectionRelative(pos.getX()),
+@@ -108,8 +_,9 @@
+                             region,
                              pos,
                              blockState,
-                             this.blockModelSet.get(blockState),
+-                            this.blockModelSet.get(blockState),
 -                            blockState.getSeed(pos)
++                            model,
 +                            blockState.getSeed(pos),
-+                            modelDataMap.getOrDefault(pos, net.minecraftforge.client.model.data.ModelData.EMPTY)
++                            modelData
                          );
                      }
                  } catch (Throwable var21) {
