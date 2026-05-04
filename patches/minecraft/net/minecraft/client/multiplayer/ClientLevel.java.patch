@@ -17,15 +17,15 @@
  
      public void handleBlockChangedAck(final int sequence) {
          if (SharedConstants.DEBUG_BLOCK_BREAK) {
-@@ -273,6 +_,8 @@
- 
-             update.run();
-         }
+@@ -243,6 +_,8 @@
+         this.serverSimulationDistance = serverSimulationDistance;
+         this.environmentAttributes = this.addEnvironmentAttributeLayers(EnvironmentAttributeSystem.builder()).build();
+         this.updateSkyBrightness();
 +        this.gatherCapabilities();
 +        net.minecraftforge.event.ForgeEventFactory.onLevelLoad(this);
      }
  
-     public @Nullable EndFlashState endFlashState() {
+     private EnvironmentAttributeSystem.Builder addEnvironmentAttributeLayers(final EnvironmentAttributeSystem.Builder environmentAttributes) {
 @@ -352,6 +_,7 @@
          entity.setOldPosAndRot();
          entity.tickCount++;
