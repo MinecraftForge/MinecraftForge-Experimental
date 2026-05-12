@@ -1,7 +1,7 @@
 import groovy.transform.Field
 
 pluginManagement {
-    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.45'
+    private static final @Field FORGEDEV_VERSION = '7.0.0-beta.48'
 
     if (new File('forgedev/settings.gradle').exists()) {
         includeBuild 'forgedev'
@@ -10,7 +10,6 @@ pluginManagement {
             // TODO [ForgeDev] Consolidate these entry-points
             switch (requested.id.id) {
                 case 'net.minecraftforge.forgedev':
-                case 'net.minecraftforge.forge.build.forge':
                 case 'net.minecraftforge.forge.build.convention':
                     useVersion(FORGEDEV_VERSION)
                     break
@@ -21,7 +20,7 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         maven { url = 'https://maven.minecraftforge.net/' }
-        mavenLocal()
+        //mavenLocal()
     }
 }
 
@@ -48,10 +47,7 @@ gradle.beforeProject { Project project ->
         //@formatter:off
         project.ext.javaVersion          = project.gradleutils.unpack(project.bootLibs.versions.java)
         project.ext.minecraftVersion     = project.gradleutils.unpack(project.bootLibs.versions.minecraft)
-        // The new versioning sceme is <MCVersion>-<ForgeMC>.<RB>.<CommitsSinceRB>
-        // ForgeMC is a unique identifier for every MC version we have supported.
-        // Essentially, the same as the old, except dropping the first number, and the builds are no longer unique.
-        project.version                  = '1.21.11-61.1.0' //project.gitversion.getMCTagOffsetBranch(project.ext.minecraftVersion)
+        project.version                  = project.gitversion.getMCTagOffsetBranch(project.ext.minecraftVersion)
         project.ext.forgeVersion         = project.version.substring(project.ext.minecraftVersion.length() + 1)
         project.ext.minecraftNextVersion = project.gradleutils.unpack(project.bootLibs.versions.minecraft.next)
         project.ext.mcpVersion           = project.gradleutils.unpack(project.bootLibs.versions.mcp)

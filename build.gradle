@@ -66,9 +66,9 @@ forgedev.validatePublish {
     }
 }
 
-var minecraftFiles = forgedev.minecraftFiles(minecraftVersion)
+final minecraftFiles = forgedev.minecraftFiles(minecraftVersion)
 
-var mcpBase = forgedev.mcpBase {
+final mcpBase = forgedev.mcpBase {
     mcpVersion = "${minecraftVersion}-${project.ext.mcpVersion}"
     mappingChannel = mappingsChannel
     mappingVersion = mappingsVersion
@@ -198,7 +198,7 @@ dependencies {
     annotationProcessor libs.eventbus.validator
 }
 
-var EXTRA_TXTS = [
+final EXTRA_TXTS = [
     file('LICENSE.txt'),
     changelog.task.flatMap(task -> task.outputFile)
 ]
@@ -355,7 +355,7 @@ forgedev.checks() {
     }
 }
 
-def crowdin = forgedev.crowdin // Create the crowdin tasks
+final crowdin = forgedev.crowdin // Create the crowdin tasks
 tasks.named('jar', Jar) {
     from(EXTRA_TXTS)
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
@@ -389,7 +389,7 @@ tasks.named('jar', Jar) {
     jarSigner.sign(it)
 }
 
-def universalJar = tasks.register('universalJar', Jar) {
+final universalJar = tasks.register('universalJar', Jar) {
     from (zipTree(tasks.named('jar', Jar).flatMap { it.archiveFile } )) {
         exclude(forgedev.filterVanilla(mcpBase.classes))
     }
@@ -398,12 +398,12 @@ def universalJar = tasks.register('universalJar', Jar) {
     jarSigner.sign(it)
 }
 
-def reobfJar = renamer.classes('srgJar', tasks.named('jar', Jar)) {
+final reobfJar = renamer.classes('srgJar', tasks.named('jar', Jar)) {
     libraries.setFrom(configurations.compileClasspath)
     mappings mcpBase.map2Srg
     archiveClassifier = 'srg'
 }
-def universalJarSrg = tasks.register('universalJarSrg', Jar) {
+final universalJarSrg = tasks.register('universalJarSrg', Jar) {
     from (zipTree(reobfJar.flatMap { it.output } )) {
         exclude(forgedev.filterVanilla(mcpBase.classes))
     }
@@ -411,7 +411,7 @@ def universalJarSrg = tasks.register('universalJarSrg', Jar) {
     archiveClassifier = 'universal-srg'
     jarSigner.sign(it)
 }
-def sourcesSrg = renamer.sources(sourceSets.main) {
+final sourcesSrg = renamer.sources(sourceSets.main) {
     apply {
         archiveClassifier = 'sources-srg'
         mappings mcpBase.map2Srg
@@ -421,7 +421,7 @@ def sourcesSrg = renamer.sources(sourceSets.main) {
         mustRunAfter(forgedev.patches.apply)
     }
 }
-def sourcesJar = tasks.register('sourcesJar', Jar) {
+final sourcesJar = tasks.register('sourcesJar', Jar) {
     archiveClassifier = 'sources'
     // If we don't need to reobf we can just do this
     //from(sourceSets.main.allJava.srcDirs - forgedev.patches.patched.asFile.get())
@@ -502,26 +502,26 @@ forgedev.userdevCompatibility(minecraftVersion) {
 }
 
 // region Installer tasks, Not needed when we simplify the installer/remove obf
-def clientOfficial = renamer.classes('renameClientOfficial') {
+final clientOfficial = renamer.classes('renameClientOfficial') {
     additionalArgs = ['--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse']
     input.fileProvider(minecraftFiles.client)
     libraries = mcpBase.dependencyConfiguration
     mappings minecraftFiles.clientMappings
 }
-def serverOfficial = renamer.classes('renameServerOfficial') {
+final serverOfficial = renamer.classes('renameServerOfficial') {
     additionalArgs = ['--ann-fix', '--ids-fix', '--src-fix', '--record-fix', '--strip-sigs', '--reverse']
     input.fileProvider(minecraftFiles.serverExtracted)
     libraries = mcpBase.dependencyConfiguration
     mappings minecraftFiles.serverMappings
 }
-def clientBinPatches = forgedev.binaryPatches('client') {
+final clientBinPatches = forgedev.binaryPatches('client') {
     clean = clientOfficial.flatMap { it.output }
 }
-def serverBinPatches = forgedev.binaryPatches('server') {
+final serverBinPatches = forgedev.binaryPatches('server') {
     clean = serverOfficial.flatMap { it.output }
 }
-def sanitizedClientMappings = renamer.convert("cleanClientMappings", minecraftFiles.clientMappings)
-def sanitizedServerMappings = renamer.convert("cleanServerMappings", minecraftFiles.serverMappings)
+final sanitizedClientMappings = renamer.convert("cleanClientMappings", minecraftFiles.clientMappings)
+final sanitizedServerMappings = renamer.convert("cleanServerMappings", minecraftFiles.serverMappings)
 // endregion
 
 forgedev.installer {
@@ -545,10 +545,10 @@ forgedev.installer {
     launcherLibraries configurations.installerextra
     launcherLibraries configurations.installer
 
-    var launcherId = "${minecraftVersion}-${project.name}-${forgeVersion}"
-    var installertools = tool(buildLibs.installertools)
-    var binarypatcher = tool(buildLibs.binarypatcher)
-    var renamer = tool(buildLibs.renamer)
+    final launcherId = "${minecraftVersion}-${project.name}-${forgeVersion}"
+    final installertools = tool(buildLibs.installertools)
+    final binarypatcher = tool(buildLibs.binarypatcher)
+    final renamer = tool(buildLibs.renamer)
 
     jar {
         from(EXTRA_TXTS)
@@ -562,8 +562,8 @@ forgedev.installer {
             rename { 'data/server.lzma' }
         }
 
-        final var argsFile = rootProject.file('server_files/args.txt')
-        var tokens = [tokens: [
+        final argsFile = rootProject.file('server_files/args.txt')
+        final tokens = [tokens: [
             SHIM_JAR_FILE: serverShim.jar.get().archiveFileName.get(),
             MAVEN_PATH: forgedev.mavenArtifact.directory
         ]]
@@ -592,7 +592,7 @@ forgedev.installer {
         minecraft = minecraftVersion
         profileVersion = launcherId
 
-        var projectArtifact = "${project.group}:${project.name}:${project.version}"
+        final projectArtifact = "${project.group}:${project.name}:${project.version}"
 
         data 'MOJMAPS', "[net.minecraft:client:${minecraftVersion}:mappings@tsrg]", "[net.minecraft:server:${minecraftVersion}:mappings@tsrg]"
         data 'MOJMAPS_SHA', sanitizedClientMappings.flatMap{ it.output }, sanitizedServerMappings.flatMap{ it.output }
