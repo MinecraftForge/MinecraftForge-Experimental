@@ -59,12 +59,14 @@ renamerTools {
     }
 }
 
+/* This is used for debugging, comparing all published artifacts against actual production
 forgedev.validatePublish {
     task {
         baseBranch = 'upstream/1.21.11'
         versionPrefix = minecraftVersion
     }
 }
+*/
 
 final minecraftFiles = forgedev.minecraftFiles(minecraftVersion)
 
@@ -115,6 +117,7 @@ license {
 
 changelog {
     from changelogBase
+    publishAll = false
 }
 
 // TODO [ForgeDev] Support compileOnlyApi, runtimeOnly, and a consumable annotation processor configuration
@@ -299,7 +302,7 @@ tasks.register('genAllData') {
     dependsOn forgedev.runs.data.run, forgedev.runs.data.runTest, forgedev.runs.clientData.run, forgedev.runs.clientData.runTest
 }
 
-def serverShim = forgedev.shim {
+final serverShim = forgedev.shim {
     config {
         mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
         args = ['--launchTarget', 'forge_server']
@@ -317,8 +320,7 @@ def serverShim = forgedev.shim {
     }
 }
 
-def finalizeSpawn = forgedev.methodCallFinder('findFinalizeSpawnTargets') {
-    allowEmpty = true // Old implementation bug, remove when moved to production
+final finalizeSpawn = forgedev.methodCallFinder('findFinalizeSpawnTargets') {
     jar = tasks.named('renameClientOfficial').flatMap{ it.output } //.fileProvider(mcpBase.classes)
     output = rootProject.file('forge-transformers/src/main/resources/coremods/finalize_spawn_targets.json')
     blacklist 'net/minecraft/world/level/BaseSpawner' // Ignore this class as we special case it.
@@ -836,6 +838,7 @@ publishing {
 }
 
 
+/*
 // These are debugging tasks that are only used when developing ForgeDevPlugin, to bulk test task's config/caching
 // region ForgeDev Tests
 def all = tasks.register('all') {}
@@ -853,15 +856,17 @@ afterEvaluate {
 	    }
     }
 }
+*/
+// endregion
 // We dont have any unit tests, so disable this error
 tasks.withType(AbstractTestTask).configureEach {
     failOnNoDiscoveredTests = false
 }
+// This shouldn't be needed according to the Gradle devs, as we never run these commands together.
+// But in another case of Gradle being gradle, here we are
 [ 'makePatches', 'compileJava', 'checkLicenseMain', 'updateLicenseMain', 'sourcesJar' ]
     .each{ tasks.named(it).configure{ mustRunAfter forgedev.patches.apply }}
 forgedev.runs.configureEach {
     run.configure { dependsOn finalizeSpawn}
     runTest.configure { dependsOn finalizeSpawn}
 }
-// endregion
-

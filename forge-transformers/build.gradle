@@ -25,18 +25,14 @@ changelog {
     from changelogBase
 }
 
-configurations.configureEach {
-    transitive = false
-}
-
 dependencies {
     compileOnly(libs.jetbrains.annotations)
 
-    implementation(libs.bundles.asm) // Needed by all the black magic
-    implementation(libs.log4j.api)
-    implementation(libs.gson)
-    implementation(libs.modlauncher)
-    implementation(libs.coremods.api)
+    implementation(libs.bundles.asm ){ transitive = false } // Needed by all the black magic
+    implementation(libs.log4j.api   ){ transitive = false }
+    implementation(libs.gson        ){ transitive = false }
+    implementation(libs.modlauncher ){ transitive = false }
+    implementation(libs.coremods.api){ transitive = false }
 
     testCompileOnly(libs.jetbrains.annotations)
 }
