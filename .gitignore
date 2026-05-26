@@ -1,3 +1,6 @@
+#forgedev dev if the folder exists in here
+forgedev
+
 #eclipse
 **/bin
 **/.settings
@@ -22,10 +25,12 @@
 /*/build
 /*/.gradle
 
+# Minecraft
+/run
+/*.launch
+
 # Projects repo, either ignore it, or ignore patches.
-/projects/mcp/
-/projects/clean/
-/projects/forge/
+src/minecraft
 
 #occupational hazards
 /projects/**/build/
@@ -46,3 +51,8 @@ src/*/generated/**/.cache/
 /*/.gitignore
 /*/.factorypath
 /*/.apt_generated/
+/lib/
+/_actual/
+/runs/
+/forge.ipr
+/forge.iws
