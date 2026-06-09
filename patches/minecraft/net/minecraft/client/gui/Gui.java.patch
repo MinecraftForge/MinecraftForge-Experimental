@@ -54,11 +54,25 @@
                      graphics.blitSprite(RenderPipelines.GUI_TEXTURED, getMobEffectSprite(effect), x + 3, y + 3, 18, 18, ARGB.white(alpha));
                  }
              }
-@@ -610,15 +_,23 @@
+@@ -610,15 +_,37 @@
      }
  
      public void extractSelectedItemName(final GuiGraphicsExtractor graphics) {
 +        renderSelectedItemName(graphics, 0);
++    }
++
++    // Forge: Maintain vanilla parity during FLD#BACKGROUND
++    public final void updateContextualInfo(final GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
++        Gui.ContextualInfo nextContextualInfo = this.nextContextualInfoState();
++        if (nextContextualInfo != this.contextualInfoBar.getKey()) {
++            this.contextualInfoBar = Pair.of(nextContextualInfo, this.contextualInfoBarRenderers.get(nextContextualInfo).get());
++        }
++
++        this.contextualInfoBar.getValue().extractBackground(graphics, deltaTracker);
++    }
++    // Forge: Same as above but for FLD#CONTEXTUAL_INFO
++    public final void extractContextualInfoState(final GuiGraphicsExtractor graphics, DeltaTracker deltaTracker) {
++        this.contextualInfoBar.getValue().extractRenderState(graphics, deltaTracker);
 +    }
 +
 +    public void renderSelectedItemName(final GuiGraphicsExtractor graphics, int yShift) {
