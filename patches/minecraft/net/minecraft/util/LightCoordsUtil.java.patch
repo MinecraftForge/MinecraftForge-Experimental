@@ -1,6 +1,6 @@
 --- a/net/minecraft/util/LightCoordsUtil.java
 +++ b/net/minecraft/util/LightCoordsUtil.java
-@@ -10,7 +_,7 @@
+@@ -15,7 +_,7 @@
      }
  
      public static int block(final int packed) {

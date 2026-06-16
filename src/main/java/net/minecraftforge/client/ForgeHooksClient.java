@@ -23,6 +23,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.color.block.BlockColors;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.ChatComponent;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -203,34 +204,34 @@ public class ForgeHooksClient {
         guiLayers.forEach(screen -> screen.resize(width, height));
     }
 
-    public static void clearGuiLayers(Minecraft minecraft) {
+    public static void clearGuiLayers(Gui gui) {
         while (!guiLayers.isEmpty())
-            popGuiLayerInternal(minecraft);
+            popGuiLayerInternal(gui);
     }
 
-    private static void popGuiLayerInternal(Minecraft minecraft) {
-        if (minecraft.screen != null)
-            minecraft.screen.removed();
-        minecraft.screen = guiLayers.pop();
+    private static void popGuiLayerInternal(Gui gui) {
+        if (gui.screen() != null)
+            gui.screen().removed();
+        gui.screen = guiLayers.pop();
     }
 
     public static void pushGuiLayer(Minecraft minecraft, Screen screen) {
-        if (minecraft.screen != null)
-            guiLayers.push(minecraft.screen);
-        minecraft.screen = Objects.requireNonNull(screen);
+        if (minecraft.gui.screen() != null)
+            guiLayers.push(minecraft.gui.screen());
+        minecraft.gui.screen = Objects.requireNonNull(screen);
         screen.init(minecraft.getWindow().getGuiScaledWidth(), minecraft.getWindow().getGuiScaledHeight());
         minecraft.getNarrator().saySystemNow(screen.getNarrationMessage());
     }
 
     public static void popGuiLayer(Minecraft minecraft) {
         if (guiLayers.isEmpty()) {
-            minecraft.setScreen(null);
+            minecraft.gui.setScreen(null);
             return;
         }
 
-        popGuiLayerInternal(minecraft);
-        if (minecraft.screen != null)
-            minecraft.getNarrator().saySystemNow(minecraft.screen.getNarrationMessage());
+        popGuiLayerInternal(minecraft.gui);
+        if (minecraft.gui.screen() != null)
+            minecraft.getNarrator().saySystemNow(minecraft.gui.screen().getNarrationMessage());
     }
 
     public static float getGuiFarPlane() {
@@ -789,7 +790,7 @@ public class ForgeHooksClient {
         var mismatch = NetworkContext.get(connection).getMismatchs();
         if (mismatch == null)
             return false;
-        mc.setScreen(new ModMismatchDisconnectedScreen(parent, CommonComponents.CONNECT_FAILED, message, mismatch));
+        mc.gui.setScreen(new ModMismatchDisconnectedScreen(parent, CommonComponents.CONNECT_FAILED, message, mismatch));
         return true;
     }
 

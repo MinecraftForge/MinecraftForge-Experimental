@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/MobBucketItem.java
 +++ b/net/minecraft/world/item/MobBucketItem.java
-@@ -18,13 +_,18 @@
+@@ -21,13 +_,18 @@
  import org.jspecify.annotations.Nullable;
  
  public class MobBucketItem extends BucketItem {
@@ -24,7 +24,7 @@
      }
  
      @Override
-@@ -37,11 +_,11 @@
+@@ -40,11 +_,11 @@
  
      @Override
      protected void playEmptySound(final @Nullable LivingEntity user, final LevelAccessor level, final BlockPos pos) {
@@ -38,7 +38,7 @@
          if (mob instanceof Bucketable bucketable) {
              CustomData entityData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
              bucketable.loadFromBucketTag(entityData.copyTag());
-@@ -52,5 +_,13 @@
+@@ -55,6 +_,14 @@
              level.addFreshEntityWithPassengers(mob);
              mob.playAmbientSound();
          }
@@ -51,4 +51,5 @@
 +    protected SoundEvent getEmptySound() {
 +        return emptySoundSupplier.get();
      }
- }
+ 
+     @Override

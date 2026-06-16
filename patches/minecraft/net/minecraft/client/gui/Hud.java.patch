@@ -57,7 +57,7 @@
 @@ -629,15 +_,37 @@
      }
  
-     private void extractSelectedItemName(final GuiGraphicsExtractor graphics) {
+     public void extractSelectedItemName(final GuiGraphicsExtractor graphics) {
 +        renderSelectedItemName(graphics, 0);
 +    }
 +
