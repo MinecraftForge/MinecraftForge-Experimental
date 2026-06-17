@@ -38,18 +38,22 @@
          if (mob instanceof Bucketable bucketable) {
              CustomData entityData = itemStack.getOrDefault(DataComponents.BUCKET_ENTITY_DATA, CustomData.EMPTY);
              bucketable.loadFromBucketTag(entityData.copyTag());
-@@ -55,6 +_,14 @@
-             level.addFreshEntityWithPassengers(mob);
-             mob.playAmbientSound();
+@@ -57,9 +_,17 @@
          }
-+    }
-+
+     }
+ 
 +    protected EntityType<? extends Mob> getFishType() {
 +        return entityTypeSupplier.get();
 +    }
 +
 +    protected SoundEvent getEmptySound() {
 +        return emptySoundSupplier.get();
-     }
- 
++    }
++
      @Override
+     public boolean emptyContents(final @Nullable LivingEntity user, final Level level, final BlockPos pos, final @Nullable BlockHitResult hitResult) {
+-        if (this.content == Fluids.EMPTY) {
++        if (this.getContent() == Fluids.EMPTY) {
+             this.playEmptySound(user, level, pos);
+             return true;
+         } else {

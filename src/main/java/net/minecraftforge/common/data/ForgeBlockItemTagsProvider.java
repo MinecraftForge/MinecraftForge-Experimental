@@ -160,7 +160,7 @@ public class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
             .add(TINTED_GLASS);
         tag(GLASS_BLOCKS_CHEAP)
             .add(GLASS)
-            .addAll(STAINED_GLASS_PANE.asList());
+            .addAll(STAINED_GLASS.asList());
         tag(GLASS_PANES)
             .add(GLASS_PANES_COLORLESS)
             .addAll(STAINED_GLASS_PANE.asList());
