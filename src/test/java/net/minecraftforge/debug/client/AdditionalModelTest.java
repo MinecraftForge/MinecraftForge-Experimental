@@ -16,7 +16,6 @@ import net.minecraft.client.model.animal.cow.CowModel;
 import net.minecraft.client.model.animal.pig.PigModel;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.MovingBlockRenderState;
-import net.minecraft.client.renderer.block.model.BlockStateModelWrapper;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
@@ -27,7 +26,6 @@ import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.pig.Pig;
@@ -160,7 +158,7 @@ public class AdditionalModelTest extends BaseTestMod {
 
                     var state = new MovingBlockRenderState();
                     state.blockState = COW_HEAD_STATE.any();
-                    source.submitMovingBlock(stack, state);
+                    source.submitMovingBlock(stack, state, 0);
                     stack.popPose();
                 }
             }
