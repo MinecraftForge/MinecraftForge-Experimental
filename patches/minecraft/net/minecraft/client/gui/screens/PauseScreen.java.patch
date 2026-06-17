@@ -4,7 +4,7 @@
                  Button.builder(OPTIONS, var1x -> this.minecraft.gui.setScreen(new OptionsScreen(this, this.minecraft.options, true))).width(204).build(), 2
              );
          }
-+        helper.addChild(Button.builder(Component.translatable("fml.menu.mods"), button -> this.minecraft.setScreen(new net.minecraftforge.client.gui.ModListScreen(this))).width(BUTTON_WIDTH_FULL).build(), 2);
++        helper.addChild(Button.builder(Component.translatable("fml.menu.mods"), button -> this.minecraft.gui.setScreen(new net.minecraftforge.client.gui.ModListScreen(this))).width(BUTTON_WIDTH_FULL).build(), 2);
  
          this.disconnectButton = helper.addChild(
              Button.builder(

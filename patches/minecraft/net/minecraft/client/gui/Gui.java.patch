@@ -1,11 +1,28 @@
 --- a/net/minecraft/client/gui/Gui.java
 +++ b/net/minecraft/client/gui/Gui.java
+@@ -64,7 +_,7 @@
+ import org.slf4j.Logger;
+ 
+ @OnlyIn(Dist.CLIENT)
+-public class Gui {
++public class Gui extends net.minecraftforge.client.gui.overlay.ForgeLayerInstance {
+     private static final Logger LOGGER = LogUtils.getLogger();
+     private static final Component SOCIAL_INTERACTIONS_NOT_AVAILABLE = Component.translatable("multiplayer.socialInteractions.not_available");
+     public static final Component SAVING_LEVEL = Component.translatable("menu.savingLevel");
+@@ -80,6 +_,7 @@
+     private @Nullable TutorialToast socialInteractionsToast;
+ 
+     public Gui(final Minecraft minecraft, final Hud hud, final GuiRenderState guiRenderState) {
++        super(minecraft);
+         this.minecraft = minecraft;
+         this.hud = hud;
+         this.splashManager = new SplashManager(minecraft.getUser());
 @@ -175,7 +_,7 @@
              profiler.push("screen");
  
              try {
 -                this.screen.extractRenderStateWithTooltipAndSubtitles(graphics, xMouse, yMouse, deltaTracker.getGameTimeDeltaTicks());
-+                net.minecraftforge.client.ForgeHooksClient.drawScreen(this.screen, graphics, xMouse, yMouse, deltaTracker.getRealtimeDeltaTicks());
++                drawScreen(graphics, xMouse, yMouse, deltaTracker.getRealtimeDeltaTicks());
              } catch (Throwable t) {
                  CrashReport report = CrashReport.forThrowable(t, "Rendering screen");
                  CrashReportCategory category = report.addCategory("Screen render details");
@@ -26,7 +43,7 @@
              }
          }
  
-+        net.minecraftforge.client.ForgeHooksClient.clearGuiLayers(this);
++        clearLayers();
 +        Screen old = this.screen;
 +        if (screen != null) {
 +           var event = net.minecraftforge.client.event.ForgeEventFactoryClient.onScreenOpening(old, screen);
@@ -45,3 +62,14 @@
          this.screen = screen;
          if (this.screen != null) {
              this.screen.added();
+@@ -465,5 +_,10 @@
+                         }
+                     )
+             );
++    }
++
++    @Override
++    protected void setScreenInternal(Screen value) {
++        this.screen = value;
+     }
+ }

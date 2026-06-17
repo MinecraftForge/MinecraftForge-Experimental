@@ -16,7 +16,6 @@ import com.mojang.brigadier.tree.RootCommandNode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientPacketListener;
-import net.minecraft.client.multiplayer.ClientSuggestionProvider;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSource;
@@ -26,7 +25,6 @@ import net.minecraft.commands.synchronization.SuggestionProviders;
 import net.minecraft.network.chat.*;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterClientCommandsEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.server.command.CommandHelper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -71,12 +69,12 @@ public class ClientCommandHandler {
         copy(serverCommandsRoot, newServerCommands.getRoot());
 
         // Copies the client side commands into the server side commands to be used for suggestions
-        CommandHelper.mergeCommandNode(commands.getRoot(), newServerCommands.getRoot(), new IdentityHashMap<>(), getSource(), (context) -> 0, (suggestions) -> {
+        CommandHelper.mergeCommandNode(commands.getRoot(), newServerCommands.getRoot(), new IdentityHashMap<>(), getSource(), (_) -> 0, (suggestions) -> {
             @SuppressWarnings("unchecked")
             var shared = (SuggestionProvider<T>)(SuggestionProvider<?>)suggestions;
             var suggestionProvider = shared; //SuggestionProviders.safelySwap(shared);
             if (suggestionProvider == SuggestionProviders.ASK_SERVER) {
-                suggestionProvider = (context, builder) -> {
+                suggestionProvider = (context, _) -> {
                     ClientCommandSourceStack source = getSource();
                     StringReader reader = new StringReader(context.getInput());
                     if (reader.canRead() && reader.peek() == '/')

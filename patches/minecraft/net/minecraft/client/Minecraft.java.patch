@@ -132,7 +132,7 @@
          this.window.setGuiScale(guiScale);
          if (this.gui.screen() != null) {
              this.gui.screen().resize(this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
-+            net.minecraftforge.client.ForgeHooksClient.resizeGuiLayers(this, this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
++            this.gui.resizeLayers(this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
          }
  
          this.mouseHandler.setIgnoreFirstMove();

@@ -22,7 +22,7 @@
 +
 +    private java.util.List<ItemStack> shearInternal(ServerLevel level, SoundSource soundSource, ItemStack tool) {
 +        var ret = new java.util.ArrayList<ItemStack>();
-+        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityType.COW, time -> {}))
++        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, EntityTypes.COW, time -> {}))
 +            return ret;
          level.playSound(null, this, SoundEvents.MOOSHROOM_SHEAR, soundSource, 1.0F, 1.0F);
          this.convertTo(EntityTypes.COW, ConversionParams.single(this, false, false), cow -> {

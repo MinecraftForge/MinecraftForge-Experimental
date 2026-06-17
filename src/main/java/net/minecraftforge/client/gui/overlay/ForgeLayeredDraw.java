@@ -294,7 +294,7 @@ public final class ForgeLayeredDraw implements ForgeLayer {
      */
     public ForgeLayeredDraw addConditionTo(Identifier targetLayer, BooleanSupplier condition) {
         var result = namedLayers.computeIfPresent(targetLayer,
-                (name, layer) -> (guiGraphics, deltaTracker) -> {
+                (_, layer) -> (guiGraphics, deltaTracker) -> {
                     if (condition.getAsBoolean()) {
                         layer.extract(guiGraphics, deltaTracker);
                     }
@@ -431,19 +431,19 @@ public final class ForgeLayeredDraw implements ForgeLayer {
     public static void init(Hud gui, Minecraft minecraft) {
         BooleanSupplier spectator = () -> minecraft.gameMode.isSpectator();
         var hotbarCluster = new ForgeLayeredDraw(HOTBAR_AND_DECOS)
-                .addWithCondition(SPECTATOR_HOTBAR,  (gg, dt) -> gui.getSpectatorGui().extractHotbar(gg), spectator)
+                .addWithCondition(SPECTATOR_HOTBAR,  (gg, _) -> gui.getSpectatorGui().extractHotbar(gg), spectator)
                 .addWithCondition(ITEM_HOTBAR, gui::extractItemHotbar, () -> !spectator.getAsBoolean())
-                .addWithCondition(HEALTH_BAR, (gg, dt) -> gui.extractPlayerHealth(gg), () -> minecraft.gameMode.canHurtPlayer())
-                .add(VEHICLE_HEALTH, (gg, dt) -> gui.extractVehicleHealth(gg))
+                .addWithCondition(HEALTH_BAR, (gg, _) -> gui.extractPlayerHealth(gg), () -> minecraft.gameMode.canHurtPlayer())
+                .add(VEHICLE_HEALTH, (gg, _) -> gui.extractVehicleHealth(gg))
                 .add(BACKGROUND, gui::updateContextualInfo)
-                .addWithCondition(EXPERIENCE_LEVEL, (gg, dt) -> ContextualBar.extractExperienceLevel(gg, minecraft.font, minecraft.player.experienceLevel), () -> minecraft.gameMode.hasExperience() && minecraft.player.experienceLevel > 0)
+                .addWithCondition(EXPERIENCE_LEVEL, (gg, _) -> ContextualBar.extractExperienceLevel(gg, minecraft.font, minecraft.player.experienceLevel), () -> minecraft.gameMode.hasExperience() && minecraft.player.experienceLevel > 0)
                 .add(CONTEXTUAL_INFO, gui::extractContextualInfoState)
-                .addWithCondition(SELECTED_ITEM_NAME, (gg, dt) -> gui.extractSelectedItemName(gg), () -> !spectator.getAsBoolean())
-                .addWithCondition(SPECTATOR_ACTION, (gg, dt) -> gui.getSpectatorGui().extractAction(gg), spectator);
+                .addWithCondition(SELECTED_ITEM_NAME, (gg, _) -> gui.extractSelectedItemName(gg), () -> !spectator.getAsBoolean())
+                .addWithCondition(SPECTATOR_ACTION, (gg, _) -> gui.getSpectatorGui().extractAction(gg), spectator);
         var preSleepDraw = new ForgeLayeredDraw(PRE_SLEEP_STACK)
             .add(CAMERA_OVERLAY, gui::extractCameraOverlays)
             .add(CROSSHAIR, gui::extractCrosshair)
-            .add(CHANGE_STRATUM, (gg, dt) -> gg.nextStratum())
+            .add(CHANGE_STRATUM, (gg, _) -> gg.nextStratum())
             .add(HOTBAR_AND_DECOS, hotbarCluster)
             .add(POTION_EFFECTS, gui::extractEffects)
             .add(BOSS_OVERLAY, gui::extractBossOverlay);
@@ -454,12 +454,12 @@ public final class ForgeLayeredDraw implements ForgeLayer {
             .add(TITLE_OVERLAY, gui::extractTitle)
             .add(CHAT_OVERLAY, gui::extractChat)
             .add(TAB_LIST, gui::extractTabList)
-            .add(SUBTITLE_OVERLAY, (gfx, delta) -> gui.extractSubtitleOverlay(gfx, minecraft.gui.screen() != null && minecraft.gui.screen().isInGameUi()));
+            .add(SUBTITLE_OVERLAY, (gfx, _) -> gui.extractSubtitleOverlay(gfx, minecraft.gui.screen() != null && minecraft.gui.screen().isInGameUi()));
         instance
             .add(PRE_SLEEP_STACK, preSleepDraw, () -> !gui.isHidden())
             .add(SLEEP_OVERLAY, gui::extractSleepOverlay)
             .add(POST_SLEEP_STACK, postSleepDraw, () -> !gui.isHidden())
-            .add(SUBTITLE_OVERLAY, (gfx, delta) -> {
+            .add(SUBTITLE_OVERLAY, (gfx, _) -> {
                 if (!gui.isHidden() && minecraft.gui.screen() != null && minecraft.gui.screen().isInGameUi())
                     gui.extractSubtitleOverlay(gfx,  true);
             });

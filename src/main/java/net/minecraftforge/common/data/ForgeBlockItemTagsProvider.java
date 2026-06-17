@@ -5,26 +5,12 @@
 
 package net.minecraftforge.common.data;
 
-import java.util.Locale;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Stream;
-
 import net.minecraft.data.tags.BlockItemTagsProvider;
-import net.minecraft.references.BlockItemId;
 import net.minecraft.references.BlockItemIds;
-import net.minecraft.resources.Identifier;
 import net.minecraft.tags.BlockItemTagId;
 import net.minecraft.tags.BlockItemTags;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.registries.ForgeRegistries;
-
 import static net.minecraftforge.common.Tags.BlockItems.*;
 import static net.minecraft.references.BlockItemIds.*;
 
@@ -40,7 +26,6 @@ public class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
     }
 
     @Override
-    @SuppressWarnings({ "unchecked", "removal" })
     protected void run() {
         tag(BARRELS)
             .addTag(BARRELS_WOODEN);
@@ -491,103 +476,5 @@ public class ForgeBlockItemTagsProvider extends BlockItemTagsProvider {
                 STRIPPED_SPRUCE_WOOD,
                 STRIPPED_WARPED_HYPHAE
             );
-    }
-
-    private static TagKey<Block> forgeTagKey(String path) {
-        return BlockTags.create(Identifier.fromNamespaceAndPath("forge", path));
-    }
-
-    private static TagKey<Block> tagKey(String name) {
-        return BlockTags.create(Identifier.withDefaultNamespace(name));
-    }
-
-    private void addColored(Consumer<Block> consumer, TagKey<Block> group, String pattern) {
-        String prefix = group.location().getPath().toUpperCase(Locale.ENGLISH) + '_';
-        for (DyeColor color  : DyeColor.values()) {
-            Identifier key = Identifier.fromNamespaceAndPath("minecraft", pattern.replace("{color}",  color.getName()));
-            TagKey<Block> blockTag = getForgeTag(Tags.Blocks.class, prefix + color.getName());
-            TagKey<Item> itemTag = getForgeTag(Tags.Items.class, prefix + color.getName());
-            Block block = ForgeRegistries.BLOCKS.getValue(key);
-            if (block == null || block  == Blocks.AIR)
-                throw new IllegalStateException("Unknown vanilla block: " + key.toString());
-            tag(new BlockItemTagId(blockTag, itemTag))
-                .add(BlockItemId.create(key, key));
-            consumer.accept(block);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private static <T> TagKey<T> getForgeTag(Class<?> cls, String name) {
-        try {
-            name = name.toUpperCase(Locale.ENGLISH);
-            return (TagKey<T>)cls.getDeclaredField(name).get(null);
-        } catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
-            throw new IllegalStateException(cls.getName() + " is missing tag name: " + name);
-        }
-    }
-
-    private static Identifier forgeRl(String path) {
-        return Identifier.fromNamespaceAndPath("forge", path);
-    }
-
-    private WrappedCombinedAppender tag(TagKey<Block> block, TagKey<Item> item, TagKey<Block> oldBlock, TagKey<Item> oldItem) {
-        var tag = tag(new BlockItemTagId(block, item));
-        var old = tag(new BlockItemTagId(oldBlock, oldItem));
-        return wrap(tag, old, oldBlock);
-    }
-
-    private static WrappedCombinedAppender wrap(WrappedCombinedAppender tag, WrappedCombinedAppender old, TagKey<Block> oldBlock) {
-        return new WrappedCombinedAppender(null, null, null) {
-            @Override
-            public WrappedCombinedAppender addAll(Stream<BlockItemId> ids) {
-                tag.addAll(ids);
-                old.addAll(ids);
-                return this;
-            }
-
-            @Override
-            public WrappedCombinedAppender addTag(BlockItemTagId id) {
-                tag.addTag(id);
-                old.addTag(id);
-                return this;
-            }
-
-            @Override
-            public WrappedCombinedAppender addOptional(BlockItemId... ids) {
-                tag.addOptional(ids);
-                old.addOptional(ids);
-                return this;
-            }
-
-            @Override
-            public WrappedCombinedAppender addOptional(BlockItemTagId... ids) {
-                tag.addOptional(ids);
-                old.addOptional(ids);
-                return this;
-            }
-
-            /*
-            @Override
-            public TagAppender<Block> replace(boolean value) {
-                tag.replace(value);
-                old.replace(value);
-                return this;
-            }
-
-            @Override
-            public TagAppender<Block> remove(Identifier value) {
-                tag.remove(value);
-                old.remove(value);
-                return this;
-            }
-
-            @Override
-            public TagAppender<Block> remove(TagKey<Block> value) {
-                tag.remove(value);
-                old.remove(value);
-                return this;
-            }
-            */
-        };
     }
 }

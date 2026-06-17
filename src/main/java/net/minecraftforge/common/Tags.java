@@ -44,6 +44,12 @@ public class Tags {
 
     public static class BlockItems {
         private static void init() {}
+        //region forge specific tags
+        public static final BlockItemTagId STORAGE_BLOCKS_AMETHYST = forgeTag("storage_blocks/amethyst");
+        public static final BlockItemTagId STORAGE_BLOCKS_QUARTZ = forgeTag("storage_blocks/quartz");
+        //endregion
+
+
         //region `c` tags for common conventions
         // Note: Other loaders have additional `c` tags that are exclusive to their loader.
         //       Forge only adopts `c` tags that are common across all loaders.
@@ -244,6 +250,10 @@ public class Tags {
             return create(Identifier.fromNamespaceAndPath("c", name));
         }
 
+        private static BlockItemTagId forgeTag(String name) {
+            return create(Identifier.fromNamespaceAndPath("forge", name));
+        }
+
         private static BlockItemTagId create(Identifier id) {
             return BlockItemTagId.create(id, id);
         }
@@ -262,8 +272,8 @@ public class Tags {
         public static final TagKey<Block> NEEDS_WOOD_TOOL = forgeTag("needs_wood_tool");
         public static final TagKey<Block> NEEDS_GOLD_TOOL = forgeTag("needs_gold_tool");
         public static final TagKey<Block> NEEDS_NETHERITE_TOOL = forgeTag("needs_netherite_tool");
-        public static final TagKey<Block> STORAGE_BLOCKS_AMETHYST = forgeTag("storage_blocks/amethyst");
-        public static final TagKey<Block> STORAGE_BLOCKS_QUARTZ = forgeTag("storage_blocks/quartz");
+        public static final TagKey<Block> STORAGE_BLOCKS_AMETHYST = BlockItems.STORAGE_BLOCKS_AMETHYST.block();
+        public static final TagKey<Block> STORAGE_BLOCKS_QUARTZ = BlockItems.STORAGE_BLOCKS_QUARTZ.block();
         //endregion
 
         //region `c` tags for common conventions
@@ -555,8 +565,8 @@ public class Tags {
          */
         public static final TagKey<Item> ENCHANTING_FUELS = forgeTag("enchanting_fuels");
 
-        public static final TagKey<Item> STORAGE_BLOCKS_AMETHYST = forgeTag("storage_blocks/amethyst");
-        public static final TagKey<Item> STORAGE_BLOCKS_QUARTZ = forgeTag("storage_blocks/quartz");
+        public static final TagKey<Item> STORAGE_BLOCKS_AMETHYST = BlockItems.STORAGE_BLOCKS_AMETHYST.item();
+        public static final TagKey<Item> STORAGE_BLOCKS_QUARTZ = BlockItems.STORAGE_BLOCKS_QUARTZ.item();
         //endregion
 
         //region `c` tags for common conventions

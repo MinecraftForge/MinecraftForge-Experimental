@@ -28,6 +28,7 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.data.PackOutput;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.animal.cow.Cow;
 import net.minecraft.world.entity.animal.pig.Pig;
 import net.minecraft.world.item.Item;
@@ -119,7 +120,7 @@ public class AdditionalModelTest extends BaseTestMod {
     // An example on how to render both the item and block model variants
     public void onAddLayers(EntityRenderersEvent.AddLayers event) {
         // Pigs get a block on their head, this is a test of going through the ItemModel loader
-        LivingEntityRenderer<Pig, PigRenderState, PigModel> pig = event.getEntityRenderer(EntityType.PIG);
+        LivingEntityRenderer<Pig, PigRenderState, PigModel> pig = event.getEntityRenderer(EntityTypes.PIG);
         pig.addLayer(new RenderLayer<>(pig) {
             @Override
             public void submit(PoseStack stack, SubmitNodeCollector source, int light, PigRenderState state, float xRot, float yRot) {
@@ -143,7 +144,7 @@ public class AdditionalModelTest extends BaseTestMod {
 
 
         // Cows get a block on their head, this is a test of going through the BlockModel loader
-        LivingEntityRenderer<Cow, LivingEntityRenderState, CowModel> cow = event.getEntityRenderer(EntityType.COW);
+        LivingEntityRenderer<Cow, LivingEntityRenderState, CowModel> cow = event.getEntityRenderer(EntityTypes.COW);
         cow.addLayer(new RenderLayer<>(cow) {
             @Override
             public void submit(PoseStack stack, SubmitNodeCollector source, int light, LivingEntityRenderState cowState, float xRot, float yRot) {

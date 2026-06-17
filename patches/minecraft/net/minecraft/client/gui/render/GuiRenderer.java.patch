@@ -4,7 +4,7 @@
              builder.put((Class<? extends PictureInPictureRenderState>)pictureInPictureRenderer.getRenderStateClass(), pictureInPictureRenderer);
          }
  
-+        net.minecraftforge.client.ForgeHooksClient.onRegisterPictureInPictureRenderers(pictureInPictureRenderers, bufferSource, builder);
++        net.minecraftforge.client.ForgeHooksClient.onRegisterPictureInPictureRenderers(pictureInPictureRenderers, builder);
          this.pictureInPictureRenderers = builder.buildOrThrow();
      }
  

@@ -11,12 +11,13 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.clock.ClockTimeMarker;
 import net.minecraft.world.clock.ClockTimeMarkers;
 import net.minecraft.world.clock.WorldClocks;
-import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.BedBlock;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.properties.BedPart;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.gametest.GameTest;
@@ -52,7 +53,7 @@ public class TrySleepTest extends BaseTestMod {
     public static void sleep_unsafe(GameTestHelper helper) {
         var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
         var bed = putBed(helper);
-        helper.spawn(EntityType.ZOMBIE, bed.east());
+        helper.spawn(EntityTypes.ZOMBIE, bed.east());
         setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, false, "Player was able to sleep in an unsafe bed.");
     }
 
@@ -66,8 +67,8 @@ public class TrySleepTest extends BaseTestMod {
     private static BlockPos putBed(GameTestHelper helper) {
         var mid = new BlockPos(0,0,0);
         var south = mid.south();
-        helper.setAndAssertBlock(south, Blocks.BLACK_BED.defaultBlockState());
-        helper.setAndAssertBlock(mid, Blocks.BLACK_BED.defaultBlockState().setValue(BedBlock.PART, BedPart.HEAD));
+        helper.setAndAssertBlock(south, Blocks.BED.black().defaultBlockState());
+        helper.setAndAssertBlock(mid, Blocks.BED.black().defaultBlockState().setValue(BedBlock.PART, BedPart.HEAD));
         return mid;
     }
 
@@ -76,7 +77,7 @@ public class TrySleepTest extends BaseTestMod {
         var overworld = helper.getLevel().registryAccess().getOrThrow(WorldClocks.OVERWORLD);
         var origTime = manager.getTotalTicks(overworld);
 
-        player.setPos(helper.absolutePos(bed).getCenter());
+        player.setPos(Vec3.atBottomCenterOf(helper.absolutePos(bed)));
         manager.moveToTimeMarker(overworld, time);
         helper.getLevel().tick(() -> true);
         helper.useBlock(bed, player);

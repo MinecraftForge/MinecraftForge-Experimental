@@ -6,33 +6,14 @@
 package net.minecraftforge.client.extensions;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraftforge.client.ForgeHooksClient;
-
 import java.util.Locale;
 
 /**
- * Extension interface for {@link IForgeMinecraft}.
+ * Extension interface for {@link Minecraft}.
  */
 public interface IForgeMinecraft {
     private Minecraft self() {
         return (Minecraft)this;
-    }
-
-    /**
-     * Pushes a screen as a new GUI layer.
-     *
-     * @param screen the new GUI layer
-     */
-    default void pushGuiLayer(Screen screen) {
-        ForgeHooksClient.pushGuiLayer(self(), screen);
-    }
-
-    /**
-     * Pops a GUI layer from the screen.
-     */
-    default void popGuiLayer() {
-        ForgeHooksClient.popGuiLayer(self());
     }
 
     /**
