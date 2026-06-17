@@ -1,0 +1,13 @@
+--- a/net/minecraft/data/tags/BlockItemTagsProvider.java
++++ b/net/minecraft/data/tags/BlockItemTagsProvider.java
+@@ -16,6 +_,10 @@
+         this.tagSupplier = tagSupplier;
+     }
+ 
++    protected BlockItemTagsProvider.CombinedAppender tag(final net.minecraft.tags.TagKey<Block> block, final net.minecraft.tags.TagKey<Item> item) {
++        return tag(new BlockItemTagId(block, item));
++    }
++
+     protected BlockItemTagsProvider.CombinedAppender tag(final BlockItemTagId tag) {
+         return this.tagSupplier.apply(tag);
+     }

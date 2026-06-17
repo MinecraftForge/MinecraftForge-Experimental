@@ -48,7 +48,6 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.ParticleResources;
 import net.minecraft.client.player.ClientInput;
 import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
@@ -59,6 +58,7 @@ import net.minecraft.client.renderer.chunk.ChunkSectionLayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -256,9 +256,9 @@ public class ForgeHooksClient {
     }
     */
 
-    private static final RenderHighlightEvent.Callback NOOP_HIGHLIGHTER = (source, stack, translucent, state) -> { };
+    private static final RenderHighlightEvent.Callback NOOP_HIGHLIGHTER = (_, _, _) -> { };
 
-    public static RenderHighlightEvent.Callback onExtractBlockOutline(LevelRenderer context, Camera camera, LevelRenderState state, HitResult target) {
+    public static RenderHighlightEvent.Callback onExtractBlockOutline(LevelExtractor context, Camera camera, LevelRenderState state, HitResult target) {
         if (target instanceof BlockHitResult blockTarget) {
             var event = new RenderHighlightEvent.Block(context, camera, state, blockTarget);
             if (RenderHighlightEvent.Block.BUS.post(event))
@@ -457,14 +457,14 @@ public class ForgeHooksClient {
         InputEvent.Key.BUS.post(new InputEvent.Key(info, action));
     }
 
-    public static boolean isNameplateInRenderDistance(Entity entity, double squareDistance) {
+    public static boolean isNameplateInRenderDistance(Entity entity, double squareDistance, double nameTagDistance) {
         if (entity instanceof LivingEntity living) {
             var attribute = living.getAttribute(ForgeMod.NAMETAG_DISTANCE.getHolder().get());
             if (attribute != null) {
                 return !(squareDistance > (attribute.getValue() * attribute.getValue()));
             }
         }
-        return !(squareDistance > 4096.0f);
+        return !(squareDistance > Mth.square(nameTagDistance));
     }
 
     public static boolean shouldRenderEffect(MobEffectInstance effectInstance) {

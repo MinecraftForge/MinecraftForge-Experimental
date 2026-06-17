@@ -1,5 +1,14 @@
 --- a/net/minecraft/client/gui/Gui.java
 +++ b/net/minecraft/client/gui/Gui.java
+@@ -175,7 +_,7 @@
+             profiler.push("screen");
+ 
+             try {
+-                this.screen.extractRenderStateWithTooltipAndSubtitles(graphics, xMouse, yMouse, deltaTracker.getGameTimeDeltaTicks());
++                net.minecraftforge.client.ForgeHooksClient.drawScreen(this.screen, graphics, xMouse, yMouse, deltaTracker.getRealtimeDeltaTicks());
+             } catch (Throwable t) {
+                 CrashReport report = CrashReport.forThrowable(t, "Rendering screen");
+                 CrashReportCategory category = report.addCategory("Screen render details");
 @@ -224,12 +_,6 @@
              LOGGER.error("setScreen called from non-game thread");
          }

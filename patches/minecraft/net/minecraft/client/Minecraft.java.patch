@@ -40,6 +40,14 @@
          particleResources.onReload(this.particleEngine::clearParticles);
          this.gameRenderer = new GameRenderer(this, this.entityRenderDispatcher.getItemInHandRenderer(), this.modelManager);
          WindowRenderState windowRenderState = this.gameRenderer.gameRenderState().windowRenderState;
+@@ -647,6 +_,7 @@
+             this.window.getHeight()
+         );
+         this.levelExtractor = new LevelExtractor(this, this.gameRenderer.gameRenderState().levelRenderState, this.levelRenderer);
++        net.minecraftforge.client.event.ForgeEventFactoryClient.onInitLevelRenderer();
+         this.resourceManager.registerReloadListener(this.levelExtractor);
+         this.resourceManager.registerReloadListener(this.levelRenderer.cloudRenderer());
+         this.gpuWarnlistManager = new GpuWarnlistManager();
 @@ -654,6 +_,9 @@
          this.resourceManager.registerReloadListener(this.regionalCompliancies);
          this.gui = new Gui(this, new Hud(this), this.gameRenderer.gameRenderState().guiRenderState);

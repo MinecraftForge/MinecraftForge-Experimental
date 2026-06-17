@@ -22,9 +22,11 @@
          };
      }
  
-@@ -90,6 +_,8 @@
+@@ -89,7 +_,10 @@
+ 
      public static void inject(final Language language) {
          instance = language;
++        net.minecraftforge.common.ForgeI18n.loadLanguageData(language.getLanguageData());
      }
 +
 +    public Map<String, String> getLanguageData() { return Map.of(); }
