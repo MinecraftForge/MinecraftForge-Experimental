@@ -1,0 +1,16 @@
+--- a/net/minecraft/data/tags/BlockItemTagAppender.java
++++ b/net/minecraft/data/tags/BlockItemTagAppender.java
+@@ -52,6 +_,13 @@
+         return this;
+     }
+ 
++    @SafeVarargs
++    public final BlockItemTagAppender<Element> addTags(final TagKey<Element>... tags) {
++        for (var tag : tags)
++            addTag(tag);
++        return this;
++    }
++
+     public BlockItemTagAppender<Element> addOptionalTag(final TagKey<Element> tag) {
+         this.original.addOptionalTag(tag);
+         return this;
