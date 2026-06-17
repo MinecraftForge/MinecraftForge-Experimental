@@ -35,7 +35,7 @@ public class TrySleepTest extends BaseTestMod {
 
     @GameTest
     public static void sleep_obstructed(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerFull(GameType.SURVIVAL);
 
         var bed = putBed(helper);
         helper.setAndAssertBlock(bed.above(), Blocks.STONE);
@@ -44,14 +44,14 @@ public class TrySleepTest extends BaseTestMod {
 
     @GameTest
     public static void sleep_daytime(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerFull(GameType.SURVIVAL);
         var bed = putBed(helper);
         setTimeAndTest(helper, ClockTimeMarkers.DAY, bed, player, false, "Player was able to sleep during daytime.");
     }
 
     @GameTest
     public static void sleep_unsafe(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerFull(GameType.SURVIVAL);
         var bed = putBed(helper);
         helper.spawn(EntityTypes.ZOMBIE, bed.east());
         setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, false, "Player was able to sleep in an unsafe bed.");
@@ -59,7 +59,7 @@ public class TrySleepTest extends BaseTestMod {
 
     @GameTest
     public static void sleep_normally(GameTestHelper helper) {
-        var player = helper.makeMockServerPlayer(GameType.SURVIVAL);
+        var player = helper.makeMockServerPlayerFull(GameType.SURVIVAL);
         var bed = putBed(helper);
         setTimeAndTest(helper, ClockTimeMarkers.NIGHT, bed, player, true, "Player was not able to sleep. There might be a slime or something causing this to fail.");
     }

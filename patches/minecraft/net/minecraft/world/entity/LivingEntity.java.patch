@@ -32,7 +32,7 @@
              .add(Attributes.FRICTION_MODIFIER)
              .add(Attributes.NAME_TAG_DISTANCE)
 -            .add(Attributes.BELOW_NAME_DISTANCE);
-+            .add(Attributes.WAYPOINT_TRANSMIT_RANGE)
++            .add(Attributes.BELOW_NAME_DISTANCE)
 +            .add(Attributes.JUMP_STRENGTH);
      }
  
