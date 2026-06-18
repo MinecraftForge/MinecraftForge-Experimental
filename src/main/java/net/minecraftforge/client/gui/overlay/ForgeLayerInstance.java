@@ -26,7 +26,7 @@ public abstract class ForgeLayerInstance {
 
     public void popLayer() {
         if (guiLayers.isEmpty()) {
-            setScreenInternal(null);
+            minecraft.gui.setScreen(null);
             return;
         }
 
