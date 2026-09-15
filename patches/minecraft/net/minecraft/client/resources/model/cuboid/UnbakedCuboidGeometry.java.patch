@@ -29,9 +29,9 @@
 -                        Material.Baked material = modelBaker.materials().resolveSlot(textures, face.texture(), name);
 +                        Material.Baked material = materialMapper.apply(face.texture());
                          BakedQuad quad = FaceBakery.bakeQuad(
-                             modelBaker, from, to, face, material, facing, modelState, element.rotation(), element.shade(), element.lightEmission()
-                         );
-@@ -76,7 +_,5 @@
+                             modelBaker,
+                             from,
+@@ -85,7 +_,5 @@
                  }
              }
          }

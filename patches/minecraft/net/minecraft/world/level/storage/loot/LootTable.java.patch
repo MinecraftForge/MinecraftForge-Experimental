@@ -6,7 +6,7 @@
                      Identifier.CODEC.optionalFieldOf("random_sequence").forGetter(t -> t.randomSequence),
 -                    LootPool.CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(t -> t.pools),
 +                    LootPool.CONDITIONAL_CODEC.listOf().optionalFieldOf("pools", List.of()).forGetter(t -> t.pools),
-                     LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(t -> t.functions)
+                     LootItemFunctions.CODEC.optionalFieldOf("modifier").forGetter(t -> t.modifier)
                  )
                  .apply(i, LootTable::new)
 @@ -58,7 +_,7 @@
@@ -15,10 +15,10 @@
          this.randomSequence = randomSequence;
 -        this.pools = pools;
 +        this.pools = Lists.newArrayList(pools);
-         this.functions = functions;
-         this.compositeFunction = LootItemFunctions.compose(functions);
+         this.modifier = modifier;
      }
-@@ -81,10 +_,12 @@
+ 
+@@ -80,10 +_,12 @@
          };
      }
  
@@ -31,7 +31,7 @@
      public void getRandomItemsRaw(final LootContext context, final Consumer<ItemStack> output) {
          LootContext.VisitedEntry<?> breadcrumb = LootContext.createVisitedEntry(this);
          if (context.pushVisitedElement(breadcrumb)) {
-@@ -101,18 +_,19 @@
+@@ -100,18 +_,19 @@
      }
  
      public void getRandomItems(final LootParams params, final long optionalLootTableSeed, final Consumer<ItemStack> output) {
@@ -55,7 +55,7 @@
      }
  
      public ObjectArrayList<ItemStack> getRandomItems(final LootParams params, final RandomSource randomSource) {
-@@ -129,7 +_,8 @@
+@@ -128,7 +_,8 @@
  
      private ObjectArrayList<ItemStack> getRandomItems(final LootContext context) {
          ObjectArrayList<ItemStack> result = new ObjectArrayList<>();
@@ -65,7 +65,7 @@
          return result;
      }
  
-@@ -214,6 +_,68 @@
+@@ -213,6 +_,68 @@
  
      public static LootTable.Builder lootTable() {
          return new LootTable.Builder();

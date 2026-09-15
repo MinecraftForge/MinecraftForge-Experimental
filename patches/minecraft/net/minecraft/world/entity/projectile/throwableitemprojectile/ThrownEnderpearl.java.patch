@@ -14,7 +14,7 @@
                          if (this.random.nextFloat() < 0.05F && level.isSpawningMonsters() && level.getLevelData().getDifficulty() != Difficulty.PEACEFUL) {
                              Endermite endermite = EntityTypes.ENDERMITE.create(level, EntitySpawnReason.TRIGGERED);
                              if (endermite != null) {
-@@ -124,7 +_,7 @@
+@@ -122,7 +_,7 @@
                          if (newOwner != null) {
                              newOwner.resetFallDistance();
                              newOwner.resetCurrentImpulseContext();

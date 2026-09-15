@@ -7,7 +7,7 @@ package net.minecraftforge.registries;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
-import net.minecraft.core.RegistrySetBuilder.RegistryBootstrap;
+import net.minecraft.core.registries.SingleRegistryBootstrap;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -67,7 +67,7 @@ import java.util.function.Supplier;
  *
  * @param <T> The base registry type
  */
-public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
+public class DeferredRegisterData<T> implements SingleRegistryBootstrap<T> {
 
     /**
      * DeferredRegister factory for data driven registries. This will not create objects during the normal registry events.
@@ -299,7 +299,7 @@ public class DeferredRegisterData<T> implements RegistryBootstrap<T> {
             T value;
             if (e.getValue() != null) {
                 value = e.getValue().apply(context);
-                context.register(ro.getKey(), value, this.lifecycle);
+                context.register(ro.getKey(), value);
             } else
                 value = lookup.get(ro.getKey()).map(Holder::get).orElse(null);
 

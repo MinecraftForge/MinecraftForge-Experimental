@@ -7,13 +7,11 @@ package net.minecraftforge.client;
 
 import com.mojang.blaze3d.framegraph.FrameGraphBuilder;
 import com.mojang.blaze3d.framegraph.FramePass;
-import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.renderer.LevelTargetBundle;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
 import net.minecraft.resources.Identifier;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
-import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,11 +29,11 @@ public class FramePassManager {
 
     // Note: Pass order is determined automatically within FrameGraphBuilder. It's unclear what must be done to guarantee ordering.
     @ApiStatus.Internal
-    public static void insertForgePasses(FrameGraphBuilder graphBuilder, LevelTargetBundle bundle, LevelRenderState state, DeltaTracker deltaTracker) {
+    public static void insertForgePasses(FrameGraphBuilder graphBuilder, LevelTargetBundle bundle, LevelRenderState state) {
         for (PassInfo info : addedPasses) {
             FramePass pass = graphBuilder.addPass(info.name);
             PassDefinition forgePass = info.pass;
-            forgePass.extracts(bundle, pass, deltaTracker);
+            forgePass.extracts(bundle, pass, state);
             pass.executes(() -> forgePass.executes(state));
         }
     }
@@ -71,7 +69,7 @@ public class FramePassManager {
      /// if you want to take a crack at it.
      ///
      /// Satisfying #2 is simple. Any state information you need to extract
-     /// should be done during {@linkplain PassDefinition#extracts(LevelTargetBundle, FramePass, DeltaTracker)}.
+     /// should be done during {@linkplain PassDefinition#extracts(LevelTargetBundle, FramePass, LevelRenderState)}.
      /// No actual rendering should be done at this time. This can happen before or after binding to a target.
      /// The specific implementation of your render state is up to you, it can even be done with some instance variables.
      ///
@@ -79,23 +77,13 @@ public class FramePassManager {
      /// during the extracts phase.
     @NullMarked
     public interface PassDefinition {
-
-        /**
-         * @deprecated Prefer {@linkplain PassDefinition#extracts(LevelTargetBundle, FramePass, DeltaTracker)}
-         */
-        @Deprecated(forRemoval = true, since="26.2")
-        default void extracts(LevelTargetBundle bundle, FramePass pass) {};
-
         /**
          * This method exists to do render state extraction. Your instance of a PassDefinition should have
          * locals or some filled record instance that represents the render state created.
          * The resulting render state should be consumed by {@linkplain PassDefinition#executes(LevelRenderState)}
          * You must also use this to define which targets your pass will bind against. See PassDefinition javadocs for details.
          */
-
-        default void extracts(LevelTargetBundle bundle, FramePass pass, DeltaTracker deltaTracker) {
-            extracts(bundle, pass);
-        };
+        void extracts(LevelTargetBundle bundle, FramePass pass, LevelRenderState deltaTracker);
 
         /**
          * Use to define what your pass does during the render stage. This should consume the render state created

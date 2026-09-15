@@ -33,7 +33,7 @@
          values.unwrap().ifRight(directValues -> {
              if (directValues.isEmpty()) {
                  throw new UnsupportedOperationException("Ingredients can't be empty");
-@@ -113,5 +_,50 @@
+@@ -111,6 +_,51 @@
          } else {
              return inputDisplay;
          }
@@ -83,4 +83,5 @@
 +        buf.append(']');
 +        return buf.toString();
      }
- }
+ 
+     public Optional<Holder<Item>> getSingleItem() {

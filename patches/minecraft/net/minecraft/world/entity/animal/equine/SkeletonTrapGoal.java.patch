@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/animal/equine/SkeletonTrapGoal.java
 +++ b/net/minecraft/world/entity/animal/equine/SkeletonTrapGoal.java
-@@ -31,6 +_,13 @@
+@@ -32,6 +_,13 @@
      @Override
      public void tick() {
          ServerLevel level = (ServerLevel)this.horse.level();

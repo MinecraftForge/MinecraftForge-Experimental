@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/CropBlock.java
 +++ b/net/minecraft/world/level/block/CropBlock.java
-@@ -47,7 +_,7 @@
+@@ -40,7 +_,7 @@
  
      @Override
      protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
@@ -9,7 +9,7 @@
      }
  
      protected IntegerProperty getAgeProperty() {
-@@ -81,8 +_,9 @@
+@@ -74,8 +_,9 @@
              int age = this.getAge(state);
              if (age < this.getMaxAge()) {
                  float growthSpeed = getGrowthSpeed(this, level, pos);
@@ -20,7 +20,7 @@
                  }
              }
          }
-@@ -105,9 +_,9 @@
+@@ -98,9 +_,9 @@
              for (int zz = -1; zz <= 1; zz++) {
                  float blockSpeed = 0.0F;
                  BlockState blockState = level.getBlockState(below.offset(xx, 0, zz));
@@ -32,7 +32,7 @@
                          blockSpeed = 3.0F;
                      }
                  }
-@@ -159,7 +_,7 @@
+@@ -152,7 +_,7 @@
          final InsideBlockEffectApplier effectApplier,
          final boolean isPrecise
      ) {

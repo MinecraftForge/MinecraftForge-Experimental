@@ -5,23 +5,23 @@
 
 package net.minecraftforge.client.extensions.common;
 
-import com.mojang.blaze3d.vertex.PoseStack;
 import java.util.function.Consumer;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ScreenEffectRenderer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.BlockAndTintGetter;
 import net.minecraft.client.renderer.block.FluidModel;
 import net.minecraft.client.renderer.block.FluidRenderer;
 import net.minecraft.client.renderer.fog.FogData;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.material.FogType;
+import net.minecraftforge.client.IRenderCallback;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fml.LogicalSide;
@@ -138,11 +138,14 @@ public interface IClientFluidTypeExtensions {
      * @param mc        the client instance
      * @param poseStack the transformations representing the current rendering position
      */
-    default void renderOverlay(Minecraft mc, PoseStack poseStack, SubmitNodeCollector buffer) {
+    default @Nullable IRenderCallback renderOverlay(Minecraft mc, PlayerRenderState state) {
         Identifier texture = this.getRenderOverlayTexture(mc);
         if (texture != null)
-            ScreenEffectRenderer.renderFluid(mc, poseStack, buffer, texture);
+            return (pose, collector) -> ScreenEffectRenderer.submitFluid(state.waterOverlay, pose, collector, texture);
+        return null;
     }
+
+
 
     /**
      * Modifies the color of the fog when the camera is within the fluid.

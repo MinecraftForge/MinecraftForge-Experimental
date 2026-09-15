@@ -88,18 +88,18 @@ public sealed abstract class EntityTeleportEvent implements Cancellable, EntityE
     }
 
     /**
-     * EntityTeleportEvent.EnderEntity is fired before an Enderman or Shulker randomly teleports.
+     * EntityTeleportEvent.EntityRandom is fired before an Entity randomly teleports.
      * <br>
      * This event is {@linkplain Cancellable cancelable}. If the event is cancelled, the entity will not be teleported.
      * <br>
      * This event is only fired on the {@link LogicalSide#SERVER} side.
      */
-    public static final class EnderEntity extends EntityTeleportEvent {
-        public static final CancellableEventBus<EnderEntity> BUS = CancellableEventBus.create(EnderEntity.class);
+    public static final class EntityRandom extends EntityTeleportEvent {
+        public static final CancellableEventBus<EntityRandom> BUS = CancellableEventBus.create(EntityRandom.class);
 
         private final LivingEntity entityLiving;
 
-        public EnderEntity(LivingEntity entity, double targetX, double targetY, double targetZ) {
+        public EntityRandom(LivingEntity entity, double targetX, double targetY, double targetZ) {
             super(entity, targetX, targetY, targetZ);
             this.entityLiving = entity;
         }

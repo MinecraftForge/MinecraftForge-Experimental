@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/npc/villager/Villager.java
 +++ b/net/minecraft/world/entity/npc/villager/Villager.java
-@@ -289,7 +_,7 @@
+@@ -267,7 +_,7 @@
      @Override
      public InteractionResult mobInteract(final Player player, final InteractionHand hand) {
          ItemStack itemStack = player.getItemInHand(hand);
@@ -9,7 +9,7 @@
              return super.mobInteract(player, hand);
          }
  
-@@ -761,7 +_,7 @@
+@@ -744,7 +_,7 @@
  
      @Override
      public void thunderHit(final ServerLevel level, final LightningBolt lightningBolt) {

@@ -1,17 +1,17 @@
 --- a/net/minecraft/client/renderer/GameRenderer.java
 +++ b/net/minecraft/client/renderer/GameRenderer.java
-@@ -220,6 +_,9 @@
+@@ -240,6 +_,9 @@
              case null:
              default:
-                 this.clearPostEffect();
+                 this.clearSpectatedEntityPostEffect();
 +                var rl = cameraEntity == null ? null : net.minecraftforge.client.EntitySpectatorShaderManager.get(cameraEntity.getType());
 +                if (rl != null)
 +                    this.setPostEffect(rl);
          }
      }
  
-@@ -515,6 +_,10 @@
-                     Registry<Block> blockRegistry = this.minecraft.level.registryAccess().lookupOrThrow(Registries.BLOCK);
+@@ -628,6 +_,10 @@
+                     BlockInWorld blockInWorld = new BlockInWorld(this.minecraft.level, pos, false);
                      renderOutline = !itemStack.isEmpty()
                          && (itemStack.canBreakBlockInAdventureMode(blockInWorld) || itemStack.canPlaceOnBlockInAdventureMode(blockInWorld));
 +                    if (!renderOutline && blockState.hasBlockEntity()) {
@@ -21,7 +21,7 @@
                  }
              }
          }
-@@ -538,6 +_,9 @@
+@@ -648,6 +_,9 @@
          if (optionsState.bobView) {
              this.bobView(cameraState, bobStack);
          }
@@ -30,4 +30,4 @@
 +        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
  
          projectionMatrix.mul(bobStack.last().pose());
-         float screenEffectScale = optionsState.screenEffectScale;
+         float worldPartialTicks = this.gameRenderState.levelRenderState.worldPartialTicks;

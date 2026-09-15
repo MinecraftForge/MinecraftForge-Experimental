@@ -1,0 +1,25 @@
+--- a/com/mojang/renderpearl/backend/vulkan/VulkanDevice.java
++++ b/com/mojang/renderpearl/backend/vulkan/VulkanDevice.java
+@@ -213,7 +_,21 @@
+         final int depthOrLayers,
+         final int mipLevels
+     ) {
+-        return new VulkanGpuTexture(this, usage, this.isDebuggingEnabled() && label != null ? label : "", format, width, height, depthOrLayers, mipLevels);
++        return createTexture(label, usage, format, width, height, depthOrLayers, mipLevels, false);
++    }
++
++    @Override
++    public GpuTexture createTexture(
++        final @Nullable String label,
++        final @GpuTexture.Usage int usage,
++        final GpuFormat format,
++        final int width,
++        final int height,
++        final int depthOrLayers,
++        final int mipLevels,
++        final boolean stencil
++    ) {
++        return new VulkanGpuTexture(this, usage, this.isDebuggingEnabled() && label != null ? label : "", format, width, height, depthOrLayers, mipLevels, stencil);
+     }
+ 
+     @Override

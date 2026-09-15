@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/pathfinder/WalkNodeEvaluator.java
 +++ b/net/minecraft/world/level/pathfinder/WalkNodeEvaluator.java
-@@ -494,6 +_,16 @@
+@@ -492,6 +_,16 @@
                  for (int dz = -1; dz <= 1; dz++) {
                      if (dx != 0 || dz != 0) {
                          PathType pathType = context.getPathTypeFromState(x + dx, y + dy, z + dz);
@@ -17,7 +17,7 @@
                          if (pathType == PathType.DAMAGING) {
                              return PathType.DAMAGING_IN_NEIGHBOR;
                          }
-@@ -520,6 +_,10 @@
+@@ -518,6 +_,10 @@
      protected static PathType getPathTypeFromState(final BlockGetter level, final BlockPos pos) {
          BlockState blockState = level.getBlockState(pos);
          Block block = blockState.getBlock();
@@ -28,7 +28,7 @@
          if (blockState.isAir()) {
              return PathType.OPEN;
          }
-@@ -546,6 +_,8 @@
+@@ -544,6 +_,8 @@
  
          if (!blockState.is(Blocks.WITHER_ROSE) && !blockState.is(BlockTags.SPELEOTHEMS)) {
              FluidState fluidState = blockState.getFluidState();
@@ -37,7 +37,7 @@
              if (fluidState.is(FluidTags.LAVA)) {
                  return PathType.LAVA;
              }
-@@ -558,6 +_,8 @@
+@@ -556,6 +_,8 @@
                  if (blockState.getValue(DoorBlock.OPEN)) {
                      return PathType.DOOR_OPEN;
                  } else {

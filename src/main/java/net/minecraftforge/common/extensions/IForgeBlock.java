@@ -6,6 +6,7 @@
 package net.minecraftforge.common.extensions;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
@@ -29,7 +30,6 @@ import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -241,7 +241,6 @@ public interface IForgeBlock {
      * @param occupied True if we are occupying the bed, or false if they are stopping use of the bed
      */
     default void setBedOccupied(BlockState state, Level level, BlockPos pos, LivingEntity sleeper, boolean occupied) {
-        level.setBlock(pos, state.setValue(BedBlock.OCCUPIED, occupied), 3);
     }
 
    /**
@@ -255,6 +254,17 @@ public interface IForgeBlock {
     */
     default Direction getBedDirection(BlockState state, LevelReader level, BlockPos pos) {
         return state.getValue(HorizontalDirectionalBlock.FACING);
+    }
+
+    /**
+     * Returns the height the player will appear to lay down and sleep at if this is a bed.
+     *
+     * @param level The current level
+     * @param pos Block position in level
+     * @return The height, or empty if this isn't a bed
+     */
+    default OptionalDouble getBedHeight(BlockState state, Level level, BlockPos pos) {
+        return self() instanceof AbstractBedBlock bed ? bed.getSleepHeight(state, level, pos) : OptionalDouble.empty();
     }
 
     /**
@@ -369,10 +379,7 @@ public interface IForgeBlock {
      * @return True, to support the conduit, and make it active with this block.
      */
     default boolean isConduitFrame(BlockState state, LevelReader level, BlockPos pos, BlockPos conduit) {
-        return  state.getBlock() == Blocks.PRISMARINE ||
-                state.getBlock() == Blocks.PRISMARINE_BRICKS ||
-                state.getBlock() == Blocks.SEA_LANTERN ||
-                state.getBlock() == Blocks.DARK_PRISMARINE;
+        return state.is(BlockTags.CONDUIT_EFFECT_BLOCK);
     }
 
     /**
@@ -657,7 +664,7 @@ public interface IForgeBlock {
      * @param explosion The explosion instance affecting the block
      */
     default void onBlockExploded(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion) {
-        level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         self().wasExploded(level, pos, explosion);
     }
 

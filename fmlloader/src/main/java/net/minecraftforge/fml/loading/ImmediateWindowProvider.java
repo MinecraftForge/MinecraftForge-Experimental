@@ -86,10 +86,9 @@ public interface ImmediateWindowProvider {
      * @param width This is the width of the window Mojang expects
      * @param height This is the height of the Window Mojang expects.
      * @param title This is the title for the window.
-     * @param monitor This is the monitor it should appear on.
      * @return The window id
      */
-    long setupMinecraftWindow(final int width, final int height, final String title, final long monitor, final Supplier<Object> backend);
+    long setupMinecraftWindow(final int width, final int height, final String title, final Supplier<Object> backend);
 
     /**
      * This is called after window handoff to allow us to tell Mojang about our window's position. This might give a

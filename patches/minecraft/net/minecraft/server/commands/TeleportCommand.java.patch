@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/commands/TeleportCommand.java
 +++ b/net/minecraft/server/commands/TeleportCommand.java
-@@ -236,14 +_,17 @@
+@@ -223,14 +_,17 @@
          final CommandSourceStack source,
          final Entity victim,
          final ServerLevel level,

@@ -68,7 +68,7 @@
      @Override
      public Holder.Reference<T> createIntrusiveHolder(final T value) {
          if (this.unregisteredIntrusiveHolders == null) {
-@@ -393,6 +_,31 @@
+@@ -398,6 +_,31 @@
          };
      }
  
@@ -100,7 +100,7 @@
      @Override
      public Registry.PendingTags<T> prepareTagReload(final TagLoader.LoadResult<T> tags) {
          if (!this.frozen) {
-@@ -441,6 +_,11 @@
+@@ -446,6 +_,11 @@
              @Override
              public HolderLookup.RegistryLookup<T> lookup() {
                  return patchedHolder;

@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/level/block/CactusBlock.java
 +++ b/net/minecraft/world/level/block/CactusBlock.java
-@@ -22,7 +_,7 @@
+@@ -21,7 +_,7 @@
  import net.minecraft.world.phys.shapes.CollisionContext;
  import net.minecraft.world.phys.shapes.VoxelShape;
  
 -public class CactusBlock extends Block {
 +public class CactusBlock extends Block implements net.minecraftforge.common.IPlantable {
-     public static final MapCodec<CactusBlock> CODEC = simpleCodec(CactusBlock::new);
      public static final IntegerProperty AGE = BlockStateProperties.AGE_15;
      public static final int MAX_AGE = 15;
-@@ -45,6 +_,7 @@
+     private static final VoxelShape SHAPE = Block.column(14.0, 0.0, 16.0);
+@@ -38,6 +_,7 @@
  
      @Override
      protected void tick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
@@ -17,7 +17,7 @@
          if (!state.canSurvive(level, pos)) {
              level.destroyBlock(pos, true);
          }
-@@ -63,6 +_,7 @@
+@@ -56,6 +_,7 @@
                  }
              }
  
@@ -25,7 +25,7 @@
              if (age == 8 && this.canSurvive(this.defaultBlockState(), level, pos.above())) {
                  double chanceToGrowFlower = height >= 3 ? 0.25 : 0.1;
                  if (random.nextDouble() <= chanceToGrowFlower) {
-@@ -78,6 +_,7 @@
+@@ -71,6 +_,7 @@
              if (age < 15) {
                  level.setBlock(pos, state.setValue(AGE, age + 1), 260);
              }
@@ -33,7 +33,7 @@
          }
      }
  
-@@ -119,7 +_,7 @@
+@@ -112,7 +_,7 @@
          }
  
          BlockState belowState = level.getBlockState(pos.below());
@@ -42,7 +42,7 @@
      }
  
      @Override
-@@ -142,5 +_,15 @@
+@@ -135,5 +_,15 @@
      @Override
      protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
          return false;

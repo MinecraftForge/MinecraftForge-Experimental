@@ -1,29 +1,29 @@
 --- a/net/minecraft/server/packs/resources/SimpleJsonResourceReloadListener.java
 +++ b/net/minecraft/server/packs/resources/SimpleJsonResourceReloadListener.java
-@@ -32,6 +_,10 @@
-         this(registries.createSerializationContext(JsonOps.INSTANCE), codec, FileToIdConverter.registry(registryKey));
-     }
- 
-+    protected SimpleJsonResourceReloadListener(final HolderLookup.Provider registries, final Codec<T> codec, final ResourceKey<? extends Registry<T>> registryKey, net.minecraftforge.common.crafting.conditions.ICondition.IContext context) {
-+        this(context.wrap(registries.createSerializationContext(JsonOps.INSTANCE)), codec, FileToIdConverter.registry(registryKey));
-+    }
-+
-     protected SimpleJsonResourceReloadListener(final Codec<T> codec, final FileToIdConverter lister) {
+@@ -27,6 +_,10 @@
          this(JsonOps.INSTANCE, codec, lister);
      }
-@@ -66,7 +_,15 @@
-             Identifier id = lister.fileToId(location);
+ 
++    protected SimpleJsonResourceReloadListener(final Codec<T> codec, final FileToIdConverter lister, net.minecraftforge.common.crafting.conditions.ICondition.IContext context) {
++        this(context.wrap(JsonOps.INSTANCE), codec, lister);
++    }
++
+     protected SimpleJsonResourceReloadListener(final DynamicOps<JsonElement> ops, final Codec<T> codec, final FileToIdConverter lister) {
+         this.ops = ops;
+         this.codec = codec;
+@@ -41,7 +_,15 @@
+             Identifier id = this.lister.fileToId(location);
  
              try (Reader reader = entry.getValue().openAsReader()) {
--                codec.parse(ops, StrictJsonParser.parse(reader)).ifSuccess(parsed -> {
+-                this.codec.parse(this.ops, StrictJsonParser.parse(reader)).ifSuccess(parsed -> {
 +                var json = StrictJsonParser.parse(reader);
-+                json = net.minecraftforge.common.ForgeHooks.readConditional(ops, json);
++                json = net.minecraftforge.common.ForgeHooks.readConditional(this.ops, json);
 +                if (json == null) {
 +                    LOGGER.debug("Skipping loading {} as its conditions were not met", location);
 +                    continue;
 +                }
-+                codec.parse(ops, json).ifSuccess(parsed -> {
-+                    parsed = net.minecraftforge.common.ForgeHooks.onJsonDataParsed(codec, id, parsed);
++                this.codec.parse(this.ops, json).ifSuccess(parsed -> {
++                    parsed = net.minecraftforge.common.ForgeHooks.onJsonDataParsed(this.codec, id, parsed);
 +                    if (parsed == null) return;
                      if (result.putIfAbsent(id, (T)parsed) != null) {
                          throw new IllegalStateException("Duplicate data file ignored with ID " + id);

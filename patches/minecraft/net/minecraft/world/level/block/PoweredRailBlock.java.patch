@@ -1,15 +1,10 @@
 --- a/net/minecraft/world/level/block/PoweredRailBlock.java
 +++ b/net/minecraft/world/level/block/PoweredRailBlock.java
-@@ -16,6 +_,7 @@
-     public static final MapCodec<PoweredRailBlock> CODEC = simpleCodec(PoweredRailBlock::new);
+@@ -14,9 +_,19 @@
+ public class PoweredRailBlock extends BaseRailBlock {
      public static final EnumProperty<RailShape> SHAPE = BlockStateProperties.RAIL_SHAPE_STRAIGHT;
      public static final BooleanProperty POWERED = BlockStateProperties.POWERED;
 +    private final boolean isActivator;  // TRUE for an Activator Rail, FALSE for Powered Rail
- 
-     @Override
-     public MapCodec<PoweredRailBlock> codec() {
-@@ -23,7 +_,16 @@
-     }
  
      public PoweredRailBlock(final BlockBehaviour.Properties properties) {
 +        this(properties, false);
@@ -25,7 +20,7 @@
          this.registerDefaultState(this.stateDefinition.any().setValue(SHAPE, RailShape.NORTH_SOUTH).setValue(POWERED, false).setValue(WATERLOGGED, false));
      }
  
-@@ -36,7 +_,7 @@
+@@ -29,7 +_,7 @@
          int y = pos.getY();
          int z = pos.getZ();
          boolean checkBelow = true;
@@ -34,7 +29,7 @@
          switch (shape) {
              case NORTH_SOUTH:
                  if (forward) {
-@@ -104,17 +_,17 @@
+@@ -97,17 +_,17 @@
  
      protected boolean isSameRailWithPower(final Level level, final BlockPos pos, final boolean forward, final int searchDepth, final RailShape dir) {
          BlockState state = level.getBlockState(pos);
@@ -55,16 +50,16 @@
                  }
              } else {
                  return false;
-@@ -133,7 +_,7 @@
+@@ -126,7 +_,7 @@
          if (shouldPower != isPowered) {
-             level.setBlock(pos, state.setValue(POWERED, shouldPower), 3);
+             level.setBlockAndUpdate(pos, state.setValue(POWERED, shouldPower));
              level.updateNeighborsAt(pos.below(), this);
 -            if (state.getValue(SHAPE).isSlope()) {
 +            if (state.getValue(getShapeProperty()).isSlope()) {
                  level.updateNeighborsAt(pos.above(), this);
              }
          }
-@@ -160,6 +_,10 @@
+@@ -153,6 +_,10 @@
  
      @Override
      protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {

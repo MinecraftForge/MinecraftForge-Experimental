@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/PitcherCropBlock.java
 +++ b/net/minecraft/world/level/block/PitcherCropBlock.java
-@@ -107,7 +_,7 @@
+@@ -100,7 +_,7 @@
  
      @Override
      protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {

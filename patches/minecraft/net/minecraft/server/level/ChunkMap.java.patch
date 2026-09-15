@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ChunkMap.java
 +++ b/net/minecraft/server/level/ChunkMap.java
-@@ -392,6 +_,7 @@
+@@ -391,6 +_,7 @@
              this.modified = true;
          }
  
@@ -8,7 +8,7 @@
          return chunk;
      }
  
-@@ -522,6 +_,7 @@
+@@ -521,6 +_,7 @@
                  if (this.pendingUnloads.remove(pos, chunkHolder) && chunk != null) {
                      if (chunk instanceof LevelChunk levelChunk) {
                          levelChunk.setLoaded(false);
@@ -16,7 +16,7 @@
                      }
  
                      this.save(chunk);
-@@ -767,6 +_,7 @@
+@@ -766,6 +_,7 @@
              this.activeChunkWrites.incrementAndGet();
              SerializableChunkData data = SerializableChunkData.copyOf(this.level, chunk);
              CompletableFuture<CompoundTag> encodedData = CompletableFuture.supplyAsync(data::write, Util.backgroundExecutor());
@@ -24,7 +24,7 @@
              this.write(pos, encodedData::join).handle((ignored, throwable) -> {
                  if (throwable != null) {
                      this.level.getServer().reportChunkSaveFailure(throwable, this.storageInfo(), pos);
-@@ -1142,7 +_,7 @@
+@@ -1141,7 +_,7 @@
      }
  
      protected void addEntity(final Entity entity) {

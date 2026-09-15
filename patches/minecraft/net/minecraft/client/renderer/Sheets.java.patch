@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/Sheets.java
 +++ b/net/minecraft/client/renderer/Sheets.java
-@@ -120,4 +_,13 @@
+@@ -153,4 +_,13 @@
              case COPPER_OXIDIZED -> (SpriteId)CHEST_COPPER.oxidized().select(type);
          };
      }

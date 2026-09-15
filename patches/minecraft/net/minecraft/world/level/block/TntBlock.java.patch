@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/TntBlock.java
 +++ b/net/minecraft/world/level/block/TntBlock.java
-@@ -47,7 +_,7 @@
+@@ -43,7 +_,7 @@
      @Override
      protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
          if (!oldState.is(state.getBlock())) {
@@ -9,7 +9,7 @@
                  level.removeBlock(pos, false);
              }
          }
-@@ -57,7 +_,7 @@
+@@ -53,7 +_,7 @@
      protected void neighborChanged(
          final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
      ) {
@@ -18,7 +18,7 @@
              level.removeBlock(pos, false);
          }
      }
-@@ -65,7 +_,7 @@
+@@ -61,7 +_,7 @@
      @Override
      public BlockState playerWillDestroy(final Level level, final BlockPos pos, final BlockState state, final Player player) {
          if (!level.isClientSide() && !player.getAbilities().instabuild && state.getValue(UNSTABLE)) {
@@ -27,44 +27,51 @@
          }
  
          return super.playerWillDestroy(level, pos, state, player);
-@@ -80,10 +_,12 @@
+@@ -76,10 +_,12 @@
          }
      }
  
 +    @Deprecated //Forge: Prefer using IForgeBlock#onCaughtFire
      public static boolean prime(final Level level, final BlockPos pos) {
-         return prime(level, pos, null);
+         return prime(level, pos, null, ItemStack.EMPTY);
      }
  
 +    @Deprecated //Forge: Prefer using IForgeBlock#onCaughtFire
-     private static boolean prime(final Level level, final BlockPos pos, final @Nullable LivingEntity source) {
-         if (level instanceof ServerLevel serverLevel && serverLevel.getGameRules().get(GameRules.TNT_EXPLODES)) {
-             PrimedTnt tnt = new PrimedTnt(level, pos.getX() + 0.5, pos.getY(), pos.getZ() + 0.5, source);
+     public static boolean prime(final Level level, final BlockPos pos, final @Nullable LivingEntity source, final ItemStack itemStack) {
+         if (!(level instanceof ServerLevel serverLevel && serverLevel.getGameRules().get(GameRules.TNT_EXPLODES))) {
+             return false;
 @@ -110,7 +_,7 @@
              return super.useItemOn(itemStack, state, level, pos, player, hand, hitResult);
          }
  
--        if (prime(level, pos, player)) {
+-        if (prime(level, pos, player, itemStack)) {
 +        if (onCaughtFire(state, level, pos, hitResult.getDirection(), player)) {
              level.setBlock(pos, Blocks.AIR.defaultBlockState(), 11);
              Item item = itemStack.getItem();
              if (itemStack.is(Items.FLINT_AND_STEEL)) {
-@@ -135,7 +_,7 @@
+@@ -135,11 +_,12 @@
              Entity owner = projectile.getOwner();
              if (projectile.isOnFire()
                  && projectile.mayInteract(serverLevel, pos)
--                && prime(level, pos, owner instanceof LivingEntity livingEntity ? livingEntity : null)) {
-+                && onCaughtFire(state, level, pos, null, owner instanceof LivingEntity livingEntity ? livingEntity : null)) {
+-                && prime(
++                && onCaughtFire(
++                    state,
+                     level,
+                     pos,
+-                    owner instanceof LivingEntity livingEntity ? livingEntity : null,
+-                    projectile instanceof AbstractArrow arr ? arr.getPickupItemStackOrigin() : ItemStack.EMPTY
++                    null,
++                    owner instanceof LivingEntity livingEntity ? livingEntity : null
+                 )) {
                  level.removeBlock(pos, false);
              }
-         }
-@@ -149,5 +_,9 @@
+@@ -154,5 +_,9 @@
      @Override
      protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {
          builder.add(UNSTABLE);
 +    }
 +
 +    public boolean onCaughtFire(final BlockState state, final Level level, final BlockPos pos, final net.minecraft.core.@Nullable Direction face, final @Nullable LivingEntity igniter) {
-+        return prime(level, pos, igniter);
++        return prime(level, pos, igniter, ItemStack.EMPTY);
      }
  }

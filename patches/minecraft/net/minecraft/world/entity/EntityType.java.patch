@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/entity/EntityType.java
 +++ b/net/minecraft/world/entity/EntityType.java
-@@ -73,6 +_,11 @@
-     private final FeatureFlagSet requiredFeatures;
+@@ -75,6 +_,11 @@
      private final boolean allowedInPeaceful;
+     private final boolean trackDeltas;
  
 +    private final java.util.function.Predicate<EntityType<?>> velocityUpdateSupplier;
 +    private final java.util.function.ToIntFunction<EntityType<?>> trackingRangeSupplier;
@@ -12,20 +12,20 @@
      public static Identifier getKey(final EntityType<?> type) {
          return BuiltInRegistries.ENTITY_TYPE.getKey(type);
      }
-@@ -92,7 +_,8 @@
-         final String descriptionId,
+@@ -95,7 +_,8 @@
          final Optional<ResourceKey<LootTable>> lootTable,
          final FeatureFlagSet requiredFeatures,
--        final boolean allowedInPeaceful
-+        final boolean allowedInPeaceful,
+         final boolean allowedInPeaceful,
+-        final boolean trackDeltas
++        final boolean trackDeltas,
 +        final Builder builder
      ) {
          this.factory = factory;
          this.category = category;
-@@ -109,6 +_,10 @@
-         this.lootTable = lootTable;
+@@ -113,6 +_,10 @@
          this.requiredFeatures = requiredFeatures;
          this.allowedInPeaceful = allowedInPeaceful;
+         this.trackDeltas = trackDeltas;
 +        this.velocityUpdateSupplier = builder == null || builder.velocityUpdateSupplier == null ? EntityType::defaultVelocitySupplier : builder.velocityUpdateSupplier;
 +        this.trackingRangeSupplier = builder == null || builder.trackingRangeSupplier == null ? EntityType::defaultTrackingRangeSupplier : builder.trackingRangeSupplier;
 +        this.updateIntervalSupplier = builder == null || builder.updateIntervalSupplier == null ? EntityType::defaultUpdateIntervalSupplier : builder.updateIntervalSupplier;
@@ -33,7 +33,7 @@
      }
  
      public @Nullable T spawn(
-@@ -424,14 +_,26 @@
+@@ -432,14 +_,26 @@
      }
  
      public int clientTrackingRange() {
@@ -52,15 +52,15 @@
          return this.updateInterval;
      }
  
-     public boolean trackDeltas() {
+     public boolean hasUpdateInterval() {
 +        return velocityUpdateSupplier.test(this);
 +    }
 +
 +    private boolean defaultVelocitySupplier() {
-         return this != EntityTypes.PLAYER
-             && this != EntityTypes.LLAMA_SPIT
-             && this != EntityTypes.WITHER
-@@ -466,6 +_,15 @@
+         return this.updateInterval != Integer.MAX_VALUE;
+     }
+ 
+@@ -469,6 +_,15 @@
          return EntityTypes.OP_ONLY_CUSTOM_DATA.contains(this);
      }
  
@@ -76,10 +76,10 @@
      public static class Builder<T extends Entity> {
          private final EntityType.EntityFactory<T> factory;
          private final MobCategory category;
-@@ -485,6 +_,10 @@
-         );
+@@ -489,6 +_,10 @@
          private final DependantName<EntityType<?>, String> descriptionId = id -> Util.makeDescriptionId("entity", id.identifier());
          private boolean allowedInPeaceful = true;
+         private boolean trackDeltas = true;
 +        private java.util.function.Predicate<EntityType<?>> velocityUpdateSupplier = EntityType::defaultVelocitySupplier;
 +        private java.util.function.ToIntFunction<EntityType<?>> trackingRangeSupplier = EntityType::defaultTrackingRangeSupplier;
 +        private java.util.function.ToIntFunction<EntityType<?>> updateIntervalSupplier = EntityType::defaultUpdateIntervalSupplier;
@@ -87,7 +87,7 @@
  
          private Builder(final EntityType.EntityFactory<T> factory, final MobCategory category) {
              this.factory = factory;
-@@ -603,6 +_,30 @@
+@@ -616,6 +_,30 @@
              return this;
          }
  
@@ -118,12 +118,12 @@
          public EntityType<T> build(final ResourceKey<EntityType<?>> name) {
              if (this.serialize) {
                  Util.fetchChoiceType(References.ENTITY_TREE, name.identifier().toString());
-@@ -623,7 +_,8 @@
-                 this.descriptionId.get(name),
+@@ -637,7 +_,8 @@
                  this.lootTable.get(name),
                  this.requiredFeatures,
--                this.allowedInPeaceful
-+                this.allowedInPeaceful,
+                 this.allowedInPeaceful,
+-                this.trackDeltas
++                this.trackDeltas,
 +                this
              );
          }

@@ -1,17 +1,17 @@
 --- a/net/minecraft/client/resources/language/LanguageManager.java
 +++ b/net/minecraft/client/resources/language/LanguageManager.java
-@@ -29,8 +_,8 @@
-     private final Consumer<ClientLanguage> reloadCallback;
+@@ -34,8 +_,8 @@
  
-     public LanguageManager(final String languageCode, final Consumer<ClientLanguage> reloadCallback) {
+     public LanguageManager(final Minecraft minecraft, final String languageCode, final Consumer<ClientLanguage> reloadCallback) {
+         this.minecraft = minecraft;
 -        this.currentCode = languageCode;
          this.reloadCallback = reloadCallback;
 +        setSelected(languageCode);
      }
  
      private static Map<String, LanguageInfo> extractLanguages(final Stream<PackResources> resourcePacks) {
-@@ -67,8 +_,12 @@
-         this.reloadCallback.accept(locale);
+@@ -86,8 +_,12 @@
+         }
      }
  
 +    private java.util.Locale javaLocale; // Forge: add locale information for modders

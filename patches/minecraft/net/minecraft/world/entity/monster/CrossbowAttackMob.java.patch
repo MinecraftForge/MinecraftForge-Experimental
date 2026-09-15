@@ -10,6 +10,6 @@
 -        if (usedItem.getItem() instanceof CrossbowItem crossbow) {
 +        if (body.isHolding(is -> is.getItem() instanceof CrossbowItem)) {
 +            var crossbow = (CrossbowItem) usedItem.getItem();
-             crossbow.performShooting(body.level(), body, hand, usedItem, crossbowPower, 14 - body.level().getDifficulty().getId() * 4, this.getTarget());
+             crossbow.performShooting(body.level(), body, hand, usedItem, crossbowPower, this.rangedAttackUncertainty(body.level()), this.getTarget());
          }
  

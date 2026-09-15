@@ -68,6 +68,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.util.CrudeIncrementalIntIdentityHashBiMap;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.util.Mth;
+import net.minecraft.util.Prediction;
 import net.minecraft.util.datafix.fixes.StructuresBecomeConfiguredFix;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -307,9 +308,12 @@ public final class ForgeHooks {
 
     @SuppressWarnings("resource")
     @Nullable
-    public static ItemEntity onPlayerTossEvent(@NotNull Player player, @NotNull ItemStack item, boolean includeName) {
+    public static ItemEntity onPlayerTossEvent(@NotNull Player player, @NotNull ItemStack item, boolean thrownFromHand, Prediction prediction) {
+        if (item.isEmpty())
+            return null;
+
         player.captureDrops(new ArrayList<>());
-        ItemEntity ret = player.drop(item, false, includeName);
+        ItemEntity ret = player.drop(item, thrownFromHand, prediction);
         player.captureDrops(null);
 
         if (ret == null)

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/projectile/arrow/AbstractArrow.java
 +++ b/net/minecraft/world/entity/projectile/arrow/AbstractArrow.java
-@@ -79,6 +_,7 @@
+@@ -77,6 +_,7 @@
      private @Nullable List<Entity> piercedAndKilledEntities;
      private ItemStack pickupItemStack = this.getDefaultPickupItem();
      private @Nullable ItemStack firedFromWeapon = null;
@@ -8,7 +8,7 @@
  
      protected AbstractArrow(final EntityType<? extends AbstractArrow> type, final Level level) {
          super(type, level);
-@@ -196,7 +_,7 @@
+@@ -194,7 +_,7 @@
              this.shakeTime--;
          }
  
@@ -17,7 +17,7 @@
              this.clearFire();
          }
  
-@@ -601,7 +_,7 @@
+@@ -593,7 +_,7 @@
      protected boolean canHitEntity(final Entity entity) {
          return entity instanceof Player playerEntity && this.getOwner() instanceof Player player && !player.canHarmPlayer(playerEntity)
              ? false

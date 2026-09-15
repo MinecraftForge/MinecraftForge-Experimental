@@ -1,0 +1,16 @@
+--- a/net/minecraft/world/level/block/AbstractBedBlock.java
++++ b/net/minecraft/world/level/block/AbstractBedBlock.java
+@@ -123,6 +_,13 @@
+         }
+     }
+ 
++    @Override
++    public void setBedOccupied(BlockState state, Level level, BlockPos pos, LivingEntity sleeper, boolean occupied) {
++        level.setBlockAndUpdate(pos, state.setValue(BedBlock.OCCUPIED, occupied));
++        if (occupied == false)
++            onStopSleeping(level, pos);
++    }
++
+     private boolean kickVillagerOutOfBed(final Level level, final BlockPos pos) {
+         List<Villager> villagers = level.getEntitiesOfClass(Villager.class, new AABB(pos), LivingEntity::isSleeping);
+         if (villagers.isEmpty()) {

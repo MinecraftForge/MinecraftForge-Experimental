@@ -1,0 +1,25 @@
+--- a/com/mojang/renderpearl/backend/vulkan/VulkanGpuTexture.java
++++ b/com/mojang/renderpearl/backend/vulkan/VulkanGpuTexture.java
+@@ -34,7 +_,21 @@
+         final int depthOrLayers,
+         final int mipLevels
+     ) {
+-        super(usage, label, format, width, height, depthOrLayers, mipLevels);
++        this(device, usage, label, format, width, height, depthOrLayers, mipLevels, false);
++    }
++
++    public VulkanGpuTexture(
++        final VulkanDevice device,
++        final @GpuTexture.Usage int usage,
++        final String label,
++        final GpuFormat format,
++        final int width,
++        final int height,
++        final int depthOrLayers,
++        final int mipLevels,
++        final boolean stencil
++    ) {
++        super(usage, label, format, width, height, depthOrLayers, mipLevels, stencil);
+         this.device = device;
+ 
+         try (MemoryStack stack = MemoryStack.stackPush()) {

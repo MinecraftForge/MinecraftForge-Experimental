@@ -18,7 +18,7 @@
                      this.level().setBlockAndUpdate(snowPos, snow);
                      this.level().gameEvent(GameEvent.BLOCK_PLACE, snowPos, GameEvent.Context.of(this, snow));
                  }
-@@ -136,7 +_,7 @@
+@@ -141,7 +_,7 @@
      @Override
      protected InteractionResult mobInteract(final Player player, final InteractionHand hand) {
          ItemStack itemStack = player.getItemInHand(hand);

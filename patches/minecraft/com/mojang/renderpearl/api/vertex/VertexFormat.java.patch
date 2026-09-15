@@ -1,0 +1,25 @@
+--- a/com/mojang/renderpearl/api/vertex/VertexFormat.java
++++ b/com/mojang/renderpearl/api/vertex/VertexFormat.java
+@@ -19,6 +_,7 @@
+     private final int vertexSize;
+     private final int stepRate;
+     private final List<VertexFormatElement> elementValues;
++    private final com.google.common.collect.ImmutableMap<String, VertexFormatElement> elementMapping;
+ 
+     private VertexFormat(final List<VertexFormatElement> elements, final int vertexSize, final int stepRate) {
+         this.vertexSize = vertexSize;
+@@ -29,7 +_,14 @@
+         }
+ 
+         this.elementValues = elements;
++
++        var elementMapping = com.google.common.collect.ImmutableMap.<String, VertexFormatElement>builder();
++        for (var element : elements)
++            elementMapping.put(element.name(), element);
++        this.elementMapping = elementMapping.buildOrThrow();
+     }
++
++    public com.google.common.collect.ImmutableMap<String, VertexFormatElement> getElementMapping() { return elementMapping; }
+ 
+     public static VertexFormat.Builder builder(final int stepRate) {
+         return new VertexFormat.Builder(stepRate);

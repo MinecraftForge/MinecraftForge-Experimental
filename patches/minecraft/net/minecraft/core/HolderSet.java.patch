@@ -20,7 +20,7 @@
 @@ -215,6 +_,12 @@
          @Override
          public boolean canSerializeIn(final HolderOwner<T> context) {
-             return this.owner.canSerializeIn(context);
+             return context.canSerialize(this.owner);
 +        }
 +
 +        // FORGE: Keep a list of invalidation callbacks so they can be run when tags rebind

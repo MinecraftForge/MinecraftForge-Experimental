@@ -6,19 +6,21 @@
 package net.minecraftforge.common.data;
 
 import com.google.gson.JsonElement;
+
+import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Advancement.Builder;
 import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup.Provider;
-import net.minecraft.core.HolderLookup.RegistryLookup;
 import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeOutput;
-import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.tags.TagKey;
@@ -46,21 +48,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 public final class ForgeRecipeProvider extends VanillaRecipeProvider {
     private static final Logger LOGGER = LogManager.getLogger();
-    private final RegistryLookup<Item> items;
+    private final HolderGetter<Item> items;
     private final Map<Item, TagKey<Item>> replacements = HashMap.newHashMap(12);
     private final Set<ResourceKey<Recipe<?>>> excludes = HashSet.newHashSet(16);
     private final UnsafeFieldAccess<ShapelessRecipe, List<Ingredient>> INGREDIENTS = UnsafeHacks.findField(ShapelessRecipe.class, "ingredients");
     private final UnsafeFieldAccess<ShapedRecipe, ShapedRecipePattern> PATTERN = UnsafeHacks.findField(ShapedRecipe.class, "pattern");
     private final UnsafeFieldAccess<Ingredient, HolderSet<Item>> VALUES = UnsafeHacks.findField(Ingredient.class, "values");
 
-    private ForgeRecipeProvider(HolderLookup.Provider lookup, RecipeOutput output) {
-        super(lookup, new Wrapped(output));
-        ((Wrapped)this.output).setSelf(this);
-        this.items = lookup.lookupOrThrow(Registries.ITEM);
+    private ForgeRecipeProvider(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
+        super(recipeOutput, advancementOutput);
+        this.output = new Wrapped(this.output);
+        this.items = recipeOutput.lookup(Registries.ITEM);
     }
 
     private void exclude(ItemLike item) {
@@ -185,37 +187,16 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         return ret;
     }
 
-    public static class Runner extends RecipeProvider.Runner {
-        public Runner(PackOutput output, CompletableFuture<Provider> registries) {
-            super(output, registries);
-        }
-
-        @Override
-        public String getName() {
-            return ForgeRecipeProvider.class.getSimpleName();
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(Provider registries, RecipeOutput output) {
-            return new ForgeRecipeProvider(registries, output);
-        }
-    }
-
-    private static class Wrapped implements RecipeOutput {
+    private class Wrapped implements RecipeOutput {
         private final RecipeOutput wrapped;
-        private ForgeRecipeProvider self;
 
         private Wrapped(RecipeOutput wrapped) {
             this.wrapped = wrapped;
         }
 
-        private void setSelf(ForgeRecipeProvider self) {
-            this.self = self;
-        }
-
         @Override
         public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, AdvancementHolder advancement) {
-            var modified = self.enhance(id, recipe);
+            var modified = ForgeRecipeProvider.this.enhance(id, recipe);
             if (modified != null)
                 wrapped.accept(id, modified, null);
         }
@@ -227,7 +208,7 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
 
         @Override
         public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, Identifier advancementId, JsonElement advancement) {
-            var modified = self.enhance(id, recipe);
+            var modified = ForgeRecipeProvider.this.enhance(id, recipe);
             if (modified != null)
                 wrapped.accept(id, modified, null);
         }
@@ -238,6 +219,13 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         }
 
         @Override
-        public void includeRootAdvancement() {}
+        public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> key) {
+            return wrapped.lookup(key);
+        }
+
+        @Override
+        public <S> Stream<Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
+            return wrapped.listContextElements(key);
+        }
     }
 }

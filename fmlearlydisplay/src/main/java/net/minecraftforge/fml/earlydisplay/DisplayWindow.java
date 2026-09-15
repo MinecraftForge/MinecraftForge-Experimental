@@ -495,7 +495,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
         // Getting the window position isn't supported on wayland, so check the error here
         glfwGetWindowPos(window, x, y);
         handleLastGLFWError();
-        
+
         this.winX = x[0];
         this.winY = y[0];
         glfwGetFramebufferSize(window, x, y);
@@ -553,7 +553,8 @@ public class DisplayWindow implements ImmediateWindowProvider {
      *
      * @return the Window we own.
      */
-    public long setupMinecraftWindow(final int width, final int height, final String title, final long monitorSupplier, final Supplier<Object> backend) {
+    @Override
+    public long setupMinecraftWindow(final int width, final int height, final String title, final Supplier<Object> backend) {
         // wait for the window to actually be initialized
         try {
             this.initializationFuture.get(30, TimeUnit.SECONDS);

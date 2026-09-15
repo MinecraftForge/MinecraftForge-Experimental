@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/biome/Biome.java
 +++ b/net/minecraft/world/level/biome/Biome.java
-@@ -35,9 +_,9 @@
+@@ -39,9 +_,9 @@
  public final class Biome {
      public static final Codec<Biome> DIRECT_CODEC = RecordCodecBuilder.create(
          i -> i.group(
@@ -9,21 +9,22 @@
                  EnvironmentAttributeMap.CODEC_ONLY_POSITIONAL.optionalFieldOf("attributes", EnvironmentAttributeMap.EMPTY).forGetter(b -> b.attributes),
 -                BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter(b -> b.specialEffects),
 +                BiomeSpecialEffects.CODEC.fieldOf("effects").forGetter(b -> b.modifiableBiomeInfo().getOriginalBiomeInfo().effects()), // FORGE: Patch codec to ignore field redirect coremods.
-                 BiomeGenerationSettings.CODEC.forGetter(b -> b.generationSettings),
-                 MobSpawnSettings.CODEC.forGetter(b -> b.mobSettings)
+                 BiomeGenerationSettings.CODEC.forGetter(b -> b.generationSettings)
              )
-@@ -65,8 +_,10 @@
+             .apply(i, Biome::new)
+@@ -71,9 +_,11 @@
      @Deprecated(forRemoval = true)
-     public static final PerlinSimplexNoise BIOME_INFO_NOISE = new PerlinSimplexNoise(new WorldgenRandom(new LegacyRandomSource(2345L)), ImmutableList.of(0));
+     public static final Noise BIOME_INFO_NOISE = new SimplexNoise(new WorldgenRandom(new LegacyRandomSource(2345L)), true);
      private static final int TEMPERATURE_CACHE_SIZE = 1024;
 +    /** @deprecated Redirected to {@link #getModifiedClimateSettings()} by field_to_method.js */
      private final Biome.ClimateSettings climateSettings;
      private final BiomeGenerationSettings generationSettings;
-+    /** @deprecated Redirected to {@link #getModifiedSpecialEffects()} by field_to_method.js */
-     private final MobSpawnSettings mobSettings;
      private final EnvironmentAttributeMap attributes;
++    /** @deprecated Redirected to {@link #getModifiedSpecialEffects()} by field_to_method.js */
      private final BiomeSpecialEffects specialEffects;
-@@ -79,6 +_,7 @@
+     private final ThreadLocal<Long2FloatLinkedOpenHashMap> temperatureCache = ThreadLocal.withInitial(() -> {
+         Long2FloatLinkedOpenHashMap map = new Long2FloatLinkedOpenHashMap(1024, 0.25F) {
+@@ -84,6 +_,7 @@
          map.defaultReturnValue(Float.NaN);
          return map;
      });
@@ -31,20 +32,15 @@
  
      private Biome(
          final Biome.ClimateSettings climateSettings,
-@@ -92,10 +_,11 @@
-         this.mobSettings = mobSettings;
+@@ -95,6 +_,7 @@
          this.attributes = attributes;
          this.specialEffects = specialEffects;
-+        this.modifiableBiomeInfo = new net.minecraftforge.common.world.ModifiableBiomeInfo(new net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo(climateSettings, specialEffects, generationSettings, mobSettings)); // FORGE: cache original biome info on construction so we can bypass our field read coremods where necessary
-     }
- 
-     public MobSpawnSettings getMobSettings() {
--        return this.mobSettings;
-+        return this.modifiableBiomeInfo().get().mobSpawnSettings();
+         this.generationSettings = generationSettings;
++        this.modifiableBiomeInfo = new net.minecraftforge.common.world.ModifiableBiomeInfo(new net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo(climateSettings, specialEffects, generationSettings)); // FORGE: cache original biome info on construction so we can bypass our field read coremods where necessary
      }
  
      public boolean hasPrecipitation() {
-@@ -197,7 +_,7 @@
+@@ -196,7 +_,7 @@
      }
  
      public BiomeGenerationSettings getGenerationSettings() {
@@ -53,7 +49,7 @@
      }
  
      public int getGrassColor(final double x, final double z) {
-@@ -250,6 +_,31 @@
+@@ -249,6 +_,31 @@
  
      public int getWaterColor() {
          return this.specialEffects.waterColor();

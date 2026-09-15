@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacer.java
 +++ b/net/minecraft/world/level/levelgen/feature/trunkplacers/TrunkPlacer.java
-@@ -68,6 +_,8 @@
+@@ -63,6 +_,8 @@
      ) {
-         BlockState blockBelowTrunk = config.belowTrunkProvider.getOptionalState(level, random, pos);
+         BlockState blockBelowTrunk = tree.belowTrunkProvider().value().getOptionalState(level, random, pos);
          if (blockBelowTrunk != null) {
 +            var levelReader = (net.minecraft.world.level.LevelReader)level;
 +            if (!levelReader.getBlockState(pos).onTreeGrow(levelReader, trunkSetter, random, pos, config))

@@ -1,12 +1,12 @@
 --- a/net/minecraft/world/level/block/grower/TreeGrower.java
 +++ b/net/minecraft/world/level/block/grower/TreeGrower.java
-@@ -131,6 +_,9 @@
-                 .lookupOrThrow(Registries.CONFIGURED_FEATURE)
-                 .get(megaFeatureKey)
-                 .orElse(null);
+@@ -114,6 +_,9 @@
+         ResourceKey<Feature> megaFeatureKey = this.getConfiguredMegaFeature(random);
+         if (megaFeatureKey != null) {
+             Holder<Feature> featureHolder = level.registryAccess().lookupOrThrow(Registries.FEATURE).get(megaFeatureKey).orElse(null);
 +            var event = net.minecraftforge.event.ForgeEventFactory.blockGrowFeature(level, random, pos, featureHolder);
 +            featureHolder = event.getFeature();
 +            if (event.getResult().isDenied()) return false;
              if (featureHolder != null) {
-                 for (int dx = 0; dx >= -1; dx--) {
-                     for (int dz = 0; dz >= -1; dz--) {
+                 Optional<TreeGrower.TwoByTwoSaplingPos> twoByTwoSaplingPos = findTwoByTwoSaplingPos(level, state, pos);
+                 if (twoByTwoSaplingPos.isPresent()) {

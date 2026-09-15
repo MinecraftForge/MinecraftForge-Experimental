@@ -1,6 +1,6 @@
 --- a/net/minecraft/tags/StructureTags.java
 +++ b/net/minecraft/tags/StructureTags.java
-@@ -29,4 +_,12 @@
+@@ -42,4 +_,12 @@
      private static TagKey<Structure> create(final String name) {
          return TagKey.create(Registries.STRUCTURE, Identifier.withDefaultNamespace(name));
      }

@@ -66,7 +66,7 @@ public interface IClientItemExtensions {
       */
     @Nullable
     default HumanoidModel.ArmPose getArmPose(LivingEntity entityLiving, InteractionHand hand, ItemStack itemStack) {
-        return null;
+        return HumanoidModel.ArmPose.ITEM;
     }
 
     /**

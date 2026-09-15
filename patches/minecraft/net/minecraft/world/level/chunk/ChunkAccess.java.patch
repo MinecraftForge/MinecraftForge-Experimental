@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/chunk/ChunkAccess.java
 +++ b/net/minecraft/world/level/chunk/ChunkAccess.java
-@@ -318,23 +_,28 @@
+@@ -316,10 +_,14 @@
  
      @Override
      public final void findBlockLightSources(final BiConsumer<BlockPos, BlockState> consumer) {
@@ -13,27 +13,19 @@
 +    }
 +
 +    public void findBlocks(final java.util.function.BiPredicate<BlockState, BlockPos> predicate, final BiConsumer<BlockPos, BlockState> consumer) {
-         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+         BlockStateConsumer blockStateConsumer = (pos, state) -> {
+             consumer.accept(pos, state);
+             return Continuation.CONTINUE;
+@@ -328,7 +_,7 @@
  
          for (int sectionY = this.getMinSectionY(); sectionY <= this.getMaxSectionY(); sectionY++) {
              LevelChunkSection section = this.getSection(this.getSectionIndexFromSectionY(sectionY));
 -            if (section.maybeHas(predicate)) {
 +            if (section.maybeHas(state -> predicate.test(state, BlockPos.ZERO))) {
                  BlockPos origin = SectionPos.of(this.chunkPos, sectionY).origin();
- 
-                 for (int y = 0; y < 16; y++) {
-                     for (int z = 0; z < 16; z++) {
-                         for (int x = 0; x < 16; x++) {
-                             BlockState state = section.getBlockState(x, y, z);
--                            if (predicate.test(state)) {
--                                consumer.accept(mutablePos.setWithOffset(origin, x, y, z), state);
-+                            mutablePos.setWithOffset(origin, x, y, z);
-+                            if (predicate.test(state, mutablePos.immutable())) {
-+                                consumer.accept(mutablePos, state);
-                             }
-                         }
-                     }
-@@ -499,5 +_,9 @@
+                 BlockScanUtils.findBlocksInSection(section, origin, 0, 0, 0, 15, 15, 15, predicate, blockStateConsumer);
+             }
+@@ -479,5 +_,9 @@
      }
  
      public record PackedTicks(List<SavedTick<Block>> blocks, List<SavedTick<Fluid>> fluids) {

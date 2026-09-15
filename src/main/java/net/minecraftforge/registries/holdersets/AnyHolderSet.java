@@ -88,7 +88,7 @@ public record AnyHolderSet<T>(HolderLookup.RegistryLookup<T> registryLookup) imp
 
     @Override
     public boolean canSerializeIn(HolderOwner<T> holderOwner) {
-        return this.registryLookup.canSerializeIn(holderOwner);
+        return this.registryLookup.canSerialize(holderOwner);
     }
 
     @Override

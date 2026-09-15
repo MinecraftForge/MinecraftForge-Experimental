@@ -31,8 +31,8 @@
  
          @Override
          public boolean canUse() {
--            return Fox.this.isInWater() && Fox.this.getFluidHeight(FluidTags.WATER) > 0.25 || Fox.this.isInLava();
-+            return Fox.this.isInWater() && Fox.this.getFluidHeight(FluidTags.WATER) > 0.25 || Fox.this.isInLava() || Fox.this.isInFluidType((fluidType, height) -> Fox.this.canSwimInFluidType(fluidType) && height > 0.25D);
+-            return Fox.this.isInFluidDeeperThan(0.25, this.fluid) || Fox.this.isInLava();
++            return Fox.this.isInFluidDeeperThan(0.25, this.fluid) || Fox.this.isInLava() || Fox.this.isInFluidType((fluidType, height) -> Fox.this.canSwimInFluidType(fluidType) && height > 0.25D);
          }
      }
  

@@ -1,43 +1,22 @@
 --- a/net/minecraft/data/loot/LootTableProvider.java
 +++ b/net/minecraft/data/loot/LootTableProvider.java
-@@ -59,7 +_,7 @@
-     private CompletableFuture<?> run(final CachedOutput cache, final HolderLookup.Provider registries) {
-         WritableRegistry<LootTable> tables = new MappedRegistry<>(Registries.LOOT_TABLE, Lifecycle.experimental());
+@@ -33,7 +_,7 @@
          Map<RandomSupport.Seed128bit, Identifier> randomSequenceSeeds = new Object2ObjectOpenHashMap<>();
--        this.subProviders.forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
-+        this.getTables().forEach(subProvider -> subProvider.provider().apply(registries).generate((id, lootTable) -> {
-             Identifier sequenceId = sequenceIdForLootTable(id);
-             Identifier previous = randomSequenceSeeds.put(RandomSequence.seedForKey(sequenceId), sequenceId);
-             if (previous != null) {
-@@ -75,11 +_,8 @@
-         HolderGetter.Provider validationProvider = new RegistryAccess.ImmutableRegistryAccess(List.of(tables)).freeze();
-         ValidationContextSource validationContext = new ValidationContextSource(problems, validationProvider);
+         HolderGetter<LootTable> lootTables = context.lookup(Registries.LOOT_TABLE);
+         this.requiredTables.forEach(lootTables::get);
+-        this.subProviders.forEach(subProvider -> subProvider.bootstrap().create(new LootTableSubProvider.Context() {
++        this.getTables().forEach(subProvider -> subProvider.bootstrap().create(new LootTableSubProvider.Context() {
+             @Override
+             public Holder.Reference<LootTable> accept(final ResourceKey<LootTable> key, final LootTable.Builder lootTable) {
+                 Identifier sequenceId = LootTableProvider.sequenceIdForLootTable(key);
+@@ -61,6 +_,10 @@
  
--        for (ResourceKey<LootTable> missingTable : Sets.difference(this.requiredTables, tables.registryKeySet())) {
--            problems.report(new LootTableProvider.MissingTableProblem(missingTable));
--        }
-+        validate(tables, validationContext, problems);
- 
--        LootDataType.TABLE.runValidation(validationContext, tables);
-         if (!problems.isEmpty()) {
-             problems.forEach((id, problem) -> LOGGER.warn("Found validation problem in {}: {}", id, problem.description()));
-             throw new IllegalStateException("Failed to validate loot tables, see logs");
-@@ -100,6 +_,18 @@
-     @Override
-     public final String getName() {
-         return "Loot Tables";
+     private static Identifier sequenceIdForLootTable(final ResourceKey<LootTable> id) {
+         return id.identifier();
 +    }
 +
 +    public List<LootTableProvider.SubProviderEntry> getTables() {
 +        return this.subProviders;
-+    }
-+
-+    protected void validate(net.minecraft.core.Registry<LootTable> map, ValidationContextSource context, ProblemReporter report) {
-+        for (ResourceKey<LootTable> resourcekey : Sets.difference(this.requiredTables, map.registryKeySet())) {
-+            report.report(new LootTableProvider.MissingTableProblem(resourcekey));
-+        }
-+
-+        LootDataType.TABLE.runValidation(context, map);
      }
  
-     public record MissingTableProblem(ResourceKey<LootTable> id) implements ProblemReporter.Problem {
+     public record SubProviderEntry(LootTableSubProvider.Factory bootstrap, ContextKeySet paramSet) {

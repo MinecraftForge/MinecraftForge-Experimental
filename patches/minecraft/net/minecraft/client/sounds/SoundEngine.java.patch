@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/sounds/SoundEngine.java
 +++ b/net/minecraft/client/sounds/SoundEngine.java
-@@ -82,6 +_,7 @@
+@@ -83,6 +_,7 @@
          this.options = options;
          this.soundBuffers = new SoundBufferLibrary(resourceProvider);
          this.lastSeenDevices = this.deviceTracker.currentDevices();
@@ -8,7 +8,7 @@
      }
  
      public void reload() {
-@@ -99,6 +_,7 @@
+@@ -100,6 +_,7 @@
  
          this.destroy();
          this.loadLibrary();
@@ -16,7 +16,7 @@
      }
  
      private synchronized void loadLibrary() {
-@@ -340,7 +_,7 @@
+@@ -363,7 +_,7 @@
          }
      }
  
@@ -25,19 +25,19 @@
          if (!this.loaded) {
              return SoundEngine.PlayResult.NOT_STARTED;
          }
-@@ -349,6 +_,9 @@
+@@ -372,6 +_,9 @@
              return SoundEngine.PlayResult.NOT_STARTED;
          }
  
 +        instance = net.minecraftforge.client.ForgeHooksClient.playSound(this, instance);
 +        if (instance == null || !instance.canPlaySound())
 +            return SoundEngine.PlayResult.NOT_STARTED;
-         WeighedSoundEvents soundEvent = instance.resolve(this.soundManager);
+         WeighedSoundEvents soundEvent = instance.getOrResolve(this.soundManager);
          Identifier eventLocation = instance.getIdentifier();
          if (soundEvent == null) {
-@@ -430,15 +_,18 @@
+@@ -447,15 +_,18 @@
                      channel.setSelfPosition(position);
-                     channel.setRelative(isRelative);
+                     channel.setRelative(instance.isRelative());
                  });
 +                SoundInstance soundinstance = instance;
                  if (!isStreaming) {

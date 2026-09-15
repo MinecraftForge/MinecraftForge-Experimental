@@ -1,0 +1,20 @@
+--- a/com/mojang/renderpearl/api/device/GpuDevice.java
++++ b/com/mojang/renderpearl/api/device/GpuDevice.java
+@@ -37,7 +_,17 @@
+         @Nullable Supplier<String> label, @GpuTexture.Usage int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels
+     );
+ 
++    default GpuTexture createTexture(
++        @Nullable Supplier<String> label, @GpuTexture.Usage int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels, boolean stencil
++    ) {
++        return createTexture(label, usage, format, width, height, depthOrLayers, mipLevels);
++    }
++
+     GpuTexture createTexture(@Nullable String label, @GpuTexture.Usage int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels);
++
++    default GpuTexture createTexture(@Nullable String label, @GpuTexture.Usage int usage, GpuFormat format, int width, int height, int depthOrLayers, int mipLevels, boolean stencil) {
++        return createTexture(label, usage, format, width, height, depthOrLayers, mipLevels, stencil);
++    }
+ 
+     GpuTextureView createTextureView(GpuTexture texture);
+ 

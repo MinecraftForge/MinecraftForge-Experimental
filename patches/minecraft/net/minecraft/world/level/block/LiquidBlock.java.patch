@@ -1,8 +1,8 @@
 --- a/net/minecraft/world/level/block/LiquidBlock.java
 +++ b/net/minecraft/world/level/block/LiquidBlock.java
-@@ -52,7 +_,8 @@
-         i -> i.group(FLOWING_FLUID.fieldOf("fluid").forGetter(b -> b.fluid), propertiesCodec()).apply(i, LiquidBlock::new)
-     );
+@@ -37,13 +_,15 @@
+ 
+ public class LiquidBlock extends Block implements BucketPickup {
      public static final IntegerProperty LEVEL = BlockStateProperties.LEVEL;
 -    protected final FlowingFluid fluid;
 +    @Deprecated // Use getFluid
@@ -10,15 +10,14 @@
      private final List<FluidState> stateCache;
      public static final ImmutableList<Direction> POSSIBLE_FLOW_DIRECTIONS = ImmutableList.of(
          Direction.DOWN, Direction.SOUTH, Direction.NORTH, Direction.EAST, Direction.WEST
-@@ -64,6 +_,7 @@
-         return CODEC;
-     }
+     );
+     private static final int BUBBLE_COLUMN_CHECK_DELAY = 20;
  
 +    @Deprecated  // Forge: Use the constructor that takes a supplier
      public LiquidBlock(final FlowingFluid fluid, final BlockBehaviour.Properties properties) {
          super(properties);
          this.fluid = fluid;
-@@ -76,6 +_,19 @@
+@@ -56,6 +_,19 @@
  
          this.stateCache.add(fluid.getFlowing(8, true));
          this.registerDefaultState(this.stateDefinition.any().setValue(LEVEL, 0));
@@ -38,7 +37,7 @@
      }
  
      @Override
-@@ -124,6 +_,7 @@
+@@ -104,6 +_,7 @@
      @Override
      protected FluidState getFluidState(final BlockState state) {
          int level = state.getValue(LEVEL);
@@ -46,7 +45,7 @@
          return this.stateCache.get(Math.min(level, 8));
      }
  
-@@ -149,7 +_,7 @@
+@@ -129,7 +_,7 @@
  
      @Override
      protected void onPlace(final BlockState state, final Level level, final BlockPos pos, final BlockState oldState, final boolean movedByPiston) {
@@ -55,7 +54,7 @@
              level.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(level));
          }
  
-@@ -197,7 +_,7 @@
+@@ -177,7 +_,7 @@
      protected void neighborChanged(
          final BlockState state, final Level level, final BlockPos pos, final Block block, final @Nullable Orientation orientation, final boolean movedByPiston
      ) {
@@ -64,7 +63,7 @@
              level.scheduleTick(pos, state.getFluidState().getType(), this.fluid.getTickDelay(level));
          }
  
-@@ -213,6 +_,7 @@
+@@ -193,6 +_,7 @@
          }
      }
  
@@ -72,7 +71,7 @@
      private boolean shouldSpreadLiquid(final Level level, final BlockPos pos, final BlockState state) {
          if (this.fluid.is(FluidTags.LAVA)) {
              boolean isOverSoulSoil = level.getBlockState(pos.below()).is(Blocks.SOUL_SOIL);
-@@ -259,5 +_,24 @@
+@@ -239,5 +_,24 @@
      @Override
      public Optional<SoundEvent> getPickupSound() {
          return this.fluid.getPickupSound();

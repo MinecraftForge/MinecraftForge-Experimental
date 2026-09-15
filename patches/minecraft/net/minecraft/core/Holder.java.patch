@@ -24,7 +24,7 @@
      T value();
  
      boolean isBound();
-@@ -258,6 +_,10 @@
+@@ -262,6 +_,10 @@
          @Override
          public Stream<TagKey<T>> tags() {
              return this.boundTags().stream();

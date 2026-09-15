@@ -1,15 +1,15 @@
 --- a/net/minecraft/client/renderer/rendertype/RenderTypes.java
 +++ b/net/minecraft/client/renderer/rendertype/RenderTypes.java
-@@ -574,7 +_,7 @@
+@@ -674,7 +_,7 @@
      }
  
-     public static RenderType text(final Identifier texture) {
--        return TEXT.apply(texture);
+     public static RenderType eyes(final Identifier texture) {
+-        return EYES.apply(texture);
 +        return net.minecraftforge.client.ForgeRenderTypes.getText(texture);
      }
  
-     public static RenderType textBackground() {
-@@ -582,19 +_,19 @@
+     public static RenderType breezeEyes(final Identifier texture) {
+@@ -737,23 +_,23 @@
      }
  
      public static RenderType textGrayscale(final Identifier texture) {
@@ -30,10 +30,6 @@
      public static RenderType textSeeThrough(final Identifier texture) {
 -        return TEXT_SEE_THROUGH.apply(texture);
 +        return net.minecraftforge.client.ForgeRenderTypes.getTextSeeThrough(texture);
-     }
- 
-     public static RenderType textBackgroundSeeThrough() {
-@@ -602,7 +_,7 @@
      }
  
      public static RenderType textGrayscaleSeeThrough(final Identifier texture) {

@@ -37,8 +37,10 @@ public interface ICondition {
         @ApiStatus.Internal
         public static Identifier KEY = Identifier.fromNamespaceAndPath("forge", "condition_context");
 
-        default <T, O extends DelegatingOps<T>> O wrap(O ops) {
-            return ops.withContext(KEY, this);
+        default <T, O extends DynamicOps<T>> DynamicOps<T> wrap(O ops) {
+            @SuppressWarnings("unchecked")
+            var delegate = (ops instanceof DelegatingOps del) ? (DelegatingOps<T>)del : new DelegatingOps<>(ops) {};
+            return delegate.withContext(KEY, this);
         }
 
         IContext EMPTY = new IContext() {

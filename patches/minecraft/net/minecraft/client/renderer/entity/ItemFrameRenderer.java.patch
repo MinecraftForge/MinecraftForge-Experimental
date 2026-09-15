@@ -3,9 +3,9 @@
 @@ -82,6 +_,7 @@
          if (state.mapId != null) {
              int rotation = state.rotation % 4 * 2;
-             poseStack.mulPose(Axis.ZP.rotationDegrees(rotation * 360.0F / 8.0F));
+             poseStack.rotateDegrees(Axis.ZP, rotation * 360.0F / 8.0F);
 +            if (!net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderItemInFrame(state, this, poseStack, submitNodeCollector, state.lightCoords)) {
-             poseStack.mulPose(Axis.ZP.rotationDegrees(180.0F));
+             poseStack.rotateDegrees(Axis.ZP, 180.0F);
              float s = 0.0078125F;
              poseStack.scale(0.0078125F, 0.0078125F, 0.0078125F);
 @@ -89,6 +_,7 @@
@@ -14,5 +14,5 @@
              this.mapRenderer.render(state.mapRenderState, poseStack, submitNodeCollector, true, lightCoords);
 +            }
          } else if (!state.item.isEmpty()) {
-             poseStack.mulPose(Axis.ZP.rotationDegrees(state.rotation * 360.0F / 8.0F));
+             poseStack.rotateDegrees(Axis.ZP, state.rotation * 360.0F / 8.0F);
              int lightVal = this.getLightCoords(state.isGlowFrame, 15728880, state.lightCoords);

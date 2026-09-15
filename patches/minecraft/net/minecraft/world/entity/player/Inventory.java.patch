@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/player/Inventory.java
 +++ b/net/minecraft/world/entity/player/Inventory.java
-@@ -91,6 +_,10 @@
+@@ -93,6 +_,10 @@
          return this.items;
      }
  
@@ -11,7 +11,7 @@
      private boolean hasRemainingSpaceForItem(final ItemStack slotItemStack, final ItemStack newItemStack) {
          return !slotItemStack.isEmpty()
              && ItemStack.isSameItemSameComponents(slotItemStack, newItemStack)
-@@ -169,7 +_,7 @@
+@@ -171,7 +_,7 @@
  
          for (int slot = 0; slot < 9; slot++) {
              int index = (this.selected + slot) % 9;
@@ -20,7 +20,7 @@
                  return index;
              }
          }
-@@ -242,7 +_,7 @@
+@@ -243,7 +_,7 @@
          for (int i = 0; i < this.items.size(); i++) {
              ItemStack itemStack = this.getItem(i);
              if (!itemStack.isEmpty()) {
@@ -29,7 +29,7 @@
              }
          }
      }
-@@ -293,6 +_,8 @@
+@@ -294,6 +_,8 @@
          } catch (Throwable t) {
              CrashReport report = CrashReport.forThrowable(t, "Adding item to inventory");
              CrashReportCategory category = report.addCategory("Item being added");

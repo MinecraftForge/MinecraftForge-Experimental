@@ -1,9 +1,9 @@
 --- a/net/minecraft/network/Connection.java
 +++ b/net/minecraft/network/Connection.java
-@@ -81,9 +_,17 @@
+@@ -79,9 +_,17 @@
+     private boolean handlingFault;
      private volatile @Nullable DisconnectionDetails delayedDisconnect;
      private @Nullable BandwidthDebugMonitor bandwidthDebugMonitor;
-     private @Nullable UUID intendedProfileId;
 +    private java.util.function.Consumer<Connection> activationHandler;
 +    private final net.minecraftforge.common.util.PacketLogger packetLogger = new net.minecraftforge.common.util.PacketLogger(this);
 +    private ProtocolInfo<?> outboundProtocol = null;
@@ -18,7 +18,7 @@
      }
  
      @Override
-@@ -91,6 +_,7 @@
+@@ -89,6 +_,7 @@
          super.channelActive(ctx);
          this.channel = ctx.channel();
          this.address = this.channel.remoteAddress();
@@ -26,7 +26,7 @@
          if (this.delayedDisconnect != null) {
              this.disconnect(this.delayedDisconnect);
          }
-@@ -152,6 +_,7 @@
+@@ -150,6 +_,7 @@
  
              if (packetListener.shouldHandleMessage(packet)) {
                  try {
@@ -34,7 +34,7 @@
                      genericsFtw(packet, packetListener);
                  } catch (RunningOnDifferentThreadException var5) {
                  } catch (RejectedExecutionException ignored) {
-@@ -201,6 +_,7 @@
+@@ -199,6 +_,7 @@
              throw new IllegalStateException("Invalid inbound protocol: " + protocol.id());
          }
  
@@ -42,7 +42,7 @@
          this.packetListener = packetListener;
          this.disconnectListener = null;
          UnconfiguredPipelineHandler.InboundConfigurationTask configMessage = UnconfiguredPipelineHandler.setupInboundProtocol(protocol);
-@@ -218,7 +_,7 @@
+@@ -216,7 +_,7 @@
              throw new IllegalStateException("Invalid outbound protocol: " + protocol.id());
          }
  
@@ -51,7 +51,7 @@
          BundlerInfo bundlerInfo = protocol.bundlerInfo();
          if (bundlerInfo != null) {
              PacketBundleUnpacker newUnbundler = new PacketBundleUnpacker(bundlerInfo);
-@@ -265,7 +_,8 @@
+@@ -263,7 +_,8 @@
          this.disconnectListener = listener;
          this.runOnceConnected(connection -> {
              this.setupInboundProtocol(inbound, listener);
@@ -61,7 +61,7 @@
              this.setupOutboundProtocol(outbound);
          });
      }
-@@ -309,10 +_,13 @@
+@@ -307,10 +_,13 @@
          if (listener != null) {
              ChannelFuture future = flush ? this.channel.writeAndFlush(packet) : this.channel.write(packet);
              future.addListener(listener);
@@ -75,7 +75,7 @@
          }
      }
  
-@@ -381,7 +_,7 @@
+@@ -379,7 +_,7 @@
          if (this.address == null) {
              return "local";
          } else {
@@ -84,7 +84,7 @@
          }
      }
  
-@@ -426,7 +_,9 @@
+@@ -424,7 +_,9 @@
      }
  
      public static ChannelFuture connect(final InetSocketAddress address, final EventLoopGroupHolder eventLoopGroupHolder, final Connection connection) {
@@ -95,7 +95,7 @@
              @Override
              protected void initChannel(final Channel channel) {
                  try {
-@@ -491,7 +_,8 @@
+@@ -489,7 +_,8 @@
  
      public static Connection connectToLocalServer(final SocketAddress address) {
          final Connection connection = new Connection(PacketFlow.CLIENTBOUND);
@@ -105,7 +105,7 @@
              @Override
              protected void initChannel(final Channel channel) {
                  ChannelPipeline pipeline = channel.pipeline();
-@@ -590,6 +_,22 @@
+@@ -588,6 +_,22 @@
  
      public float getAverageSentPackets() {
          return this.averageSentPackets;

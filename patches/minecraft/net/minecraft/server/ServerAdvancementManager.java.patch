@@ -1,13 +1,13 @@
 --- a/net/minecraft/server/ServerAdvancementManager.java
 +++ b/net/minecraft/server/ServerAdvancementManager.java
-@@ -27,6 +_,10 @@
-     private final HolderLookup.Provider registries;
+@@ -22,6 +_,10 @@
+     private final AdvancementTree tree;
  
      public ServerAdvancementManager(final HolderLookup.Provider registries) {
 +        this(registries, net.minecraftforge.common.crafting.conditions.ICondition.IContext.EMPTY);
 +    }
 +
 +    public ServerAdvancementManager(final HolderLookup.Provider registries, net.minecraftforge.common.crafting.conditions.ICondition.IContext context) {
-         super(registries, Advancement.CODEC, Registries.ADVANCEMENT);
-         this.registries = registries;
-     }
+         HolderLookup.RegistryLookup<Advancement> advancements = registries.lookupOrThrow(Registries.ADVANCEMENT);
+         Builder<Identifier, AdvancementHolder> builder = ImmutableMap.builder();
+         advancements.listElements().forEach(advancement -> {

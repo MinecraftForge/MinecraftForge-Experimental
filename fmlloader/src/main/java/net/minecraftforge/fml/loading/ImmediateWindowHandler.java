@@ -102,8 +102,8 @@ public class ImmediateWindowHandler {
         return "default";
     }
 
-    public static long setupMinecraftWindow(final int width, final int height, final String title, final long monitor, final Supplier<Object> backend) {
-        return provider.setupMinecraftWindow(width, height, title, monitor, backend);
+    public static long setupMinecraftWindow(final int width, final int height, final String title, final Supplier<Object> backend) {
+        return provider.setupMinecraftWindow(width, height, title, backend);
     }
 
     public static boolean positionWindow(Optional<Object> monitor,IntConsumer widthSetter, IntConsumer heightSetter, IntConsumer xSetter, IntConsumer ySetter) {
@@ -155,9 +155,9 @@ public class ImmediateWindowHandler {
         }
 
         @Override
-        public long setupMinecraftWindow(final int width, final int height, final String title, final long monitor, final Supplier<Object> backend) {
+        public long setupMinecraftWindow(final int width, final int height, final String title, final Supplier<Object> backend) {
             try {
-                var longsupplier = (LongSupplier)NV_HANDOFF.invoke(null, width, height, title, monitor, backend);
+                var longsupplier = (LongSupplier)NV_HANDOFF.invoke(null, width, height, title, backend);
                 return longsupplier.getAsLong();
             } catch (Throwable e) {
                 throw new IllegalStateException("How did you get here?", e);

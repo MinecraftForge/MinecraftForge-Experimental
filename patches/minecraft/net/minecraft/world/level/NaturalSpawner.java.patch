@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/NaturalSpawner.java
 +++ b/net/minecraft/world/level/NaturalSpawner.java
-@@ -75,7 +_,7 @@
+@@ -74,7 +_,7 @@
  
          for (Entity entity : entities) {
              if (!(entity instanceof Mob mob && (mob.isPersistenceRequired() || mob.requiresCustomPersistence()))) {
@@ -9,7 +9,7 @@
                  if (category != MobCategory.MISC) {
                      BlockPos pos = entity.blockPosition();
                      chunkGetter.query(ChunkPos.pack(pos), chunk -> {
-@@ -211,7 +_,7 @@
+@@ -207,7 +_,7 @@
                                      groupSize++;
                                      level.addFreshEntityWithPassengers(mob);
                                      spawnCallback.run(mob, chunk);
@@ -18,7 +18,7 @@
                                          return;
                                      }
  
-@@ -288,7 +_,7 @@
+@@ -284,7 +_,7 @@
          return nearestPlayerDistanceSqr > mob.getType().getCategory().getDespawnDistance() * mob.getType().getCategory().getDespawnDistance()
                  && mob.removeWhenFarAway(nearestPlayerDistanceSqr)
              ? false
@@ -27,32 +27,32 @@
      }
  
      private static Optional<MobSpawnSettings.SpawnerData> getRandomSpawnMobAt(
-@@ -324,9 +_,11 @@
-         final BlockPos pos,
-         final @Nullable Holder<Biome> biome
+@@ -315,9 +_,11 @@
+     private static WeightedList<MobSpawnSettings.SpawnerData> mobsAt(
+         final ServerLevel level, final StructureManager structureManager, final ChunkGenerator generator, final MobCategory mobCategory, final BlockPos pos
      ) {
 -        return isInNetherFortressBounds(pos, level, mobCategory, structureManager)
 -            ? NetherFortressStructure.FORTRESS_ENEMIES
--            : generator.getMobsAt(biome != null ? biome : level.getBiome(pos), structureManager, mobCategory, pos);
+-            : generator.getMobsAt(level, structureManager, mobCategory, pos);
 +        return net.minecraftforge.event.ForgeEventFactory.getPotentialSpawns(level, mobCategory, pos,
 +               isInNetherFortressBounds(pos, level, mobCategory, structureManager)
 +            ? structureManager.registryAccess().lookupOrThrow(Registries.STRUCTURE).getOrThrow(BuiltinStructures.FORTRESS).get().spawnOverrides().get(MobCategory.MONSTER).spawns()
-+            : generator.getMobsAt(biome != null ? biome : level.getBiome(pos), structureManager, mobCategory, pos)
++            : generator.getMobsAt(level, structureManager, mobCategory, pos)
 +        );
      }
  
      public static boolean isInNetherFortressBounds(
-@@ -417,8 +_,7 @@
+@@ -411,8 +_,7 @@
  
-                                 entity.snapTo(fx, pos.getY(), fz, random.nextFloat() * 360.0F, 0.0F);
-                                 if (entity instanceof Mob mob
--                                    && mob.checkSpawnRules(level, EntitySpawnReason.CHUNK_GENERATION)
--                                    && mob.checkSpawnObstruction(level)) {
-+                                    && net.minecraftforge.event.ForgeEventFactory.checkSpawnPosition(mob, level, EntitySpawnReason.CHUNK_GENERATION)) {
-                                     groupSpawnData = mob.finalizeSpawn(
-                                         level, level.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.CHUNK_GENERATION, groupSpawnData
-                                     );
-@@ -527,7 +_,7 @@
+                                     entity.snapTo(fx, pos.getY(), fz, random.nextFloat() * 360.0F, 0.0F);
+                                     if (entity instanceof Mob mob
+-                                        && mob.checkSpawnRules(level, EntitySpawnReason.CHUNK_GENERATION)
+-                                        && mob.checkSpawnObstruction(level)) {
++                                        && net.minecraftforge.event.ForgeEventFactory.checkSpawnPosition(mob, level, EntitySpawnReason.CHUNK_GENERATION)) {
+                                         groupSpawnData = mob.finalizeSpawn(
+                                             level, level.getCurrentDifficultyAt(mob.blockPosition()), EntitySpawnReason.CHUNK_GENERATION, groupSpawnData
+                                         );
+@@ -524,7 +_,7 @@
              }
  
              this.spawnPotential.addCharge(pos, charge);

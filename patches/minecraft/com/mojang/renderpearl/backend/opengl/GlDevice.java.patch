@@ -1,0 +1,36 @@
+--- a/com/mojang/renderpearl/backend/opengl/GlDevice.java
++++ b/com/mojang/renderpearl/backend/opengl/GlDevice.java
+@@ -200,6 +_,11 @@
+         final int depthOrLayers,
+         final int mipLevels
+     ) {
++        return this.createTexture(label, usage, format, width, height, depthOrLayers, mipLevels, false);
++    }
++
++    @Override
++    public GpuTexture createTexture(@Nullable String label, @GpuTexture.Usage final int usage, final GpuFormat format, final int width, final int height, final int depthOrLayers, final int mipLevels, boolean stencil) {
+         GlStateManager.clearGlErrors();
+         int id = GlStateManager._genTexture();
+         if (label == null) {
+@@ -223,9 +_,9 @@
+             GlStateManager._texParameter(target, 34892, 0);
+         }
+ 
+-        int glInternalID = GlConst.toGlInternalId(format);
+-        int glExternalID = GlConst.toGlExternalId(format);
+-        int glType = GlConst.toGlType(format);
++        int glInternalID = GlConst.toGlInternalId(format, stencil);
++        int glExternalID = GlConst.toGlExternalId(format, stencil);
++        int glType = GlConst.toGlType(format, stencil);
+         if (glInternalID != 0 && glExternalID != 0 && glType != 0) {
+             if (isCubemap) {
+                 for (int cubeTarget : GlConst.CUBEMAP_TARGETS) {
+@@ -248,7 +_,7 @@
+                 throw new IllegalStateException("OpenGL error " + error);
+             }
+ 
+-            GlTexture texture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, id, this.frameBufferCache);
++            GlTexture texture = new GlTexture(usage, label, format, width, height, depthOrLayers, mipLevels, id, this.frameBufferCache, stencil);
+             this.debugLabels.applyLabel(texture);
+             return texture;
+         } else {

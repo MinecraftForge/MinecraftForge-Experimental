@@ -1,0 +1,30 @@
+--- a/net/minecraft/core/registries/PatchedRegistry.java
++++ b/net/minecraft/core/registries/PatchedRegistry.java
+@@ -73,8 +_,8 @@
+         }
+ 
+         HolderLookup.RegistryLookup<T> patchContents = patchProvider.lookupOrThrow(registryKey);
+-        HolderLookup.RegistryLookup<T> baseContents = baseProvider.lookupOrThrow(registryKey);
+-        Lifecycle lifecycle = patchContents.registryLifecycle().add(baseContents.registryLifecycle());
++        HolderLookup.RegistryLookup<T> baseContents = baseProvider.lookup(registryKey).orElse(null);
++        Lifecycle lifecycle = baseContents == null ? patchContents.registryLifecycle() : patchContents.registryLifecycle().add(baseContents.registryLifecycle());
+         PatchedRegistry<T> result = new PatchedRegistry<>(registryKey, lifecycle);
+         patchContents.listElements().forEach(elementHolder -> {
+             ResourceKey<T> elementKey = elementHolder.key();
+@@ -82,6 +_,7 @@
+             holder.supplier = () -> cloner.clone((T)elementHolder.value(), patchProvider, clonedRegistriesProvider.get());
+             result.entries.put(elementKey, holder);
+         });
++        if (baseContents != null)
+         baseContents.listElements().forEach(elementHolder -> {
+             ResourceKey<T> elementKey = elementHolder.key();
+             result.entries.computeIfAbsent(elementKey, key -> {
+@@ -121,7 +_,7 @@
+         }
+ 
+         @Override
+-        protected void bindValue(final T value) {
++        public void bindValue(final T value) {
+             super.bindValue(value);
+             this.supplier = null;
+         }

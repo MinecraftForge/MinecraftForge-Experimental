@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/chat/ChatListener.java
 +++ b/net/minecraft/client/multiplayer/chat/ChatListener.java
-@@ -142,6 +_,8 @@
+@@ -138,6 +_,8 @@
              LocalPlayer receiver = this.minecraft.player;
              if (receiver != null && receiver.chatAbilities().canReceivePlayerMessages()) {
                  Component decoratedMessage = boundChatType.decorate(message);
@@ -9,7 +9,7 @@
                  this.minecraft.gui.hud.getChat().addPlayerMessage(decoratedMessage, null, GuiMessageTag.system());
                  this.narrateChatMessage(boundChatType, message);
                  this.logSystemMessage(decoratedMessage, received);
-@@ -177,12 +_,16 @@
+@@ -173,12 +_,16 @@
                  MessageSignature signature = message.signature();
                  FilterMask filterMask = message.filterMask();
                  if (filterMask.isEmpty()) {
@@ -28,7 +28,7 @@
                          this.narrateChatMessage(boundChatType, filteredContent);
                      }
                  }
-@@ -216,12 +_,14 @@
+@@ -212,12 +_,14 @@
          chatLog.push(LoggedChatMessage.system(message, timeStamp));
      }
  

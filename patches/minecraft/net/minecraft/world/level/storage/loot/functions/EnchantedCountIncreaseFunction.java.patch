@@ -1,9 +1,9 @@
 --- a/net/minecraft/world/level/storage/loot/functions/EnchantedCountIncreaseFunction.java
 +++ b/net/minecraft/world/level/storage/loot/functions/EnchantedCountIncreaseFunction.java
-@@ -72,8 +_,12 @@
+@@ -71,8 +_,12 @@
      @Override
      public ItemStack run(final ItemStack itemStack, final LootContext context) {
-         Entity killer = context.getOptionalParameter(LootContextParams.ATTACKING_ENTITY);
+         Entity killer = context.getOptional(LootContextParams.ATTACKING_ENTITY);
 -        if (killer instanceof LivingEntity entity) {
 -            int level = EnchantmentHelper.getEnchantmentLevel(this.enchantment, entity);
 +        int level = 0;
@@ -15,7 +15,7 @@
              if (level == 0) {
                  return itemStack;
              }
-@@ -83,7 +_,6 @@
+@@ -82,7 +_,6 @@
              if (this.hasLimit()) {
                  itemStack.limitSize(this.limit);
              }

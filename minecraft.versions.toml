@@ -1,6 +1,6 @@
 [versions]
 java = "25"
-minecraft = "26.2"
-minecraft-next = "26.3"
-mcp = "20260616.103818"
-changelog-base = "65.0"
+minecraft = "26.3"
+minecraft-next = "26.4"
+mcp = "20260915.103801"
+changelog-base = "66.0"

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/MushroomBlock.java
 +++ b/net/minecraft/world/level/block/MushroomBlock.java
-@@ -83,7 +_,7 @@
+@@ -72,7 +_,7 @@
      protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
          BlockPos belowPos = pos.below();
          BlockState below = level.getBlockState(belowPos);
@@ -9,7 +9,7 @@
      }
  
      public boolean growMushroom(final ServerLevel level, final BlockPos pos, final BlockState state, final RandomSource random) {
-@@ -92,8 +_,10 @@
+@@ -81,8 +_,10 @@
              return false;
          }
  

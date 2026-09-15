@@ -6,6 +6,7 @@
 package net.minecraftforge.common.extensions;
 
 import java.util.Optional;
+import java.util.OptionalDouble;
 import java.util.function.BiConsumer;
 
 import net.minecraft.client.Camera;
@@ -184,6 +185,17 @@ public interface IForgeBlockState {
     */
     default Direction getBedDirection(LevelReader level, BlockPos pos) {
         return self().getBlock().getBedDirection(self(), level, pos);
+    }
+
+    /**
+     * Returns the height the player will appear to lay down and sleep at if this is a bed.
+     *
+     * @param level The current level
+     * @param pos Block position in level
+     * @return The height, or empty if this isn't a bed
+     */
+    default OptionalDouble getBedHeight(Level level, BlockPos pos) {
+        return self().getBlock().getBedHeight(self(), level, pos);
     }
 
     /**

@@ -1,12 +1,11 @@
 --- a/net/minecraft/world/level/block/Block.java
 +++ b/net/minecraft/world/level/block/Block.java
-@@ -75,11 +_,12 @@
+@@ -75,10 +_,11 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
 -public class Block extends BlockBehaviour implements ItemLike {
 +public class Block extends BlockBehaviour implements ItemLike, net.minecraftforge.common.extensions.IForgeBlock {
-     public static final MapCodec<Block> CODEC = simpleCodec(Block::new);
      private static final Logger LOGGER = LogUtils.getLogger();
      private final Holder.Reference<Block> builtInRegistryHolder = BuiltInRegistries.BLOCK.createIntrusiveHolder(this);
 -    public static final IdMapper<BlockState> BLOCK_STATE_REGISTRY = new IdMapper<>();
@@ -15,7 +14,7 @@
      private static final LoadingCache<VoxelShape, Boolean> SHAPE_FULL_BLOCK_CACHE = CacheBuilder.newBuilder()
          .maximumSize(512L)
          .weakKeys()
-@@ -247,6 +_,7 @@
+@@ -241,6 +_,7 @@
                  LOGGER.error("Block classes should end with Block and {} doesn't.", className);
              }
          }
@@ -23,7 +22,7 @@
      }
  
      public static boolean isExceptionForConnection(final BlockState state) {
-@@ -297,7 +_,12 @@
+@@ -293,7 +_,12 @@
          }
      }
  
@@ -36,7 +35,7 @@
          VoxelShape occluder = neighborState.getFaceOcclusionShape(direction.getOpposite());
          if (occluder == Shapes.block()) {
              return false;
-@@ -396,17 +_,22 @@
+@@ -392,17 +_,22 @@
          }
      }
  
@@ -61,7 +60,7 @@
          }
      }
  
-@@ -436,7 +_,7 @@
+@@ -432,7 +_,7 @@
      }
  
      private static void popResource(final Level level, final Supplier<ItemEntity> entityFactory, final ItemStack itemStack) {
@@ -70,7 +69,7 @@
              ItemEntity entity = entityFactory.get();
              entity.setDefaultPickUpDelay();
              level.addFreshEntity(entity);
-@@ -444,11 +_,12 @@
+@@ -440,11 +_,12 @@
      }
  
      public void popExperience(final ServerLevel level, final BlockPos pos, final int amount) {
@@ -84,7 +83,7 @@
      public float getExplosionResistance() {
          return this.explosionResistance;
      }
-@@ -473,7 +_,8 @@
+@@ -469,7 +_,8 @@
      ) {
          player.awardStat(Stats.BLOCK_MINED.get(this));
          player.causeFoodExhaustion(0.005F);
@@ -94,15 +93,15 @@
      }
  
      public void setPlacedBy(final Level level, final BlockPos pos, final BlockState state, final @Nullable LivingEntity by, final ItemStack itemStack) {
-@@ -495,6 +_,7 @@
-         return this.bounceRestitution;
+@@ -499,6 +_,7 @@
+         return this.fallDistanceReduction;
      }
  
 +    /** @deprecated Forge: use {@link net.minecraftforge.common.extensions.IForgeBlockState#getFriction(LevelReader, BlockPos, Entity)}*/
      public float getFriction() {
          return this.friction;
      }
-@@ -565,7 +_,7 @@
+@@ -567,7 +_,7 @@
              this.item = Item.byBlock(this);
          }
  
@@ -111,7 +110,7 @@
      }
  
      public boolean hasDynamicShape() {
-@@ -630,6 +_,79 @@
+@@ -632,6 +_,79 @@
          public int hashCode() {
              return System.identityHashCode(this.first) * 31 + System.identityHashCode(this.second);
          }

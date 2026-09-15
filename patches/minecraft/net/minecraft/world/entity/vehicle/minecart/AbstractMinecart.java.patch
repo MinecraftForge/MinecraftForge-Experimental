@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
 +++ b/net/minecraft/world/entity/vehicle/minecart/AbstractMinecart.java
-@@ -46,7 +_,7 @@
+@@ -47,7 +_,7 @@
  import net.minecraft.world.phys.Vec3;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      private static final Vec3 LOWERED_PASSENGER_ATTACHMENT = new Vec3(0.0, 0.0, 0.0);
      private static final EntityDataAccessor<Optional<BlockState>> DATA_ID_CUSTOM_DISPLAY_BLOCK = SynchedEntityData.defineId(
          AbstractMinecart.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE
-@@ -96,15 +_,12 @@
+@@ -97,15 +_,12 @@
              }
          )
      );
@@ -27,7 +27,7 @@
      }
  
      protected AbstractMinecart(final EntityType<?> type, final Level level, final double x, final double y, final double z) {
-@@ -166,7 +_,7 @@
+@@ -167,7 +_,7 @@
  
      @Override
      public boolean isPushable() {
@@ -36,7 +36,7 @@
      }
  
      @Override
-@@ -367,22 +_,31 @@
+@@ -373,22 +_,31 @@
      }
  
      protected void comeOffTrack(final ServerLevel level) {
@@ -70,7 +70,7 @@
      }
  
      protected double makeStepAlongTrack(final BlockPos pos, final RailShape shape, final double movementLeft) {
-@@ -438,7 +_,7 @@
+@@ -444,7 +_,7 @@
      public Vec3 getRedstoneDirection(final BlockPos pos) {
          BlockState state = this.level().getBlockState(pos);
          if (state.is(Blocks.POWERED_RAIL) && state.getValue(PoweredRailBlock.POWERED)) {
@@ -79,7 +79,7 @@
              if (shape == RailShape.EAST_WEST) {
                  if (this.isRedstoneConductor(pos.west())) {
                      return new Vec3(1.0, 0.0, 0.0);
-@@ -609,5 +_,40 @@
+@@ -615,5 +_,40 @@
  
      public boolean isFurnace() {
          return false;

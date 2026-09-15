@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/entity/monster/Shulker.java
 +++ b/net/minecraft/world/entity/monster/Shulker.java
-@@ -401,6 +_,12 @@
-                     && this.level().noCollision(this, new AABB(target).deflate(1.0E-6))) {
+@@ -405,6 +_,12 @@
                      Direction attachmentDirection = this.findAttachableSurface(target);
-                     if (attachmentDirection != null) {
-+                        var event = new net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity(this, target.getX(), target.getY(), target.getZ());
-+                        if (net.minecraftforge.event.entity.EntityTeleportEvent.EnderEntity.BUS.post(event)) attachmentDirection = null;
+                     if (attachmentDirection != null
+                         && !this.level().getBlockState(target.relative(attachmentDirection)).is(BlockTags.SHULKER_DOES_NOT_TELEPORT_TO)) {
++                        var event = new net.minecraftforge.event.entity.EntityTeleportEvent.EntityRandom(this, target.getX(), target.getY(), target.getZ());
++                        if (net.minecraftforge.event.entity.EntityTeleportEvent.EntityRandom.BUS.post(event)) attachmentDirection = null;
 +                        target = BlockPos.containing(event.getTargetX(), event.getTargetY(), event.getTargetZ());
 +                    }
 +

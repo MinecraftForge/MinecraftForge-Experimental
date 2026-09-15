@@ -1,22 +1,22 @@
 --- a/net/minecraft/resources/RegistryOps.java
 +++ b/net/minecraft/resources/RegistryOps.java
-@@ -76,6 +_,22 @@
-             .forGetter(e -> null);
+@@ -71,6 +_,22 @@
+             .forGetter(var0 -> null);
      }
  
-+    public static <E> com.mojang.serialization.MapCodec<HolderLookup.RegistryLookup<E>> retrieveRegistryLookup(final ResourceKey<? extends Registry<? extends E>> resourceKey) {
++    public static <E> com.mojang.serialization.MapCodec<HolderLookup.RegistryLookup<E>> retrieveRegistryLookup(final ResourceKey<? extends Registry<? extends E>> registryKey) {
 +       return ExtraCodecs.retrieveContext(ops -> {
-+           if (!(ops instanceof RegistryOps<?> registryOps)) {
++           if (!(ops instanceof RegistryOps<?> registryOps))
 +              return DataResult.error(() -> "Not a registry ops");
-+           }
 +
-+           return registryOps.lookupProvider.lookup(resourceKey).map(registryInfo -> {
-+               if (!(registryInfo.owner() instanceof HolderLookup.RegistryLookup<E> registryLookup)) {
-+                   return DataResult.<HolderLookup.RegistryLookup<E>>error(() -> "Found holder getter but was not a registry lookup for " + resourceKey);
-+               }
++           var lookup = registryOps.lookupProvider.lookup(registryKey);
++           if (lookup.isEmpty())
++               return DataResult.error(() -> "Unknown Registry: " + registryKey);
 +
-+               return DataResult.success(registryLookup, registryInfo.elementsLifecycle());
-+           }).orElseGet(() -> DataResult.error(() -> "Unknown registry: " + resourceKey));
++           if (!(lookup.get() instanceof HolderLookup.RegistryLookup<E> registryLookup))
++               return DataResult.<HolderLookup.RegistryLookup<E>>error(() -> "Found holder getter but was not a registry lookup for " + registryKey);
++
++           return DataResult.success(registryLookup, registryLookup.registryLifecycle());
 +       });
 +    }
 +

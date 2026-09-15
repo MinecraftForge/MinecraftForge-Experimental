@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/PumpkinBlock.java
 +++ b/net/minecraft/world/level/block/PumpkinBlock.java
-@@ -43,7 +_,7 @@
+@@ -35,7 +_,7 @@
          final InteractionHand hand,
          final BlockHitResult hitResult
      ) {

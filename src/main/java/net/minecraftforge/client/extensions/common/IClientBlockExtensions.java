@@ -8,6 +8,7 @@ package net.minecraftforge.client.extensions.common;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.ParticleEngine;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.effect.MobEffects;
@@ -21,7 +22,6 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
-import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.fml.LogicalSide;
 import org.joml.Vector3d;
 
@@ -51,11 +51,11 @@ public interface IClientBlockExtensions {
      *
      * @param state   The current state
      * @param level   The current level
-     * @param target  The target the player is looking at {x/y/z/side/sub}
+     * @param direction  The side of the block the player is breaking
      * @param manager A reference to the current particle manager.
      * @return True to prevent vanilla digging particles form spawning.
      */
-    default boolean addHitEffects(BlockState state, Level level, HitResult target, ParticleEngine manager) {
+    default boolean addHitEffects(BlockState state, Level level, Direction direction, ParticleEngine manager) {
         return false;
     }
 

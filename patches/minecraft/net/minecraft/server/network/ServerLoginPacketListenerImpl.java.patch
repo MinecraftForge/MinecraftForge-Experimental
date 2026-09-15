@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
 +++ b/net/minecraft/server/network/ServerLoginPacketListenerImpl.java
-@@ -188,7 +_,7 @@
+@@ -185,7 +_,7 @@
              throw new IllegalStateException("Protocol error", e);
          }
  
@@ -9,7 +9,7 @@
              @Override
              public void run() {
                  String name = Objects.requireNonNull(ServerLoginPacketListenerImpl.this.requestedUsername, "Player name not initialized");
-@@ -234,6 +_,7 @@
+@@ -231,6 +_,7 @@
  
      @Override
      public void handleCustomQueryPacket(final ServerboundCustomQueryAnswerPacket packet) {
@@ -17,7 +17,7 @@
          this.disconnect(ServerCommonPacketListenerImpl.DISCONNECT_UNEXPECTED_QUERY);
      }
  
-@@ -256,6 +_,11 @@
+@@ -253,6 +_,11 @@
      @Override
      public void handleCookieResponse(final ServerboundCookieResponsePacket packet) {
          this.disconnect(ServerCommonPacketListenerImpl.DISCONNECT_UNEXPECTED_QUERY);

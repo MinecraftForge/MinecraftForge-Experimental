@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/MinecraftServer.java
 +++ b/net/minecraft/server/MinecraftServer.java
-@@ -296,7 +_,7 @@
+@@ -291,7 +_,7 @@
  
      public static <S extends MinecraftServer> S spin(final Function<Thread, S> factory) {
          AtomicReference<S> serverReference = new AtomicReference<>();
@@ -9,7 +9,7 @@
          thread.setUncaughtExceptionHandler((t, e) -> LOGGER.error("Uncaught exception in server thread", e));
          if (Runtime.getRuntime().availableProcessors() > 4) {
              thread.setPriority(8);
-@@ -436,6 +_,7 @@
+@@ -429,6 +_,7 @@
          this.scoreboard.load(this.savedDataStorage.computeIfAbsent(ScoreboardSaveData.TYPE).getData());
          this.commandStorage = new CommandStorage(this.savedDataStorage);
          this.stopwatches = this.savedDataStorage.computeIfAbsent(Stopwatches.TYPE);
@@ -17,7 +17,7 @@
          if (!levelData.isInitialized()) {
              try {
                  setInitialSpawn(overworld, levelData, worldOptions.generateBonusChest(), isDebug, this.levelLoadListener);
-@@ -470,6 +_,7 @@
+@@ -463,6 +_,7 @@
                      this, this.executor, this.storageSource, derivedLevelData, dimension, entry.getValue(), isDebug, biomeZoomSeed, ImmutableList.of(), false
                  );
                  this.levels.put(dimension, level);
@@ -25,15 +25,15 @@
              } else {
                  level = overworld;
              }
-@@ -492,6 +_,7 @@
+@@ -485,6 +_,7 @@
              levelData.setSpawn(LevelData.RespawnData.of(level.dimension(), BlockPos.ZERO.above(80), 0.0F, 0.0F));
          } else {
              ServerChunkCache chunkSource = level.getChunkSource();
 +            if (net.minecraftforge.event.ForgeEventFactory.onCreateWorldSpawn(level, levelData)) return;
-             ChunkPos spawnChunk = ChunkPos.containing(chunkSource.randomState().sampler().findSpawnPosition());
+             ChunkPos spawnChunk = chunkSource.getGenerator().getOrigin(chunkSource.randomState());
              levelLoadListener.start(LevelLoadListener.Stage.PREPARE_GLOBAL_SPAWN, 0);
              levelLoadListener.updateFocus(level.dimension(), spawnChunk);
-@@ -678,6 +_,7 @@
+@@ -662,6 +_,7 @@
          for (ServerLevel level : this.getAllLevels()) {
              if (level != null) {
                  try {
@@ -41,7 +41,7 @@
                      level.close();
                  } catch (IOException e) {
                      LOGGER.error("Exception closing the level", e);
-@@ -725,9 +_,11 @@
+@@ -709,9 +_,11 @@
                  throw new IllegalStateException("Failed to initialize server");
              }
  
@@ -53,7 +53,7 @@
  
              while (this.running) {
                  long thisTickNanos;
-@@ -781,6 +_,8 @@
+@@ -765,6 +_,8 @@
                  this.isReady = true;
                  JvmProfiler.INSTANCE.onServerTick(this.smoothedTickTimeMillis);
              }
@@ -62,7 +62,7 @@
          } catch (Throwable t) {
              LOGGER.error("Encountered an unexpected exception", t);
              CrashReport report = constructOrExtractCrashReport(t);
-@@ -792,6 +_,7 @@
+@@ -776,6 +_,7 @@
                  LOGGER.error("We were unable to save this crash report to disk.");
              }
  
@@ -70,7 +70,7 @@
              this.onServerCrash(report);
          } finally {
              try {
-@@ -800,6 +_,7 @@
+@@ -784,6 +_,7 @@
              } catch (Throwable t) {
                  LOGGER.error("Exception stopping the server", t);
              } finally {
@@ -78,7 +78,7 @@
                  this.onServerExit();
              }
          }
-@@ -980,12 +_,14 @@
+@@ -964,12 +_,14 @@
              }
          }
  
@@ -93,7 +93,7 @@
          }
  
          this.ticksUntilAutosave--;
-@@ -1003,6 +_,7 @@
+@@ -987,6 +_,7 @@
          this.smoothedTickTimeMillis = this.smoothedTickTimeMillis * 0.8F + (float)tickTime / (float)TimeUtil.NANOSECONDS_PER_MILLISECOND * 0.19999999F;
          this.logTickMethodTime(nano);
          profiler.pop();
@@ -101,7 +101,7 @@
      }
  
      protected void processPacketsAndTick(final boolean sprinting) {
-@@ -1064,7 +_,8 @@
+@@ -1048,7 +_,8 @@
              Optional.of(players),
              Optional.of(ServerStatus.Version.current()),
              Optional.ofNullable(this.statusIcon),
@@ -111,7 +111,7 @@
          );
      }
  
-@@ -1109,9 +_,11 @@
+@@ -1093,9 +_,11 @@
          profiler.push("levels");
          this.updateEffectiveRespawnData();
  
@@ -124,7 +124,7 @@
  
              try {
                  level.tick(haveTime);
-@@ -1120,9 +_,11 @@
+@@ -1104,9 +_,11 @@
                  level.fillReportDetails(report);
                  throw new ReportedException(report);
              }
@@ -136,7 +136,7 @@
          }
  
          profiler.popPush("connection");
-@@ -1131,7 +_,7 @@
+@@ -1115,7 +_,7 @@
          this.playerList.tick();
          profiler.popPush("debugSubscribers");
          this.debugSubscribers.tick();
@@ -145,7 +145,7 @@
              profiler.popPush("gameTests");
              GameTestTicker.SINGLETON.tick();
          }
-@@ -1217,7 +_,7 @@
+@@ -1201,7 +_,7 @@
      }
  
      public String getServerModName() {
@@ -154,15 +154,15 @@
      }
  
      public ServerClockManager clockManager() {
-@@ -1561,6 +_,7 @@
+@@ -1544,6 +_,7 @@
+                 this.getPlayerList().reloadResources();
                  this.functionManager.replaceLibrary(this.resources.managers.getFunctionLibrary());
                  this.structureTemplateManager.onResourceManagerReload(this.resources.resourceManager);
-                 this.fuelValues = FuelValues.vanillaBurnTimes(this.registries.compositeAccess(), this.worldData.enabledFeatures());
 +                this.getPlayerList().getPlayers().forEach(this.getPlayerList()::sendPlayerPermissionLevel); //Forge: Fix newly added/modified commands not being sent to the client when commands reload.
              }, this);
          if (this.isSameThread()) {
              this.managedBlock(result::isDone);
-@@ -1572,12 +_,15 @@
+@@ -1555,12 +_,15 @@
      public static WorldDataConfiguration configurePackRepository(
          final PackRepository packRepository, final WorldDataConfiguration initialDataConfig, final boolean initMode, final boolean safeMode
      ) {
@@ -179,7 +179,7 @@
          }
  
          Set<String> selected = Sets.newLinkedHashSet();
-@@ -2226,6 +_,48 @@
+@@ -2192,6 +_,48 @@
  
      public ServerLinks serverLinks() {
          return ServerLinks.EMPTY;

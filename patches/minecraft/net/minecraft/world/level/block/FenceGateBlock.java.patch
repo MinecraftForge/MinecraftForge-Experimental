@@ -1,16 +1,11 @@
 --- a/net/minecraft/world/level/block/FenceGateBlock.java
 +++ b/net/minecraft/world/level/block/FenceGateBlock.java
-@@ -57,6 +_,8 @@
+@@ -52,10 +_,18 @@
          Util.mapValues(SHAPE_OCCLUSION, v -> v.move(0.0, -0.1875, 0.0).optimize())
      );
      private final WoodType type;
 +    private final net.minecraft.sounds.SoundEvent openSound;
 +    private final net.minecraft.sounds.SoundEvent closeSound;
- 
-     @Override
-     public MapCodec<FenceGateBlock> codec() {
-@@ -64,8 +_,14 @@
-     }
  
      public FenceGateBlock(final WoodType type, final BlockBehaviour.Properties properties) {
 -        super(properties.sound(type.soundType()));
@@ -25,7 +20,7 @@
          this.registerDefaultState(this.stateDefinition.any().setValue(OPEN, false).setValue(POWERED, false).setValue(IN_WALL, false));
      }
  
-@@ -156,7 +_,7 @@
+@@ -146,7 +_,7 @@
  
          boolean opens = state.getValue(OPEN);
          level.playSound(
@@ -34,7 +29,7 @@
          );
          level.gameEvent(player, opens ? GameEvent.BLOCK_OPEN : GameEvent.BLOCK_CLOSE, pos);
          return InteractionResult.SUCCESS;
-@@ -170,7 +_,7 @@
+@@ -160,7 +_,7 @@
              boolean open = state.getValue(OPEN);
              level.setBlockAndUpdate(pos, state.setValue(OPEN, !open));
              level.playSound(
@@ -43,7 +38,7 @@
              );
              level.gameEvent(open ? GameEvent.BLOCK_CLOSE : GameEvent.BLOCK_OPEN, pos, GameEvent.Context.of(state));
          }
-@@ -190,7 +_,7 @@
+@@ -180,7 +_,7 @@
                      level.playSound(
                          null,
                          pos,

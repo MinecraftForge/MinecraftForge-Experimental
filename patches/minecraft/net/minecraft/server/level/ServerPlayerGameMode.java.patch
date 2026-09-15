@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/level/ServerPlayerGameMode.java
 +++ b/net/minecraft/server/level/ServerPlayerGameMode.java
-@@ -150,6 +_,10 @@
+@@ -163,6 +_,10 @@
      public void handleBlockBreakAction(
          final BlockPos pos, final ServerboundPlayerActionPacket.Action action, final Direction direction, final int maxY, final int sequence
      ) {
@@ -9,9 +9,9 @@
 +           return;
 +        }
          if (!this.player.isWithinBlockInteractionRange(pos, 1.0)) {
-             this.debugLogging(pos, false, sequence, "too far");
-         } else if (pos.getY() > maxY) {
-@@ -184,6 +_,7 @@
+             if (this.isDestroyingBlock && action == ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK) {
+                 this.abortDestroyBlock(pos, sequence);
+@@ -201,6 +_,7 @@
                  float progress = 1.0F;
                  BlockState blockState = this.level.getBlockState(pos);
                  if (!blockState.isAir()) {
@@ -19,7 +19,7 @@
                      EnchantmentHelper.onHitBlock(
                          this.level,
                          this.player.getMainHandItem(),
-@@ -195,6 +_,7 @@
+@@ -212,6 +_,7 @@
                          item -> this.player.onEquippedItemBroken(item, EquipmentSlot.MAINHAND)
                      );
                      blockState.attack(this.level, pos, this.player);
@@ -27,7 +27,7 @@
                      progress = blockState.getDestroyProgress(this.player, this.player.level(), pos);
                  }
  
-@@ -261,7 +_,8 @@
+@@ -285,7 +_,8 @@
  
      public boolean destroyBlock(final BlockPos pos) {
          BlockState state = this.level.getBlockState(pos);
@@ -37,7 +37,7 @@
              return false;
          }
  
-@@ -272,35 +_,53 @@
+@@ -296,35 +_,53 @@
              return false;
          }
  
@@ -102,7 +102,7 @@
      public InteractionResult useItem(final ServerPlayer player, final Level level, final ItemStack itemStack, final InteractionHand hand) {
          if (this.gameModeForPlayer == GameType.SPECTATOR) {
              return InteractionResult.PASS;
-@@ -310,6 +_,8 @@
+@@ -334,6 +_,8 @@
              return InteractionResult.PASS;
          }
  
@@ -111,7 +111,7 @@
          int oldCount = itemStack.getCount();
          int oldDamage = itemStack.getDamageValue();
          InteractionResult result = itemStack.use(level, player, hand);
-@@ -355,6 +_,8 @@
+@@ -379,6 +_,8 @@
              return InteractionResult.FAIL;
          }
  
@@ -120,7 +120,7 @@
          if (this.gameModeForPlayer == GameType.SPECTATOR) {
              MenuProvider menuProvider = state.getMenuProvider(level, pos);
              if (menuProvider != null) {
-@@ -364,10 +_,16 @@
+@@ -404,10 +_,16 @@
                  return InteractionResult.PASS;
              }
          } else {
@@ -138,7 +138,7 @@
                  InteractionResult itemUse = state.useItemOn(player.getItemInHand(hand), level, player, hand, hitResult);
                  if (itemUse.consumesAction()) {
                      CriteriaTriggers.ITEM_USED_ON_BLOCK.trigger(player, pos, usedItemStack);
-@@ -383,8 +_,8 @@
+@@ -423,8 +_,8 @@
                  }
              }
  
@@ -146,6 +146,6 @@
 -                UseOnContext context = new UseOnContext(player, hand, hitResult);
 +            if (event.getUseItem().isAllowed() || (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack))) {
 +                if (event.getUseItem().isDenied()) return InteractionResult.PASS;
-                 InteractionResult success;
+                 InteractionResult result;
                  if (player.hasInfiniteMaterials()) {
                      int count = itemStack.getCount();

@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/StemBlock.java
 +++ b/net/minecraft/world/level/block/StemBlock.java
-@@ -76,14 +_,16 @@
+@@ -58,14 +_,16 @@
  
      @Override
      protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
@@ -19,7 +19,7 @@
                  int age = state.getValue(AGE);
                  if (age < 7) {
                      state = state.setValue(AGE, age + 1);
-@@ -92,7 +_,7 @@
+@@ -74,7 +_,7 @@
                      Direction direction = Direction.Plane.HORIZONTAL.getRandomDirection(random);
                      BlockPos relative = pos.relative(direction);
                      BlockState stateBelow = level.getBlockState(relative.below());
@@ -28,7 +28,7 @@
                          Registry<Block> blocks = level.registryAccess().lookupOrThrow(Registries.BLOCK);
                          Optional<Block> fruit = blocks.getOptional(this.fruit);
                          Optional<Block> stem = blocks.getOptional(this.attachedStem);
-@@ -102,6 +_,7 @@
+@@ -84,6 +_,7 @@
                          }
                      }
                  }
@@ -36,7 +36,7 @@
              }
          }
      }
-@@ -134,5 +_,10 @@
+@@ -116,5 +_,10 @@
      @Override
      protected void createBlockStateDefinition(final StateDefinition.Builder<Block, BlockState> builder) {
          builder.add(AGE);

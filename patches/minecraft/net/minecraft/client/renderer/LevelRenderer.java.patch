@@ -1,16 +1,16 @@
 --- a/net/minecraft/client/renderer/LevelRenderer.java
 +++ b/net/minecraft/client/renderer/LevelRenderer.java
-@@ -235,6 +_,7 @@
+@@ -279,6 +_,7 @@
+             }
          }
  
-         this.addAlwaysOnTopPass(frame, featureFrame, terrainFog);
-+        net.minecraftforge.client.FramePassManager.insertForgePasses(frame, targets, this.levelRenderState, deltaTracker); // Forge: Modded passes are inserted here.
++        net.minecraftforge.client.FramePassManager.insertForgePasses(frame, targets, this.levelRenderState); // Forge: Modded passes are inserted here.
          profiler.popPush("executeFrameGraph");
          frame.execute(resourceAllocator, new FrameGraphBuilder.Inspector() {
              @Override
-@@ -285,7 +_,8 @@
-         this.submitBlockDestroyAnimation(poseStack, submitNodeCollector, levelRenderState);
+@@ -335,7 +_,8 @@
          levelRenderState.blockBreakingRenderStates.clear();
+         this.submitTransientBlocks(poseStack, submitNodeCollector, levelRenderState);
          levelRenderState.particlesRenderState.submit(submitNodeCollector, levelRenderState.cameraRenderState);
 -        if (renderOutline) {
 +        var hasCustomOutline = this.levelRenderState.blockOutlineRenderState != null && this.levelRenderState.blockOutlineRenderState.customRenderer() != null;
@@ -18,7 +18,7 @@
              this.submitBlockOutline(poseStack, this.submitNodeStorage, levelRenderState);
          }
  
-@@ -705,6 +_,10 @@
+@@ -1075,6 +_,10 @@
      private void submitBlockOutline(final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, final LevelRenderState levelRenderState) {
          BlockOutlineRenderState state = levelRenderState.blockOutlineRenderState;
          if (state != null) {
@@ -29,7 +29,7 @@
              Vec3 cameraPos = levelRenderState.cameraRenderState.pos;
              BlockPos pos = state.pos();
              poseStack.pushPose();
-@@ -979,6 +_,14 @@
+@@ -1331,6 +_,14 @@
  
      public SectionOcclusionGraph sectionOcclusionGraph() {
          return this.sectionOcclusionGraph;

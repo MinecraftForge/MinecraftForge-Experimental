@@ -1,0 +1,33 @@
+--- a/net/minecraft/world/level/blockscan/BlockScanUtils.java
++++ b/net/minecraft/world/level/blockscan/BlockScanUtils.java
+@@ -100,14 +_,29 @@
+         final Predicate<BlockState> predicate,
+         final BlockStateConsumer consumer
+     ) {
++        return findBlocksInSection(section, origin, fromX, fromY, fromX, toX, toY, toZ, (state, pos) -> predicate.test(state), consumer);
++    }
++
++    public static boolean findBlocksInSection(
++        final LevelChunkSection section,
++        final BlockPos origin,
++        final int fromX,
++        final int fromY,
++        final int fromZ,
++        final int toX,
++        final int toY,
++        final int toZ,
++        final java.util.function.BiPredicate<BlockState, BlockPos> predicate,
++        final BlockStateConsumer consumer
++    ) {
+         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+ 
+         for (int y = fromY; y <= toY; y++) {
+             for (int z = fromZ; z <= toZ; z++) {
+                 for (int x = fromX; x <= toX; x++) {
+                     BlockState blockState = section.getBlockState(x, y, z);
+-                    if (predicate.test(blockState)) {
+                         mutablePos.setWithOffset(origin, x, y, z);
++                    if (predicate.test(blockState, mutablePos)) {
+                         if (consumer.apply(mutablePos, blockState).shouldAbort()) {
+                             return true;
+                         }

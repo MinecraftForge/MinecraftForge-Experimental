@@ -9,7 +9,7 @@
      private static final int EXTRA_SPACE_AFTER_FIRST_TOOLTIP_LINE = 2;
      private final Minecraft minecraft;
      private final Matrix3x2fStack pose;
-@@ -912,6 +_,7 @@
+@@ -914,6 +_,7 @@
                  CrashReport report = CrashReport.forThrowable(t, "Rendering item");
                  CrashReportCategory category = report.addCategory("Item being rendered");
                  category.setDetail("Item Type", () -> String.valueOf(itemStack.getItem()));
@@ -17,7 +17,7 @@
                  category.setDetail("Item Components", () -> String.valueOf(itemStack.getComponents()));
                  category.setDetail("Item Foil", () -> String.valueOf(itemStack.hasFoil()));
                  throw new ReportedException(report);
-@@ -938,6 +_,7 @@
+@@ -940,6 +_,7 @@
              this.itemCooldown(itemStack, x, y);
              this.itemCount(font, itemStack, x, y, countText);
              this.pose.popMatrix();
@@ -25,7 +25,7 @@
          }
      }
  
-@@ -1106,16 +_,25 @@
+@@ -1109,16 +_,29 @@
          this.setTooltipForNextFrame(this.minecraft.font, formattedCharSequences, DefaultTooltipPositioner.INSTANCE, x, y, false);
      }
  
@@ -33,7 +33,7 @@
      public void setTooltipForNextFrame(final Font font, final ItemStack itemStack, final int xo, final int yo) {
 +        this.tooltipStack = itemStack;
          this.setTooltipForNextFrame(
-             font, Screen.getTooltipFromItem(this.minecraft, itemStack), itemStack.getTooltipImage(), xo, yo, itemStack.get(DataComponents.TOOLTIP_STYLE)
+             font, Screen.getTooltipFromItem(this.minecraft, itemStack), itemStack.getTooltipImage(), xo, yo, itemStack.get(DataComponents.TOOLTIP_STYLE), true
          );
 +        this.tooltipStack = ItemStack.EMPTY;
      }
@@ -43,17 +43,21 @@
      }
  
 +    public void setTooltipForNextFrame(Font font, List<Component> texts, Optional<TooltipComponent> optionalImage, ItemStack stack, int xo, int yo) {
-+       this.tooltipStack = stack;
-+       this.setTooltipForNextFrame(font, texts, optionalImage, xo, yo, stack.get(DataComponents.TOOLTIP_STYLE));
-+       this.tooltipStack = ItemStack.EMPTY;
++       this.setTooltipForNextFrame(font, texts, optionalImage, stack, xo, yo, false);
++    }
++
++    public void setTooltipForNextFrame(Font font, List<Component> texts, Optional<TooltipComponent> optionalImage, ItemStack stack, int xo, int yo, final boolean extraSpaceAfterFirstLine) {
++        this.tooltipStack = stack;
++        this.setTooltipForNextFrame(font, texts, optionalImage, xo, yo, stack.get(DataComponents.TOOLTIP_STYLE), extraSpaceAfterFirstLine);
++        this.tooltipStack = ItemStack.EMPTY;
 +    }
 +
      public void setTooltipForNextFrame(
          final Font font,
          final List<Component> texts,
-@@ -1124,11 +_,7 @@
-         final int yo,
-         final @Nullable Identifier style
+@@ -1139,11 +_,7 @@
+         final @Nullable Identifier style,
+         final boolean extraSpaceAfterFirstLine
      ) {
 -        List<ClientTooltipComponent> components = texts.stream()
 -            .map(Component::getVisualOrderText)
@@ -61,10 +65,10 @@
 -            .collect(Util.toMutableList());
 -        optionalImage.ifPresent(image -> components.add(components.isEmpty() ? 0 : 1, ClientTooltipComponent.create(image)));
 +        List<ClientTooltipComponent> components = net.minecraftforge.client.ForgeHooksClient.gatherTooltipComponents(this.tooltipStack, texts, optionalImage, xo, guiWidth(), guiHeight(), font);
-         this.setTooltipForNextFrameInternal(font, components, xo, yo, DefaultTooltipPositioner.INSTANCE, style, false);
+         this.setTooltipForNextFrameInternal(font, components, xo, yo, DefaultTooltipPositioner.INSTANCE, style, false, extraSpaceAfterFirstLine);
      }
  
-@@ -1156,7 +_,22 @@
+@@ -1171,7 +_,22 @@
      }
  
      public void setComponentTooltipForNextFrame(final Font font, final List<Component> lines, final int xo, final int yo) {
@@ -88,36 +92,34 @@
      }
  
      public void setComponentTooltipForNextFrame(final Font font, final List<Component> lines, final int xo, final int yo, final @Nullable Identifier style) {
-@@ -1207,10 +_,16 @@
+@@ -1235,9 +_,14 @@
      ) {
          if (!lines.isEmpty()) {
              if (this.deferredTooltip == null || replaceExisting) {
--                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style);
+-                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style, extraSpaceAfterFirstLine);
 +                final var stackContext = this.tooltipStack;
-+                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style, stackContext);
++                this.deferredTooltip = () -> this.tooltip(font, lines, xo, yo, positioner, style, extraSpaceAfterFirstLine, stackContext);
              }
          }
-     }
-+
-+    public void tooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style) {
-+        tooltip(font, lines, xo, yo, positioner, style, ItemStack.EMPTY);
 +    }
 +
++    public void tooltip(Font font, List<ClientTooltipComponent> lines, int xo, int yo, ClientTooltipPositioner positioner, @Nullable Identifier style, boolean extraSpaceAfterFirstLine) {
++        tooltip(font, lines, xo, yo, positioner, style, extraSpaceAfterFirstLine,  ItemStack.EMPTY);
+     }
  
      public void tooltip(
-         final Font font,
-@@ -1218,13 +_,16 @@
-         final int xo,
+@@ -1247,13 +_,16 @@
          final int yo,
          final ClientTooltipPositioner positioner,
--        final @Nullable Identifier style
-+        final @Nullable Identifier style,
+         final @Nullable Identifier style,
+-        boolean extraSpaceAfterFirstLine
++        boolean extraSpaceAfterFirstLine,
 +        ItemStack itemstack
      ) {
 +        var preEvent = net.minecraftforge.client.ForgeHooksClient.onRenderTooltipPre(itemstack, this, xo, yo, guiWidth(), guiHeight(), lines, font, positioner, style);
 +        if (preEvent == null) return;
          int textWidth = 0;
-         int tempHeight = lines.size() == 1 ? -2 : 0;
+         int tempHeight = extraSpaceAfterFirstLine && lines.size() != 1 ? 0 : -2;
  
          for (ClientTooltipComponent line : lines) {
 -            int lineWidth = line.getWidth(font);
@@ -125,7 +127,7 @@
              if (lineWidth > textWidth) {
                  textWidth = lineWidth;
              }
-@@ -1234,25 +_,25 @@
+@@ -1263,25 +_,25 @@
  
          int w = textWidth;
          int h = tempHeight;
@@ -141,9 +143,9 @@
          for (int i = 0; i < lines.size(); i++) {
              ClientTooltipComponent line = lines.get(i);
 -            line.extractText(this, font, x, localY);
--            localY += line.getHeight(font) + (i == 0 ? 2 : 0);
+-            localY += line.getHeight(font) + (extraSpaceAfterFirstLine && i == 0 ? 2 : 0);
 +            line.extractText(this, preEvent.getFont(), x, localY);
-+            localY += line.getHeight(preEvent.getFont()) + (i == 0 ? 2 : 0);
++            localY += line.getHeight(preEvent.getFont()) + (extraSpaceAfterFirstLine && i == 0 ? 2 : 0);
          }
  
          localY = y;
@@ -151,13 +153,13 @@
          for (int i = 0; i < lines.size(); i++) {
              ClientTooltipComponent line = lines.get(i);
 -            line.extractImage(font, x, localY, w, h, this);
--            localY += line.getHeight(font) + (i == 0 ? 2 : 0);
+-            localY += line.getHeight(font) + (extraSpaceAfterFirstLine && i == 0 ? 2 : 0);
 +            line.extractImage(preEvent.getFont(), x, localY, w, h, this);
-+            localY += line.getHeight(preEvent.getFont()) + (i == 0 ? 2 : 0);
++            localY += line.getHeight(preEvent.getFont()) + (extraSpaceAfterFirstLine && i == 0 ? 2 : 0);
          }
  
          this.pose.popMatrix();
-@@ -1326,6 +_,14 @@
+@@ -1355,6 +_,14 @@
  
      private ActiveTextCollector.Parameters createDefaultTextParameters(final float opacity) {
          return new ActiveTextCollector.Parameters(new Matrix3x2f(this.pose), opacity, this.scissorStack.peek());

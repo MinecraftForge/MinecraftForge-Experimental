@@ -1,11 +1,11 @@
 --- a/net/minecraft/world/level/storage/loot/LootPool.java
 +++ b/net/minecraft/world/level/storage/loot/LootPool.java
-@@ -33,10 +_,13 @@
-                 LootItemCondition.DIRECT_CODEC.listOf().optionalFieldOf("conditions", List.of()).forGetter(p -> p.conditions),
-                 LootItemFunctions.ROOT_CODEC.listOf().optionalFieldOf("functions", List.of()).forGetter(p -> p.functions),
-                 NumberProviders.CODEC.fieldOf("rolls").forGetter(p -> p.rolls),
--                NumberProviders.CODEC.optionalFieldOf("bonus_rolls", ConstantValue.exactly(0.0F)).forGetter(p -> p.bonusRolls)
-+                NumberProviders.CODEC.optionalFieldOf("bonus_rolls", ConstantValue.exactly(0.0F)).forGetter(p -> p.bonusRolls),
+@@ -33,15 +_,20 @@
+                 LootItemCondition.CODEC.optionalFieldOf("condition").forGetter(p -> p.condition),
+                 LootItemFunctions.CODEC.optionalFieldOf("modifier").forGetter(p -> p.modifier),
+                 ContextIntProviders.CODEC.fieldOf("rolls").forGetter(p -> p.rolls),
+-                ContextFloatProviders.CODEC.optionalFieldOf("bonus_rolls", ContextFloatProviders.exactly(0.0F)).forGetter(p -> p.bonusRolls)
++                ContextFloatProviders.CODEC.optionalFieldOf("bonus_rolls", ContextFloatProviders.exactly(0.0F)).forGetter(p -> p.bonusRolls),
 +                Codec.STRING.optionalFieldOf("name").forGetter(p -> p.name.filter(n -> !n.startsWith("custom#"))),
 +                net.minecraftforge.common.crafting.conditions.ICondition.OPTIONAL_FEILD_CODEC.forGetter(p -> p.forge_condition)
              )
@@ -13,38 +13,34 @@
      );
 +    public static final Codec<LootPool> CONDITIONAL_CODEC = net.minecraftforge.common.crafting.conditions.ConditionCodec.checkingDecode(CODEC, () -> lootPool().build());
      private final List<LootPoolEntryContainer> entries;
-     private final List<LootItemCondition> conditions;
-     private final Predicate<LootContext> compositeCondition;
-@@ -44,6 +_,8 @@
-     private final BiFunction<ItemStack, LootContext, ItemStack> compositeFunction;
-     private NumberProvider rolls;
-     private NumberProvider bonusRolls;
+     private final Optional<Holder<LootItemCondition>> condition;
+     private final Optional<Holder<LootItemFunction>> modifier;
+     private Holder<ContextIntProvider> rolls;
+     private Holder<ContextFloatProvider> bonusRolls;
 +    private java.util.Optional<String> name;
 +    private java.util.Optional<net.minecraftforge.common.crafting.conditions.ICondition> forge_condition;
  
      private LootPool(
          final List<LootPoolEntryContainer> entries,
-@@ -52,6 +_,18 @@
-         final NumberProvider rolls,
-         final NumberProvider bonusRolls
+@@ -50,11 +_,25 @@
+         final Holder<ContextIntProvider> rolls,
+         final Holder<ContextFloatProvider> bonusRolls
      ) {
-+        this(entries, conditions, functions, rolls, bonusRolls, java.util.Optional.empty(), java.util.Optional.empty());
++        this(entries, condition, modifier, rolls, bonusRolls, java.util.Optional.empty(), java.util.Optional.empty());
 +    }
 +
 +    private LootPool(
 +        final List<LootPoolEntryContainer> entries,
-+        final List<LootItemCondition> conditions,
-+        final List<LootItemFunction> functions,
-+        final NumberProvider rolls,
-+        final NumberProvider bonusRolls,
++        final Optional<Holder<LootItemCondition>> condition,
++        final Optional<Holder<LootItemFunction>> modifier,
++        final Holder<ContextIntProvider> rolls,
++        final Holder<ContextFloatProvider> bonusRolls,
 +        final java.util.Optional<String> name,
 +        final java.util.Optional<net.minecraftforge.common.crafting.conditions.ICondition> forge_condition
 +    ) {
          this.entries = entries;
-         this.conditions = conditions;
-         this.compositeCondition = Util.allOf(conditions);
-@@ -59,6 +_,8 @@
-         this.compositeFunction = LootItemFunctions.compose(functions);
+         this.condition = condition;
+         this.modifier = modifier;
          this.rolls = rolls;
          this.bonusRolls = bonusRolls;
 +        this.name = name;
@@ -52,7 +48,7 @@
      }
  
      private void addRandomItem(final Consumer<ItemStack> result, final LootContext context) {
-@@ -118,12 +_,35 @@
+@@ -114,18 +_,51 @@
          return new LootPool.Builder();
      }
  
@@ -70,25 +66,24 @@
 +          throw new UnsupportedOperationException("Cannot change the name of a pool when it has a name set!");
 +       this.name = java.util.Optional.of(name);
 +    }
-+    public NumberProvider getRolls()      { return this.rolls; }
-+    public NumberProvider getBonusRolls() { return this.bonusRolls; }
-+    public void setRolls     (NumberProvider v){ checkFrozen(); this.rolls = v; }
-+    public void setBonusRolls(NumberProvider v){ checkFrozen(); this.bonusRolls = v; }
++    public Holder<ContextIntProvider> getRolls()      { return this.rolls; }
++    public Holder<ContextFloatProvider> getBonusRolls() { return this.bonusRolls; }
++    public void setRolls     (Holder<ContextIntProvider> v){ checkFrozen(); this.rolls = v; }
++    public void setBonusRolls(Holder<ContextFloatProvider> v){ checkFrozen(); this.bonusRolls = v; }
 +
      public static class Builder implements FunctionUserBuilder<LootPool.Builder>, ConditionUserBuilder<LootPool.Builder> {
          private final ImmutableList.Builder<LootPoolEntryContainer> entries = ImmutableList.builder();
-         private final ImmutableList.Builder<LootItemCondition> conditions = ImmutableList.builder();
-         private final ImmutableList.Builder<LootItemFunction> functions = ImmutableList.builder();
-         private NumberProvider rolls = ConstantValue.exactly(1.0F);
-         private NumberProvider bonusRolls = ConstantValue.exactly(0.0F);
+         private final ImmutableList.Builder<Holder<LootItemCondition>> conditions = ImmutableList.builder();
+         private final ImmutableList.Builder<Holder<LootItemFunction>> functions = ImmutableList.builder();
+         private Holder<ContextIntProvider> rolls = ContextIntProviders.exactly(1);
+         private Holder<ContextFloatProvider> bonusRolls = ContextFloatProviders.exactly(0.0F);
 +        @org.jetbrains.annotations.Nullable
 +        private String name;
 +        @org.jetbrains.annotations.Nullable
 +        private net.minecraftforge.common.crafting.conditions.ICondition forge_condition;
  
-         public LootPool.Builder setRolls(final NumberProvider rolls) {
+         public LootPool.Builder setRolls(final Holder<ContextIntProvider> rolls) {
              this.rolls = rolls;
-@@ -162,8 +_,18 @@
              return this;
          }
  
@@ -102,9 +97,17 @@
 +            return this;
 +        }
 +
-         public LootPool build() {
--            return new LootPool(this.entries.build(), this.conditions.build(), this.functions.build(), this.rolls, this.bonusRolls);
-+            return new LootPool(this.entries.build(), this.conditions.build(), this.functions.build(), this.rolls, this.bonusRolls, java.util.Optional.ofNullable(this.name), java.util.Optional.ofNullable(forge_condition));
+         public LootPool.Builder unwrap() {
+             return this;
+         }
+@@ -164,7 +_,9 @@
+                 ConditionUserBuilder.buildCondition(this.conditions.build()),
+                 FunctionUserBuilder.buildFunction(this.functions.build()),
+                 this.rolls,
+-                this.bonusRolls
++                this.bonusRolls,
++                java.util.Optional.ofNullable(this.name),
++                java.util.Optional.ofNullable(forge_condition)
+             );
          }
      }
- }

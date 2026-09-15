@@ -1,0 +1,11 @@
+--- a/com/mojang/renderpearl/api/textures/GpuTexture.java
++++ b/com/mojang/renderpearl/api/textures/GpuTexture.java
+@@ -10,7 +_,7 @@
+ import net.minecraftforge.api.distmarker.OnlyIn;
+ 
+ @OnlyIn(Dist.CLIENT)
+-public interface GpuTexture extends UncheckedAutoCloseable {
++public interface GpuTexture extends UncheckedAutoCloseable, net.minecraftforge.client.extensions.IForgeGpuTexture {
+     int USAGE_COPY_DST = 1;
+     int USAGE_COPY_SRC = 2;
+     int USAGE_TEXTURE_BINDING = 4;

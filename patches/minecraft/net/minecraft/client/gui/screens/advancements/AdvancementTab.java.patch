@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/advancements/AdvancementTab.java
 +++ b/net/minecraft/client/gui/screens/advancements/AdvancementTab.java
-@@ -41,6 +_,7 @@
+@@ -38,6 +_,7 @@
      private float fade;
      private boolean centered;
      private @Nullable AdvancementWidget hovered;
@@ -8,15 +8,22 @@
  
      public AdvancementTab(
          final Minecraft minecraft,
-@@ -62,6 +_,15 @@
-         this.addWidget(this.root, rootNode.holder());
+@@ -60,6 +_,11 @@
+         this.addWidget(root);
      }
  
-+    public AdvancementTab(Minecraft mc, AdvancementsScreen screen, AdvancementTabType type, int index, int page, AdvancementNode adv, DisplayInfo info) {
-+        this(mc, screen, type, index, adv, info);
++    public AdvancementTab(Minecraft mc, AdvancementsScreen screen, AdvancementTabType type, int index, int page, AdvancementWidget root, ItemStackTemplate icon, Component title, Identifier background) {
++        this(mc, screen, type, index, root, icon, title, background);
 +        this.page = page;
 +    }
 +
+     public void copyPosition(final AdvancementTab source) {
+         this.scrollX = source.scrollX;
+         this.scrollY = source.scrollY;
+@@ -70,6 +_,10 @@
+         this.centered = source.centered;
+     }
+ 
 +    public int getPage() {
 +        return this.page;
 +    }
@@ -24,14 +31,14 @@
      public AdvancementTabType getType() {
          return this.type;
      }
-@@ -169,8 +_,8 @@
-         }
+@@ -179,8 +_,8 @@
+         Identifier background = rootDisplay.background().get().texturePath();
  
          for (AdvancementTabType type : AdvancementTabType.values()) {
 -            if (index < type.getMax()) {
--                return new AdvancementTab(minecraft, screen, type, index, root, display.get());
+-                return new AdvancementTab(minecraft, screen, type, index, rootWidget, rootDisplay.icon(), rootDisplay.title(), background);
 +            if ((index % AdvancementTabType.MAX_TABS) < type.getMax()) {
-+                return new AdvancementTab(minecraft, screen, type, index % AdvancementTabType.MAX_TABS, index / AdvancementTabType.MAX_TABS, root, display.get());
++                return new AdvancementTab(minecraft, screen, type, index % AdvancementTabType.MAX_TABS, index / AdvancementTabType.MAX_TABS, rootWidget, rootDisplay.icon(), rootDisplay.title(), background);
              }
  
              index -= type.getMax();

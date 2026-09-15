@@ -7,7 +7,7 @@ package net.minecraftforge.client.loading;
 
 import com.mojang.blaze3d.platform.Monitor;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.GpuBackend;
+import com.mojang.renderpearl.api.device.GpuBackend;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
@@ -23,10 +23,10 @@ import org.lwjgl.glfw.GLFW;
 
 public final class NoVizFallback {
     private static long WINDOW;
-    public static LongSupplier windowHandoff(int width, int height, String title, long monitor, Supplier<Object> backend) {
+    public static LongSupplier windowHandoff(int width, int height, String title, Supplier<Object> backend) {
         return () -> {
             try {
-                return WINDOW = Window.createGlfwWindow(width, height, title, monitor, (GpuBackend)backend.get());
+                return WINDOW = Window.createWindowStatic((GpuBackend)backend.get(), width, height, title);
             } catch (Throwable e) {
                 return sneak(e);
             }

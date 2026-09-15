@@ -1,30 +1,30 @@
 --- a/net/minecraft/resources/RegistryDataLoader.java
 +++ b/net/minecraft/resources/RegistryDataLoader.java
-@@ -81,7 +_,7 @@
+@@ -95,7 +_,7 @@
  public class RegistryDataLoader {
      private static final Logger LOGGER = LogUtils.getLogger();
      private static final Comparator<ResourceKey<?>> ERROR_KEY_COMPARATOR = Comparator.<ResourceKey<?>, Identifier>comparing(ResourceKey::registry).thenComparing(ResourceKey::identifier);
--    public static final List<RegistryDataLoader.RegistryData<?>> WORLDGEN_REGISTRIES = List.of(
-+    public static final List<RegistryDataLoader.RegistryData<?>> WORLDGEN_REGISTRIES = net.minecraftforge.registries.DataPackRegistriesHooks.grabWorldgenRegistries(
+-    public static final List<RegistryDataLoader.RegistryData<?>> WORLD_REGISTRIES = List.of(
++    public static final List<RegistryDataLoader.RegistryData<?>> WORLD_REGISTRIES = net.minecraftforge.registries.DataPackRegistriesHooks.grabWorldgenRegistries(
          new RegistryDataLoader.RegistryData<>(Registries.DIMENSION_TYPE, DimensionType.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.BIOME, Biome.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.CHAT_TYPE, ChatType.DIRECT_CODEC),
-@@ -132,7 +_,7 @@
-     public static final List<RegistryDataLoader.RegistryData<?>> DIMENSION_REGISTRIES = List.of(
-         new RegistryDataLoader.RegistryData<>(Registries.LEVEL_STEM, LevelStem.CODEC)
+@@ -161,7 +_,7 @@
+         new RegistryDataLoader.RegistryData<>(Registries.ADVANCEMENT, Advancement.CODEC),
+         new RegistryDataLoader.RegistryData<>(Registries.RECIPE, Recipe.DIRECT_CODEC)
      );
 -    public static final List<RegistryDataLoader.RegistryData<?>> SYNCHRONIZED_REGISTRIES = List.of(
 +    public static final List<RegistryDataLoader.RegistryData<?>> SYNCHRONIZED_REGISTRIES = net.minecraftforge.registries.DataPackRegistriesHooks.grabSynchronizedRegistries(
          new RegistryDataLoader.RegistryData<>(Registries.BIOME, Biome.NETWORK_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.CHAT_TYPE, ChatType.DIRECT_CODEC),
          new RegistryDataLoader.RegistryData<>(Registries.TRIM_PATTERN, TrimPattern.DIRECT_CODEC),
-@@ -163,6 +_,10 @@
-         new RegistryDataLoader.RegistryData<>(Registries.WORLD_CLOCK, WorldClock.DIRECT_CODEC),
-         new RegistryDataLoader.RegistryData<>(Registries.TIMELINE, Timeline.NETWORK_CODEC)
+@@ -195,6 +_,10 @@
+         new RegistryDataLoader.RegistryData<>(Registries.BLOCK_TRANSFORMER, BlockTransformer.DIRECT_CODEC),
+         new RegistryDataLoader.RegistryData<>(Registries.BLOCK_STATE_PROVIDER, BlockStateProvider.DIRECT_CODEC)
      );
 +
 +    public static java.util.stream.Stream<RegistryDataLoader.RegistryData<?>> getWorldGenAndDimensionStream() {
-+        return java.util.stream.Stream.concat(RegistryDataLoader.WORLDGEN_REGISTRIES.stream(), RegistryDataLoader.DIMENSION_REGISTRIES.stream());
++        return java.util.stream.Stream.concat(RegistryDataLoader.WORLD_REGISTRIES.stream(), RegistryDataLoader.DIMENSION_REGISTRIES.stream());
 +    }
  
      public static CompletableFuture<RegistryAccess.Frozen> load(

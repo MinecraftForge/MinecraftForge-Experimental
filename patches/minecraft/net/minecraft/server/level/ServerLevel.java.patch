@@ -1,10 +1,11 @@
 --- a/net/minecraft/server/level/ServerLevel.java
 +++ b/net/minecraft/server/level/ServerLevel.java
-@@ -217,10 +_,12 @@
+@@ -218,11 +_,13 @@
      private final List<CustomSpawner> customSpawners;
      private @Nullable EnderDragonFight dragonFight;
      private final Int2ObjectMap<EnderDragonPart> dragonParts = new Int2ObjectOpenHashMap<>();
 +    final Int2ObjectMap<net.minecraftforge.entity.PartEntity<?>> partEntities = new Int2ObjectOpenHashMap<>();
+     private final BiomeResolver uncachedBiomeResolver;
      private final StructureManager structureManager;
      private final StructureCheck structureCheck;
      private final boolean tickTime;
@@ -13,9 +14,9 @@
  
      public ServerLevel(
          final MinecraftServer server,
-@@ -304,6 +_,18 @@
-         this.waypointManager = new ServerWaypointManager();
+@@ -306,6 +_,18 @@
          this.environmentAttributes = EnvironmentAttributeSystem.builder().addDefaultLayers(this).build();
+         this.uncachedBiomeResolver = this.getChunkSource().getGenerator().getBiomeSource().createUncachedResolver(this.getChunkSource().randomState());
          this.updateSkyBrightness();
 +        this.initCapabilities();
 +    }
@@ -32,18 +33,18 @@
      }
  
      @Override
-@@ -367,7 +_,9 @@
+@@ -373,7 +_,9 @@
          if (this.sleepStatus.areEnoughSleeping(percentage) && this.sleepStatus.areEnoughDeepSleeping(percentage, this.players)) {
              Optional<Holder<WorldClock>> defaultClock = this.dimensionType().defaultClock();
              if (this.getGameRules().get(GameRules.ADVANCE_TIME) && defaultClock.isPresent()) {
 -                this.server.clockManager().moveToTimeMarker(defaultClock.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
-+                long minTime = this.server.clockManager().getTotalTicks(defaultClock.get());
++                long minTime = this.server.clockManager().getInstance(defaultClock.get()).totalTicks();
 +                long newTime = this.server.clockManager().getTimeMarker(defaultClock.get(), ClockTimeMarkers.WAKE_UP_FROM_SLEEP);
 +                this.server.clockManager().setTotalTicks(defaultClock.get(), net.minecraftforge.event.ForgeEventFactory.onSleepFinished(this, newTime, minTime));
              }
  
              this.wakeUpAllPlayers();
-@@ -441,6 +_,7 @@
+@@ -447,6 +_,7 @@
                                          entity.stopRiding();
                                      }
  
@@ -51,7 +52,7 @@
                                      profiler.push("tick");
                                      this.guardEntityTick(this::tickNonPassenger, entity);
                                      profiler.pop();
-@@ -581,6 +_,7 @@
+@@ -588,6 +_,7 @@
          BlockPos topPos = this.getHeightmapPos(Heightmap.Types.MOTION_BLOCKING, pos);
          BlockPos belowPos = topPos.below();
          Biome biome = this.getBiome(topPos).value();
@@ -59,7 +60,7 @@
          if (biome.shouldFreeze(this, belowPos)) {
              this.setBlockAndUpdate(belowPos, Blocks.ICE.defaultBlockState());
          }
-@@ -790,8 +_,8 @@
+@@ -797,8 +_,8 @@
                  this.server.getPlayerList().broadcastAll(new ClientboundGameEventPacket(ClientboundGameEventPacket.START_RAINING, 0.0F));
              }
  
@@ -70,23 +71,29 @@
          }
      }
  
-@@ -829,6 +_,7 @@
-         entity.tickCount++;
+@@ -834,8 +_,10 @@
+         ProfilerFiller profiler = Profiler.get();
          profiler.push(entity.typeHolder()::getRegisteredName);
          profiler.incrementCounter("tickNonPassenger");
-+        if (entity.canUpdate())
++        if (entity.canUpdate()) {
+         entity.commonTick();
          entity.tick();
++        }
          profiler.pop();
  
-@@ -846,6 +_,7 @@
+         for (Entity passenger : entity.getPassengers()) {
+@@ -850,8 +_,10 @@
              ProfilerFiller profiler = Profiler.get();
              profiler.push(entity.typeHolder()::getRegisteredName);
              profiler.incrementCounter("tickPassenger");
-+            if (entity.canUpdate())
++            if (entity.canUpdate()) {
+             entity.commonTick();
              entity.rideTick();
++            }
              profiler.pop();
  
-@@ -892,6 +_,7 @@
+             for (Entity passenger : entity.getPassengers()) {
+@@ -897,6 +_,7 @@
              } else {
                  this.entityManager.autoSave();
              }
@@ -94,7 +101,7 @@
          }
      }
  
-@@ -983,6 +_,7 @@
+@@ -988,6 +_,7 @@
      }
  
      private void addPlayer(final ServerPlayer player) {
@@ -102,7 +109,7 @@
          Entity existing = this.getEntity(player.getUUID());
          if (existing != null) {
              LOGGER.warn("Force-added player with duplicate UUID {}", player.getUUID());
-@@ -990,7 +_,8 @@
+@@ -995,7 +_,8 @@
              this.removePlayerImmediately((ServerPlayer)existing, Entity.RemovalReason.DISCARDED);
          }
  
@@ -112,7 +119,7 @@
      }
  
      private boolean addEntity(final Entity entity) {
-@@ -998,7 +_,12 @@
+@@ -1003,7 +_,12 @@
              LOGGER.warn("Tried to add entity {} but it was marked as removed already", entity.typeHolder().getRegisteredName());
              return false;
          } else {
@@ -126,7 +133,7 @@
          }
      }
  
-@@ -1047,6 +_,8 @@
+@@ -1052,6 +_,8 @@
          final float pitch,
          final long seed
      ) {
@@ -135,7 +142,7 @@
          this.server
              .getPlayerList()
              .broadcast(
-@@ -1054,9 +_,9 @@
+@@ -1059,9 +_,9 @@
                  x,
                  y,
                  z,
@@ -147,7 +154,7 @@
              );
      }
  
-@@ -1070,6 +_,8 @@
+@@ -1075,6 +_,8 @@
          final float pitch,
          final long seed
      ) {
@@ -156,7 +163,7 @@
          this.server
              .getPlayerList()
              .broadcast(
-@@ -1079,7 +_,7 @@
+@@ -1084,7 +_,7 @@
                  sourceEntity.getZ(),
                  sound.value().getRange(volume),
                  this.dimension(),
@@ -165,7 +172,7 @@
              );
      }
  
-@@ -1128,6 +_,7 @@
+@@ -1133,6 +_,7 @@
  
      @Override
      public void gameEvent(final Holder<GameEvent> gameEvent, final Vec3 position, final GameEvent.Context context) {
@@ -173,7 +180,7 @@
          this.gameEventDispatcher.post(gameEvent, position, context);
      }
  
-@@ -1166,11 +_,15 @@
+@@ -1171,11 +_,15 @@
  
      @Override
      public void updateNeighborsAt(final BlockPos pos, final Block sourceBlock) {
@@ -189,7 +196,7 @@
          this.neighborUpdater.updateNeighborsAtExceptFromFacing(pos, sourceBlock, null, orientation);
      }
  
-@@ -1178,6 +_,10 @@
+@@ -1183,6 +_,10 @@
      public void updateNeighborsAtExceptFromFacing(
          final BlockPos pos, final Block blockObject, final Direction skipDirection, final @Nullable Orientation orientation
      ) {
@@ -200,7 +207,7 @@
          this.neighborUpdater.updateNeighborsAtExceptFromFacing(pos, blockObject, skipDirection, orientation);
      }
  
-@@ -1226,7 +_,7 @@
+@@ -1231,7 +_,7 @@
          Explosion.BlockInteraction blockInteraction = switch (interactionType) {
              case NONE -> Explosion.BlockInteraction.KEEP;
              case BLOCK -> this.getDestroyType(GameRules.BLOCK_EXPLOSION_DROP_DECAY);
@@ -209,7 +216,7 @@
                  ? this.getDestroyType(GameRules.MOB_EXPLOSION_DROP_DECAY)
                  : Explosion.BlockInteraction.KEEP;
              case TNT -> this.getDestroyType(GameRules.TNT_EXPLOSION_DROP_DECAY);
-@@ -1234,6 +_,8 @@
+@@ -1239,6 +_,8 @@
          };
          Vec3 center = new Vec3(x, y, z);
          ServerExplosion explosion = new ServerExplosion(this, source, damageSource, damageCalculator, center, r, fire, blockInteraction);
@@ -218,7 +225,7 @@
          int blockCount = explosion.explode();
          ParticleOptions explosionParticle = explosion.isSmall() ? smallExplosionParticles : largeExplosionParticles;
  
-@@ -1894,6 +_,11 @@
+@@ -2010,6 +_,11 @@
          return this.getGameRules().get(GameRules.SPAWNER_BLOCKS_WORK);
      }
  
@@ -230,7 +237,7 @@
      private final class EntityCallbacks implements LevelCallback<Entity> {
          public void onCreated(final Entity entity) {
              if (entity instanceof WaypointTransmitter waypoint && waypoint.isTransmittingWaypoint()) {
-@@ -1949,6 +_,12 @@
+@@ -2065,6 +_,12 @@
                  }
              }
  
@@ -243,7 +250,7 @@
              entity.updateDynamicGameEventListener(DynamicGameEventListener::add);
          }
  
-@@ -1977,8 +_,17 @@
+@@ -2093,8 +_,17 @@
                  }
              }
  

@@ -1,0 +1,15 @@
+--- a/net/minecraft/world/entity/ConversionTracker.java
++++ b/net/minecraft/world/entity/ConversionTracker.java
+@@ -95,10 +_,12 @@
+     }
+ 
+     private void doConversion(final ServerLevel serverLevel) {
++        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this.mob, this.convertsTo.get(), (timer) -> this.conversionTime = timer)) return;
+         this.mob.convertTo(this.convertsTo.get(), ConversionParams.single(this.mob, true, true), converted -> {
+             if (this.postConversionStep != null) {
+                 this.postConversionStep.accept((M)converted, serverLevel);
+             }
++            net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this.mob, converted);
+ 
+             if (!converted.isSilent()) {
+                 serverLevel.levelEvent(null, this.conversionSound.get(), converted.blockPosition(), 0);

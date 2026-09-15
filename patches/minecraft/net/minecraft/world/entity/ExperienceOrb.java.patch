@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/ExperienceOrb.java
 +++ b/net/minecraft/world/entity/ExperienceOrb.java
-@@ -136,7 +_,8 @@
+@@ -134,7 +_,8 @@
              this.applyEffectsFromBlocks();
              float friction = this.getAirDrag();
              if (this.onGround()) {
@@ -10,7 +10,7 @@
              }
  
              this.setDeltaMovement(this.getDeltaMovement().scale(friction));
-@@ -282,6 +_,7 @@
+@@ -280,6 +_,7 @@
      public void playerTouch(final Player player) {
          if (player instanceof ServerPlayer serverPlayer) {
              if (player.takeXpDelay == 0) {

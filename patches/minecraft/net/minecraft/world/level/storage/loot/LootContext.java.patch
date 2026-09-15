@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/storage/loot/LootContext.java
 +++ b/net/minecraft/world/level/storage/loot/LootContext.java
-@@ -25,11 +_,17 @@
+@@ -26,11 +_,17 @@
      private final RandomSource random;
      private final HolderGetter.Provider lootDataResolver;
      private final Set<LootContext.VisitedEntry<?>> visitedElements = Sets.newLinkedHashSet();
@@ -18,7 +18,7 @@
      }
  
      public boolean hasParameter(final ContextKey<?> key) {
-@@ -76,6 +_,10 @@
+@@ -73,6 +_,10 @@
          return this.params.getLevel();
      }
  
@@ -29,8 +29,8 @@
      public static LootContext.VisitedEntry<LootTable> createVisitedEntry(final LootTable table) {
          return new LootContext.VisitedEntry<>(LootDataType.TABLE, table);
      }
-@@ -88,6 +_,18 @@
-         return new LootContext.VisitedEntry<>(LootDataType.MODIFIER, table);
+@@ -89,6 +_,18 @@
+         return new LootContext.VisitedEntry<>(LootDataType.SLOT_SOURCE, slotSource);
      }
  
 +    public int getLootingModifier() {
@@ -48,7 +48,7 @@
      public enum BlockEntityTarget implements StringRepresentable, LootContextArg.SimpleGetter<BlockEntity> {
          BLOCK_ENTITY("block_entity", LootContextParams.BLOCK_ENTITY);
  
-@@ -113,11 +_,18 @@
+@@ -114,11 +_,18 @@
      public static class Builder {
          private final LootParams params;
          private @Nullable RandomSource random;
@@ -67,7 +67,7 @@
          public LootContext.Builder withOptionalRandomSeed(final long seed) {
              if (seed != 0L) {
                  this.random = RandomSource.create(seed);
-@@ -131,6 +_,11 @@
+@@ -132,6 +_,11 @@
              return this;
          }
  
@@ -79,7 +79,7 @@
          public ServerLevel getLevel() {
              return this.params.getLevel();
          }
-@@ -139,7 +_,7 @@
+@@ -140,7 +_,7 @@
              ServerLevel level = this.getLevel();
              MinecraftServer server = level.getServer();
              RandomSource random = Optional.ofNullable(this.random).or(() -> randomSequenceKey.map(server::getRandomSequence)).orElseGet(level::getRandom);

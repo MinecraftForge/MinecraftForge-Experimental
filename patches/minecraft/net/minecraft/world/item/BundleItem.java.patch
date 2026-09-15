@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/BundleItem.java
 +++ b/net/minecraft/world/item/BundleItem.java
-@@ -97,6 +_,7 @@
+@@ -98,6 +_,7 @@
      public boolean overrideOtherStackedOnMe(
          final ItemStack self, final ItemStack other, final Slot slot, final ClickAction clickAction, final Player player, final SlotAccess carriedItem
      ) {

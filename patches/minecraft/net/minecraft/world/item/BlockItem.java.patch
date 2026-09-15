@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/BlockItem.java
 +++ b/net/minecraft/world/item/BlockItem.java
-@@ -83,17 +_,23 @@
+@@ -92,17 +_,23 @@
              }
          }
  
@@ -26,7 +26,7 @@
      public @Nullable BlockPlaceContext updatePlacementContext(final BlockPlaceContext context) {
          return context;
      }
-@@ -188,6 +_,10 @@
+@@ -191,6 +_,10 @@
  
      public void registerBlocks(final Map<Block, Item> map, final Item item) {
          map.put(this.getBlock(), item);

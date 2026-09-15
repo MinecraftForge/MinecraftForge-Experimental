@@ -1,0 +1,23 @@
+--- a/net/minecraft/client/player/FirstPersonHandsAndItems.java
++++ b/net/minecraft/client/player/FirstPersonHandsAndItems.java
+@@ -45,8 +_,18 @@
+             this.offHandHeight = Mth.clamp(this.offHandHeight - 0.4F, 0.0F, 1.0F);
+         } else {
+             float attackAnim = player.getItemSwapScale(1.0F);
+-            float mainHandTargetHeight = this.mainHandItem != nextMainHand ? 0.0F : attackAnim * attackAnim * attackAnim;
+-            float offHandTargetHeight = this.offHandItem != nextOffHand ? 0.0F : 1.0F;
++
++            boolean requipM = net.minecraftforge.client.ForgeHooksClient.shouldCauseReequipAnimation(this.mainHandItem, nextMainHand, player.getInventory().getSelectedSlot());
++            boolean requipO = net.minecraftforge.client.ForgeHooksClient.shouldCauseReequipAnimation(this.offHandItem, nextOffHand, -1);
++
++            if (!requipM && this.mainHandItem != nextMainHand)
++               this.mainHandItem = nextMainHand;
++            if (!requipO && this.offHandItem != nextOffHand)
++               this.offHandItem = nextOffHand;
++
++            float mainHandTargetHeight = requipM ? 0.0F : attackAnim * attackAnim * attackAnim;
++            float offHandTargetHeight = requipO ? 0.0F : 1.0F;
++
+             this.mainHandHeight = this.mainHandHeight + Mth.clamp(mainHandTargetHeight - this.mainHandHeight, -0.4F, 0.4F);
+             this.offHandHeight = this.offHandHeight + Mth.clamp(offHandTargetHeight - this.offHandHeight, -0.4F, 0.4F);
+         }

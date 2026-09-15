@@ -1,15 +1,15 @@
 --- a/net/minecraft/client/renderer/extract/LevelExtractor.java
 +++ b/net/minecraft/client/renderer/extract/LevelExtractor.java
-@@ -172,7 +_,7 @@
+@@ -188,7 +_,7 @@
          profiler.popPush("entities");
          this.extractVisibleEntities(camera, cullFrustum, deltaTracker, this.levelRenderState);
          profiler.popPush("blockEntities");
--        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState);
-+        this.extractVisibleBlockEntities(camera, deltaPartialTick, this.levelRenderState, cullFrustum);
+-        this.extractVisibleBlockEntities(camera, worldPartialTicks, this.levelRenderState);
++        this.extractVisibleBlockEntities(camera, worldPartialTicks, this.levelRenderState, cullFrustum);
          profiler.popPush("blockOutline");
          this.extractBlockOutline(camera, this.levelRenderState);
          profiler.popPush("blockBreaking");
-@@ -264,7 +_,7 @@
+@@ -311,7 +_,7 @@
          return this.levelRenderer.entityRenderDispatcher().extractEntity(entity, partialTickTime);
      }
  
@@ -18,15 +18,15 @@
          Vec3 cameraPos = camera.position();
          double camX = cameraPos.x();
          double camY = cameraPos.y();
-@@ -275,6 +_,7 @@
+@@ -323,6 +_,7 @@
              List<BlockEntity> renderableBlockEntities = section.getSectionMesh().getRenderableBlockEntities();
-             if (!renderableBlockEntities.isEmpty() && !(section.getVisibility(Util.getMillis()) < 0.3F)) {
+             if (!renderableBlockEntities.isEmpty() && !(section.getVisibility(Util.getMillis(), chunkFadeDuration) < 0.3F)) {
                  for (BlockEntity blockEntity : renderableBlockEntities) {
 +                    if (!frustum.isVisible(blockEntity.getRenderBoundingBox())) continue;
                      BlockPos blockPos = blockEntity.getBlockPos();
                      SortedSet<BlockDestructionProgress> progresses = this.level.destructionProgress().get(blockPos.asLong());
                      ModelFeatureRenderer.CrumblingOverlay breakProgress;
-@@ -304,6 +_,7 @@
+@@ -352,6 +_,7 @@
              if (blockEntity.isRemoved()) {
                  iterator.remove();
              } else {
@@ -34,7 +34,7 @@
                  BlockEntityRenderState state = this.levelRenderer
                      .blockEntityRenderDispatcher()
                      .tryExtractRenderState(blockEntity, deltaPartialTick, null, true);
-@@ -327,7 +_,7 @@
+@@ -375,7 +_,7 @@
                  SortedSet<BlockDestructionProgress> progresses = entry.getValue();
                  if (progresses != null && !progresses.isEmpty()) {
                      int progress = progresses.last().getProgress();
@@ -43,7 +43,7 @@
                  }
              }
          }
-@@ -335,6 +_,12 @@
+@@ -383,6 +_,12 @@
  
      private void extractBlockOutline(final Camera camera, final LevelRenderState levelRenderState) {
          levelRenderState.blockOutlineRenderState = null;
@@ -56,3 +56,60 @@
          if (this.minecraft.hitResult instanceof BlockHitResult blockHitResult) {
              if (blockHitResult.getType() != HitResult.Type.MISS) {
                  BlockPos pos = blockHitResult.getBlockPos();
+@@ -444,24 +_,32 @@
+                 }
+ 
+                 if (!(camera.entity() instanceof LivingEntity livingEntity && livingEntity.isSleeping())) {
+-                    BlockState viewBlockingState = getViewBlockingState(player, camera.getCullFrustum());
++                    var overlay = getOverlayBlock(player, camera.getCullFrustum());
++                    BlockState viewBlockingState = overlay == null ? null : overlay.state();
+                     if (viewBlockingState != null) {
+                         TextureAtlasSprite sprite = this.minecraft.getModelManager().getBlockStateModelSet().getParticleMaterial(viewBlockingState).sprite();
+                         state.blockOverlay = new PlayerRenderState.BlockOverlay(
+                             sprite.atlasLocation(), sprite.getU0(), sprite.getV0(), sprite.getU1(), sprite.getV1()
+                         );
++                        state.customBlockOverlay = net.minecraftforge.client.ForgeHooksClient.renderBlockOverlay(player, overlay.state(), overlay.pos());
+                     }
+ 
+                     if (this.minecraft.options.getCameraType().isFirstPerson()) {
+                         state.isEyeInWater = player.isEyeInFluid(FluidTags.WATER);
+                         state.isOnFire = player.isOnFire();
+-                        if (state.isEyeInWater) {
++                        if (state.isEyeInWater || !player.getEyeInFluidType().isAir()) {
+                             BlockPos eyePos = BlockPos.containing(player.getEyePosition());
+                             float brightness = Lightmap.getBrightness(player.level().dimensionType(), player.level().getMaxLocalRawBrightness(eyePos));
+                             state.waterOverlay = new PlayerRenderState.WaterOverlay(
+                                 ARGB.colorFromFloat(0.1F, brightness, brightness, brightness), -player.getYRot() / 64.0F, player.getXRot() / 64.0F
+                             );
++                            if (state.isEyeInWater)
++                                state.customFluidOverlay = net.minecraftforge.client.ForgeHooksClient.renderWaterOverlay(player, state);
++                            else
++                                state.customFluidOverlay = net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(player.getEyeInFluidType()).renderOverlay(this.minecraft, state);
+                         }
++                        if (state.isOnFire)
++                            state.customFireOverlay = net.minecraftforge.client.ForgeHooksClient.renderFireOverlay(player);
+                     }
+                 }
+             } else {
+@@ -475,6 +_,12 @@
+             return null;
+         }
+ 
++        var ret = getOverlayBlock(player, frustum);
++        return ret == null ? null : ret.state();
++    }
++
++    private record OverlayInfo(BlockState state, BlockPos pos) {}
++    private static @Nullable OverlayInfo getOverlayBlock(final LocalPlayer player, final Frustum frustum) {
+         AABB nearPlaneBB = frustum.getNearPlaneBounds().move(player.getEyePosition());
+         BlockPos.MutableBlockPos testPos = new BlockPos.MutableBlockPos();
+ 
+@@ -486,7 +_,7 @@
+             );
+             BlockState blockState = player.level().getBlockState(testPos);
+             if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.isViewBlocking(player.level(), testPos, nearPlaneBB)) {
+-                return blockState;
++                return new OverlayInfo(blockState, testPos.immutable());
+             }
+         }
+ 

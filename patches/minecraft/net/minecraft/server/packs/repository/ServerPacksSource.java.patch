@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/packs/repository/ServerPacksSource.java
 +++ b/net/minecraft/server/packs/repository/ServerPacksSource.java
-@@ -70,7 +_,9 @@
+@@ -69,7 +_,9 @@
      }
  
      public static PackRepository createPackRepository(final Path datapackDir, final DirectoryValidator validator) {

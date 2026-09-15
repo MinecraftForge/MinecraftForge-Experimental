@@ -1,0 +1,22 @@
+--- a/net/minecraft/client/renderer/state/level/PlayerRenderState.java
++++ b/net/minecraft/client/renderer/state/level/PlayerRenderState.java
+@@ -24,12 +_,19 @@
+     public PlayerRenderState.@Nullable WaterOverlay waterOverlay;
+     public PlayerRenderState.@Nullable ItemActivationRenderState itemActivation;
+ 
++    public net.minecraftforge.client.@Nullable IRenderCallback customBlockOverlay;
++    public net.minecraftforge.client.@Nullable IRenderCallback customFluidOverlay;
++    public net.minecraftforge.client.@Nullable IRenderCallback customFireOverlay;
++
+     public void reset() {
+         this.hasPlayer = false;
+         this.avatarRenderState = null;
+         this.blockOverlay = null;
+         this.waterOverlay = null;
+         this.itemActivation = null;
++        this.customBlockOverlay = null;
++        this.customFluidOverlay = null;
++        this.customFireOverlay = null;
+     }
+ 
+     @OnlyIn(Dist.CLIENT)

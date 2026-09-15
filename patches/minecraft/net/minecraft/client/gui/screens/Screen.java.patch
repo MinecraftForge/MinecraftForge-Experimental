@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/screens/Screen.java
 +++ b/net/minecraft/client/gui/screens/Screen.java
-@@ -196,7 +_,7 @@
+@@ -202,7 +_,7 @@
      }
  
      public void onClose() {
@@ -9,7 +9,7 @@
      }
  
      protected <T extends GuiEventListener & Renderable & NarratableEntry> T addRenderableWidget(final T widget) {
-@@ -327,8 +_,10 @@
+@@ -333,8 +_,10 @@
          this.width = width;
          this.height = height;
          if (!this.initialized) {
@@ -20,7 +20,7 @@
          } else {
              this.repositionElements();
          }
-@@ -345,8 +_,10 @@
+@@ -351,8 +_,10 @@
      protected void rebuildWidgets() {
          this.clearWidgets();
          this.clearFocus();
@@ -31,7 +31,7 @@
      }
  
      protected void fadeWidgets(final float widgetFade) {
-@@ -386,6 +_,8 @@
+@@ -392,6 +_,8 @@
              this.extractMenuBackground(graphics);
          }
  
@@ -40,7 +40,7 @@
          this.minecraft.gui.hud.extractDeferredSubtitles();
      }
  
-@@ -471,6 +_,19 @@
+@@ -472,6 +_,19 @@
      }
  
      public void onFilesDrop(final List<Path> files) {
@@ -59,4 +59,4 @@
 +        this.children.add(guiEventListener);
      }
  
-     private void scheduleNarration(final long delay, final boolean ignoreSuppression) {
+     private void scheduleNarration(final long delay, final boolean ignoreSuppression, final NarrationTrigger narrationTrigger) {

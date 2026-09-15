@@ -1,6 +1,6 @@
---- a/net/minecraft/world/entity/monster/EnderMan.java
-+++ b/net/minecraft/world/entity/monster/EnderMan.java
-@@ -121,7 +_,6 @@
+--- a/net/minecraft/world/entity/monster/Enderman.java
++++ b/net/minecraft/world/entity/monster/Enderman.java
+@@ -124,7 +_,6 @@
  
      @Override
      public void setTarget(final @Nullable LivingEntity target) {
@@ -8,7 +8,7 @@
          AttributeInstance movementSpeed = this.getAttribute(Attributes.MOVEMENT_SPEED);
          if (target == null) {
              this.targetChangeTime = 0;
-@@ -135,6 +_,7 @@
+@@ -138,6 +_,7 @@
                  movementSpeed.addTransientModifier(SPEED_MODIFIER_ATTACKING);
              }
          }
@@ -16,7 +16,7 @@
      }
  
      @Override
-@@ -207,7 +_,7 @@
+@@ -210,7 +_,7 @@
      }
  
      private boolean isBeingStaredBy(final Player player) {
@@ -25,19 +25,7 @@
      }
  
      @Override
-@@ -285,8 +_,10 @@
-         boolean couldStandOn = blockState.blocksMotion();
-         boolean isWet = blockState.getFluidState().is(FluidTags.WATER);
-         if (couldStandOn && !isWet) {
-+            var event = net.minecraftforge.event.ForgeEventFactory.onEnderManTeleport(this, x, y, z);
-+            if (event == null) return false;
-             Vec3 oldPos = this.position();
--            boolean result = this.randomTeleport(x, y, z, true);
-+            boolean result = this.randomTeleport(event.getTargetX(), event.getTargetY(), event.getTargetZ(), true);
-             if (result) {
-                 this.level().gameEvent(GameEvent.TELEPORT, oldPos, GameEvent.Context.of(this));
-                 if (!this.isSilent()) {
-@@ -441,7 +_,7 @@
+@@ -461,7 +_,7 @@
              if (this.enderman.getCarriedBlock() == null) {
                  return false;
              } else {
@@ -46,16 +34,16 @@
                      ? false
                      : this.enderman.getRandom().nextInt(reducedTickDelay(2000)) == 0;
              }
-@@ -461,7 +_,7 @@
+@@ -481,7 +_,7 @@
              BlockState carried = this.enderman.getCarriedBlock();
              if (carried != null) {
                  carried = Block.updateFromNeighbourShapes(carried, this.enderman.level(), pos);
 -                if (this.canPlaceBlock(level, pos, carried, targetState, belowState, below)) {
 +                if (this.canPlaceBlock(level, pos, carried, targetState, belowState, below) && !net.minecraftforge.event.ForgeEventFactory.onBlockPlace(enderman, net.minecraftforge.common.util.BlockSnapshot.create(level.dimension(), level, below), net.minecraft.core.Direction.UP)) {
-                     level.setBlock(pos, carried, 3);
+                     level.setBlockAndUpdate(pos, carried);
                      level.gameEvent(GameEvent.BLOCK_PLACE, pos, GameEvent.Context.of(this.enderman, carried));
                      this.enderman.setCarriedBlock(null);
-@@ -475,6 +_,7 @@
+@@ -495,6 +_,7 @@
              return targetState.isAir()
                  && !belowState.isAir()
                  && !belowState.is(Blocks.BEDROCK)
@@ -63,7 +51,7 @@
                  && belowState.isCollisionShapeFullBlock(level, below)
                  && carried.canSurvive(level, pos)
                  && level.getEntities(this.enderman, AABB.unitCubeFromLowerCorner(Vec3.atLowerCornerOf(pos))).isEmpty();
-@@ -585,7 +_,7 @@
+@@ -605,7 +_,7 @@
              if (this.enderman.getCarriedBlock() != null) {
                  return false;
              } else {

@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/biome/BiomeGenerationSettings.java
 +++ b/net/minecraft/world/level/biome/BiomeGenerationSettings.java
 @@ -92,6 +_,17 @@
-         protected final List<Holder<ConfiguredWorldCarver<?>>> carvers = new ArrayList<>();
+         protected final List<Holder<WorldCarver>> carvers = new ArrayList<>();
          protected final List<List<Holder<PlacedFeature>>> features = new ArrayList<>();
  
 +        public BiomeGenerationSettings.PlainBuilder addFrom(BiomeGenerationSettings other) {
@@ -29,4 +29,4 @@
 +            return this.features.get(stage.ordinal());
          }
  
-         public BiomeGenerationSettings.PlainBuilder addCarver(final Holder<ConfiguredWorldCarver<?>> carver) {
+         public BiomeGenerationSettings.PlainBuilder addCarver(final Holder<WorldCarver> carver) {

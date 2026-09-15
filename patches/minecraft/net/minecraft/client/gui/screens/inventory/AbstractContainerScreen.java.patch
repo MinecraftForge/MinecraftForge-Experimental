@@ -20,8 +20,8 @@
              ItemStack item = this.hoveredSlot.getItem();
              if (this.menu.getCarried().isEmpty() || this.showTooltipWithItemInHand(item)) {
                  graphics.setTooltipForNextFrame(
--                    this.font, this.getTooltipFromContainerItem(item), item.getTooltipImage(), mouseX, mouseY, item.get(DataComponents.TOOLTIP_STYLE)
-+                    this.font, this.getTooltipFromContainerItem(item), item.getTooltipImage(), item, mouseX, mouseY
+-                    this.font, this.getTooltipFromContainerItem(item), item.getTooltipImage(), mouseX, mouseY, item.get(DataComponents.TOOLTIP_STYLE), true
++                    this.font, this.getTooltipFromContainerItem(item), item.getTooltipImage(), item, mouseX, mouseY, true
                  );
              }
          }
@@ -35,7 +35,7 @@
      }
  
      protected void extractLabels(final GuiGraphicsExtractor graphics, final int xm, final int ym) {
-@@ -285,7 +_,8 @@
+@@ -297,7 +_,8 @@
              return true;
          }
  
@@ -45,7 +45,7 @@
          Slot slot = this.getHoveredSlot(event.x(), event.y());
          this.doubleclick = this.lastClickSlot == slot && doubleClick;
          this.skipNextRelease = false;
-@@ -295,6 +_,7 @@
+@@ -307,6 +_,7 @@
              int xo = this.leftPos;
              int yo = this.topPos;
              boolean clickedOutside = this.hasClickedOutside(event.x(), event.y(), xo, yo);
@@ -53,25 +53,25 @@
              int slotId = -1;
              if (slot != null) {
                  slotId = slot.index;
-@@ -306,7 +_,7 @@
+@@ -318,7 +_,7 @@
  
              if (slotId != -1 && !this.isQuickCrafting) {
                  if (this.menu.getCarried().isEmpty()) {
 -                    if (cloning) {
 +                    if (this.minecraft.options.keyPickItem.isActiveAndMatches(mouseKey)) {
-                         this.slotClicked(slot, slotId, event.button(), ContainerInput.CLONE);
+                         this.slotClicked(slot, slotId, event, ContainerInput.CLONE);
                      } else {
                          boolean quickKey = slotId != -999 && event.hasShiftDown();
-@@ -330,7 +_,7 @@
+@@ -342,7 +_,7 @@
                          this.quickCraftingType = 0;
-                     } else if (event.button() == 1) {
+                     } else if (event.button() == 3) {
                          this.quickCraftingType = 1;
 -                    } else if (cloning) {
 +                    } else if (this.minecraft.options.keyPickItem.isActiveAndMatches(mouseKey)) {
                          this.quickCraftingType = 2;
                      }
                  }
-@@ -374,10 +_,13 @@
+@@ -386,10 +_,13 @@
  
      @Override
      public boolean mouseReleased(final MouseButtonEvent event) {
@@ -85,25 +85,25 @@
          int slotId = -1;
          if (slot != null) {
              slotId = slot.index;
-@@ -394,7 +_,7 @@
+@@ -406,7 +_,7 @@
                          if (target != null
                              && target.mayPickup(this.minecraft.player)
                              && target.hasItem()
 -                            && target.container == slot.container
 +                            && target.isSameInventory(slot)
                              && AbstractContainerMenu.canItemQuickReplace(target, this.lastQuickMoved, true)) {
-                             this.slotClicked(target, target.index, event.button(), ContainerInput.QUICK_MOVE);
+                             this.slotClicked(target, target.index, event, ContainerInput.QUICK_MOVE);
                          }
-@@ -421,7 +_,7 @@
+@@ -433,7 +_,7 @@
              if (this.isQuickCrafting && !this.quickCraftSlots.isEmpty()) {
                  this.quickCraftToSlots();
              } else if (!this.menu.getCarried().isEmpty()) {
 -                if (this.minecraft.options.keyPickItem.matchesMouse(event)) {
 +                if (this.minecraft.options.keyPickItem.isActiveAndMatches(mouseKey)) {
-                     this.slotClicked(slot, slotId, event.button(), ContainerInput.CLONE);
+                     this.slotClicked(slot, slotId, event, ContainerInput.CLONE);
                  } else {
                      boolean quickKey = slotId != -999 && event.hasShiftDown();
-@@ -489,7 +_,7 @@
+@@ -501,7 +_,7 @@
              return true;
          }
  
@@ -112,7 +112,7 @@
              this.onClose();
              return true;
          }
-@@ -587,4 +_,11 @@
+@@ -599,4 +_,11 @@
  
          super.onClose();
      }

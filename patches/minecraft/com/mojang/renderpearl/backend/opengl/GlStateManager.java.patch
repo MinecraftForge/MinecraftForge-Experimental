@@ -1,0 +1,32 @@
+--- a/com/mojang/renderpearl/backend/opengl/GlStateManager.java
++++ b/com/mojang/renderpearl/backend/opengl/GlStateManager.java
+@@ -82,6 +_,11 @@
+         }
+     }
+ 
++    public static boolean _isBlendEnabled(int index) {
++        RenderSystem.assertOnRenderThread();
++        return BLEND_ENABLE[index];
++    }
++
+     public static void _disableBlend(final int index) {
+         RenderSystem.assertOnRenderThread();
+         if (BLEND_ENABLE[index]) {
+@@ -401,9 +_,17 @@
+         }
+     }
+ 
++    /* Stores the last values sent into glMultiTexCoord2f */
++    public static float lastBrightnessX = 0.0f;
++    public static float lastBrightnessY = 0.0f;
++
+     public static void _texParameter(final int target, final int name, final int value) {
+         RenderSystem.assertOnRenderThread();
+         GL33C.glTexParameteri(target, name, value);
++        if (target == GL33C.GL_TEXTURE1) {
++            lastBrightnessX = name;
++            lastBrightnessY = value;
++        }
+     }
+ 
+     public static int _getTexLevelParameter(final int target, final int level, final int name) {

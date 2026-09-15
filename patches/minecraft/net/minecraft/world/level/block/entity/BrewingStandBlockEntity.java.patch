@@ -1,28 +1,17 @@
 --- a/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BrewingStandBlockEntity.java
-@@ -177,9 +_,10 @@
-         for (int dest = 0; dest < 3; dest++) {
-             items.set(dest, potionBrewing.mix(ingredient, items.get(dest)));
+@@ -235,8 +_,9 @@
+             Optional<RecipeHolder<BrewingRecipe>> recipe = entity.quickCheck.getRecipeFor(input, level);
+             items.set(dest, recipe.isPresent() ? recipe.get().value().assemble(input) : container);
          }
 +        net.minecraftforge.event.ForgeEventFactory.onPotionBrewed(items);
  
+-        ItemStackTemplate remainder = ingredient.getItem().getCraftingRemainder();
 +        ItemStackTemplate remainder = ingredient.getCraftingRemainder();
          ingredient.shrink(1);
--        ItemStackTemplate remainder = ingredient.getItem().getCraftingRemainder();
          if (remainder != null) {
              if (ingredient.isEmpty()) {
-                 ingredient = remainder.create();
-@@ -218,6 +_,9 @@
-         if (slot == 3) {
-             PotionBrewing potionBrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
-             return potionBrewing.isIngredient(itemStack);
-+        } else if (slot != 4) {
-+            PotionBrewing potionbrewing = this.level != null ? this.level.potionBrewing() : PotionBrewing.EMPTY;
-+            return this.getItem(slot).isEmpty() && potionbrewing.isValidInput(itemStack);
-         } else {
-             return slot == 4
-                 ? itemStack.is(ItemTags.BREWING_FUEL)
-@@ -248,5 +_,34 @@
+@@ -315,5 +_,34 @@
      @Override
      protected AbstractContainerMenu createMenu(final int containerId, final Inventory inventory) {
          return new BrewingStandMenu(containerId, inventory, this, this.dataAccess);

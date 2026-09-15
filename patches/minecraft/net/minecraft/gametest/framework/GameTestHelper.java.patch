@@ -1,6 +1,6 @@
 --- a/net/minecraft/gametest/framework/GameTestHelper.java
 +++ b/net/minecraft/gametest/framework/GameTestHelper.java
-@@ -77,7 +_,7 @@
+@@ -78,7 +_,7 @@
  import net.minecraft.world.phys.Vec3;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      private final GameTestInfo testInfo;
      private boolean finalCheckAdded;
  
-@@ -1109,6 +_,12 @@
+@@ -1130,6 +_,12 @@
          return this.testInfo.getTick();
      }
  
@@ -22,8 +22,8 @@
      public AABB getBounds() {
          return this.testInfo.getStructureBounds();
      }
-@@ -1153,6 +_,26 @@
-         if (result.right().isPresent()) {
+@@ -1167,6 +_,26 @@
+         if (result.right().isPresent() && result.right().get().getType() != FillBiomeCommand.ERROR_NO_BIOMES_SET) {
              throw this.assertionException("test.error.set_biome");
          }
 +    }

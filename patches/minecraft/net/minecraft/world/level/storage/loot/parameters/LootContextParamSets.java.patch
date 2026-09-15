@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/level/storage/loot/parameters/LootContextParamSets.java
 +++ b/net/minecraft/world/level/storage/loot/parameters/LootContextParamSets.java
-@@ -19,7 +_,7 @@
-             REGISTRY.inverse()::get
-         );
-     public static final ContextKeySet EMPTY = register("empty", builder -> {});
+@@ -35,7 +_,7 @@
+             .required(LootContextParams.ENCHANTMENT_ACTIVE)
+             .required(LootContextParams.ENCHANTMENT_LEVEL)
+     );
 -    public static final ContextKeySet CHEST = register("chest", builder -> builder.required(LootContextParams.ORIGIN).optional(LootContextParams.THIS_ENTITY));
 +    public static final ContextKeySet CHEST = register("chest", builder -> builder.required(LootContextParams.ORIGIN).optional(LootContextParams.THIS_ENTITY).optional(LootContextParams.ATTACKING_ENTITY)); //Forge: Chest Minecarts can have killers.
      public static final ContextKeySet COMMAND = register(
          "command", builder -> builder.required(LootContextParams.ORIGIN).optional(LootContextParams.THIS_ENTITY)
      );
-@@ -33,7 +_,7 @@
+@@ -67,7 +_,7 @@
              .required(LootContextParams.ADDITIONAL_COST_COMPONENT_ALLOWED)
      );
      public static final ContextKeySet FISHING = register(

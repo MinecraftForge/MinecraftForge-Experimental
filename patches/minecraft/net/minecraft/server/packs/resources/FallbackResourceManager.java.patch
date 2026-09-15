@@ -1,6 +1,6 @@
 --- a/net/minecraft/server/packs/resources/FallbackResourceManager.java
 +++ b/net/minecraft/server/packs/resources/FallbackResourceManager.java
-@@ -103,8 +_,11 @@
+@@ -102,8 +_,11 @@
  
          for (int i = this.fallbacks.size() - 1; i >= 0; i--) {
              FallbackResourceManager.PackEntry entry = this.fallbacks.get(i);
@@ -14,7 +14,7 @@
                  IoSupplier<InputStream> resource = fileSource.getResource(this.type, location);
                  if (resource != null) {
                      IoSupplier<ResourceMetadata> metadataGetter;
-@@ -118,6 +_,7 @@
+@@ -117,6 +_,7 @@
                      }
  
                      result.add(new Resource(fileSource, resource, metadataGetter));

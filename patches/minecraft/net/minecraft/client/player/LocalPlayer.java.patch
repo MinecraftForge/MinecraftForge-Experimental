@@ -1,14 +1,6 @@
 --- a/net/minecraft/client/player/LocalPlayer.java
 +++ b/net/minecraft/client/player/LocalPlayer.java
-@@ -318,6 +_,7 @@
-         ServerboundPlayerActionPacket.Action action = all
-             ? ServerboundPlayerActionPacket.Action.DROP_ALL_ITEMS
-             : ServerboundPlayerActionPacket.Action.DROP_ITEM;
-+        if (isUsingItem() && getUsedItemHand() == InteractionHand.MAIN_HAND && (all || getUseItem().getCount() == 1)) stopUsingItem(); // Forge: fix MC-231097 on the clientside
-         ItemStack prediction = this.getInventory().removeFromSelected(all);
-         this.connection.send(new ServerboundPlayerActionPacket(action, BlockPos.ZERO, Direction.DOWN));
-         return !prediction.isEmpty();
-@@ -545,7 +_,10 @@
+@@ -560,7 +_,10 @@
  
      @Override
      public void playSound(final SoundEvent sound, final float volume, final float pitch) {
@@ -20,7 +12,7 @@
      }
  
      @Override
-@@ -787,6 +_,7 @@
+@@ -803,6 +_,7 @@
              && this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.CROUCHING)
              && (this.isShiftKeyDown() || !this.isSleeping() && !this.canPlayerFitWithinBlocksAndEntitiesWhen(Pose.STANDING));
          this.input.tick();
@@ -28,7 +20,7 @@
          this.minecraft.getTutorial().onInput(this.input);
          boolean wasAutoJump = false;
          if (this.autoJumpTime > 0) {
-@@ -859,8 +_,9 @@
+@@ -875,8 +_,9 @@
          }
  
          this.wasFallFlying = this.isFallFlying();
@@ -40,7 +32,7 @@
          }
  
          if (this.isEyeInFluid(FluidTags.WATER)) {
-@@ -928,7 +_,7 @@
+@@ -944,7 +_,7 @@
      }
  
      private boolean shouldStopSwimSprinting() {
@@ -49,7 +41,7 @@
      }
  
      public Portal.Transition getActivePortalLocalTransition() {
-@@ -973,6 +_,8 @@
+@@ -1004,6 +_,8 @@
      @Override
      public void rideTick() {
          super.rideTick();
@@ -58,7 +50,7 @@
          this.handsBusy = false;
          if (this.getControlledVehicle() instanceof AbstractBoat boat) {
              boat.setInput(this.input.keyPresses.left(), this.input.keyPresses.right(), this.input.keyPresses.forward(), this.input.keyPresses.backward());
-@@ -1147,7 +_,7 @@
+@@ -1178,7 +_,7 @@
              && this.isSprintingPossible(this.getAbilities().flying)
              && !this.isSlowDueToUsingItem()
              && (!this.isFallFlying() || this.isUnderWater())
@@ -67,7 +59,7 @@
      }
  
      private boolean vehicleCanSprint(final Entity vehicle) {
-@@ -1222,6 +_,17 @@
+@@ -1253,6 +_,17 @@
      @Override
      public float getVisualRotationYInDegrees() {
          return this.getYRot();

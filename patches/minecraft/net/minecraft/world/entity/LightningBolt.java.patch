@@ -23,7 +23,7 @@
      private void powerLightningRod() {
          BlockPos strikePosition = this.getStrikePosition();
          BlockState stateBelow = this.level().getBlockState(strikePosition);
-@@ -150,6 +_,7 @@
+@@ -152,6 +_,7 @@
                      );
  
                  for (Entity entity : entities) {

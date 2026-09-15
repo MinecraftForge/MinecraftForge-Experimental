@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/VegetationBlock.java
 +++ b/net/minecraft/world/level/block/VegetationBlock.java
-@@ -12,7 +_,7 @@
+@@ -11,13 +_,13 @@
  import net.minecraft.world.level.block.state.BlockState;
  import net.minecraft.world.level.pathfinder.PathComputationType;
  
@@ -9,8 +9,6 @@
      protected VegetationBlock(final BlockBehaviour.Properties properties) {
          super(properties);
      }
-@@ -21,7 +_,7 @@
-     protected abstract MapCodec<? extends VegetationBlock> codec();
  
      protected boolean mayPlaceOn(final BlockState state, final BlockGetter level, final BlockPos pos) {
 -        return state.is(BlockTags.SUPPORTS_VEGETATION);
@@ -18,7 +16,7 @@
      }
  
      @Override
-@@ -43,6 +_,9 @@
+@@ -39,6 +_,9 @@
      @Override
      protected boolean canSurvive(final BlockState state, final LevelReader level, final BlockPos pos) {
          BlockPos below = pos.below();
@@ -28,7 +26,7 @@
          return this.mayPlaceOn(level.getBlockState(below), level, below);
      }
  
-@@ -54,5 +_,11 @@
+@@ -50,5 +_,11 @@
      @Override
      protected boolean isPathfindable(final BlockState state, final PathComputationType type) {
          return type == PathComputationType.AIR && !this.hasCollision ? true : super.isPathfindable(state, type);

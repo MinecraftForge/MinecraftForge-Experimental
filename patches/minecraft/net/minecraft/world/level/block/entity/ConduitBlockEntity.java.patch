@@ -1,13 +1,11 @@
 --- a/net/minecraft/world/level/block/entity/ConduitBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/ConduitBlockEntity.java
-@@ -150,8 +_,8 @@
+@@ -147,7 +_,7 @@
+                      {
                          BlockPos testPos = worldPosition.offset(ox, oy, oz);
                          BlockState testBlock = level.getBlockState(testPos);
- 
--                        for (Block type : VALID_BLOCKS) {
--                            if (testBlock.is(type)) {
-+                        {
-+                            if (testBlock.isConduitFrame(level, testPos, worldPosition)) {
-                                 effectBlocks.add(testPos);
-                             }
+-                        if (testBlock.is(BlockTags.CONDUIT_EFFECT_BLOCK)) {
++                        if (testBlock.isConduitFrame(level, testPos, worldPosition)) {
+                             effectBlocks.add(testPos);
                          }
+                     }

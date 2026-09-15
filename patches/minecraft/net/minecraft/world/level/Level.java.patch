@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/Level.java
 +++ b/net/minecraft/world/level/Level.java
-@@ -90,7 +_,7 @@
+@@ -89,7 +_,7 @@
  import org.apache.commons.lang3.mutable.MutableBoolean;
  import org.jspecify.annotations.Nullable;
  
@@ -9,7 +9,7 @@
      public static final Codec<ResourceKey<Level>> RESOURCE_KEY_CODEC = ResourceKey.codec(Registries.DIMENSION);
      public static final ResourceKey<Level> OVERWORLD = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("overworld"));
      public static final ResourceKey<Level> NETHER = ResourceKey.create(Registries.DIMENSION, Identifier.withDefaultNamespace("the_nether"));
-@@ -131,6 +_,11 @@
+@@ -130,6 +_,11 @@
      private final DamageSources damageSources;
      private final PalettedContainerFactory palettedContainerFactory;
      private long subTickCount;
@@ -21,7 +21,7 @@
  
      protected Level(
          final WritableLevelData levelData,
-@@ -219,7 +_,7 @@
+@@ -213,7 +_,7 @@
      }
  
      @Override
@@ -30,7 +30,7 @@
          if (!this.isInValidBounds(pos)) {
              return false;
          }
-@@ -230,12 +_,31 @@
+@@ -224,12 +_,31 @@
  
          LevelChunk chunk = this.getChunkAt(pos);
          Block block = blockState.getBlock();
@@ -63,7 +63,7 @@
          if (newState == blockState) {
              if (oldState != newState) {
                  this.setBlocksDirty(pos, oldState, newState);
-@@ -262,9 +_,8 @@
+@@ -256,9 +_,8 @@
              }
  
              this.updatePOIOnBlockStateChange(pos, oldState, newState);
@@ -74,7 +74,7 @@
      }
  
      public void updatePOIOnBlockStateChange(final BlockPos pos, final BlockState oldState, final BlockState newState) {
-@@ -531,8 +_,27 @@
+@@ -529,8 +_,27 @@
          (this.tickingBlockEntities ? this.pendingBlockEntityTickers : this.blockEntityTickers).add(ticker);
      }
  
@@ -102,7 +102,7 @@
          if (!this.pendingBlockEntityTickers.isEmpty()) {
              this.blockEntityTickers.addAll(this.pendingBlockEntityTickers);
              this.pendingBlockEntityTickers.clear();
-@@ -555,12 +_,19 @@
+@@ -553,12 +_,19 @@
  
      public <T extends Entity> void guardEntityTick(final Consumer<T> tick, final T entity) {
          try {
@@ -122,7 +122,7 @@
          }
      }
  
-@@ -716,6 +_,7 @@
+@@ -714,6 +_,7 @@
          if (this.isInValidBounds(pos)) {
              this.getChunkAt(pos).removeBlockEntity(pos);
          }
@@ -130,7 +130,7 @@
      }
  
      public boolean isLoaded(final BlockPos pos) {
-@@ -781,8 +_,8 @@
+@@ -779,8 +_,8 @@
              }
          });
  
@@ -141,7 +141,7 @@
                  output.add(dragonPart);
              }
          }
-@@ -815,8 +_,8 @@
+@@ -813,8 +_,8 @@
                  }
              }
  
@@ -152,7 +152,7 @@
                      T castSubPart = type.tryCast(subEntity);
                      if (castSubPart != null && selector.test(castSubPart)) {
                          output.add(castSubPart);
-@@ -1004,17 +_,16 @@
+@@ -1013,17 +_,16 @@
      public abstract Scoreboard getScoreboard();
  
      public void updateNeighbourForOutputSignal(final BlockPos pos, final Block changedBlock) {
@@ -175,7 +175,7 @@
                      }
                  }
              }
-@@ -1099,6 +_,20 @@
+@@ -1108,6 +_,20 @@
      }
  
      public abstract ClockManager clockManager();

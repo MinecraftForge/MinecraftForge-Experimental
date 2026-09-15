@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/DropperBlock.java
 +++ b/net/minecraft/world/level/block/DropperBlock.java
-@@ -56,7 +_,7 @@
+@@ -49,7 +_,7 @@
                  level.levelEvent(1001, pos, 0);
              } else {
                  ItemStack itemStack = blockEntity.getItem(slot);

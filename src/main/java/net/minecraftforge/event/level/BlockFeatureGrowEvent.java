@@ -11,7 +11,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
@@ -37,10 +37,10 @@ public final class BlockFeatureGrowEvent implements LevelEvent, HasResult {
     private final RandomSource randomSource;
     private final BlockPos pos;
     @Nullable
-    private Holder<ConfiguredFeature<?, ?>> feature;
+    private Holder<Feature> feature;
     private Result result = Result.DEFAULT;
 
-    public BlockFeatureGrowEvent(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<ConfiguredFeature<?, ?>> feature) {
+    public BlockFeatureGrowEvent(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<Feature> feature) {
         this.level = level;
         this.randomSource = randomSource;
         this.pos = pos;
@@ -70,22 +70,22 @@ public final class BlockFeatureGrowEvent implements LevelEvent, HasResult {
      * {@return the holder of the feature which will be placed, possibly null}
      */
     @Nullable
-    public Holder<ConfiguredFeature<?, ?>> getFeature() {
+    public Holder<Feature> getFeature() {
         return feature;
     }
 
     /**
      * @param feature a {@linkplain Holder} referencing a tree feature to be placed instead of the current feature.
      */
-    public void setFeature(@Nullable Holder<ConfiguredFeature<?, ?>> feature) {
+    public void setFeature(@Nullable Holder<Feature> feature) {
         this.feature = feature;
     }
 
     /**
      * @param featureKey a {@linkplain ResourceKey} referencing a tree feature to be placed instead of the current feature.
      */
-    public void setFeature(ResourceKey<ConfiguredFeature<?, ?>> featureKey) {
-        this.feature = this.getLevel().registryAccess().lookupOrThrow(Registries.CONFIGURED_FEATURE).get(featureKey).orElse(null);
+    public void setFeature(ResourceKey<Feature> featureKey) {
+        this.feature = this.getLevel().registryAccess().lookupOrThrow(Registries.FEATURE).get(featureKey).orElse(null);
     }
 
     @Override

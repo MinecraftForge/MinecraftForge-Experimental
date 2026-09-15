@@ -1,14 +1,15 @@
 --- a/net/minecraft/world/level/pathfinder/PathType.java
 +++ b/net/minecraft/world/level/pathfinder/PathType.java
-@@ -1,6 +_,6 @@
- package net.minecraft.world.level.pathfinder;
+@@ -6,7 +_,7 @@
+ import net.minecraft.network.codec.StreamCodec;
+ import net.minecraft.util.ByIdMap;
  
 -public enum PathType {
 +public enum PathType implements net.minecraftforge.common.IExtensibleEnum {
-     BLOCKED(-1.0F),
-     OPEN(0.0F),
-     WALKABLE(0.0F),
-@@ -37,5 +_,9 @@
+     BLOCKED(0, -1.0F),
+     OPEN(1, 0.0F),
+     WALKABLE(2, 0.0F),
+@@ -47,5 +_,9 @@
  
      public float getMalus() {
          return this.malus;

@@ -1,98 +1,49 @@
 --- a/net/minecraft/core/RegistrySetBuilder.java
 +++ b/net/minecraft/core/RegistrySetBuilder.java
-@@ -22,7 +_,8 @@
- import org.apache.commons.lang3.mutable.MutableObject;
- import org.jspecify.annotations.Nullable;
+@@ -19,7 +_,7 @@
+ import net.minecraft.data.worldgen.BootstrapContext;
+ import net.minecraft.resources.ResourceKey;
  
 -public class RegistrySetBuilder {
 +public class RegistrySetBuilder implements net.minecraftforge.common.extensions.IForgeRegistrySetBuilder {
-+    private final it.unimi.dsi.fastutil.objects.Object2IntMap<ResourceKey<? extends Registry<?>>> indexes = new it.unimi.dsi.fastutil.objects.Object2IntLinkedOpenHashMap<>();
-     private final List<RegistrySetBuilder.RegistryStub<?>> entries = new ArrayList<>();
+     private final List<RegistrySetBuilder.RegistryStub> entries = new ArrayList<>();
  
-     private static <T> HolderGetter<T> wrapContextLookup(final HolderLookup.RegistryLookup<T> original) {
-@@ -66,14 +_,43 @@
-     public <T> RegistrySetBuilder add(
-         final ResourceKey<? extends Registry<T>> key, final Lifecycle lifecycle, final RegistrySetBuilder.RegistryBootstrap<T> bootstrap
-     ) {
--        this.entries.add(new RegistrySetBuilder.RegistryStub<>(key, lifecycle, bootstrap));
-+        add(new RegistrySetBuilder.RegistryStub<>(key, lifecycle, bootstrap));
+     private static RegistrySetBuilder.RegistryStub placeholderStub(final ResourceKey<? extends Registry<?>> key) {
+@@ -65,6 +_,12 @@
          return this;
      }
  
-+    // Forge: This merges two entries in this builder together, so that we can reuse vanilla boostrap methods, or potentially other modder's methods.
-+    private <T> RegistrySetBuilder.RegistryStub<T> add(RegistrySetBuilder.RegistryStub<T> entry) {
-+        int idx = indexes.getOrDefault(entry.key(), -1);
-+        if (idx != -1) {
-+            var _oldB = ((RegistrySetBuilder.RegistryStub<T>)this.entries.get(idx)).bootstrap();
-+            var _newB = entry.bootstrap();
-+            var _new = new RegistrySetBuilder.RegistryStub<>(entry.key(), entry.lifecycle(), ctx -> {
-+                _oldB.run(ctx);
-+                _newB.run(ctx);
-+            });
-+            this.entries.set(idx, _new);
-+            return _new;
-+        } else {
-+            this.indexes.put(entry.key(), this.entries.size());
-+            this.entries.add(entry);
-+            return entry;
-+        }
-+    }
-+
 +    public RegistrySetBuilder copy() {
 +        var ret = new RegistrySetBuilder();
-+        this.entries.forEach(ret::add);
++        ret.entries.addAll(this.entries);
 +        return ret;
 +    }
 +
-     public <T> RegistrySetBuilder add(final ResourceKey<? extends Registry<T>> key, final RegistrySetBuilder.RegistryBootstrap<T> bootstrap) {
-         return this.add(key, Lifecycle.stable(), bootstrap);
+     private static HolderLookup.Provider buildProviderWithContext(
+         final HolderLookup.Provider context, final Stream<? extends HolderLookup.RegistryLookup<?>> newRegistries
+     ) {
+@@ -128,6 +_,10 @@
+         return (ResourceKey<? extends Registry<T>>)registryKey;
      }
  
 +    public List<? extends ResourceKey<? extends Registry<?>>> getEntryKeys() {
-+        return this.entries.stream().map(RegistrySetBuilder.RegistryStub::key).toList();
++        return newRegistryKeys(this.entries.stream()).toList();
 +    }
 +
-     private RegistrySetBuilder.BuildState createState(final RegistryAccess context) {
-         RegistrySetBuilder.BuildState state = RegistrySetBuilder.BuildState.create(context, this.entries.stream().map(RegistrySetBuilder.RegistryStub::key));
-         this.entries.forEach(e -> e.apply(state));
-@@ -181,14 +_,16 @@
-         }
- 
-         Map<ResourceKey<T>, Holder.Reference<T>> entries = new HashMap<>();
--        HolderLookup.RegistryLookup<T> patchContents = patchProvider.lookupOrThrow(registryKey);
-+        HolderLookup.RegistryLookup<T> patchContents = patchProvider.lookup(registryKey).orElse(null);
-         patchContents.listElements().forEach(elementHolder -> {
-             ResourceKey<T> elementKey = elementHolder.key();
-             RegistrySetBuilder.LazyHolder<T> holder = new RegistrySetBuilder.LazyHolder<>(owner, elementKey);
-             holder.supplier = () -> cloner.clone((T)elementHolder.value(), patchProvider, targetProvider.get());
-             entries.put(elementKey, holder);
-         });
--        HolderLookup.RegistryLookup<T> fallbackContents = fallbackProvider.lookupOrThrow(registryKey);
-+        HolderLookup.RegistryLookup<T> fallbackContents = fallbackProvider.lookup(registryKey).orElse(null);
-+        Lifecycle lifecycle = patchContents.registryLifecycle();
-+        if (fallbackContents != null) {
-         fallbackContents.listElements().forEach(elementHolder -> {
-             ResourceKey<T> elementKey = elementHolder.key();
-             entries.computeIfAbsent(elementKey, key -> {
-@@ -197,7 +_,8 @@
-                 return holder;
-             });
-         });
--        Lifecycle lifecycle = patchContents.registryLifecycle().add(fallbackContents.registryLifecycle());
-+        lifecycle = patchContents.registryLifecycle().add(fallbackContents.registryLifecycle());
-+        }
-         return lookupFromMap(registryKey, lifecycle, owner, entries);
+     private static Stream<ResourceKey<? extends Registry<?>>> newRegistryKeys(final Stream<RegistrySetBuilder.RegistryStub> entries) {
+         return entries.flatMap(RegistrySetBuilder.RegistryStub::requiredRegistries).distinct();
      }
- 
-@@ -266,6 +_,11 @@
+@@ -158,6 +_,13 @@
                  @Override
-                 public <S> HolderGetter<S> lookup(final ResourceKey<? extends Registry<? extends S>> key) {
-                     return (HolderGetter<S>)BuildState.this.registries.getOrDefault(key.identifier(), BuildState.this.lookup);
+                 public <S> Stream<Holder.Reference<S>> listContextElements(final ResourceKey<? extends Registry<? extends S>> key) {
+                     return state.contextRegistries.lookupOrThrow(key).listElements();
 +                }
 +
 +                @Override
-+                public <S> Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
-+                   return Optional.ofNullable((HolderLookup.RegistryLookup<S>) BuildState.this.registries.get(registry.identifier()));
++                public <S> java.util.Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
++                    @SuppressWarnings("unchecked")
++                    var ret = (java.util.Optional<HolderLookup.RegistryLookup<S>>)state.contextRegistries.lookup(registry);
++                    return ret;
                  }
              };
          }

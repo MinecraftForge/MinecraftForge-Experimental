@@ -34,10 +34,10 @@
              for (AdvancementTab tab : this.tabs.values()) {
 -                if (tab.isMouseOver(xo, yo, event.x(), event.y())) {
 +                if (tab.getPage() == tabPage && tab.isMouseOver(xo, yo, event.x(), event.y())) {
-                     this.advancements.setSelectedTab(tab.getRootNode().holder(), true);
+                     this.advancements.setSelectedTab(tab.getRootAdvancement(), true);
                      break;
                  }
-@@ -208,10 +_,12 @@
+@@ -212,10 +_,12 @@
          graphics.blit(RenderPipelines.GUI_TEXTURED, WINDOW_LOCATION, this.leftPos, this.topPos, 0.0F, 0.0F, 252, 140, 256, 256);
          if (this.tabs.size() > 1) {
              for (AdvancementTab tab : this.tabs.values()) {
@@ -50,7 +50,7 @@
                  tab.extractIcon(graphics, this.leftPos, this.topPos);
              }
          }
-@@ -230,6 +_,7 @@
+@@ -234,6 +_,7 @@
  
          if (this.tabs.size() > 1) {
              for (AdvancementTab tab : this.tabs.values()) {

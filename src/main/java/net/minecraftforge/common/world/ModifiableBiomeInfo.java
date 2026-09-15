@@ -92,7 +92,7 @@ public class ModifiableBiomeInfo {
      * @param generationSettings Worldgen features and carvers.
      * @param mobSpawnSettings Mob spawn settings.
      */
-    public record BiomeInfo(ClimateSettings climateSettings, BiomeSpecialEffects effects, BiomeGenerationSettings generationSettings, MobSpawnSettings mobSpawnSettings) {
+    public record BiomeInfo(ClimateSettings climateSettings, BiomeSpecialEffects effects, BiomeGenerationSettings generationSettings) {
         public static class Builder {
             private ClimateSettingsBuilder climateSettings;
             private BiomeSpecialEffectsBuilder effects;
@@ -126,7 +126,7 @@ public class ModifiableBiomeInfo {
             }
 
             public BiomeInfo build() {
-                return new BiomeInfo(this.climateSettings.build(), this.effects.build(), this.generationSettings.build(), this.mobSpawnSettings.build());
+                return new BiomeInfo(this.climateSettings.build(), this.effects.build(), this.generationSettings.build());
             }
 
             public ClimateSettingsBuilder getClimateSettings() {

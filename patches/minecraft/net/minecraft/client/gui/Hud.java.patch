@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/gui/Hud.java
 +++ b/net/minecraft/client/gui/Hud.java
-@@ -156,7 +_,7 @@
+@@ -157,7 +_,7 @@
      public float vignetteBrightness = 1.0F;
      private int toolHighlightTimer;
      private ItemStack lastToolHighlight = ItemStack.EMPTY;
@@ -9,7 +9,7 @@
      private final SubtitleOverlay subtitleOverlay;
      private final SpectatorGui spectatorGui;
      private final PlayerTabOverlay tabList;
-@@ -198,6 +_,7 @@
+@@ -199,6 +_,7 @@
              () -> new JumpableVehicleBar(minecraft)
          );
          this.resetTitleTimes();
@@ -17,7 +17,7 @@
      }
  
      public void registerReloadListeners(final ReloadableResourceManager resourceManager) {
-@@ -221,6 +_,10 @@
+@@ -222,6 +_,10 @@
      public void extractRenderState(final GuiGraphicsExtractor graphics, final DeltaTracker deltaTracker) {
          this.minecraft.gameRenderer.gameRenderState().guiRenderState.isHudHidden = this.isHidden;
          if (!(this.minecraft.gui.screen() instanceof LevelLoadingScreen)) {
@@ -28,7 +28,7 @@
              if (!this.isHidden) {
                  this.extractCameraOverlays(graphics, deltaTracker);
                  this.extractCrosshair(graphics, deltaTracker);
-@@ -404,7 +_,7 @@
+@@ -405,7 +_,7 @@
              int mouseX = Mth.floor(this.minecraft.mouseHandler.getScaledXPos(window));
              int mouseY = Mth.floor(this.minecraft.mouseHandler.getScaledYPos(window));
              graphics.nextStratum();
@@ -37,7 +37,7 @@
          }
      }
  
-@@ -497,6 +_,8 @@
+@@ -500,6 +_,8 @@
  
              for (MobEffectInstance instance : Ordering.natural().reverse().sortedCopy(activeEffects)) {
                  Holder<MobEffect> effect = instance.getEffect();
@@ -46,7 +46,7 @@
                  if (instance.showIcon()) {
                      int x = graphics.guiWidth();
                      int y = 1;
-@@ -527,6 +_,7 @@
+@@ -530,6 +_,7 @@
                          }
                      }
  
@@ -54,7 +54,7 @@
                      graphics.blitSprite(RenderPipelines.GUI_TEXTURED, getMobEffectSprite(effect), x + 3, y + 3, 18, 18, ARGB.white(alpha));
                  }
              }
-@@ -629,15 +_,37 @@
+@@ -632,15 +_,37 @@
      }
  
      public void extractSelectedItemName(final GuiGraphicsExtractor graphics) {
@@ -94,7 +94,7 @@
              if (!this.minecraft.gameMode.canHurtPlayer()) {
                  y += 14;
              }
-@@ -648,7 +_,7 @@
+@@ -651,7 +_,7 @@
              }
  
              if (alpha > 0) {
@@ -103,7 +103,7 @@
              }
          }
      }
-@@ -1216,7 +_,9 @@
+@@ -1219,7 +_,9 @@
                  this.toolHighlightTimer = 0;
              } else if (this.lastToolHighlight.isEmpty()
                  || !selected.is(this.lastToolHighlight.getItem())

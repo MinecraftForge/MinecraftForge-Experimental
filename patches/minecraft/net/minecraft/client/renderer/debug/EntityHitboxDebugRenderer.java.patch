@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/debug/EntityHitboxDebugRenderer.java
 +++ b/net/minecraft/client/renderer/debug/EntityHitboxDebugRenderer.java
-@@ -99,8 +_,8 @@
+@@ -102,8 +_,8 @@
              );
          }
  

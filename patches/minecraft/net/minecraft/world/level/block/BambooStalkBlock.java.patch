@@ -1,15 +1,15 @@
 --- a/net/minecraft/world/level/block/BambooStalkBlock.java
 +++ b/net/minecraft/world/level/block/BambooStalkBlock.java
-@@ -24,7 +_,7 @@
+@@ -23,7 +_,7 @@
  import net.minecraft.world.phys.shapes.VoxelShape;
  import org.jspecify.annotations.Nullable;
  
 -public class BambooStalkBlock extends Block implements BonemealableBlock {
 +public class BambooStalkBlock extends Block implements BonemealableBlock, net.minecraftforge.common.IPlantable {
-     public static final MapCodec<BambooStalkBlock> CODEC = simpleCodec(BambooStalkBlock::new);
      private static final VoxelShape SHAPE_SMALL = Block.column(6.0, 0.0, 16.0);
      private static final VoxelShape SHAPE_LARGE = Block.column(10.0, 0.0, 16.0);
-@@ -119,10 +_,12 @@
+     private static final VoxelShape SHAPE_COLLISION = Block.column(3.0, 0.0, 16.0);
+@@ -112,10 +_,12 @@
      @Override
      protected void randomTick(final BlockState state, final ServerLevel level, final BlockPos pos, final RandomSource random) {
          if (state.getValue(STAGE) == 0) {
@@ -24,7 +24,7 @@
                  }
              }
          }
-@@ -230,5 +_,11 @@
+@@ -223,5 +_,11 @@
          }
  
          return height;

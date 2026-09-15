@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Minecraft.java
 +++ b/net/minecraft/client/Minecraft.java
-@@ -258,7 +_,7 @@
+@@ -265,7 +_,7 @@
  import org.slf4j.Logger;
  
  @OnlyIn(Dist.CLIENT)
@@ -8,8 +8,8 @@
 +public class Minecraft extends ReentrantBlockableEventLoop<Runnable> implements WindowEventHandler, net.minecraftforge.client.extensions.IForgeMinecraft {
      private static Minecraft instance;
      private static final Logger LOGGER = LogUtils.getLogger();
-     private static final int MAX_TICKS_PER_UPDATE = 10;
-@@ -410,7 +_,6 @@
+     private static final SectionCategory TRACY_CURRENT_LEVEL = TracyClient.createSectionCategory("Level");
+@@ -420,7 +_,6 @@
              }
          }, Util.nonCriticalIoPool());
          LOGGER.info("Setting user: {}", this.user.getName());
@@ -17,30 +17,23 @@
          this.demo = gameConfig.game.demo;
          this.allowsMultiplayer = !gameConfig.game.disableMultiplayer;
          this.allowsChat = !gameConfig.game.disableChat;
-@@ -547,12 +_,12 @@
-             LOGGER.error("Couldn't set icon", e);
-         }
- 
-+        // FORGE: Move mouse and keyboard handler setup further below
-         this.mouseHandler = new MouseHandler(this);
--        this.mouseHandler.setup(this.window);
+@@ -568,6 +_,7 @@
          this.keyboardHandler = new KeyboardHandler(this);
--        this.keyboardHandler.setup(this.window);
          this.options.applyGraphicsPreset(this.options.graphicsPreset().get());
          this.resourceManager = new ReloadableResourceManager(PackType.CLIENT_RESOURCES);
 +        net.minecraftforge.client.loading.ClientModLoader.begin(this, this.resourcePackRepository, this.resourceManager);
          this.resourcePackRepository.reload();
          this.options.loadSelectedResourcePacks(this.resourcePackRepository);
-         this.languageManager = new LanguageManager(this.options.languageCode, var1 -> {
-@@ -630,6 +_,7 @@
+         this.languageManager = new LanguageManager(this, this.options.languageCode, var1 -> {
+@@ -645,6 +_,7 @@
          ParticleResources particleResources = new ParticleResources();
          this.resourceManager.registerReloadListener(particleResources);
          this.particleEngine = new ParticleEngine(this.level, particleResources);
 +        net.minecraftforge.client.ForgeHooksClient.onRegisterParticleProviders(particleResources);
          particleResources.onReload(this.particleEngine::clearParticles);
-         this.gameRenderer = new GameRenderer(this, this.entityRenderDispatcher.getItemInHandRenderer(), this.modelManager);
-         WindowRenderState windowRenderState = this.gameRenderer.gameRenderState().windowRenderState;
-@@ -647,6 +_,7 @@
+         this.gameRenderer = new GameRenderer(this, new FirstPersonHandsAndItemsRenderer(this), this.modelManager, this.itemModelResolver);
+         this.resourceManager.registerReloadListener(this.gameRenderer);
+@@ -663,6 +_,7 @@
              this.window.getHeight()
          );
          this.levelExtractor = new LevelExtractor(this, this.gameRenderer.gameRenderState().levelRenderState, this.levelRenderer);
@@ -48,25 +41,15 @@
          this.resourceManager.registerReloadListener(this.levelExtractor);
          this.resourceManager.registerReloadListener(this.levelRenderer.cloudRenderer());
          this.gpuWarnlistManager = new GpuWarnlistManager();
-@@ -654,6 +_,9 @@
-         this.resourceManager.registerReloadListener(this.regionalCompliancies);
-         this.gui = new Gui(this, new Hud(this), this.gameRenderer.gameRenderState().guiRenderState);
-         this.gui.registerReloadListeners(this.resourceManager);
-+        // FORGE: Moved keyboard and mouse handler setup below ingame gui creation to prevent NPEs in them.
-+        this.mouseHandler.setup(this.window);
-+        this.keyboardHandler.setup(this.window);
-         RealmsClient realmsClient = RealmsClient.getOrCreate(this);
-         this.realmsDataFetcher = new RealmsDataFetcher(realmsClient);
-         RenderSystem.setErrorCallback(this::onFullscreenError);
-@@ -686,6 +_,7 @@
-             }
+@@ -694,6 +_,7 @@
+             MessageBox.error(message.toString());
          }
  
 +        net.minecraftforge.client.ForgeHooksClient.initClientHooks(this, this.resourceManager);
-         this.window.updateRawMouseInput(this.options.rawMouseInput().get());
          this.window.setAllowCursorChanges(this.options.allowCursorChanges().get());
-         this.window.setDefaultErrorCallback();
-@@ -710,14 +_,15 @@
+         this.window.setQuitShortcuts(this.options.quitShortcuts().get());
+         if (InputQuirks.EMULATE_RIGHT_CLICK_WITH_CTRL_KEY) {
+@@ -721,14 +_,15 @@
              .createReload(Util.backgroundExecutor().forName("resourceLoad"), this, RESOURCE_RELOAD_INITIAL_TASK, packs);
          GameLoadTimesEvent.INSTANCE.beginStep(TelemetryProperty.LOAD_TIME_LOADING_OVERLAY_MS);
          GameLoadCookie loadCookie = new GameLoadCookie(realmsClient, gameConfig.quickPlay);
@@ -84,7 +67,7 @@
          this.quickPlayLog = QuickPlayLog.of(gameConfig.quickPlay.logPath());
          this.framerateLimitTracker = new FramerateLimitTracker(this.options, this);
          this.fpsPieProfiler = new ContinuousProfiler(Util.timeSource(), () -> this.fpsPieRenderTicks, this.framerateLimitTracker::isHeavilyThrottled);
-@@ -801,6 +_,7 @@
+@@ -812,6 +_,7 @@
          StringBuilder builder = new StringBuilder("Minecraft");
          if (checkModStatus().shouldReportAsModified()) {
              builder.append("*");
@@ -92,16 +75,16 @@
          }
  
          builder.append(" ");
-@@ -824,6 +_,8 @@
+@@ -835,6 +_,8 @@
      }
  
-     private static UserApiService createUserApiService(final YggdrasilAuthenticationService authService, final GameConfig config) {
+     private static UserApiService createUserApiService(final MinecraftServicesDiscoveryService discoveryService, final GameConfig config) {
 +        if ("0".equals(config.user.user.getAccessToken())) // Forge: We use "0" in dev. Short circuit to stop exception spam.
 +            return UserApiService.OFFLINE;
-         return config.game.offlineDeveloperMode ? UserApiService.OFFLINE : authService.createUserApiService(config.user.user.getAccessToken());
+         return config.game.offlineDeveloperMode ? UserApiService.OFFLINE : discoveryService.createUserApiService(config.user.user.getAccessToken());
      }
  
-@@ -840,7 +_,7 @@
+@@ -851,7 +_,7 @@
      }
  
      private void rollbackResourcePacks(final Throwable t, final @Nullable GameLoadCookie loadCookie) {
@@ -110,33 +93,33 @@
              this.clearResourcePacksOnError(t, null, loadCookie);
          } else {
              Util.throwAsRuntime(t);
-@@ -1141,6 +_,7 @@
-             Util.shutdownExecutors();
+@@ -1148,6 +_,7 @@
+             FreeTypeUtil.destroy();
              this.windowSurface.close();
              RenderSystem.shutdownRenderer();
 +            net.minecraftforge.fml.config.ConfigTracker.forceUnload();
          } catch (Throwable t) {
              LOGGER.error("Shutdown failure!", t);
              throw t;
-@@ -1301,7 +_,9 @@
+@@ -1305,7 +_,9 @@
                  profiler.popPush("gpuAsync");
                  RenderSystem.executePendingTasks();
                  profiler.pop();
 +                net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderTickStart(this.deltaTracker);
-                 this.gameRenderer.render(this.deltaTracker, advanceGameTime);
+                 this.gameRenderer.render();
 +                net.minecraftforge.client.event.ForgeEventFactoryClient.onRenderTickEnd(this.deltaTracker);
              }
  
-             profiler.push("present");
-@@ -1425,6 +_,7 @@
+             profiler.push("swapchainBlit");
+@@ -1432,6 +_,7 @@
          this.window.setGuiScale(guiScale);
          if (this.gui.screen() != null) {
              this.gui.screen().resize(this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
 +            this.gui.resizeLayers(this.window.getGuiScaledWidth(), this.window.getGuiScaledHeight());
          }
  
-         this.mouseHandler.setIgnoreFirstMove();
-@@ -1576,6 +_,7 @@
+         this.mouseHandler.resyncMousePosition();
+@@ -1595,6 +_,7 @@
      }
  
      public void stop() {
@@ -144,7 +127,7 @@
          this.running = false;
      }
  
-@@ -1599,10 +_,18 @@
+@@ -1622,9 +_,16 @@
                  if (down && this.hitResult != null && this.hitResult.getType() == HitResult.Type.BLOCK) {
                      BlockHitResult blockHit = (BlockHitResult)this.hitResult;
                      BlockPos pos = blockHit.getBlockPos();
@@ -153,20 +136,17 @@
 +                        var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
 +                        if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
 +                           if (inputEvent.shouldSwingHand()) {
-+                              this.level.addBreakingBlockEffect(pos, blockHit);
-+                              this.player.swing(InteractionHand.MAIN_HAND);
++                              this.player.swing(InteractionHand.MAIN_HAND, swingAnimation, false);
 +                           }
 +                           return;
 +                        }
                          Direction direction = blockHit.getDirection();
 -                        if (this.gameMode.continueDestroyBlock(pos, direction)) {
--                            this.level.addBreakingBlockEffect(pos, direction);
 +                        if (this.gameMode.continueDestroyBlock(pos, direction) && inputEvent.shouldSwingHand()) {
-+                            this.level.addBreakingBlockEffect(pos, blockHit);
-                             this.player.swing(InteractionHand.MAIN_HAND);
+                             this.player.swing(InteractionHand.MAIN_HAND, swingAnimation, false);
+                             this.player.connection.send(ServerboundPunchPacket.INSTANCE);
                          }
-                     }
-@@ -1656,6 +_,8 @@
+@@ -1679,6 +_,8 @@
                      return true;
                  }
  
@@ -175,7 +155,7 @@
                  switch (this.hitResult.getType()) {
                      case ENTITY:
                          AttackRange customItemRange = heldItem.get(DataComponents.ATTACK_RANGE);
-@@ -1666,7 +_,7 @@
+@@ -1689,7 +_,7 @@
                      case BLOCK:
                          BlockHitResult blockHit = (BlockHitResult)this.hitResult;
                          BlockPos pos = blockHit.getBlockPos();
@@ -184,49 +164,53 @@
                              this.gameMode.startDestroyBlock(pos, blockHit.getDirection());
                              if (this.level.getBlockState(pos).isAir()) {
                                  endAttack = true;
-@@ -1679,8 +_,10 @@
+@@ -1702,10 +_,13 @@
                          }
  
                          this.player.resetAttackStrengthTicker();
 +                        net.minecraftforge.event.ForgeEventFactory.onLeftClickEmpty(this.player);
                  }
  
-+                if (inputEvent.shouldSwingHand())
-                 this.player.swing(InteractionHand.MAIN_HAND);
++                if (inputEvent.shouldSwingHand()) {
+                 this.player.swing(InteractionHand.MAIN_HAND, attackAnimation, false);
+                 this.player.connection.send(ServerboundPunchPacket.INSTANCE);
++                }
                  return endAttack;
              }
-@@ -1696,6 +_,12 @@
-                 }
+         }
+@@ -1726,6 +_,13 @@
+                     }
  
-                 for (InteractionHand hand : InteractionHand.values()) {
+                     SwingAnimation swingAnimation = heldItem.getInteractAnimation();
++
 +                    var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(1, this.options.keyUse, hand);
 +                    if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
-+                       if (inputEvent.shouldSwingHand()) this.player.swing(hand);
++                       if (inputEvent.shouldSwingHand()) this.player.swing(hand, swingAnimation, false);
 +                       return;
 +                    }
 +
-                     ItemStack heldItem = this.player.getItemInHand(hand);
-                     if (!heldItem.isItemEnabled(this.level.enabledFeatures())) {
-                         return;
-@@ -1712,7 +_,7 @@
+                     if (this.hitResult != null) {
+                         switch (this.hitResult.getType()) {
+                             case ENTITY:
+@@ -1737,7 +_,7 @@
  
                                  if (this.player.isWithinEntityInteractionRange(entity, 0.0)
                                      && this.gameMode.interact(this.player, entity, entityHit, hand) instanceof InteractionResult.Success success) {
--                                    if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
-+                                    if (success.swingSource() == InteractionResult.SwingSource.CLIENT && inputEvent.shouldSwingHand()) {
-                                         this.player.swing(hand);
+-                                    if (success.swingSource() == InteractionResult.SwingSource.PREDICTED) {
++                                    if (success.swingSource() == InteractionResult.SwingSource.PREDICTED && inputEvent.shouldSwingHand()) {
+                                         this.player.swing(hand, swingAnimation, false);
                                      }
  
-@@ -1724,7 +_,7 @@
+@@ -1749,7 +_,7 @@
                                  int oldCount = heldItem.getCount();
                                  InteractionResult useResult = this.gameMode.useItemOn(this.player, hand, blockHit);
                                  if (useResult instanceof InteractionResult.Success success) {
--                                    if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
-+                                    if (success.swingSource() == InteractionResult.SwingSource.CLIENT && inputEvent.shouldSwingHand()) {
-                                         this.player.swing(hand);
+-                                    if (success.swingSource() == InteractionResult.SwingSource.PREDICTED) {
++                                    if (success.swingSource() == InteractionResult.SwingSource.PREDICTED && inputEvent.shouldSwingHand()) {
+                                         this.player.swing(hand, swingAnimation, false);
                                          if (!heldItem.isEmpty() && (heldItem.getCount() != oldCount || this.player.hasInfiniteMaterials())) {
-                                             this.gameRenderer.itemInHandRenderer.itemUsed(hand);
-@@ -1740,6 +_,9 @@
+                                             this.player.itemUsed(hand);
+@@ -1765,6 +_,9 @@
                          }
                      }
  
@@ -234,9 +218,9 @@
 +                       net.minecraftforge.event.ForgeEventFactory.onRightClickEmpty(this.player, hand);
 +
                      if (!heldItem.isEmpty() && this.gameMode.useItem(this.player, hand) instanceof InteractionResult.Success success) {
-                         if (success.swingSource() == InteractionResult.SwingSource.CLIENT) {
-                             this.player.swing(hand);
-@@ -1768,6 +_,8 @@
+                         if (success.swingSource() == InteractionResult.SwingSource.PREDICTED) {
+                             this.player.swing(hand, swingAnimation, false);
+@@ -1793,6 +_,8 @@
          }
  
          ProfilerFiller profiler = Profiler.get();
@@ -245,7 +229,7 @@
          profiler.push("gameMode");
          if (!this.pause && this.level != null) {
              this.gameMode.tick();
-@@ -1817,6 +_,7 @@
+@@ -1845,6 +_,7 @@
  
                  this.tutorial.tick();
  
@@ -253,7 +237,7 @@
                  try {
                      this.level.tick(() -> true);
                  } catch (Throwable t) {
-@@ -1830,6 +_,7 @@
+@@ -1858,6 +_,7 @@
  
                      throw new ReportedException(report);
                  }
@@ -261,7 +245,7 @@
              }
  
              profiler.popPush("animateTick");
-@@ -1854,6 +_,7 @@
+@@ -1882,6 +_,7 @@
          profiler.popPush("keyboard");
          this.keyboardHandler.tick();
          profiler.pop();
@@ -269,7 +253,7 @@
      }
  
      private boolean isLevelRunningNormally() {
-@@ -2059,6 +_,7 @@
+@@ -2088,6 +_,7 @@
      }
  
      public void setLevel(final ClientLevel level) {
@@ -277,7 +261,7 @@
          this.level = level;
          this.updateLevelInEngines(level);
      }
-@@ -2120,6 +_,7 @@
+@@ -2149,6 +_,7 @@
          IntegratedServer server = this.singleplayerServer;
          this.singleplayerServer = null;
          this.gameRenderer.resetData();
@@ -285,7 +269,7 @@
          this.gameMode = null;
          this.narrator.clear();
          this.gui.setClientLevelTeardownInProgress(true);
-@@ -2127,6 +_,7 @@
+@@ -2156,6 +_,7 @@
          try {
              if (this.level != null) {
                  this.gui.hud.onDisconnected();
@@ -293,7 +277,7 @@
              }
  
              this.level = null;
-@@ -2141,6 +_,7 @@
+@@ -2171,6 +_,7 @@
                  }
  
                  profiler.pop();
@@ -301,7 +285,7 @@
              }
  
              this.setScreenAndShow(screen);
-@@ -2354,6 +_,7 @@
+@@ -2403,6 +_,7 @@
  
      private void pickBlockOrEntity() {
          if (this.hitResult != null && this.hitResult.getType() != HitResult.Type.MISS) {

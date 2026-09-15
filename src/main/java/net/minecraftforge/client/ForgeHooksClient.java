@@ -51,6 +51,7 @@ import net.minecraft.client.renderer.extract.LevelExtractor;
 import net.minecraft.client.renderer.fog.FogData;
 import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.minecraft.client.renderer.state.level.LevelRenderState;
+import net.minecraft.client.renderer.state.level.PlayerRenderState;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
@@ -111,6 +112,9 @@ import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.client.event.RenderBlockScreenEffectEvent;
+import net.minecraftforge.client.event.RenderBlockScreenEffectEvent.BlockOverlayEvent;
+import net.minecraftforge.client.event.RenderBlockScreenEffectEvent.FireOverlayEvent;
+import net.minecraftforge.client.event.RenderBlockScreenEffectEvent.WaterOverlayEvent;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.client.event.RenderHighlightEvent;
 import net.minecraftforge.client.event.RenderTooltipEvent;
@@ -128,6 +132,7 @@ import net.minecraftforge.client.textures.ForgeTextureMetadata;
 import net.minecraftforge.client.textures.TextureAtlasSpriteLoaderManager;
 import net.minecraftforge.common.ForgeI18n;
 import net.minecraftforge.common.ForgeMod;
+import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.fml.IExtensionPoint;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.network.NetworkContext;
@@ -646,16 +651,19 @@ public class ForgeHooksClient {
         return font.split(text, maxWidth).stream().map(ClientTooltipComponent::create);
     }
 
-    public static boolean renderFireOverlay(Player player, PoseStack mat) {
-        return renderBlockOverlay(player, mat, RenderBlockScreenEffectEvent.OverlayType.FIRE, Blocks.FIRE.defaultBlockState(), player.blockPosition());
+    public static @Nullable IRenderCallback renderFireOverlay(Player player) {
+        var event = new FireOverlayEvent(player, Blocks.FIRE.defaultBlockState(), player.blockPosition());
+        return FireOverlayEvent.BUS.post(event) ? event.getCustomRenderer() : null;
     }
 
-    public static boolean renderWaterOverlay(Player player, PoseStack mat) {
-        return renderBlockOverlay(player, mat, RenderBlockScreenEffectEvent.OverlayType.WATER, Blocks.WATER.defaultBlockState(), player.blockPosition());
+    public static @Nullable IRenderCallback renderWaterOverlay(Player player, PlayerRenderState state) {
+        var event = new WaterOverlayEvent(player, Blocks.WATER.defaultBlockState(), player.blockPosition(), state);
+        return WaterOverlayEvent.BUS.post(event) ? event.getCustomRenderer() : null;
     }
 
-    public static boolean renderBlockOverlay(Player player, PoseStack mat, RenderBlockScreenEffectEvent.OverlayType type, BlockState block, BlockPos pos) {
-        return RenderBlockScreenEffectEvent.BUS.post(new RenderBlockScreenEffectEvent(player, mat, type, block, pos));
+    public static @Nullable IRenderCallback renderBlockOverlay(Player player, BlockState state, BlockPos pos) {
+        var event = new BlockOverlayEvent(player, state, pos);
+        return BlockOverlayEvent.BUS.post(event) ? event.getCustomRenderer() : null;
     }
 
     public static int getMaxMipmapLevel(int width, int height) {

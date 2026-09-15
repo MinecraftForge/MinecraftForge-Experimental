@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/item/ItemStack.java
 +++ b/net/minecraft/world/item/ItemStack.java
-@@ -99,7 +_,7 @@
+@@ -100,7 +_,7 @@
  import org.jspecify.annotations.Nullable;
  import org.slf4j.Logger;
  
@@ -9,7 +9,7 @@
      private static final List<Component> OP_NBT_WARNING = List.of(
          Component.translatable("item.op_warning.line1").withStyle(ChatFormatting.RED, ChatFormatting.BOLD),
          Component.translatable("item.op_warning.line2").withStyle(ChatFormatting.RED),
-@@ -257,12 +_,15 @@
+@@ -258,12 +_,15 @@
      }
  
      private ItemStack(final Holder<Item> item, final int count, final PatchedDataComponentMap components) {
@@ -25,7 +25,7 @@
          this.item = null;
          this.components = new PatchedDataComponentMap(DataComponentMap.EMPTY);
      }
-@@ -355,6 +_,15 @@
+@@ -356,6 +_,15 @@
      }
  
      public InteractionResult useOn(final UseOnContext context) {
@@ -41,19 +41,19 @@
          Player player = context.getPlayer();
          BlockPos pos = context.getClickedPos();
          if (player != null && !player.getAbilities().mayBuild && !this.canPlaceOnBlockInAdventureMode(new BlockInWorld(context.getLevel(), pos, false))) {
-@@ -362,7 +_,7 @@
-         }
- 
-         Item usedItem = this.getItem();
--        InteractionResult result = usedItem.useOn(context);
-+        InteractionResult result = callback.apply(context);
-         if (player != null && result instanceof InteractionResult.Success success && success.wasItemInteraction()) {
-             player.awardStat(Stats.ITEM_USED.get(usedItem));
-         }
-@@ -442,18 +_,26 @@
+@@ -363,7 +_,7 @@
+         } else {
+             ItemStack stackBeforeUse = this.copy();
+             Item usedItem = this.getItem();
+-            InteractionResult result = usedItem.useOn(context);
++            InteractionResult result = callback.apply(context);
+             if (player != null && result instanceof InteractionResult.Success success && success.wasItemInteraction()) {
+                 player.awardStat(Stats.ITEM_USED.get(usedItem));
+                 ItemStack transformTo = success.heldItemTransformedTo() == null ? this : success.heldItemTransformedTo();
+@@ -447,18 +_,26 @@
      }
  
-     public void hurtAndBreak(final int amount, final ServerLevel level, final @Nullable ServerPlayer player, final Consumer<Item> onBreak) {
+     public void hurtAndBreak(final int amount, final ServerLevel level, final @Nullable ServerPlayer player, final Consumer<ItemStack> onBreak) {
 -        int newAmount = this.processDurabilityChange(amount, level, player);
 +        // FORGE: use context-sensitive sister of processDurabilityChange that calls IForgeItem.damageItem
 +        int newAmount = this.processDurabilityChange(amount, level, player, true, onBreak);
@@ -78,7 +78,7 @@
              return amount > 0 ? EnchantmentHelper.processDurabilityChange(level, this, amount) : amount;
          }
      }
-@@ -490,7 +_,13 @@
+@@ -495,7 +_,13 @@
      public void hurtAndBreak(final int amount, final LivingEntity owner, final EquipmentSlot slot) {
          if (owner.level() instanceof ServerLevel serverLevel) {
              this.hurtAndBreak(
@@ -93,7 +93,7 @@
              );
          }
      }
-@@ -857,6 +_,7 @@
+@@ -873,6 +_,7 @@
              List<Component> lines = Lists.newArrayList();
              lines.add(this.getStyledHoverName());
              this.addDetailsToTooltip(context, display, player, tooltipFlag, lines::add);
@@ -101,7 +101,7 @@
              return lines;
          }
      }
-@@ -1105,6 +_,7 @@
+@@ -1127,6 +_,7 @@
          }
      }
  

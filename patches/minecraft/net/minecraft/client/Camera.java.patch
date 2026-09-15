@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/Camera.java
 +++ b/net/minecraft/client/Camera.java
-@@ -224,11 +_,13 @@
+@@ -228,11 +_,13 @@
          }
  
          float fov = this.minecraft.options.fov().get().intValue() * Mth.lerp(partialTicks, this.oldFovModifier, this.fovModifier);
@@ -16,7 +16,7 @@
      }
  
      private float modifyFovBasedOnDeathOrFluid(final float partialTicks, float fov) {
-@@ -337,9 +_,13 @@
+@@ -341,9 +_,13 @@
      }
  
      protected void setRotation(final float yRot, final float xRot) {
@@ -31,7 +31,7 @@
          FORWARDS.rotate(this.rotation, this.forwards);
          UP.rotate(this.rotation, this.up);
          LEFT.rotate(this.rotation, this.left);
-@@ -370,6 +_,13 @@
+@@ -374,6 +_,13 @@
  
      public float yRot() {
          return this.yRot;

@@ -1,6 +1,6 @@
 --- a/net/minecraft/data/tags/VanillaBlockTagsProvider.java
 +++ b/net/minecraft/data/tags/VanillaBlockTagsProvider.java
-@@ -29,6 +_,10 @@
+@@ -30,6 +_,10 @@
          };
      }
  

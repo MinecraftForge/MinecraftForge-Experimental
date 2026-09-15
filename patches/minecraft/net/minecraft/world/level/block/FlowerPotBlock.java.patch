@@ -1,7 +1,7 @@
 --- a/net/minecraft/world/level/block/FlowerPotBlock.java
 +++ b/net/minecraft/world/level/block/FlowerPotBlock.java
-@@ -43,9 +_,31 @@
-     }
+@@ -33,9 +_,31 @@
+     private final Block potted;
  
      public FlowerPotBlock(final Block potted, final BlockBehaviour.Properties properties) {
 +        this(Blocks.FLOWER_POT == null ? null : () -> (FlowerPotBlock) net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(Blocks.FLOWER_POT).get(), () -> net.minecraftforge.registries.ForgeRegistries.BLOCKS.getDelegateOrThrow(potted).get(), properties);
@@ -34,7 +34,7 @@
      }
  
      @Override
-@@ -64,7 +_,7 @@
+@@ -54,7 +_,7 @@
          final BlockHitResult hitResult
      ) {
          BlockState newContents = (itemStack.getItem() instanceof BlockItem blockItem
@@ -43,16 +43,16 @@
                  : Blocks.AIR)
              .defaultBlockState();
          if (newContents.isAir()) {
-@@ -95,7 +_,7 @@
-             player.drop(plant, false);
+@@ -85,7 +_,7 @@
+             player.drop(plant, false, Prediction.PREDICTED);
          }
  
--        level.setBlock(pos, Blocks.FLOWER_POT.defaultBlockState(), 3);
-+        level.setBlock(pos, getEmptyPot().defaultBlockState(), 3);
+-        level.setBlockAndUpdate(pos, Blocks.FLOWER_POT.defaultBlockState());
++        level.setBlockAndUpdate(pos, getEmptyPot().defaultBlockState());
          level.gameEvent(player, GameEvent.BLOCK_CHANGE, pos);
          return InteractionResult.SUCCESS;
      }
-@@ -126,7 +_,7 @@
+@@ -116,7 +_,7 @@
      }
  
      public Block getPotted() {
@@ -61,7 +61,7 @@
      }
  
      @Override
-@@ -161,5 +_,24 @@
+@@ -151,5 +_,24 @@
          } else {
              return state.is(Blocks.POTTED_CLOSED_EYEBLOSSOM) ? Blocks.POTTED_OPEN_EYEBLOSSOM.defaultBlockState() : state;
          }

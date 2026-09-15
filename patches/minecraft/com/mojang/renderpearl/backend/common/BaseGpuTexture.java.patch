@@ -1,0 +1,43 @@
+--- a/com/mojang/renderpearl/backend/common/BaseGpuTexture.java
++++ b/com/mojang/renderpearl/backend/common/BaseGpuTexture.java
+@@ -24,6 +_,19 @@
+         final int depthOrLayers,
+         final int mipLevels
+     ) {
++        this(usage, label, format, width, height, depthOrLayers, mipLevels, false);
++    }
++
++    public BaseGpuTexture(
++        final @GpuTexture.Usage int usage,
++        final String label,
++        final GpuFormat format,
++        final int width,
++        final int height,
++        final int depthOrLayers,
++        final int mipLevels,
++        final boolean stencil
++    ) {
+         this.usage = usage;
+         this.label = label;
+         this.format = format;
+@@ -31,6 +_,7 @@
+         this.height = height;
+         this.depthOrLayers = depthOrLayers;
+         this.mipLevels = mipLevels;
++        this.stencilEnabled = stencil;
+     }
+ 
+     @Override
+@@ -66,5 +_,12 @@
+     @Override
+     public String getLabel() {
+         return this.label;
++    }
++
++    private final boolean stencilEnabled;
++
++    @Override
++    public boolean isStencilEnabled() {
++        return this.stencilEnabled;
+     }
+ }

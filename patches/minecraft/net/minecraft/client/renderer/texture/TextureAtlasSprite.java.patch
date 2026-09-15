@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
 +++ b/net/minecraft/client/renderer/texture/TextureAtlasSprite.java
-@@ -26,7 +_,7 @@
+@@ -24,7 +_,7 @@
      private final float v1;
      private final int padding;
  
@@ -9,7 +9,7 @@
          final Identifier atlasLocation, final SpriteContents contents, final int atlasWidth, final int atlasHeight, final int x, final int y, final int padding
      ) {
          this.atlasLocation = atlasLocation;
-@@ -127,5 +_,14 @@
+@@ -123,5 +_,14 @@
      @Override
      public void close() {
          this.contents.close();

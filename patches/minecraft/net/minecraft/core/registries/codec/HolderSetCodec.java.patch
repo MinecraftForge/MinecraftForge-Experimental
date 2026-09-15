@@ -1,0 +1,51 @@
+--- a/net/minecraft/core/registries/codec/HolderSetCodec.java
++++ b/net/minecraft/core/registries/codec/HolderSetCodec.java
+@@ -7,6 +_,8 @@
+ import com.mojang.serialization.DynamicOps;
+ import java.util.List;
+ import java.util.Optional;
++import java.util.function.Function;
++
+ import net.minecraft.core.Holder;
+ import net.minecraft.core.HolderGetter;
+ import net.minecraft.core.HolderOwner;
+@@ -20,6 +_,8 @@
+ public class HolderSetCodec<E> implements Codec<HolderSet<E>> {
+     private final ResourceKey<? extends Registry<E>> registryKey;
+     private final Codec<Either<TagKey<E>, List<Holder<E>>>> tagKeyOrValuesCodec;
++    private final Codec<net.minecraftforge.registries.holdersets.ICustomHolderSet<E>> forgeDispatchCodec;
++    private final Codec<Either<net.minecraftforge.registries.holdersets.ICustomHolderSet<E>, Either<TagKey<E>, List<Holder<E>>>>> combinedCodec;
+ 
+     private static <E> Codec<List<Holder<E>>> directCodec(final Codec<Holder<E>> elementCodec, final boolean alwaysUseList) {
+         Codec<List<Holder<E>>> listCodec = elementCodec.listOf();
+@@ -35,15 +_,21 @@
+     private HolderSetCodec(final ResourceKey<? extends Registry<E>> registryKey, final Codec<Holder<E>> elementCodec, final boolean alwaysUseList) {
+         this.registryKey = registryKey;
+         this.tagKeyOrValuesCodec = Codec.either(TagKey.hashedCodec(registryKey), directCodec(elementCodec, alwaysUseList));
++        // FORGE: make registry-specific dispatch codec and make forge-or-vanilla either codec
++        this.forgeDispatchCodec = Codec.lazyInitialized(() -> net.minecraftforge.registries.ForgeRegistries.HOLDER_SET_TYPES.get().getCodec())
++            .dispatch(net.minecraftforge.registries.holdersets.ICustomHolderSet::type, type -> type.makeCodec(registryKey, elementCodec, alwaysUseList));
++        this.combinedCodec = Codec.either(this.forgeDispatchCodec, this.tagKeyOrValuesCodec);
+     }
+ 
+     @Override
+     public <T> DataResult<Pair<HolderSet<E>, T>> decode(final DynamicOps<T> ops, final T input) {
+-        return this.tagKeyOrValuesCodec
++        return this.combinedCodec
+             .decode(ops, input)
+             .flatMap(
+                 tagKeyOrValues -> {
+                     DataResult<HolderSet<E>> result = tagKeyOrValues.getFirst()
++                        .map(custom -> DataResult.success(custom),
++                        tagOrList -> tagOrList
+                         .map(
+                             tagKey -> {
+                                 if (ops instanceof RegistryOps<T> registryOps) {
+@@ -56,6 +_,7 @@
+                                 }
+                             },
+                             values -> DataResult.success(HolderSet.direct((List<? extends Holder<E>>)values))
++                        )
+                         );
+                     return result.map(holders -> Pair.of((HolderSet<E>)holders, (T)tagKeyOrValues.getSecond()));
+                 }

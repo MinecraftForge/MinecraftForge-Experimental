@@ -1,9 +1,9 @@
 --- a/net/minecraft/world/level/levelgen/structure/Structure.java
 +++ b/net/minecraft/world/level/levelgen/structure/Structure.java
-@@ -46,10 +_,13 @@
+@@ -47,10 +_,13 @@
  public abstract class Structure {
      public static final Codec<Structure> DIRECT_CODEC = BuiltInRegistries.STRUCTURE_TYPE.byNameCodec().dispatch(Structure::type, StructureType::codec);
-     public static final Codec<Holder<Structure>> CODEC = RegistryFileCodec.create(Registries.STRUCTURE, DIRECT_CODEC);
+     public static final Codec<Holder<Structure>> CODEC = RegistryCodecs.holder(Registries.STRUCTURE, DIRECT_CODEC);
 -    protected final Structure.StructureSettings settings;
 +    //Forge: Make this field private so that the redirect coremod can target it
 +    @Deprecated
@@ -16,7 +16,7 @@
      }
  
      public static <S extends Structure> MapCodec<S> simpleCodec(final Function<Structure.StructureSettings, S> constructor) {
-@@ -58,22 +_,23 @@
+@@ -59,22 +_,23 @@
  
      protected Structure(final Structure.StructureSettings settings) {
          this.settings = settings;
@@ -44,7 +44,7 @@
      }
  
      public BoundingBox adjustBoundingBox(final BoundingBox boundingBox) {
-@@ -209,6 +_,22 @@
+@@ -208,6 +_,22 @@
      }
  
      public abstract StructureType<?> type();

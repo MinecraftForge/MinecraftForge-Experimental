@@ -1,10 +1,9 @@
 --- a/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
 +++ b/net/minecraft/world/level/block/entity/BaseContainerBlockEntity.java
-@@ -170,4 +_,27 @@
-         output.discard("lock");
+@@ -177,6 +_,29 @@
          output.discard("Items");
      }
-+
+ 
 +    private net.minecraftforge.common.util.LazyOptional<?> itemHandler = net.minecraftforge.common.util.LazyOptional.of(() -> createUnSidedHandler());
 +    protected net.minecraftforge.items.IItemHandler createUnSidedHandler() {
 +        return new net.minecraftforge.items.wrapper.InvWrapper(this);
@@ -27,4 +26,7 @@
 +        super.reviveCaps();
 +        itemHandler = net.minecraftforge.common.util.LazyOptional.of(() -> createUnSidedHandler());
 +    }
- }
++
+     protected LootContext getLootContext(final ServerLevel level) {
+         return new LootContext.Builder(
+                 new LootParams.Builder(level)

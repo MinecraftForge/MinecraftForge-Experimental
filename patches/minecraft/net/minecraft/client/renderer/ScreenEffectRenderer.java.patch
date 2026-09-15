@@ -1,70 +1,43 @@
 --- a/net/minecraft/client/renderer/ScreenEffectRenderer.java
 +++ b/net/minecraft/client/renderer/ScreenEffectRenderer.java
-@@ -61,8 +_,9 @@
+@@ -40,6 +_,9 @@
          PoseStack poseStack = new PoseStack();
-         Player player = this.minecraft.player;
-         if (isFirstPerson && !isSleeping) {
--            BlockState blockState = getViewBlockingState(player);
--            if (blockState != null) {
-+            var overlay = getOverlayBlock(player);
-+            BlockState blockState = overlay == null ? null : overlay.getLeft();
-+            if (blockState != null && net.minecraftforge.client.ForgeHooksClient.renderBlockOverlay(player, poseStack, net.minecraftforge.client.event.RenderBlockScreenEffectEvent.OverlayType.BLOCK, overlay.getLeft(), overlay.getRight())) {
-                 BlockStateModelSet blockStateModelSet = this.minecraft.getModelManager().getBlockStateModelSet();
-                 TextureAtlasSprite sprite = blockStateModelSet.getParticleMaterial(blockState).sprite();
-                 submitBlockSprite(sprite, poseStack, submitNodeCollector, -15132391);
-@@ -70,11 +_,15 @@
+         AvatarRenderState avatarRenderState = playerRenderState.avatarRenderState;
+         if (!cameraRenderState.entityRenderState.isSleeping && playerRenderState.hasPlayer && avatarRenderState != null) {
++            if (playerRenderState.customBlockOverlay != null)
++                playerRenderState.customBlockOverlay.render(poseStack, submitNodeCollector);
++            else
+             if (playerRenderState.blockOverlay != null) {
+                 submitBlockSprite(
+                     playerRenderState.blockOverlay.atlasLocation(),
+@@ -54,10 +_,16 @@
+             }
  
-             if (!this.minecraft.player.isSpectator()) {
-                 if (this.minecraft.player.isEyeInFluid(FluidTags.WATER)) {
-+                    if (!net.minecraftforge.client.ForgeHooksClient.renderWaterOverlay(player, poseStack))
-                     submitWater(this.minecraft, poseStack, submitNodeCollector);
-+                } else if (!player.getEyeInFluidType().isAir()) {
-+                    net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions.of(player.getEyeInFluidType()).renderOverlay(this.minecraft, poseStack, submitNodeCollector);
+             if (cameraRenderState.isFirstPerson && !avatarRenderState.isSpectator) {
++                if (playerRenderState.customFluidOverlay != null)
++                    playerRenderState.customFluidOverlay.render(poseStack, submitNodeCollector);
++                else
+                 if (playerRenderState.waterOverlay != null) {
+                     submitWater(playerRenderState.waterOverlay, poseStack, submitNodeCollector);
                  }
  
-                 if (this.minecraft.player.isOnFire()) {
++                if (playerRenderState.customFireOverlay != null)
++                    playerRenderState.customFireOverlay.render(poseStack, submitNodeCollector);
++                else
+                 if (playerRenderState.isOnFire) {
                      TextureAtlasSprite fireSprite = this.sprites.get(ModelBakery.FIRE_1);
-+                    if (!net.minecraftforge.client.ForgeHooksClient.renderFireOverlay(player, poseStack))
                      submitFire(poseStack, submitNodeCollector, fireSprite);
-                 }
-             }
-@@ -128,6 +_,11 @@
-             return null;
-         }
- 
-+        var ret = getOverlayBlock(player);
-+        return ret == null ? null : ret.getLeft();
-+    }
-+
-+    private static org.apache.commons.lang3.tuple.@Nullable Pair<BlockState, BlockPos> getOverlayBlock(Player player) {
-         BlockPos.MutableBlockPos testPos = new BlockPos.MutableBlockPos();
- 
-         for (int i = 0; i < 8; i++) {
-@@ -138,7 +_,7 @@
-             );
-             BlockState blockState = player.level().getBlockState(testPos);
-             if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.isViewBlocking(player.level(), testPos)) {
--                return blockState;
-+                return org.apache.commons.lang3.tuple.Pair.of(blockState, testPos.immutable());
-             }
-         }
- 
-@@ -156,13 +_,17 @@
+@@ -116,9 +_,12 @@
      }
  
-     private static void submitWater(final Minecraft minecraft, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector) {
-+        renderFluid(minecraft, poseStack, submitNodeCollector, UNDERWATER_LOCATION);
+     private static void submitWater(final PlayerRenderState.WaterOverlay waterOverlay, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector) {
++        submitFluid(waterOverlay, poseStack, submitNodeCollector, UNDERWATER_LOCATION);
 +    }
-+
-+    public static void renderFluid(Minecraft minecraft, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, Identifier texture) {
-         LocalPlayer player = minecraft.player;
-         BlockPos pos = BlockPos.containing(player.getEyePosition());
-         float brightness = Lightmap.getBrightness(player.level().dimensionType(), player.level().getMaxLocalRawBrightness(pos));
-         int color = ARGB.colorFromFloat(0.1F, brightness, brightness, brightness);
-         float u0 = -player.getYRot() / 64.0F;
-         float v0 = player.getXRot() / 64.0F;
--        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.blockScreenEffect(UNDERWATER_LOCATION), (pose, builder) -> {
-+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.blockScreenEffect(texture), (pose, builder) -> {
-             float uvSize = 4.0F;
-             buildQuad(builder, pose.pose(), -1.0F, -1.0F, 1.0F, 1.0F, -0.5F, u0 + 4.0F, v0 + 4.0F, u0, v0, color);
-         });
++    public static void submitFluid(final PlayerRenderState.WaterOverlay waterOverlay, final PoseStack poseStack, final SubmitNodeCollector submitNodeCollector, Identifier texture) {
+         submitNodeCollector.submitCustomGeometry(
+             poseStack,
+-            RenderTypes.blockScreenEffect(UNDERWATER_LOCATION),
++            RenderTypes.blockScreenEffect(texture),
+             (pose, builder) -> {
+                 float uvSize = 4.0F;
+                 buildQuad(

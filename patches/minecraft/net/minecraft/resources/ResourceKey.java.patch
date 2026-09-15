@@ -6,10 +6,10 @@
  
 -public class ResourceKey<T> {
 +public class ResourceKey<T> implements Comparable<ResourceKey<?>>, net.minecraftforge.common.extensions.IForgeResourceKey<T> {
+     public static final StreamCodec<ByteBuf, ResourceKey<? extends Registry<?>>> REGISTRY_STREAM_CODEC = Identifier.STREAM_CODEC
+         .map(ResourceKey::createRegistryKey, ResourceKey::identifier);
      private static final ConcurrentMap<ResourceKey.InternKey, ResourceKey<?>> VALUES = new MapMaker().weakValues().makeMap();
-     private final Identifier registryName;
-     private final Identifier identifier;
-@@ -74,5 +_,18 @@
+@@ -76,5 +_,18 @@
      }
  
      private record InternKey(Identifier registry, Identifier identifier) {

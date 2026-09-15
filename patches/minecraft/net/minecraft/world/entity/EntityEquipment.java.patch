@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/entity/EntityEquipment.java
 +++ b/net/minecraft/world/entity/EntityEquipment.java
-@@ -49,7 +_,7 @@
+@@ -50,7 +_,7 @@
          for (Entry<EquipmentSlot, ItemStack> entry : this.items.entrySet()) {
              ItemStack item = entry.getValue();
              if (!item.isEmpty()) {
@@ -9,7 +9,7 @@
              }
          }
      }
-@@ -69,5 +_,9 @@
+@@ -73,5 +_,9 @@
  
      public void clear() {
          this.items.replaceAll((s, v) -> ItemStack.EMPTY);

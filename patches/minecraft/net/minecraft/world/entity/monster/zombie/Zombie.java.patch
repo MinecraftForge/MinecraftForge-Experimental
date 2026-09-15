@@ -1,31 +1,15 @@
 --- a/net/minecraft/world/entity/monster/zombie/Zombie.java
 +++ b/net/minecraft/world/entity/monster/zombie/Zombie.java
-@@ -245,17 +_,21 @@
-     }
- 
-     protected void convertToZombieType(final ServerLevel level, final EntityType<? extends Zombie> zombieType) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(this, zombieType, timer -> this.conversionTime = timer)) return;
-         this.convertTo(
-             zombieType,
-             ConversionParams.single(this, true, true),
--            newZombie -> newZombie.handleAttributes(
--                level.getCurrentDifficultyAt(newZombie.blockPosition()).getSpecialMultiplier(), EntitySpawnReason.CONVERSION
--            )
-+            newZombie -> {
-+                newZombie.handleAttributes(level.getCurrentDifficultyAt(newZombie.blockPosition()).getSpecialMultiplier(), EntitySpawnReason.CONVERSION);
-+                net.minecraftforge.event.ForgeEventFactory.onLivingConvert(this, newZombie);
-+            }
-         );
-     }
+@@ -231,6 +_,8 @@
  
      @VisibleForTesting
      public boolean convertVillagerToZombieVillager(final ServerLevel level, final Villager villager) {
-+        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(villager, EntityTypes.ZOMBIE_VILLAGER, (timer) -> {}))
++        if (!net.minecraftforge.event.ForgeEventFactory.canLivingConvert(villager, EntityTypes.ZOMBIE_VILLAGER, _ -> {}))
 +            return false;
          ZombieVillager zombieVillager = villager.convertTo(
              EntityTypes.ZOMBIE_VILLAGER,
              ConversionParams.single(villager, true, true),
-@@ -268,6 +_,7 @@
+@@ -243,6 +_,7 @@
                  zombie.setGossips(villager.getGossips().copy());
                  zombie.setTradeOffers(villager.getOffers().copy());
                  zombie.setVillagerXp(villager.getVillagerXp());
@@ -33,7 +17,7 @@
                  if (!this.isSilent()) {
                      level.levelEvent(null, 1026, this.blockPosition(), 0);
                  }
-@@ -291,15 +_,26 @@
+@@ -266,15 +_,26 @@
              target = (LivingEntity)source.getEntity();
          }
  

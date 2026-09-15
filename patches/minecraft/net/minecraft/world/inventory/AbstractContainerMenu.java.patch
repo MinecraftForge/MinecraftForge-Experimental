@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/inventory/AbstractContainerMenu.java
 +++ b/net/minecraft/world/inventory/AbstractContainerMenu.java
-@@ -435,6 +_,7 @@
+@@ -438,6 +_,7 @@
                  ItemStack carried = this.getCarried();
                  player.updateTutorialInventoryAction(carried, slot.getItem(), clickAction);
                  if (!this.tryItemClickBehaviourOverride(player, clickAction, slot, clicked, carried)) {
@@ -8,7 +8,7 @@
                      if (clicked.isEmpty()) {
                          if (!carried.isEmpty()) {
                              int amount = clickAction == ClickAction.PRIMARY ? carried.getCount() : 1;
-@@ -648,7 +_,7 @@
+@@ -664,7 +_,7 @@
                  ItemStack target = slot.getItem();
                  if (!target.isEmpty() && ItemStack.isSameItemSameComponents(itemStack, target)) {
                      int totalStack = target.getCount() + itemStack.getCount();

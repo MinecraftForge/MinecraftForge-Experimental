@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/ClientLevel.java
 +++ b/net/minecraft/client/multiplayer/ClientLevel.java
-@@ -165,6 +_,7 @@
+@@ -168,6 +_,7 @@
          cache.put(BiomeColors.FOLIAGE_COLOR_RESOLVER, new BlockTintCache(pos -> this.calculateBlockTint(pos, BiomeColors.FOLIAGE_COLOR_RESOLVER)));
          cache.put(BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER, new BlockTintCache(pos -> this.calculateBlockTint(pos, BiomeColors.DRY_FOLIAGE_COLOR_RESOLVER)));
          cache.put(BiomeColors.WATER_COLOR_RESOLVER, new BlockTintCache(pos -> this.calculateBlockTint(pos, BiomeColors.WATER_COLOR_RESOLVER)));
@@ -8,7 +8,7 @@
      });
      private final ClientChunkCache chunkSource;
      private final Deque<Runnable> lightUpdateQueue = Queues.newArrayDeque();
-@@ -178,6 +_,8 @@
+@@ -181,6 +_,8 @@
      private final Long2ObjectMap<SortedSet<BlockDestructionProgress>> destructionProgress = new Long2ObjectOpenHashMap<>();
      private final int seaLevel;
      private static final Set<Item> MARKER_PARTICLE_ITEMS = Set.of(Items.BARRIER, Items.LIGHT);
@@ -17,7 +17,7 @@
  
      public void handleBlockChangedAck(final int sequence) {
          if (SharedConstants.DEBUG_BLOCK_BREAK) {
-@@ -260,6 +_,8 @@
+@@ -263,6 +_,8 @@
          this.serverSimulationDistance = serverSimulationDistance;
          this.environmentAttributes = this.addEnvironmentAttributeLayers(EnvironmentAttributeSystem.builder()).build();
          this.updateSkyBrightness();
@@ -26,15 +26,15 @@
      }
  
      private EnvironmentAttributeSystem.Builder addEnvironmentAttributeLayers(final EnvironmentAttributeSystem.Builder environmentAttributes) {
-@@ -471,6 +_,7 @@
-         entity.setOldPosAndRot();
-         entity.tickCount++;
+@@ -473,6 +_,7 @@
+     public void tickNonPassenger(final Entity entity) {
          Profiler.get().push(entity.typeHolder()::getRegisteredName);
+         entity.commonTick();
 +        if (entity.canUpdate())
          entity.tick();
          Profiler.get().pop();
  
-@@ -527,8 +_,10 @@
+@@ -528,8 +_,10 @@
      }
  
      public void addEntity(final Entity entity) {
@@ -45,7 +45,7 @@
      }
  
      public void removeEntity(final int id, final Entity.RemovalReason reason) {
-@@ -692,8 +_,10 @@
+@@ -693,8 +_,10 @@
          final float pitch,
          final long seed
      ) {
@@ -57,7 +57,7 @@
          }
      }
  
-@@ -707,8 +_,10 @@
+@@ -708,8 +_,10 @@
          final float pitch,
          final long seed
      ) {
@@ -69,7 +69,7 @@
          }
      }
  
-@@ -1081,7 +_,7 @@
+@@ -1095,7 +_,7 @@
  
      @Override
      public void addDestroyBlockEffect(final BlockPos pos, final BlockState blockState) {
@@ -78,7 +78,7 @@
              VoxelShape shape = blockState.getShape(this, pos);
              double density = 0.25;
              shape.forAllBoxes(
-@@ -1108,6 +_,7 @@
+@@ -1122,6 +_,7 @@
                                          new TerrainParticle(
                                              this, pos.getX() + x, pos.getY() + y, pos.getZ() + z, relX - 0.5, relY - 0.5, relZ - 0.5, blockState, pos
                                          )
@@ -86,30 +86,29 @@
                                      );
                              }
                          }
-@@ -1117,6 +_,13 @@
-         }
-     }
- 
-+    public void addBreakingBlockEffect(BlockPos pos, net.minecraft.world.phys.BlockHitResult target) {
-+        var state = this.getBlockState(pos);
-+        if (!net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(state).addHitEffects(state, this, target, this.minecraft.particleEngine))
-+            addBreakingBlockEffect(pos, target.getDirection());
-+    }
-+
-+    /** @deprecated Forge - Use crack(BlockPos, BlockHitResult) as it has more context and gives more control to modders */
-     public void addBreakingBlockEffect(final BlockPos pos, final Direction direction) {
-         BlockState blockState = this.getBlockState(pos);
-         if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.shouldSpawnTerrainParticles()) {
-@@ -1152,7 +_,7 @@
-                 xp = x + shape.maxX + 0.1F;
+@@ -1138,6 +_,7 @@
+                 this.playBreakingSound(pos, blockState);
              }
  
--            this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).setPower(0.2F).scale(0.6F));
-+            this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).updateSprite(blockState, pos).setPower(0.2F).scale(0.6F));
++            if (!net.minecraftforge.client.extensions.common.IClientBlockExtensions.of(blockState).addHitEffects(blockState, this, direction, this.minecraft.particleEngine))
+             if (blockState.getRenderShape() != RenderShape.INVISIBLE && blockState.shouldSpawnTerrainParticles()) {
+                 this.addBreakingParticles(pos, direction, blockState);
+             }
+@@ -1177,11 +_,11 @@
+             xp = x + shape.maxX + 0.1F;
          }
+ 
+-        this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).setPower(0.2F).scale(0.6F));
++        this.minecraft.particleEngine.add(new TerrainParticle(this, xp, yp, zp, 0.0, 0.0, 0.0, blockState, pos).updateSprite(blockState, pos).setPower(0.2F).scale(0.6F));
      }
  
-@@ -1218,6 +_,16 @@
+     private void playBreakingSound(final BlockPos pos, final BlockState blockState) {
+-        SoundType soundType = blockState.getSoundType();
++        SoundType soundType = blockState.getSoundType(this, pos, this.minecraft.player);
+         this.minecraft
+             .getSoundManager()
+             .play(
+@@ -1248,6 +_,16 @@
          this.explosionTracker.track(center, radius, blockCount, blockParticles);
      }
  
@@ -126,7 +125,7 @@
      @OnlyIn(Dist.CLIENT)
      public static class ClientLevelData implements WritableLevelData {
          private final boolean hardcore;
-@@ -1273,6 +_,7 @@
+@@ -1303,6 +_,7 @@
          }
  
          public void setDifficulty(final Difficulty difficulty) {
@@ -134,7 +133,7 @@
              this.difficulty = difficulty;
          }
  
-@@ -1315,6 +_,12 @@
+@@ -1345,6 +_,12 @@
                      break;
                  default:
              }
@@ -147,7 +146,7 @@
          }
  
          public void onTrackingEnd(final Entity entity) {
-@@ -1327,6 +_,15 @@
+@@ -1357,6 +_,15 @@
                      ClientLevel.this.dragonParts.removeAll(Arrays.asList(dragon.getSubEntities()));
                      break;
                  default:

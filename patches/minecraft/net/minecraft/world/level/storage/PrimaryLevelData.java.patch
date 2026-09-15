@@ -1,23 +1,23 @@
 --- a/net/minecraft/world/level/storage/PrimaryLevelData.java
 +++ b/net/minecraft/world/level/storage/PrimaryLevelData.java
-@@ -42,6 +_,7 @@
-     private final Set<String> knownServerBrands;
+@@ -45,6 +_,7 @@
      private boolean wasModded;
      private final Set<String> removedFeatureFlags;
+     private List<Integer> versionHistory;
 +    private boolean confirmedExperimentalWarning = false;
  
      private PrimaryLevelData(
          final @Nullable UUID singlePlayerUUID,
-@@ -105,7 +_,7 @@
-             settings,
+@@ -112,7 +_,7 @@
              specialWorldProperty,
-             worldGenSettingsLifecycle
+             worldGenSettingsLifecycle,
+             input.get("version_history").orElseEmptyList().asList(d -> d.asInt(-1))
 -        );
 +        ).withConfirmedWarning(worldGenSettingsLifecycle != Lifecycle.stable() && input.get("confirmedExperimentalSettings").asBoolean(false));
      }
  
      @Override
-@@ -142,6 +_,8 @@
+@@ -150,6 +_,8 @@
          }
  
          tag.store(WorldDataConfiguration.MAP_CODEC, this.settings.dataConfiguration());
@@ -26,7 +26,7 @@
      }
  
      public static void writeLastPlayed(final CompoundTag tag) {
-@@ -327,6 +_,16 @@
+@@ -346,6 +_,16 @@
      public LevelSettings getLevelSettings() {
          return this.settings.copy();
      }

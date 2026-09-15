@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/ChorusFlowerBlock.java
 +++ b/net/minecraft/world/level/block/ChorusFlowerBlock.java
-@@ -65,7 +_,7 @@
+@@ -54,7 +_,7 @@
          BlockPos above = pos.above();
          if (level.isEmptyBlock(above) && above.getY() <= level.getMaxY()) {
              int currentAge = state.getValue(AGE);
@@ -9,7 +9,7 @@
                  boolean growUpwards = false;
                  boolean pillarOnSupportBlock = false;
                  BlockState belowState = level.getBlockState(pos.below());
-@@ -121,6 +_,7 @@
+@@ -110,6 +_,7 @@
                  } else {
                      this.placeDeadFlower(level, pos);
                  }

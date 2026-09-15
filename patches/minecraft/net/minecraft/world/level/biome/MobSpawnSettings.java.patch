@@ -1,35 +1,38 @@
 --- a/net/minecraft/world/level/biome/MobSpawnSettings.java
 +++ b/net/minecraft/world/level/biome/MobSpawnSettings.java
-@@ -44,6 +_,8 @@
-     private final float creatureGenerationProbability;
-     private final Map<MobCategory, WeightedList<MobSpawnSettings.SpawnerData>> spawners;
+@@ -55,6 +_,8 @@
+     );
+     private final Map<MobCategory, WeightedList<MobSpawnSettings.SpawnerData>> spawnsByCategory;
      private final Map<EntityType<?>, MobSpawnSettings.MobSpawnCost> mobSpawnCosts;
 +    private final java.util.Set<MobCategory> typesView;
 +    private final java.util.Set<EntityType<?>> costView;
  
      private MobSpawnSettings(
-         final float creatureGenerationProbability,
-@@ -53,6 +_,8 @@
-         this.creatureGenerationProbability = creatureGenerationProbability;
-         this.spawners = ImmutableMap.copyOf(spawners);
+         final Map<MobCategory, WeightedList<MobSpawnSettings.SpawnerData>> spawnsByCategory,
+@@ -62,6 +_,8 @@
+     ) {
+         this.spawnsByCategory = ImmutableMap.copyOf(spawnsByCategory);
          this.mobSpawnCosts = ImmutableMap.copyOf(mobSpawnCosts);
-+        this.typesView = java.util.Collections.unmodifiableSet(this.spawners.keySet());
++        this.typesView = java.util.Collections.unmodifiableSet(this.spawnsByCategory.keySet());
 +        this.costView = java.util.Collections.unmodifiableSet(this.mobSpawnCosts.keySet());
      }
  
-     public WeightedList<MobSpawnSettings.SpawnerData> getMobs(final MobCategory category) {
-@@ -65,6 +_,14 @@
+     public WeightedList<MobSpawnSettings.SpawnerData> getMobsToSpawn(final MobCategory category) {
+@@ -84,8 +_,16 @@
+         return this.mobSpawnCosts;
+     }
  
-     public float getCreatureProbability() {
-         return this.creatureGenerationProbability;
-+    }
-+
 +    public java.util.Set<MobCategory> getSpawnerTypes() {
 +        return this.typesView;
 +    }
 +
 +    public java.util.Set<EntityType<?>> getEntityTypes() {
 +        return this.costView;
-     }
- 
++    }
++
      public static class Builder {
+-        private final Map<MobCategory, WeightedList.Builder<MobSpawnSettings.SpawnerData>> spawnsByCategory = new EnumMap<>(MobCategory.class);
++        protected final Map<MobCategory, WeightedList.Builder<MobSpawnSettings.SpawnerData>> spawnsByCategory = new EnumMap<>(MobCategory.class);
+         protected final Map<EntityType<?>, MobSpawnSettings.MobSpawnCost> mobSpawnCosts = Maps.newLinkedHashMap();
+ 
+         public MobSpawnSettings.Builder addSpawn(final EntityType<?> type, final int weight, final int minCount, final int maxCount) {

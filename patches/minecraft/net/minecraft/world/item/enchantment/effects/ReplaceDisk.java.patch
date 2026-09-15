@@ -5,6 +5,6 @@
              if (pos.distToCenterSqr(position.x(), pos.getY() + 0.5, position.z()) < Mth.square(dist)
                  && this.predicate.map(p -> p.test(serverLevel, pos)).orElse(true)
 +                && !net.minecraftforge.event.ForgeEventFactory.onBlockPlace(entity, net.minecraftforge.common.util.BlockSnapshot.create(serverLevel.dimension(), serverLevel, centerBlock), net.minecraft.core.Direction.UP)
-                 && serverLevel.setBlockAndUpdate(pos, this.blockState.getState(serverLevel, random, pos))) {
+                 && serverLevel.setBlockAndUpdate(pos, this.blockState.value().getState(serverLevel, random, pos))) {
                  this.triggerGameEvent.ifPresent(event -> serverLevel.gameEvent(entity, (Holder<GameEvent>)event, pos));
              }

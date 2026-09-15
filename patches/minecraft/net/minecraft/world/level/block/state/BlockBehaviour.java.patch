@@ -1,6 +1,6 @@
 --- a/net/minecraft/world/level/block/state/BlockBehaviour.java
 +++ b/net/minecraft/world/level/block/state/BlockBehaviour.java
-@@ -178,7 +_,7 @@
+@@ -169,7 +_,7 @@
          if (!state.isAir() && explosion.getBlockInteraction() != Explosion.BlockInteraction.TRIGGER_BLOCK) {
              Block block = state.getBlock();
              boolean doDropExperienceHack = explosion.getIndirectSourceEntity() instanceof Player;
@@ -9,17 +9,17 @@
                  BlockEntity blockEntity = state.hasBlockEntity() ? level.getBlockEntity(pos) : null;
                  LootParams.Builder params = new LootParams.Builder(level)
                      .withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
-@@ -193,8 +_,7 @@
+@@ -184,8 +_,7 @@
                  state.getDrops(params).forEach(stack -> onHit.accept(stack, pos));
              }
  
--            level.setBlock(pos, Blocks.AIR.defaultBlockState(), 3);
+-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 -            block.wasExploded(level, pos, explosion);
 +            state.onBlockExploded(level, pos, explosion);
          }
      }
  
-@@ -352,11 +_,14 @@
+@@ -347,11 +_,14 @@
              return 0.0F;
          }
  
@@ -36,7 +36,7 @@
      }
  
      protected void attack(final BlockState state, final Level level, final BlockPos pos, final Player player) {
-@@ -407,6 +_,8 @@
+@@ -406,6 +_,8 @@
          return this.isRandomlyTicking;
      }
  
@@ -45,7 +45,7 @@
      protected SoundType getSoundType(final BlockState state) {
          return this.soundType;
      }
-@@ -427,6 +_,10 @@
+@@ -426,6 +_,10 @@
          return this.properties.destroyTime;
      }
  
@@ -56,7 +56,7 @@
      public abstract static class BlockStateBase extends StateHolder<Block, BlockState> implements TypedInstance<Block> {
          private static final Direction[] DIRECTIONS = Direction.values();
          private static final VoxelShape[] EMPTY_OCCLUSION_SHAPES = Util.make(new VoxelShape[DIRECTIONS.length], s -> Arrays.fill(s, Shapes.empty()));
-@@ -582,12 +_,14 @@
+@@ -577,12 +_,14 @@
              return this.useShapeForLightOcclusion;
          }
  
@@ -72,7 +72,7 @@
          }
  
          public boolean ignitedByLava() {
-@@ -600,9 +_,11 @@
+@@ -595,9 +_,11 @@
          }
  
          public MapColor getMapColor(final BlockGetter level, final BlockPos pos) {
@@ -85,7 +85,7 @@
          public BlockState rotate(final Rotation rotation) {
              return this.getBlock().rotate(this.asState(), rotation);
          }
-@@ -660,6 +_,8 @@
+@@ -659,6 +_,8 @@
          }
  
          public PushReaction getPistonPushReaction() {
@@ -94,12 +94,12 @@
              return this.pushReaction;
          }
  
-@@ -1013,7 +_,7 @@
+@@ -1033,7 +_,7 @@
          private BlockBehaviour.StateArgumentPredicate<EntityType<?>> isValidSpawn = (state, level, pos, entityType) -> state.isFaceSturdy(
                  level, pos, Direction.UP
              )
 -            && state.getLightEmission() < 14;
 +            && state.getLightEmission(level, pos) < 14;
          private BlockBehaviour.StatePredicate isRedstoneConductor = BlockBehaviour.BlockStateBase::isCollisionShapeFullBlock;
-         private BlockBehaviour.StatePredicate isSuffocating = (state, level, pos) -> state.blocksMotion() && state.isCollisionShapeFullBlock(level, pos);
-         private BlockBehaviour.StatePredicate isViewBlocking = this.isSuffocating;
+         private BlockBehaviour.StatePredicate isSuffocating = (state, level, pos) -> state.is(BlockTags.CAUSES_SUFFOCATION)
+             && state.isCollisionShapeFullBlock(level, pos);

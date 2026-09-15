@@ -1,20 +1,20 @@
---- a/net/minecraft/world/level/block/RedStoneWireBlock.java
-+++ b/net/minecraft/world/level/block/RedStoneWireBlock.java
-@@ -242,7 +_,7 @@
+--- a/net/minecraft/world/level/block/RedstoneWireBlock.java
++++ b/net/minecraft/world/level/block/RedstoneWireBlock.java
+@@ -235,7 +_,7 @@
          BlockState relativeState = level.getBlockState(relativePos);
          if (canConnectUp) {
              boolean isPlaceableAbove = relativeState.getBlock() instanceof TrapDoorBlock || this.canSurviveOn(level, relativePos, relativeState);
--            if (isPlaceableAbove && shouldConnectTo(level.getBlockState(relativePos.above()))) {
+-            if (isPlaceableAbove && shouldConnectTo(level, relativePos.above())) {
 +            if (isPlaceableAbove && level.getBlockState(relativePos.above()).canRedstoneConnectTo(level, relativePos.above(), null)) {
                  if (relativeState.isFaceSturdy(level, relativePos, direction.getOpposite())) {
                      return RedstoneSide.UP;
                  }
-@@ -251,10 +_,14 @@
+@@ -244,10 +_,14 @@
              }
          }
  
--        return !shouldConnectTo(relativeState, direction)
--                && (relativeState.isRedstoneConductor(level, relativePos) || !shouldConnectTo(level.getBlockState(relativePos.below())))
+-        return !shouldConnectTo(relativeState, level, relativePos, direction)
+-                && (relativeState.isRedstoneConductor(level, relativePos) || !shouldConnectTo(level, relativePos.below()))
 -            ? RedstoneSide.NONE
 -            : RedstoneSide.SIDE;
 +        if (relativeState.canRedstoneConnectTo(level, relativePos, direction)) {

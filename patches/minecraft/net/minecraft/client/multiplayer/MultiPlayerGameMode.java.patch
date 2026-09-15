@@ -1,6 +1,6 @@
 --- a/net/minecraft/client/multiplayer/MultiPlayerGameMode.java
 +++ b/net/minecraft/client/multiplayer/MultiPlayerGameMode.java
-@@ -115,6 +_,7 @@
+@@ -120,6 +_,7 @@
      }
  
      public boolean destroyBlock(final BlockPos pos) {
@@ -8,7 +8,7 @@
          if (this.minecraft.player.blockActionRestricted(this.minecraft.level, pos, this.localPlayerMode)) {
              return false;
          }
-@@ -134,9 +_,8 @@
+@@ -139,9 +_,8 @@
              return false;
          }
  
@@ -19,7 +19,7 @@
          if (changed) {
              oldBlock.destroy(level, pos, oldState);
          }
-@@ -165,6 +_,7 @@
+@@ -170,6 +_,7 @@
              }
  
              this.startPrediction(this.minecraft.level, sequence -> {
@@ -27,7 +27,7 @@
                  this.destroyBlock(pos);
                  return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, pos, direction, sequence);
              });
-@@ -178,6 +_,7 @@
+@@ -183,6 +_,7 @@
                  this.connection
                      .send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.ABORT_DESTROY_BLOCK, this.destroyBlockPos, direction));
              }
@@ -35,7 +35,7 @@
  
              BlockState state = this.minecraft.level.getBlockState(pos);
              this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, state, 0.0F);
-@@ -188,9 +_,11 @@
+@@ -193,9 +_,11 @@
              this.startPrediction(this.minecraft.level, sequence -> {
                  boolean notAir = !state.isAir();
                  if (notAir && this.destroyProgress == 0.0F) {
@@ -47,15 +47,15 @@
                  if (notAir && state.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos) >= 1.0F) {
                      this.destroyBlock(pos);
                  } else {
-@@ -201,6 +_,7 @@
-                     this.destroyTicks = 0.0F;
+@@ -208,6 +_,7 @@
                      this.minecraft.level.destroyBlockProgress(this.minecraft.player.getId(), this.destroyBlockPos, this.getDestroyStage());
+                     this.minecraft.level.addBreakingBlockEffects(this.destroyBlockPos, this.destroyDirection, true);
                  }
 +                }
  
                  return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, pos, direction, sequence);
              });
-@@ -242,6 +_,7 @@
+@@ -249,6 +_,7 @@
              }
  
              this.startPrediction(this.minecraft.level, sequence -> {
@@ -63,24 +63,15 @@
                  this.destroyBlock(pos);
                  return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.START_DESTROY_BLOCK, pos, direction, sequence);
              });
-@@ -255,7 +_,7 @@
- 
+@@ -263,6 +_,7 @@
              this.destroyProgress = this.destroyProgress + state.getDestroyProgress(this.minecraft.player, this.minecraft.player.level(), pos);
-             if (this.destroyTicks % 4.0F == 0.0F) {
--                SoundType soundType = state.getSoundType();
-+                SoundType soundType = state.getSoundType(this.minecraft.level, pos, this.minecraft.player);
-                 this.minecraft
-                     .getSoundManager()
-                     .play(
-@@ -272,6 +_,7 @@
- 
              this.destroyTicks++;
              this.minecraft.getTutorial().onDestroyBlock(this.minecraft.level, pos, state, Mth.clamp(this.destroyProgress, 0.0F, 1.0F));
-+                if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, pos, direction).getUseItem().isDenied()) return true;
++            if (net.minecraftforge.event.ForgeEventFactory.onLeftClickBlockHold(this.minecraft.player, pos, direction).getUseItem().isDenied()) return true;
              if (this.destroyProgress >= 1.0F) {
                  this.isDestroying = false;
                  if (SharedConstants.DEBUG_BLOCK_BREAK) {
-@@ -279,6 +_,7 @@
+@@ -270,6 +_,7 @@
                  }
  
                  this.startPrediction(this.minecraft.level, sequence -> {
@@ -88,7 +79,7 @@
                      this.destroyBlock(pos);
                      return new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.STOP_DESTROY_BLOCK, pos, direction, sequence);
                  });
-@@ -313,7 +_,7 @@
+@@ -308,7 +_,7 @@
  
      private boolean sameDestroyTarget(final BlockPos pos) {
          ItemStack selected = this.minecraft.player.getMainHandItem();
@@ -97,7 +88,7 @@
      }
  
      private void ensureHasSentCarriedItem() {
-@@ -341,13 +_,24 @@
+@@ -336,13 +_,24 @@
      private InteractionResult performUseItemOn(final LocalPlayer player, final InteractionHand hand, final BlockHitResult blockHit) {
          BlockPos pos = blockHit.getBlockPos();
          ItemStack itemStack = player.getItemInHand(hand);
@@ -124,7 +115,7 @@
              BlockState blockState = this.minecraft.level.getBlockState(pos);
              if (!this.connection.isFeatureEnabled(blockState.getBlock().requiredFeatures())) {
                  return InteractionResult.FAIL;
-@@ -366,8 +_,10 @@
+@@ -361,8 +_,10 @@
              }
          }
  
@@ -134,10 +125,10 @@
 +           return InteractionResult.PASS;
 +        }
 +        if (event.getUseItem().isAllowed() || (!itemStack.isEmpty() && !player.getCooldowns().isOnCooldown(itemStack))) {
-             InteractionResult success;
+             InteractionResult result;
              if (player.hasInfiniteMaterials()) {
                  int count = itemStack.getCount();
-@@ -398,6 +_,12 @@
+@@ -399,6 +_,12 @@
                  return packet;
              }
  
@@ -150,7 +141,7 @@
              InteractionResult resultHolder = itemStack.use(this.minecraft.level, player, hand);
              ItemStack result;
              if (resultHolder instanceof InteractionResult.Success success) {
-@@ -408,6 +_,9 @@
+@@ -409,6 +_,9 @@
  
              if (result != itemStack) {
                  player.setItemInHand(hand, result);
@@ -160,7 +151,7 @@
              }
  
              interactionResult.setValue(resultHolder);
-@@ -445,6 +_,10 @@
+@@ -456,6 +_,10 @@
          this.ensureHasSentCarriedItem();
          Vec3 location = hitResult.getLocation().subtract(entity.getX(), entity.getY(), entity.getZ());
          this.connection.send(new ServerboundInteractPacket(entity.getId(), hand, location, player.isShiftKeyDown()));
