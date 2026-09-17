@@ -77,14 +77,12 @@ import net.minecraft.world.entity.npc.villager.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
-import net.minecraft.world.flag.FeatureFlagSet;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.BaseSpawner;
@@ -111,7 +109,6 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.common.capabilities.CapabilityDispatcher;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.BlockSnapshot;
@@ -181,7 +178,6 @@ import net.minecraftforge.event.entity.player.TradeWithVillagerEvent;
 import net.minecraftforge.event.furnace.FurnaceFuelBurnTimeEvent;
 import net.minecraftforge.event.level.AlterGroundEvent;
 import net.minecraftforge.event.level.BlockEvent;
-import net.minecraftforge.event.level.BlockEvent.BlockToolModificationEvent;
 import net.minecraftforge.event.level.BlockEvent.CreateFluidSourceEvent;
 import net.minecraftforge.event.level.BlockEvent.EntityMultiPlaceEvent;
 import net.minecraftforge.event.level.BlockEvent.NeighborNotifyEvent;
@@ -400,12 +396,6 @@ public final class ForgeEventFactory {
 
     public static void firePlayerSavingEvent(Player player, File playerDirectory, String uuidString) {
         PlayerEvent.SaveToFile.BUS.post(new PlayerEvent.SaveToFile(player, playerDirectory, uuidString));
-    }
-
-    @Nullable
-    public static BlockState onToolUse(BlockState originalState, UseOnContext context, ToolAction toolAction, boolean simulate) {
-        var event = new BlockToolModificationEvent(originalState, context, toolAction, simulate);
-        return BlockToolModificationEvent.BUS.post(event) ? null : event.getFinalState();
     }
 
     public static int onApplyBonemeal(@Nullable Player player, Level level, BlockPos pos, BlockState state, ItemStack stack) {

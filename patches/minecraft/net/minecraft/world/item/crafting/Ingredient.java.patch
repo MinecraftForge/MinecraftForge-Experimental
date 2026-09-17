@@ -33,7 +33,7 @@
          values.unwrap().ifRight(directValues -> {
              if (directValues.isEmpty()) {
                  throw new UnsupportedOperationException("Ingredients can't be empty");
-@@ -111,6 +_,51 @@
+@@ -111,6 +_,36 @@
          } else {
              return inputDisplay;
          }
@@ -49,22 +49,7 @@
 +    }
 +
 +    public static final net.minecraftforge.common.crafting.ingredients.IIngredientSerializer<Ingredient> VANILLA_SERIALIZER =
-+        new net.minecraftforge.common.crafting.ingredients.IIngredientSerializer<Ingredient>() {
-+            @Override
-+            public com.mojang.serialization.MapCodec<? extends Ingredient> codec() {
-+                return VANILLA_MAP_CODEC;
-+            }
-+
-+            @Override
-+            public void write(RegistryFriendlyByteBuf buffer, Ingredient value) {
-+                VANILLA_CONTENTS_STREAM_CODEC.encode(buffer, value);
-+            }
-+
-+            @Override
-+            public Ingredient read(RegistryFriendlyByteBuf buffer) {
-+                return VANILLA_CONTENTS_STREAM_CODEC.decode(buffer);
-+            }
-+        };
++        net.minecraftforge.common.crafting.ingredients.IIngredientSerializer.simple(VANILLA_MAP_CODEC, VANILLA_CONTENTS_STREAM_CODEC);
 +
 +    public net.minecraftforge.common.crafting.ingredients.IIngredientSerializer<? extends Ingredient> serializer() {
 +        if (!isVanilla()) throw new IllegalStateException("Modders must implement Ingredient.codec in their custom Ingredients: " + getClass());

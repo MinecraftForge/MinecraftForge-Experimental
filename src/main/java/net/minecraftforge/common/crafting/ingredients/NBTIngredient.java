@@ -26,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 /** Ingredient that matches the given items, performing a partial NBT match unless strict is set. */
 public class NBTIngredient extends AbstractIngredient {
@@ -104,29 +103,15 @@ public class NBTIngredient extends AbstractIngredient {
         ).apply(builder, NBTIngredient::new)
     );
 
-    public static final IIngredientSerializer<NBTIngredient> SERIALIZER = new IIngredientSerializer<>() {
-        private final StreamCodec<RegistryFriendlyByteBuf, HolderSet<Item>> HOLDER_SET = ByteBufCodecs.holderSet(Registries.ITEM);
+    private static final StreamCodec<RegistryFriendlyByteBuf, HolderSet<Item>> HOLDER_SET_CODEC = ByteBufCodecs.holderSet(Registries.ITEM);
+    public static final StreamCodec<RegistryFriendlyByteBuf, NBTIngredient> STREAM_CODEC = StreamCodec.composite(
+        HOLDER_SET_CODEC, i -> i.values,
+        ByteBufCodecs.COMPOUND_TAG, i -> i.nbt,
+        ByteBufCodecs.BOOL, i -> i.strict,
+        NBTIngredient::new
+    );
 
-        @Override
-        public MapCodec<? extends NBTIngredient> codec() {
-            return CODEC;
-        }
-
-        @Override
-        public NBTIngredient read(RegistryFriendlyByteBuf buffer) {
-            var items = HOLDER_SET.decode(buffer);
-            var nbt = buffer.readNbt();
-            var strict = buffer.readBoolean();
-            return new NBTIngredient(items, Objects.requireNonNull(nbt), strict);
-        }
-
-        @Override
-        public void write(RegistryFriendlyByteBuf buffer, NBTIngredient value) {
-            HOLDER_SET.encode(buffer, value.values);
-            buffer.writeNbt(value.nbt);
-            buffer.writeBoolean(value.strict);
-        }
-    };
+    public static final IIngredientSerializer<NBTIngredient> SERIALIZER = IIngredientSerializer.simple(CODEC, STREAM_CODEC);
 
     public static class Builder {
         private final List<ItemLike> items = new ArrayList<>();

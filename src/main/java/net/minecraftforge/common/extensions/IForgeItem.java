@@ -319,10 +319,7 @@ public interface IForgeItem {
      */
     default boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
         if (stack.is(ItemTags.SWORDS))
-            return ToolActions.DEFAULT_SWORD_ACTIONS.contains(toolAction);
-        else if (stack.is(ItemTags.PICKAXES))
-            return ToolActions.DEFAULT_PICKAXE_ACTIONS.contains(toolAction);
-
+            return toolAction == ToolActions.SWORD_SWEEP;
         return false;
     }
 

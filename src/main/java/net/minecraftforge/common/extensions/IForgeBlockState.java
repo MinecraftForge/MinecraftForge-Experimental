@@ -20,7 +20,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.FishingHook;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.SignalGetter;
 import net.minecraft.world.level.levelgen.feature.TreeFeature;
 import net.minecraft.world.level.material.FluidState;
@@ -39,8 +38,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -597,23 +594,6 @@ public interface IForgeBlockState {
      */
     default boolean shouldDisplayFluidOverlay(BlockAndTintGetter level, BlockPos pos, FluidState fluidState) {
         return self().getBlock().shouldDisplayFluidOverlay(self(), level, pos, fluidState);
-    }
-
-    /**
-     * Returns the state that this block should transform into when right-clicked by a tool.
-     * For example: Used to determine if {@link ToolActions#AXE_STRIP an axe can strip},
-     * {@link ToolActions#SHOVEL_FLATTEN a shovel can path}, or {@link ToolActions#HOE_TILL a hoe can till}.
-     * Returns {@code null} if nothing should happen.
-     *
-     * @param context The use on context that the action was performed in
-     * @param toolAction The action being performed by the tool
-     * @param simulate If {@code true}, no actions that modify the world in any way should be performed. If {@code false}, the world may be modified.
-     * @return The resulting state after the action has been performed
-     */
-    @Nullable
-    default BlockState getToolModifiedState(UseOnContext context, ToolAction toolAction, boolean simulate) {
-        BlockState eventState = net.minecraftforge.event.ForgeEventFactory.onToolUse(self(), context, toolAction, simulate);
-        return eventState != self() ? eventState : self().getBlock().getToolModifiedState(self(), context, toolAction, simulate);
     }
 
     /**

@@ -8,16 +8,14 @@ package net.minecraftforge.common.crafting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParseException;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.DataResult;
 import com.mojang.serialization.DynamicOps;
-import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.MapDecoder;
 import com.mojang.serialization.MapEncoder;
@@ -26,19 +24,22 @@ import com.mojang.serialization.RecordBuilder;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.Holder.Reference;
+import net.minecraft.core.HolderGetter;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.Registry;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.recipes.RecipeBuilder;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.PlacementInfo;
 import net.minecraft.world.item.crafting.Recipe;
-import net.minecraft.world.item.crafting.RecipeBookCategories;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
+import net.minecraft.world.item.crafting.RecipeInput;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -58,53 +59,40 @@ import org.jetbrains.annotations.Nullable;
  * This also means that you can wrap ALL recipes in a Conditional even those that don't explicitly
  * have support for them in their data gen.
  */
-public class ConditionalRecipe {
-    public static Builder builder() {
-        return new Builder();
+public class ConditionalRecipe implements Recipe<RecipeInput> {
+    public static Builder builder(RecipeOutput output) {
+        return new Builder(output);
+    }
+
+    private final @Nullable ICondition mainCondition;
+    private final List<InnerRecipe> children;
+    private final Recipe<RecipeInput> first;
+
+    @SuppressWarnings("unchecked")
+    private ConditionalRecipe(@Nullable ICondition mainCondition, List<InnerRecipe> children) {
+        this.mainCondition = mainCondition;
+        this.children = children;
+        this.first = (Recipe<RecipeInput>)children.getFirst().recipe();
     }
 
     public static class Builder {
         private final List<InnerRecipe> recipes = new ArrayList<>();
         private final List<InnerAdvancement> advancements = new ArrayList<>();
+        private final Bouncer bouncer;
 
-        private final RecipeOutput bouncer = new RecipeOutput() {
-            @Override
-            public void accept(ResourceKey<Recipe<?>> id, Recipe<?> value, @Nullable AdvancementHolder advancement) {
-                recipe(id, value, advancement);
-            }
+        @Nullable private ICondition condition;
+        @Nullable private ICondition mainCondition;
+        @Nullable private Identifier advancementId;
+        @Nullable private RecipeCategory category = null;
 
-            @SuppressWarnings("removal")
-            @Override
-            public Advancement.Builder advancement() {
-                return Advancement.Builder.recipeAdvancement().parent(RecipeBuilder.ROOT_RECIPE_ADVANCEMENT);
-            }
+        private Builder(RecipeOutput output) {
+            this.bouncer = new Bouncer(output, this);
+        }
 
-            @Override
-            public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, Identifier advancementId, JsonElement advancement) {
-                AdvancementHolder holder = null;
-                if (advancement != null) {
-                    Advancement adv = Advancement.CODEC.parse(JsonOps.INSTANCE, advancement).getOrThrow(JsonParseException::new);
-                    holder = new AdvancementHolder(advancementId, adv);
-                }
-                accept(id, recipe, holder);
-            }
-
-            @Override
-            public Provider registry() {
-                return null;
-            }
-
-            @Override
-            public void includeRootAdvancement() { }
-        };
-
-        @Nullable
-        private ICondition condition;
-        @Nullable
-        private ICondition mainCondition;
-
-        @Nullable
-        private Identifier advancementId;
+        public Builder category(RecipeCategory category) {
+            this.category = category;
+            return this;
+        }
 
         public Builder mainCondition(ICondition value) {
             if (this.mainCondition != null)
@@ -151,81 +139,75 @@ public class ConditionalRecipe {
             if (recipes.isEmpty())
                 throw new IllegalStateException("Invalid ConditionalRecipe builder, No recipes");
 
-            JsonElement advancement = null;
+            AdvancementHolder advancement = null;
             if (!advancements.isEmpty()) {
                 var adv = ConditionalAdvancement.builder();
                 for (var data : advancements) {
                     adv.condition(data.condition());
-                    if (data.json != null)
-                        adv.advancement(data.json());
-                    else
-                       adv.advancement(data.advancement());
+                    adv.advancement(data.advancement());
                 }
-                if (advancementId == null)
-                    advancementId = id.withPrefix("recipes/");
-                advancement = adv.build(out.registry());
-            } else {
-                advancementId = null;
+                if (advancementId == null) {
+                    if (this.category == null)
+                        advancementId = id.withPrefix("recipes/");
+                    else
+                        advancementId = id.withPrefix("recipes/" + category.getFolderName() + '/');
+                }
+                advancement = adv.build(advancementId);
             }
 
-            var key = ResourceKey.create(Registries.RECIPE, id);
-            out.accept(key, new Wrapper(mainCondition, recipes), advancementId, advancement);
+            out.accept(ResourceKey.create(Registries.RECIPE, id), new ConditionalRecipe(mainCondition, recipes), advancement);
+        }
+
+        private record Bouncer(RecipeOutput wrapped, Builder builder) implements RecipeOutput {
+            @Override
+            public void accept(ResourceKey<Recipe<?>> id, Recipe<?> value, @Nullable AdvancementHolder advancement) {
+                builder.recipe(id, value, advancement);
+            }
+
+            @Override
+            public Advancement.Builder advancement() {
+                return wrapped.advancement();
+            }
+
+            @Override
+            public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> key) {
+                return wrapped.lookup(key);
+            }
+
+            @SuppressWarnings("deprecation")
+            @Override
+            public <S> Stream<Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
+                return wrapped.listContextElements(key);
+            }
+
+            @Override
+            public <S> Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
+                return wrapped.registryLookup(registry);
+            }
         }
     }
 
     private record InnerRecipe(ICondition condition, Recipe<?> recipe) {}
     private record InnerAdvancement(ICondition condition, AdvancementHolder advancement, JsonObject json) {}
 
-    private static class Wrapper implements Recipe<CraftingInput> {
-        @Override public boolean matches(CraftingInput inv, Level level) { return false; }
-        @Override public ItemStack assemble(CraftingInput inv) { return null; }
-        @Override public boolean showNotification() { return false; }
-        @Override public String group() { return "ungrouped wrapper"; }
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-        @Override
-        public RecipeSerializer<? extends Recipe<CraftingInput>> getSerializer() {
-            return (RecipeSerializer)ConditionalRecipe.SERIALZIER;
-        }
-
-        @Override public RecipeType<? extends Recipe<CraftingInput>> getType() { throw new UnsupportedOperationException(); }
-
-        @Nullable private final ICondition main;
-        private final List<InnerRecipe> recipes;
-        private Wrapper(@Nullable ICondition main, List<InnerRecipe> recipes) {
-            this.main = main;
-            this.recipes = recipes;
-        }
-
-        @Override
-        public PlacementInfo placementInfo() {
-            return PlacementInfo.NOT_PLACEABLE;
-        }
-
-        @Override
-        public RecipeBookCategory recipeBookCategory() {
-            return RecipeBookCategories.STONECUTTER;
-        }
-
-    }
     private static final MapCodec<Recipe<?>> CODEC = Codec.of(new MapEncoder.Implementation<>() {
         @Override
         public <T> RecordBuilder<T> encode(Recipe<?> input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
-            if (!(input instanceof Wrapper))
-                new IllegalStateException("ConditionalRecipe.CODEC can only be used during data gen, how did you get here?");
-            Wrapper wrapper = (Wrapper)input;
+            if (!(input instanceof ConditionalRecipe))
+                new IllegalStateException("ConditionalRecipe.CODEC can only be used for ConditionRecipes, how did you get here?");
 
-            if (wrapper.main != null)
-                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.main));
-            else if (wrapper.recipes.size() == 1)
-                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.recipes.get(0).condition()));
+            var wrapper = (ConditionalRecipe)input;
+            if (wrapper.mainCondition != null)
+                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.mainCondition));
+            else if (wrapper.children.size() == 1)
+                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.children.getFirst().condition()));
 
             var recipes = ops.listBuilder();
-            for (var recipe : wrapper.recipes) {
+            for (var recipe : wrapper.children) {
                 var map = ops.mapBuilder();
-                if (wrapper.main != null || wrapper.recipes.size() != 1)
+                if (wrapper.mainCondition != null || wrapper.children.size() != 1)
                     map.add(ICondition.DEFAULT_FIELD, recipe.condition(), ICondition.CODEC);
-                map.add("recipe", recipe.recipe(), Recipe.CODEC);
+                map.add("recipe", recipe.recipe(), Recipe.DIRECT_CODEC);
                 recipes.add(map.build(ops.emptyMap()));
             }
             prefix.add("recipes", recipes.build(ops.emptyList()));
@@ -274,7 +256,7 @@ public class ConditionalRecipe {
             if (recipe == null)
                 return DataResult.error(() -> "Missing `recipe` entry " + count.value);
 
-            var ret = Recipe.CODEC.parse(ops, (T)recipe);
+            var ret = Recipe.DIRECT_CODEC.parse(ops, (T)recipe);
             return ret;
         }
 
@@ -284,14 +266,61 @@ public class ConditionalRecipe {
         }
     });
 
-    public static final RecipeSerializer<Recipe<?>> SERIALZIER = new RecipeSerializer<Recipe<?>>(CODEC,
-        StreamCodec.of(
-            (_, _) -> new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"),
-            _ -> { throw new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"); }
-        )
+    private static final StreamCodec<RegistryFriendlyByteBuf, ConditionalRecipe> STREAM_CODEC = StreamCodec.of(
+        (_, _) -> new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"),
+        _ -> { throw new UnsupportedOperationException("ConditionaRecipe.SERIALIZER does not support encoding to network"); }
     );
+
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+    private static MapCodec<ConditionalRecipe> typedCodec() {
+        return (MapCodec<ConditionalRecipe>)(MapCodec)CODEC;
+    }
+    public static final RecipeSerializer<ConditionalRecipe> SERIALZIER = new RecipeSerializer<>(typedCodec(), STREAM_CODEC);
 
     private static final class Holder<T> {
         private T value;
+    }
+
+    @Override
+    public RecipeSerializer<ConditionalRecipe> getSerializer() {
+        return SERIALZIER;
+    }
+
+    // This should never happen, as we're just doing this during data gen.
+    // But we need to have a full Recipe object in order for datagen to work.
+    @Override
+    public boolean matches(RecipeInput input, Level level) {
+        return this.first.matches(input, level);
+    }
+
+    @Override
+    public ItemStack assemble(RecipeInput input) {
+        return this.first.assemble((RecipeInput)input);
+    }
+
+    @Override
+    public boolean showNotification() {
+        return this.first.showNotification();
+    }
+
+    @Override
+    public String group() {
+        return this.first.group();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public RecipeType<Recipe<RecipeInput>> getType() {
+        return (RecipeType<Recipe<RecipeInput>>)this.first.getType();
+    }
+
+    @Override
+    public PlacementInfo placementInfo() {
+        return this.first.placementInfo();
+    }
+
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return this.first.recipeBookCategory();
     }
 }

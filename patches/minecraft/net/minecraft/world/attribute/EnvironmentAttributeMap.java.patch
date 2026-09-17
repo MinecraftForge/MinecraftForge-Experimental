@@ -1,0 +1,27 @@
+--- a/net/minecraft/world/attribute/EnvironmentAttributeMap.java
++++ b/net/minecraft/world/attribute/EnvironmentAttributeMap.java
+@@ -100,6 +_,12 @@
+             return this.modify(attribute, AttributeModifier.override(), value);
+         }
+ 
++        public <Value> @Nullable Entry<Value, ?> get(final EnvironmentAttribute<Value> attribute) {
++            @SuppressWarnings("unchecked")
++            var entry = (Entry<Value, ?>)this.entries.get(attribute);
++            return entry == null ? null : entry;
++        }
++
+         public EnvironmentAttributeMap build() {
+             return this.entries.isEmpty() ? EnvironmentAttributeMap.EMPTY : new EnvironmentAttributeMap(Map.copyOf(this.entries));
+         }
+@@ -134,6 +_,11 @@
+ 
+         public Value applyModifier(final Value subject) {
+             return this.modifier.apply(subject, this.argument);
++        }
++
++        @SuppressWarnings("unchecked")
++        public <A> A cast(AttributeModifier<Value, A> modifier) {
++            return (A)argument;
+         }
+     }
+ }

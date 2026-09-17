@@ -19,6 +19,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -85,21 +87,10 @@ public class CompoundIngredient extends AbstractIngredient {
         ).apply(builder, CompoundIngredient::new)
     );
 
-    public static final IIngredientSerializer<CompoundIngredient> SERIALIZER = new IIngredientSerializer<>() {
-        @Override
-        public MapCodec<CompoundIngredient> codec() {
-            return CODEC;
-        }
+    public static final StreamCodec<RegistryFriendlyByteBuf, CompoundIngredient> STREAM_CODEC = StreamCodec.composite(
+        Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), i -> i.children,
+        CompoundIngredient::new
+    );
 
-        @Override
-        public void write(RegistryFriendlyByteBuf buffer, CompoundIngredient value) {
-            buffer.writeCollection(value.children, (_, child) -> Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, child));
-        }
-
-        @Override
-        public CompoundIngredient read(RegistryFriendlyByteBuf buffer) {
-            var children = buffer.readCollection(ArrayList::new, _ -> Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
-            return new CompoundIngredient(children);
-        }
-    };
+    public static final IIngredientSerializer<CompoundIngredient> SERIALIZER = IIngredientSerializer.simple(CODEC, STREAM_CODEC);
 }

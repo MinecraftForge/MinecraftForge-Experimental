@@ -10,6 +10,8 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -100,21 +102,10 @@ public class IntersectionIngredient extends AbstractIngredient {
         .apply(builder, IntersectionIngredient::new)
     );
 
-    public static final IIngredientSerializer<IntersectionIngredient> SERIALIZER = new IIngredientSerializer<>() {
-        @Override
-        public MapCodec<? extends IntersectionIngredient> codec() {
-            return CODEC;
-        }
+    public static final StreamCodec<RegistryFriendlyByteBuf, IntersectionIngredient> STREAM_CODEC = StreamCodec.composite(
+        Ingredient.CONTENTS_STREAM_CODEC.apply(ByteBufCodecs.list()), i -> i.children,
+        IntersectionIngredient::new
+    );
 
-        @Override
-        public IntersectionIngredient read(RegistryFriendlyByteBuf buffer) {
-            var children = buffer.readCollection(ArrayList::new, _ -> Ingredient.CONTENTS_STREAM_CODEC.decode(buffer));
-            return new IntersectionIngredient(children);
-        }
-
-        @Override
-        public void write(RegistryFriendlyByteBuf buffer, IntersectionIngredient value) {
-            buffer.writeCollection(value.children, (_, child) -> Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, child));
-        }
-    };
+    public static final IIngredientSerializer<IntersectionIngredient> SERIALIZER = IIngredientSerializer.simple(CODEC, STREAM_CODEC);
 }

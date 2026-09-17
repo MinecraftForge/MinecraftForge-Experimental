@@ -9,7 +9,6 @@ import java.util.EnumSet;
 import java.util.List;
 
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.portal.PortalShape;
@@ -17,14 +16,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeHooks;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.util.BlockSnapshot;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
@@ -39,7 +35,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public sealed interface BlockEvent
-        permits BlockEvent.BlockToolModificationEvent, BlockEvent.BreakEvent, BlockEvent.CropGrowEvent,
+        permits BlockEvent.BreakEvent, BlockEvent.CropGrowEvent,
         BlockEvent.EntityPlaceEvent, BlockEvent.FarmlandTrampleEvent, BlockEvent.FluidPlaceBlockEvent,
         BlockEvent.NeighborNotifyEvent, BlockEvent.PortalSpawnEvent, NoteBlockEvent, PistonEvent {
     boolean DEBUG = Boolean.parseBoolean(System.getProperty("forge.debugBlockEvent", "false"));
@@ -372,119 +368,5 @@ public sealed interface BlockEvent
     record PortalSpawnEvent(LevelAccessor getLevel, BlockPos getPos, BlockState getState, PortalShape getPortalSize)
             implements Cancellable, BlockEvent, RecordEvent {
         public static final CancellableEventBus<PortalSpawnEvent> BUS = CancellableEventBus.create(PortalSpawnEvent.class);
-    }
-
-    /**
-     * Fired when a block is right-clicked by a tool to change its state.
-     * For example: Used to determine if {@link ToolActions#AXE_STRIP an axe can strip},
-     * {@link ToolActions#SHOVEL_FLATTEN a shovel can path}, or {@link ToolActions#HOE_TILL a hoe can till}.
-     * <p>
-     * Care must be taken to ensure level-modifying events are only performed if {@link #isSimulated()} returns {@code false}.
-     * <p>
-     * This event is {@linkplain Cancellable cancellable}. If cancelled, this will prevent the tool from changing
-     * the block's state.
-     */
-    final class BlockToolModificationEvent extends MutableEvent implements Cancellable, BlockEvent {
-        public static final CancellableEventBus<BlockToolModificationEvent> BUS = CancellableEventBus.create(BlockToolModificationEvent.class);
-
-        private final LevelAccessor level;
-        private final BlockPos pos;
-        private final BlockState originalState;
-
-        private final UseOnContext context;
-        private final ToolAction toolAction;
-        private final boolean simulate;
-        private BlockState state;
-
-        public BlockToolModificationEvent(BlockState originalState, @NotNull UseOnContext context, ToolAction toolAction, boolean simulate) {
-            this.level = context.getLevel();
-            this.pos = context.getClickedPos();
-            this.originalState = originalState;
-
-            this.context = context;
-            this.state = originalState;
-            this.toolAction = toolAction;
-            this.simulate = simulate;
-        }
-
-        @Override
-        public LevelAccessor getLevel() {
-            return level;
-        }
-
-        @Override
-        public BlockPos getPos() {
-            return pos;
-        }
-
-        @Override
-        public BlockState getState() {
-            return originalState;
-        }
-
-        /**
-         * @return the player using the tool.
-         * May be null based on what was provided by {@link #getContext() the use on context}.
-         */
-        @Nullable
-        public Player getPlayer() {
-            return this.context.getPlayer();
-        }
-
-        /**
-         * @return the tool being used
-         */
-        public ItemStack getHeldItemStack() {
-            return this.context.getItemInHand();
-        }
-
-        /**
-         * @return the action being performed
-         */
-        public ToolAction getToolAction() {
-            return this.toolAction;
-        }
-
-        /**
-         * Returns {@code true} if this event should not perform any actions that modify the level.
-         * If {@code false}, then level-modifying actions can be performed.
-         *
-         * @return {@code true} if this event should not perform any actions that modify the level.
-         * If {@code false}, then level-modifying actions can be performed.
-         */
-        public boolean isSimulated() {
-            return this.simulate;
-        }
-
-        /**
-         * Returns the nonnull use on context that this event was performed in.
-         *
-         * @return the nonnull use on context that this event was performed in
-         */
-        @NotNull
-        public UseOnContext getContext() {
-            return context;
-        }
-
-        /**
-         * Sets the state to transform the block into after tool use.
-         *
-         * @param finalState the state to transform the block into after tool use
-         * @see #getFinalState()
-         */
-        public void setFinalState(@Nullable BlockState finalState) {
-            this.state = finalState;
-        }
-
-        /**
-         * Returns the state to transform the block into after tool use.
-         * If {@link #setFinalState(BlockState)} is not called, this will return the original state.
-         * If {@link #isCanceled()} is {@code true}, this value will be ignored and the tool action will be canceled.
-         *
-         * @return the state to transform the block into after tool use
-         */
-        public BlockState getFinalState() {
-            return state;
-        }
     }
 }

@@ -7,20 +7,30 @@ package net.minecraftforge.common.crafting;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.mojang.serialization.JsonOps;
+import java.util.stream.Stream;
+
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.DataResult;
+import com.mojang.serialization.DynamicOps;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.MapDecoder;
+import com.mojang.serialization.MapEncoder;
+import com.mojang.serialization.MapLike;
+import com.mojang.serialization.RecordBuilder;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.Identifier;
-import net.minecraftforge.common.ForgeHooks;
+import net.minecraftforge.common.crafting.conditions.ConditionCodec;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 
 /**
- * A `ConditionalAdvancement` is a single advancment file that contains multiple advancements, each having a condition.
+ * A `ConditionalAdvancement` is a single advancement file that contains multiple advancements, each having a condition.
  * When loaded it will return the first advancement that the conditions pass.
  *
  * This allows for multiple variants of an advancement to share the same name in the registry. Which allows dependents
@@ -29,7 +39,7 @@ import net.minecraftforge.common.crafting.conditions.ICondition;
  * This is most likely useful when you have variants of a recipe based on what mods/resources are installed but want
  * to maintain the same 'entry' in the advancement book.
  */
-public class ConditionalAdvancement {
+public record ConditionalAdvancement(ICondition condition, Optional<Advancement> child) {
     public static Builder builder() {
         return new Builder();
     }
@@ -37,7 +47,7 @@ public class ConditionalAdvancement {
     public static class Builder {
         private static final Identifier DOESNT_MATTER = Identifier.fromNamespaceAndPath("doesnt", "matter");
 
-        private List<Adv> advancements = new ArrayList<>();
+        private List<ConditionalAdvancement> advancements = new ArrayList<>();
         private ICondition condition;
 
         public Builder condition(ICondition value) {
@@ -58,50 +68,117 @@ public class ConditionalAdvancement {
             return advancement(holder.value());
         }
 
-        public Builder advancement(JsonObject value) {
-            return advancement(null, value);
-        }
-
         private Builder advancement(Advancement value) {
-            return advancement(value, null);
-        }
-
-        private Builder advancement(Advancement value, JsonObject json) {
             if (condition == null)
                 throw new IllegalStateException("Can not add a advancement with no conditions.");
 
             if (value == null)
                 throw new IllegalStateException("Can not add a null advancement");
 
-            this.advancements.add(new Adv(this.condition, value, json));
+            this.advancements.add(new ConditionalAdvancement(this.condition, Optional.of(value)));
             this.condition = null;
 
             return this;
         }
 
-        public JsonObject build(HolderLookup.Provider lookup) {
-            var json = new JsonObject();
-            var array = new JsonArray();
-            json.add("forge:conditional", array);
+        public AdvancementHolder build(final Identifier id) {
+            if (this.advancements.isEmpty())
+                throw new IllegalStateException("Can not build an empty ConditionalAdvancement");
 
-            var ops = lookup.createSerializationContext(JsonOps.INSTANCE);
-
-            for (var pair : advancements) {
-                JsonObject holder = null;
-                if (pair.json != null)
-                    holder = pair.json;
-                else
-                    holder = (JsonObject)Advancement.CODEC.encodeStart(ops, pair.adv()).getOrThrow(IllegalStateException::new);
-
-                if (holder.has(ICondition.DEFAULT_FIELD))
-                    throw new IllegalStateException("Recipe already serialized conditions!");
-                ForgeHooks.writeCondition(pair.condition(), holder);
-
-                array.add(holder);
+            var list = new ArrayList<ConditionalAdvancement>();
+            Advancement root = null;
+            for (var child : advancements) {
+                if (root == null) {
+                    var adv = child.child.get();
+                    root = new Advancement(
+                        adv.parent(),
+                        adv.display(),
+                        adv.rewards(),
+                        adv.criteria(),
+                        adv.requirements(),
+                        adv.sendsTelemetryEvent(),
+                        adv.name(),
+                        Optional.of(list)
+                    );
+                    list.add(new ConditionalAdvancement(child.condition, Optional.empty()));
+                } else {
+                    list.add(child);
+                }
             }
-            return json;
+
+            return new AdvancementHolder(id, root);
         }
     }
 
-    private record Adv(ICondition condition, Advancement adv, JsonObject json) {}
+    public static final Codec<ConditionalAdvancement> CODEC = RecordCodecBuilder.create(i -> i.group(
+        ICondition.SAFE_CODEC.fieldOf(ICondition.DEFAULT_FIELD).forGetter(ConditionalAdvancement::condition),
+        Advancement.CODEC.optionalFieldOf("child").forGetter(ConditionalAdvancement::child)
+    ).apply(i, ConditionalAdvancement::new));
+    private static final Codec<List<ConditionalAdvancement>> LIST_CODEC = CODEC.listOf();
+
+
+    private static final String KEY = "forge:children";
+    public static final MapCodec<Advancement> CONDITIONAL_ADVANCEMENT_CODEC = Codec.of(new MapEncoder.Implementation<Advancement>() {
+        @Override
+        public <T> RecordBuilder<T> encode(Advancement input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+            var root = Advancement.MAP_CODEC.encode(input, ops, prefix);
+            if (input.forgeConditions().isPresent())
+                root.add("forge:children", LIST_CODEC.encodeStart(ops, input.forgeConditions().get()));
+            return root;
+        }
+
+        @Override
+        public <T> Stream<T> keys(DynamicOps<T> ops) {
+            return Stream.concat((Advancement.MAP_CODEC).keys(ops), List.of(ops.createString(KEY)).stream());
+        }
+    }, new MapDecoder.Implementation<Advancement>() {
+        @Override
+        public <T> DataResult<Advancement> decode(DynamicOps<T> ops, MapLike<T> input) {
+            var root = Advancement.MAP_CODEC.decode(ops, input);
+            var children = input.get(KEY);
+            if (children == null)
+                return root;
+
+            var context = ConditionCodec.getContext(ops);
+            return ops.getStream(children).flatMap(stream -> {
+                var count = new AtomicInteger();
+                var ret = stream.map(entry -> accept(context, ops, count, entry, root))
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+
+                if (ret != null)
+                    return ret;
+
+                return DataResult.error(() -> "No advancement passed conditions, if this is the case, you should have an outer condition.");
+            });
+        }
+
+        private static <T> DataResult<Advancement> accept(ICondition.IContext context, DynamicOps<T> ops, AtomicInteger count, T entry, DataResult<Advancement> root) {
+            count.getAndIncrement();
+            var map = ops.getMap(entry).result().orElse(null);
+            if (map == null)
+                return DataResult.error(() -> "Entry " + count.get() + " was not MapLike " + entry.getClass());
+
+            if (map.get(ICondition.DEFAULT_FIELD) != null) {
+                var parsed = ICondition.SAFE_CODEC.parse(ops, (T)map.get(ICondition.DEFAULT_FIELD));
+                if (parsed.result().isPresent()) {
+                    var condition = parsed.result().get();
+                    if (!condition.test(context, ops))
+                        return null;
+                }
+            }
+
+            var child = map.get("child");
+            if (child != null)
+                return Advancement.DIRECT_CODEC.parse(ops, (T)child);
+            return root;
+        }
+
+        @Override
+        public <T> Stream<T> keys(DynamicOps<T> ops) {
+            return Stream.concat((Advancement.MAP_CODEC).keys(ops), List.of(ops.createString(KEY)).stream());
+        }
+    });
+
 }

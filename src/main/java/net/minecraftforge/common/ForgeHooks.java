@@ -35,7 +35,6 @@ import com.mojang.serialization.Decoder;
 import com.mojang.serialization.DynamicOps;
 import com.mojang.serialization.JsonOps;
 import com.mojang.serialization.Lifecycle;
-
 import io.netty.handler.codec.DecoderException;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.commands.CommandSourceStack;
@@ -1216,7 +1215,7 @@ public final class ForgeHooks {
                     buf.writeVarInt(-1); // Our Marker
                     buf.writeIdentifier(key);
                 }
-                serializer.write(buf, value);
+                serializer.streamCodec().encode(buf, value);
             },
             (buf) -> {
                 buf.markReaderIndex();
@@ -1230,7 +1229,7 @@ public final class ForgeHooks {
                     if (serializer == null)
                         throw new DecoderException("Could not read ingredient of type: " + key);
                 }
-                return serializer.read(buf);
+                return serializer.streamCodec().decode(buf);
             }
         );
     }

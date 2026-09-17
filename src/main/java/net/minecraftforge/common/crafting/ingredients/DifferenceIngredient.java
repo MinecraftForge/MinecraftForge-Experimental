@@ -10,6 +10,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -81,23 +82,11 @@ public class DifferenceIngredient extends AbstractIngredient {
         ).apply(builder, DifferenceIngredient::new)
     );
 
-    public static final IIngredientSerializer<DifferenceIngredient> SERIALIZER = new IIngredientSerializer<>() {
-        @Override
-        public MapCodec<? extends DifferenceIngredient> codec() {
-            return CODEC;
-        }
+    public static final StreamCodec<RegistryFriendlyByteBuf, DifferenceIngredient> STREAM_CODEC = StreamCodec.composite(
+        Ingredient.CONTENTS_STREAM_CODEC, i -> i.base,
+        Ingredient.CONTENTS_STREAM_CODEC, i -> i.subtracted,
+        DifferenceIngredient::new
+    );
 
-        @Override
-        public DifferenceIngredient read(RegistryFriendlyByteBuf buffer) {
-            Ingredient base = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-            Ingredient without = Ingredient.CONTENTS_STREAM_CODEC.decode(buffer);
-            return new DifferenceIngredient(base, without);
-        }
-
-        @Override
-        public void write(RegistryFriendlyByteBuf buffer, DifferenceIngredient ingredient) {
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.base);
-            Ingredient.CONTENTS_STREAM_CODEC.encode(buffer, ingredient.subtracted);
-        }
-    };
+    public static final IIngredientSerializer<DifferenceIngredient> SERIALIZER = IIngredientSerializer.simple(CODEC, STREAM_CODEC);
 }
