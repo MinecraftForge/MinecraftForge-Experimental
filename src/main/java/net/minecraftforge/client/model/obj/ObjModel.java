@@ -316,9 +316,9 @@ public class ObjModel {
         if (emissiveAmbient) {
             int fakeLight = (int) ((ambientColor.x() + ambientColor.y() + ambientColor.z()) * 15 / 3.0f);
             uv2 = LightCoordsUtil.pack(fakeLight, fakeLight);
-            quadBaker.setShade(fakeLight == 0 && shadeQuads);
+            quadBaker.setShade(fakeLight == 0 && shadeQuads ? Direction.UP : null);
         } else
-            quadBaker.setShade(shadeQuads);
+            quadBaker.setShade(shadeQuads ? Direction.UP : null);
 
         boolean hasTransform = !transform.isIdentity();
         // The incoming transform is referenced on the center of the block, but our coords are referenced on the corner

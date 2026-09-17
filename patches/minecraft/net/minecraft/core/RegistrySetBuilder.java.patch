@@ -9,14 +9,13 @@
      private final List<RegistrySetBuilder.RegistryStub> entries = new ArrayList<>();
  
      private static RegistrySetBuilder.RegistryStub placeholderStub(final ResourceKey<? extends Registry<?>> key) {
-@@ -65,6 +_,12 @@
+@@ -65,6 +_,11 @@
          return this;
      }
  
-+    public RegistrySetBuilder copy() {
-+        var ret = new RegistrySetBuilder();
-+        ret.entries.addAll(this.entries);
-+        return ret;
++    public RegistrySetBuilder add(final RegistrySetBuilder other) {
++        this.entries.addAll(other.entries);
++        return this;
 +    }
 +
      private static HolderLookup.Provider buildProviderWithContext(

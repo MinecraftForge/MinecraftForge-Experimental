@@ -24,11 +24,16 @@ import net.minecraft.data.DataProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackLocationInfo;
 import net.minecraft.server.packs.repository.FolderRepositorySource;
+import net.minecraft.server.packs.repository.Pack;
+import net.minecraft.server.packs.repository.PackCompatibility;
 import net.minecraft.server.packs.repository.PackSource;
+import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraft.server.packs.repository.ServerPacksSource;
 import net.minecraft.server.packs.resources.MultiPackResourceManager;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.validation.DirectoryValidator;
 import net.minecraft.world.level.validation.ForbiddenSymlinkInfo;
 import net.minecraft.server.packs.PackResources;
@@ -96,44 +101,67 @@ public class ExistingFileHelper {
      * @param assetsDir the directory in which to find vanilla assets and indexes
      */
     public ExistingFileHelper(Collection<Path> existingPacks, final Set<String> existingMods, @Nullable final String assetIndex, @Nullable final File assetsDir) {
-        List<PackResources> candidateClientResources = new ArrayList<>();
-        List<PackResources> candidateServerResources = new ArrayList<>();
+        var client = new ArrayList<PackResources>();
+        var server = new ArrayList<PackResources>();
 
-        if (assetIndex != null && assetsDir != null && assetsDir.exists())
-        {
-            candidateClientResources.add(ClientPackSource.createVanillaPackSource(IndexedAssetSource.createIndexFs(assetsDir.toPath(), assetIndex)));
+        if (assetIndex != null && assetsDir != null && assetsDir.exists()) {
+            for (var pack : getVanillaClient(assetIndex, assetsDir))
+                pack.open().forEach(client::add);
+
         }
-        candidateServerResources.add(ServerPacksSource.createVanillaPackSource());
+        for (var pack : getVanillaServer())
+            pack.open().forEach(server::add);
 
         var symlinks = new ArrayList<ForbiddenSymlinkInfo>();
-        var folder = new FolderRepositorySource.FolderPackDetector(new DirectoryValidator(_  -> true));
+        var folder = new FolderRepositorySource.FolderPackDetector(new DirectoryValidator(_ -> true));
 
         for (Path existing : existingPacks) {
             try {
                 var info = new PackLocationInfo(existing.getFileName().toString(), Component.literal("data_gen"), PackSource.DEFAULT, Optional.empty());
                 var supplier = folder.detectPackResources(existing, symlinks, false);
-                PackResources pack = supplier.openPrimary(info);
-                candidateClientResources.add(pack);
-                candidateServerResources.add(pack);
-            }catch (IOException e) {
-                throw new RuntimeException(e);
+                add(client, server, info, supplier);
+            } catch (IOException e) {
+                throw new RuntimeException("Failed to read pack at: " + existing, e);
             }
         }
 
         for (String existingMod : existingMods) {
             IModFileInfo modFileInfo = ModList.getModFileById(existingMod);
             if (modFileInfo != null) {
-                var root = modFileInfo.getFile().findResource("/");
-                var supplier = new PathResourcesSupplier(root);
                 var info = new PackLocationInfo("mod:" + existingMod, Component.literal("data_gen:" + existingMod), PackSource.DEFAULT, Optional.empty());
-                var pack = supplier.openPrimary(info);
-                candidateClientResources.add(pack);
-                candidateServerResources.add(pack);
+                var supplier = new PathResourcesSupplier(modFileInfo.getFile().findResource("/"));
+                add(client, server, info, supplier);
             }
         }
 
-        this.clientResources = new MultiPackResourceManager(PackType.CLIENT_RESOURCES, candidateClientResources);
-        this.serverData = new MultiPackResourceManager(PackType.SERVER_DATA, candidateServerResources);
+        this.clientResources = new MultiPackResourceManager(PackType.CLIENT_RESOURCES, client);
+        this.serverData = new MultiPackResourceManager(PackType.SERVER_DATA, server);
+    }
+
+    private static List<Pack> getVanillaClient(@Nullable final String assetIndex, @Nullable final File assetsDir) {
+        var indexed = IndexedAssetSource.createIndexFs(assetsDir.toPath(), assetIndex);
+        var validator = LevelStorageSource.parseValidator(indexed.resolve(LevelStorageSource.ALLOWED_SYMLINKS_CONFIG_NAME));
+        var vanilla = new ClientPackSource(indexed, validator);
+        return toList(vanilla);
+    }
+
+    private static List<Pack> getVanillaServer() {
+        var vanilla = new ServerPacksSource(new DirectoryValidator(path -> true));
+        return toList(vanilla);
+    }
+
+    private static List<Pack> toList(RepositorySource source) {
+        var ret = new ArrayList<Pack>();
+        source.loadPacks(ret::add);
+        return ret;
+    }
+
+    private static final Pack.Metadata META = new Pack.Metadata(Component.empty(), PackCompatibility.COMPATIBLE, FeatureFlagSet.of(), List.of());
+    private void add(List<PackResources> client, List<PackResources> server, PackLocationInfo info, Pack.ResourcesSupplier resources) {
+        for (var pack : resources.openResources(info, META).toList()) {
+            client.add(pack);
+            server.add(pack);
+        }
     }
 
     private ResourceManager getManager(PackType packType) {

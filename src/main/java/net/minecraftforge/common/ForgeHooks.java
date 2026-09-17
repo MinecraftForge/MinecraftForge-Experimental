@@ -92,7 +92,6 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.LevelStorageSource;
 import net.minecraft.world.level.storage.WorldData;
 import net.minecraft.world.level.storage.loot.LootContext;
-import net.minecraft.world.level.storage.loot.LootDataType;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.block.state.BlockState;
@@ -134,8 +133,8 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.GrindstoneEvent;
 import net.minecraftforge.event.ModMismatchEvent;
-import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.RegisterStructureConversionsEvent;
+import net.minecraftforge.event.ServerChatEvent;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
 import net.minecraftforge.event.entity.item.ItemTossEvent;
@@ -169,11 +168,11 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkInitialization;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.packets.SpawnEntity;
-import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ForgeRegistry;
 import net.minecraftforge.registries.GameData;
 import net.minecraftforge.registries.RegistryManager;
+import net.minecraftforge.resource.ResourcePackLoader;
 import net.minecraftforge.server.permission.PermissionAPI;
 
 import org.apache.logging.log4j.LogManager;
@@ -1258,7 +1257,7 @@ public final class ForgeHooks {
 
     @SuppressWarnings("unchecked")
     public static <T> T onJsonDataParsed(Codec<T> codec, Identifier key, T value) {
-        if (codec == LootDataType.TABLE.codec()) {
+        if (codec == LootTable.DIRECT_CODEC) {
             var table = (LootTable)value;
             table.setLootTableId(key);
             value = (T)net.minecraftforge.event.ForgeEventFactory.onLoadLootTable(key, table);

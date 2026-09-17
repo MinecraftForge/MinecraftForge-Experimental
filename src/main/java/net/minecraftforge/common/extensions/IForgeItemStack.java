@@ -369,7 +369,7 @@ public interface IForgeItemStack {
      * {@linkplain Player#hasInfiniteMaterials() has infinite materials}, this method will not be called.
      * @see IForgeItem#damageItem(ItemStack, int, ServerLevel, ServerPlayer, boolean, Consumer)
      */
-    default int damageItem(int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<Item> onBroken) {
+    default int damageItem(int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<ItemStack> onBroken) {
         return self().getItem().damageItem(self(), damage, level, player, canBreak, onBroken);
     }
 

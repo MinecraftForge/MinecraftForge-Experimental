@@ -18,6 +18,7 @@ import net.minecraftforge.client.textures.UnitTextureAtlasSprite;
 import java.util.function.Consumer;
 
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Vertex consumer that outputs {@linkplain BakedQuad baked quads}.
@@ -36,7 +37,7 @@ public class BakedQuadBuilder implements VertexConsumer {
     private int tintIndex;
     private Direction direction = Direction.DOWN;
     private TextureAtlasSprite sprite = UnitTextureAtlasSprite.INSTANCE;
-    private boolean shade;
+    private @Nullable Direction shade;
     private int lightEmission;
 
     public BakedQuadBuilder(Consumer<BakedQuad> quadConsumer) {
@@ -104,6 +105,13 @@ public class BakedQuadBuilder implements VertexConsumer {
         return this;
     }
 
+    /** Will not actually do anything, vanilla implementations ignore if passed invalid data so we do as well */
+    @Override
+    public VertexConsumer setUv3(float u, float v) {
+        //throw new IllegalStateException("UV2 is not supported in BakedQuads anymore, you can't bake lighting per vertex anymore");
+        return this;
+    }
+
     private void setup() {
         this.positions = new Vector3f[]{ new Vector3f(), new Vector3f(), new Vector3f(), new Vector3f() };
         this.uvs = new long[4];
@@ -139,7 +147,7 @@ public class BakedQuadBuilder implements VertexConsumer {
         this.sprite = sprite;
     }
 
-    public void setShade(boolean shade) {
+    public void setShade(@Nullable Direction shade) {
         this.shade = shade;
     }
 

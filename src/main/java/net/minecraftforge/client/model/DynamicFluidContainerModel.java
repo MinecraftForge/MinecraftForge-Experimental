@@ -147,7 +147,7 @@ public class DynamicFluidContainerModel implements UnbakedGeometry {
 
     private static MaterialInfo info(final ModelBaker baker, final Material.Baked material, final int tintIndex) {
         return baker.interner().materialInfo(
-            MaterialInfo.of(material, material.sprite().transparency(), tintIndex, true, 0)
+            MaterialInfo.of(material, material.sprite().transparency(), tintIndex, null, 0)
         );
     }
 

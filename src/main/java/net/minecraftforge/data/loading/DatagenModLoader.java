@@ -91,7 +91,8 @@ public final class DatagenModLoader {
         if (genClient)
             ClientBootstrap.bootstrap();
         ModLoader.gatherAndInitializeMods(ModWorkManager.syncExecutor(), ModWorkManager.parallelExecutor(), ()->{});
-        var lookupProvider = CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor());
+        var lookupProvider = CompletableFuture.supplyAsync(VanillaRegistries::createWorldLookup, Util.backgroundExecutor())
+                .thenApplyAsync(VanillaRegistries::createReloadableLookup, Util.backgroundExecutor());
 
         var mods = new HashSet<String>();
         for (var pattern : patterns) {

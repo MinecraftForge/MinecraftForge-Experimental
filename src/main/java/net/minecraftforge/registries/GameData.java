@@ -134,10 +134,7 @@ public class GameData {
         makeRegistry(Keys.ACTIVITIES).disableSaving().disableSync().create();
 
         // Worldgen
-        makeRegistry(Keys.WORLD_CARVERS).disableSaving().disableSync().create();
-        makeRegistry(Keys.FEATURES).disableSaving().disableSync().create();
         makeRegistry(Keys.CHUNK_STATUS, "empty").disableSaving().disableSync().create();
-        makeRegistry(Keys.BLOCK_STATE_PROVIDER_TYPES).disableSaving().disableSync().create();
         makeRegistry(Keys.FOLIAGE_PLACER_TYPES).disableSaving().disableSync().create();
         makeRegistry(Keys.TREE_DECORATOR_TYPES).disableSaving().disableSync().create();
 

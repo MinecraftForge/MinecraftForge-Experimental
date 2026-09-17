@@ -36,11 +36,12 @@ import net.minecraft.client.gui.components.ObjectSelectionList;
 import net.minecraft.client.gui.components.StringWidget;
 
 import net.minecraft.client.renderer.texture.DynamicTexture;
+
+import com.mojang.blaze3d.Blaze3D;
 import com.mojang.blaze3d.platform.NativeImage;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.Util;
 import net.minecraftforge.common.ForgeHooks;
 import net.minecraftforge.common.util.Size2i;
 import net.minecraftforge.common.ForgeI18n;
@@ -232,7 +233,7 @@ public class ModListScreen extends Screen {
                 .bounds(((listWidth + PADDING + this.width - doneButtonWidth) / 2), y, doneButtonWidth, BUTTON_HEIGHT)
                 .build();
 
-        openModsFolderButton = Button.builder(Component.translatable("fml.menu.mods.openmodsfolder"), _ -> Util.getPlatform().openFile(FMLPaths.MODSDIR.get().toFile()))
+        openModsFolderButton = Button.builder(Component.translatable("fml.menu.mods.openmodsfolder"), _ -> Blaze3D.openPath(FMLPaths.MODSDIR.get()))
                 .bounds(6, y, this.listWidth, BUTTON_HEIGHT)
                 .build();
 

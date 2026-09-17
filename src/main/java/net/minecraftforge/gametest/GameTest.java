@@ -21,6 +21,8 @@ public @interface GameTest {
 
     static final String DEFAULT_STRUCTURE = "forge:empty3x3x3";
     String environment() default GameTestEnvironments.DEFAULT;
+    static final String DEFAULT_DIMENSION = "minecraft:overworld";
+    String dimension() default DEFAULT_DIMENSION;
     String structure() default DEFAULT_STRUCTURE;
     int maxTicks() default 100;
     int setupTicks() default 0;

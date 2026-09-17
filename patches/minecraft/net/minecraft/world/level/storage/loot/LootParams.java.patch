@@ -10,7 +10,7 @@
 +            this.withLuck(parent.getLuck());
 +            parent.dynamicDrops.forEach(this::withDynamicDrop);
 +            for (var key : parent.params.keySet())
-+                this.withParameter((ContextKey<Object>)key, (Object)parent.contextMap().getOptional(key));
++                this.withParameter((ContextKey<Object>)key, (Object)parent.contextMap().get(key));
 +        }
 +
          public ServerLevel getLevel() {

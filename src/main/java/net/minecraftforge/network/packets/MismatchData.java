@@ -5,11 +5,14 @@
 
 package net.minecraftforge.network.packets;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraftforge.network.NetworkContext.NetworkMismatchData;
@@ -23,37 +26,21 @@ public record MismatchData(
     Map<Identifier, Version> mismatched,
     Set<Identifier> missing
 ) {
-    public static final StreamCodec<FriendlyByteBuf, MismatchData> STREAM_CODEC = StreamCodec.ofMember(MismatchData::encode, MismatchData::decode);
     private static final int MAX_LENGTH = 0x100;
+    private static final StreamCodec<ByteBuf, String> STRING_CODEC = ByteBufCodecs.stringUtf8(MAX_LENGTH);
+    private static final StreamCodec<ByteBuf, Identifier> IDENNTIFIER_CODEC = STRING_CODEC.map(Identifier::parse, Identifier::toString);
+    public static final StreamCodec<FriendlyByteBuf, MismatchData> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.map(HashMap::new,
+            IDENNTIFIER_CODEC,
+            StreamCodec.composite(STRING_CODEC, Version::received, STRING_CODEC, Version::had, Version::new)
+        ),
+        MismatchData::mismatched,
+        ByteBufCodecs.collection(HashSet::new, IDENNTIFIER_CODEC),
+        MismatchData::missing,
+        MismatchData::new
+    );
 
     public MismatchData(NetworkMismatchData data) {
         this(data.mismatched(), data.missing());
-    }
-
-    public static MismatchData decode(FriendlyByteBuf buf) {
-        var mismatched = buf.readMap(
-            i -> Identifier.parse(i.readUtf(MAX_LENGTH)),
-            i -> new Version(
-                i.readUtf(MAX_LENGTH),
-                i.readUtf(MAX_LENGTH)
-            )
-        );
-        var missing = buf.readCollection(HashSet::new,
-            i -> Identifier.parse(i.readUtf(MAX_LENGTH))
-        );
-        return new MismatchData(mismatched, missing);
-    }
-
-    public void encode(FriendlyByteBuf buf) {
-        buf.writeMap(mismatched,
-            (o, k) -> o.writeUtf(k.toString(), MAX_LENGTH),
-            (o, v) -> {
-                o.writeUtf(v.received(), MAX_LENGTH);
-                o.writeUtf(v.had(), MAX_LENGTH);
-            }
-        );
-        buf.writeCollection(missing,
-            (o, k) -> o.writeUtf(k.toString(), MAX_LENGTH)
-        );
     }
 }

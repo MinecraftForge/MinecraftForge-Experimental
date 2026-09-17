@@ -6,28 +6,36 @@
                  this.clearSpectatedEntityPostEffect();
 +                var rl = cameraEntity == null ? null : net.minecraftforge.client.EntitySpectatorShaderManager.get(cameraEntity.getType());
 +                if (rl != null)
-+                    this.setPostEffect(rl);
++                    this.setSpectatedEntityPostEffect(rl);
          }
      }
  
+@@ -430,6 +_,8 @@
+         ProfilerFiller profiler = Profiler.get();
+         profiler.push("camera");
+         this.mainCamera.update(deltaTracker);
++        var cameraSetup = net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeCameraAngles(this, this.mainCamera, deltaTracker.getGameTimeDeltaPartialTick(true));
++        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
+         profiler.pop();
+         this.requestedPostEffects.clear();
+         this.requestedPostEffects.add(END_OF_FRAME_POST_EFFECT);
 @@ -628,6 +_,10 @@
                      BlockInWorld blockInWorld = new BlockInWorld(this.minecraft.level, pos, false);
                      renderOutline = !itemStack.isEmpty()
                          && (itemStack.canBreakBlockInAdventureMode(blockInWorld) || itemStack.canPlaceOnBlockInAdventureMode(blockInWorld));
-+                    if (!renderOutline && blockState.hasBlockEntity()) {
++                    if (!renderOutline && blockInWorld.getState().hasBlockEntity()) {
 +                        var blockEntity = this.minecraft.level.getBlockEntity(pos);
 +                        renderOutline = blockEntity != null && blockEntity.hasCustomOutlineRendering();
 +                    }
                  }
              }
          }
-@@ -648,6 +_,9 @@
-         if (optionsState.bobView) {
-             this.bobView(cameraState, bobStack);
-         }
-+
+@@ -780,6 +_,8 @@
+ 
+     private void extractCamera(final DeltaTracker deltaTracker, final float worldPartialTicks) {
+         CameraRenderState cameraState = this.gameRenderState.levelRenderState.cameraRenderState;
 +        var cameraSetup = net.minecraftforge.client.event.ForgeEventFactoryClient.fireComputeCameraAngles(this, this.mainCamera, worldPartialTicks);
 +        this.mainCamera.setRotation(cameraSetup.getYaw(), cameraSetup.getPitch(), cameraSetup.getRoll());
- 
-         projectionMatrix.mul(bobStack.last().pose());
-         float worldPartialTicks = this.gameRenderState.levelRenderState.worldPartialTicks;
+         this.mainCamera.extractRenderState(cameraState, deltaTracker);
+         cameraState.fogType = this.mainCamera.getFluidInCamera();
+         cameraState.fogData = this.fogRenderer

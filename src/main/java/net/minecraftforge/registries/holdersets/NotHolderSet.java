@@ -23,7 +23,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.HolderSetCodec;
+import net.minecraft.core.registries.codec.HolderSetCodec;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
@@ -121,7 +121,7 @@ public class NotHolderSet<T> implements ICustomHolderSet<T> {
 
     @Override
     public boolean canSerializeIn(HolderOwner<T> holderOwner) {
-        return this.registryLookup.canSerializeIn(holderOwner);
+        return this.registryLookup.canSerialize(holderOwner);
     }
 
     @Override

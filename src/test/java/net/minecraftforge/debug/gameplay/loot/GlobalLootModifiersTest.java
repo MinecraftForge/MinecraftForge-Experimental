@@ -57,7 +57,7 @@ import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.common.data.GlobalLootModifierProvider;
 import net.minecraftforge.common.loot.IGlobalLootModifier;
 import net.minecraftforge.common.loot.LootModifier;
@@ -130,7 +130,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
         var lookup = event.getLookupProvider();
         var patched = RegistryPatchGenerator.createLookup(lookup, ENCHANTMENTS.get())
                 .thenApply(RegistrySetBuilder.PatchedRegistries::patches);
-        event.getGenerator().addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(out, lookup, ENCHANTMENTS.get(), Set.of(MODID)));
+        event.getGenerator().addProvider(event.includeServer(), new RegistryDataBuilder(out, lookup, ENCHANTMENTS.get(), Set.of(MODID)));
         event.getGenerator().addProvider(event.includeServer(), new ModifierProvider(out, MODID, patched));
         event.getGenerator().addProvider(event.includeServer(), new LootProvider(out, lookup));
     }

@@ -16,9 +16,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Stream;
+
 import net.minecraft.resources.Identifier;
-import net.minecraft.server.packs.AbstractPackResources;
+import net.minecraft.server.packs.AbstractPackMetadataResources;
 import net.minecraft.server.packs.PackLocationInfo;
+import net.minecraft.server.packs.PackMetadataResources;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.metadata.MetadataSectionType;
@@ -31,7 +34,7 @@ import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
 
 @ApiStatus.Internal
-public class DelegatingPackResources extends AbstractPackResources {
+public class DelegatingPackResources extends AbstractPackMetadataResources implements PackResources {
     private final PackMetadataSection packMeta;
     private final List<PackResources> delegates;
     private final Map<String, List<PackResources>> namespacesAssets;
@@ -115,13 +118,13 @@ public class DelegatingPackResources extends AbstractPackResources {
 
     private class Supplier implements Pack.ResourcesSupplier {
         @Override
-        public PackResources openPrimary(PackLocationInfo p_332103_) {
+        public PackMetadataResources openMetadata(PackLocationInfo location) {
             return DelegatingPackResources.this;
         }
 
         @Override
-        public PackResources openFull(PackLocationInfo p_330351_, Metadata p_333429_) {
-            return DelegatingPackResources.this;
+        public Stream<PackResources> openResources(PackLocationInfo location, Metadata metadata) {
+            return DelegatingPackResources.this.delegates.stream();
         }
     }
 }

@@ -1,9 +1,13 @@
 --- a/net/minecraft/data/registries/VanillaRegistries.java
 +++ b/net/minecraft/data/registries/VanillaRegistries.java
-@@ -184,4 +_,12 @@
+@@ -184,4 +_,16 @@
          validateLootData(newRegistries);
          return newRegistries;
      }
++
++    public static RegistrySetBuilder builder() {
++        return worldBuilder().add(RELOADABLE_BUILDER);
++    }
 +
 +    public static RegistrySetBuilder worldBuilder() {
 +        return WORLD_BUILDER.copy();

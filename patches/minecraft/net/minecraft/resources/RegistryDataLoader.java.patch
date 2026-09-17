@@ -23,8 +23,8 @@
          new RegistryDataLoader.RegistryData<>(Registries.BLOCK_STATE_PROVIDER, BlockStateProvider.DIRECT_CODEC)
      );
 +
-+    public static java.util.stream.Stream<RegistryDataLoader.RegistryData<?>> getWorldGenAndDimensionStream() {
-+        return java.util.stream.Stream.concat(RegistryDataLoader.WORLD_REGISTRIES.stream(), RegistryDataLoader.DIMENSION_REGISTRIES.stream());
++    public static List<RegistryDataLoader.RegistryData<?>> getWorldAndDimensionRegistries() {
++        return java.util.stream.Stream.concat(RegistryDataLoader.WORLD_REGISTRIES.stream(), RegistryDataLoader.DIMENSION_REGISTRIES.stream()).toList();
 +    }
  
      public static CompletableFuture<RegistryAccess.Frozen> load(

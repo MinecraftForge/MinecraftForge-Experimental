@@ -160,9 +160,9 @@ public class PreventItemDamageTest extends BaseTestMod {
         }
 
         @Override
-        public int damageItem(ItemStack stack, int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<Item> onBroken) {
+        public int damageItem(ItemStack stack, int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<ItemStack> onBroken) {
             if (canBreak) {
-                onBroken.accept(this);
+                onBroken.accept(stack);
                 return 1;
             }
 

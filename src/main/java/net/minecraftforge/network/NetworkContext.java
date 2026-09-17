@@ -16,9 +16,12 @@ import org.jetbrains.annotations.ApiStatus;
 import io.netty.util.AttributeKey;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 import net.minecraft.network.Connection;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.network.ConfigurationTask;
 import net.minecraft.server.network.ServerConfigurationPacketListenerImpl;
+import net.minecraftforge.network.NetworkContext.NetworkMismatchData.Version;
 import net.minecraftforge.network.packets.ModVersions;
 
 public class NetworkContext {
@@ -152,6 +155,6 @@ public class NetworkContext {
         boolean fromServer,
         Map<String, ModVersions.Info> mods
     ) {
-        public record Version(String received, String had) {}
+        public record Version(String received, String had) { }
     }
 }

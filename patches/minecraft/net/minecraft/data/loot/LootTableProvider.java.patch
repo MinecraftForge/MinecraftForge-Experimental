@@ -9,12 +9,15 @@
              @Override
              public Holder.Reference<LootTable> accept(final ResourceKey<LootTable> key, final LootTable.Builder lootTable) {
                  Identifier sequenceId = LootTableProvider.sequenceIdForLootTable(key);
-@@ -61,6 +_,10 @@
+@@ -61,6 +_,13 @@
  
      private static Identifier sequenceIdForLootTable(final ResourceKey<LootTable> id) {
          return id.identifier();
 +    }
 +
++    public Set<ResourceKey<LootTable>> getRequired() {
++        return this.requiredTables;
++    }
 +    public List<LootTableProvider.SubProviderEntry> getTables() {
 +        return this.subProviders;
      }

@@ -43,10 +43,11 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Multimap;
 
-import io.netty.buffer.Unpooled;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.core.Registry;
@@ -794,16 +795,7 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     //Public for tests
     public Snapshot makeSnapshot() {
-        Snapshot ret = new Snapshot();
-        for (Entry<Integer, V> entry : this.ids.entrySet()) {
-            Integer id = entry.getKey();
-            V value = entry.getValue();
-            ret.ids.put(getKey(value), id.intValue());
-        }
-        ret.aliases.putAll(this.aliases);
-        ret.blocked.addAll(this.blocked);
-        ret.overrides.putAll(getOverrideOwners());
-        return ret;
+        return Snapshot.of(this);
     }
 
     Map<Identifier, String> getOverrideOwners() {
@@ -848,11 +840,42 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
 
     public static class Snapshot {
         private static final Comparator<Identifier> sorter = Identifier::compareNamespaced;
-        public final Object2IntMap<Identifier> ids = new Object2IntRBTreeMap<>(sorter);
-        public final Map<Identifier, Identifier> aliases = new TreeMap<>(sorter);
-        public final IntSet blocked = new IntRBTreeSet();
-        public final Map<Identifier, String> overrides = new TreeMap<>(sorter);
-        private FriendlyByteBuf binary = null;
+        public final Object2IntMap<Identifier> ids;
+        public final Map<Identifier, Identifier> aliases;
+        public final Map<Identifier, String> overrides;
+        public final IntSet blocked;
+
+        public static final StreamCodec<FriendlyByteBuf, Snapshot> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.map(_ -> new Object2IntRBTreeMap<>(sorter), Identifier.STREAM_CODEC, ByteBufCodecs.VAR_INT), snap -> snap.ids,
+            ByteBufCodecs.map(_ -> new TreeMap<>(sorter), Identifier.STREAM_CODEC, Identifier.STREAM_CODEC), snap -> snap.aliases,
+            ByteBufCodecs.map(_ -> new TreeMap<>(sorter), Identifier.STREAM_CODEC, ByteBufCodecs.stringUtf8(0x100)), snap -> snap.overrides,
+            ByteBufCodecs.collection(_ -> new IntRBTreeSet(), ByteBufCodecs.VAR_INT), snap -> snap.blocked,
+            Snapshot::new
+        );
+
+        private Snapshot(Object2IntMap<Identifier> ids, Map<Identifier, Identifier> aliases, Map<Identifier, String> overrides, IntSet blocked) {
+            this.ids = ids;
+            this.aliases = aliases;
+            this.overrides = overrides;
+            this.blocked = blocked;
+        }
+
+        public static <V> Snapshot of(ForgeRegistry<V> reg) {
+            var ids = new Object2IntRBTreeMap<Identifier>(sorter);
+            for (Entry<Integer, V> entry : reg.ids.entrySet())
+                ids.put(reg.getKey(entry.getValue()), entry.getKey().intValue());
+
+            var aliases = new TreeMap<Identifier, Identifier>(sorter);
+            aliases.putAll(reg.aliases);
+
+            var overrides = new TreeMap<Identifier, String>(sorter);
+            overrides.putAll(reg.getOverrideOwners());
+
+            var blocked = new IntRBTreeSet();
+            blocked.addAll(reg.blocked);
+
+            return new Snapshot(ids, aliases, overrides, blocked);
+        }
 
         public CompoundTag write() {
             CompoundTag data = new CompoundTag();
@@ -891,53 +914,32 @@ public class ForgeRegistry<V> implements IForgeRegistryInternal<V>, IForgeRegist
         }
 
         public static Snapshot read(CompoundTag nbt) {
-            Snapshot ret = new Snapshot();
-            if (nbt == null)
-                return ret;
+            var ids = new Object2IntRBTreeMap<Identifier>(sorter);
+            var aliases = new TreeMap<Identifier, Identifier>(sorter);
+            var overrides = new TreeMap<Identifier, String>(sorter);
+            var blocked = new IntRBTreeSet();
+
+            if (nbt  == null)
+                return new Snapshot(ids, aliases, overrides, blocked);
 
             nbt.getListOrEmpty("ids").compoundStream().forEach(comp ->
-                ret.ids.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getIntOr("V", 0))
+                ids.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getIntOr("V", 0))
             );
 
             nbt.getListOrEmpty("aliases").compoundStream().forEach(comp ->
-                ret.aliases.put(Identifier.parse(comp.getString("K").orElseThrow()), Identifier.parse(comp.getString("V").orElseThrow()))
+                aliases.put(Identifier.parse(comp.getString("K").orElseThrow()), Identifier.parse(comp.getString("V").orElseThrow()))
             );
 
             nbt.getListOrEmpty("overrides").compoundStream().forEach(comp ->
-                ret.overrides.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getString("V").orElseThrow())
+                overrides.put(Identifier.parse(comp.getString("K").orElseThrow()), comp.getString("V").orElseThrow())
             );
 
-            nbt.getIntArray("blocked").ifPresent(blocked -> {
-                for (int i : blocked)
-                    ret.blocked.add(i);
+            nbt.getIntArray("blocked").ifPresent(data -> {
+                for (int i : data)
+                    blocked.add(i);
             });
 
-            return ret;
-        }
-
-        public synchronized FriendlyByteBuf getPacketData() {
-            if (binary == null) {
-                FriendlyByteBuf pkt = new FriendlyByteBuf(Unpooled.buffer());
-                pkt.writeMap(this.ids, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeVarInt);
-                pkt.writeMap(this.aliases, FriendlyByteBuf::writeIdentifier, FriendlyByteBuf::writeIdentifier);
-                pkt.writeMap(this.overrides, FriendlyByteBuf::writeIdentifier, (b,v) -> b.writeUtf(v, 0x100));
-                pkt.writeCollection(this.blocked, FriendlyByteBuf::writeVarInt);
-                this.binary = pkt;
-            }
-
-            return new FriendlyByteBuf(binary.slice());
-        }
-
-        public static Snapshot read(FriendlyByteBuf buf) {
-            if (buf == null)
-                return new Snapshot();
-
-            var ret = new Snapshot();
-            ret.ids.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readVarInt));
-            ret.aliases.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, FriendlyByteBuf::readIdentifier));
-            ret.overrides.putAll(buf.readMap(FriendlyByteBuf::readIdentifier, b -> b.readUtf(0x100)));
-            ret.blocked.addAll(buf.readList(FriendlyByteBuf::readVarInt));
-            return ret;
+            return new Snapshot(ids, aliases, overrides, blocked);
         }
     }
 

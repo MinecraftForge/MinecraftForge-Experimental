@@ -5,7 +5,7 @@
          BlockState blockBelowTrunk = tree.belowTrunkProvider().value().getOptionalState(level, random, pos);
          if (blockBelowTrunk != null) {
 +            var levelReader = (net.minecraft.world.level.LevelReader)level;
-+            if (!levelReader.getBlockState(pos).onTreeGrow(levelReader, trunkSetter, random, pos, config))
++            if (!levelReader.getBlockState(pos).onTreeGrow(levelReader, trunkSetter, random, pos, tree))
              trunkSetter.accept(pos, blockBelowTrunk);
          }
      }

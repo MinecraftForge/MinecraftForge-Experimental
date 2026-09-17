@@ -7,17 +7,18 @@ package net.minecraftforge.common.world;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Consumer;
 
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.core.Holder;
+import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biome.ClimateSettings;
 import net.minecraft.world.level.biome.BiomeGenerationSettings;
 import net.minecraft.world.level.biome.BiomeSpecialEffects;
-import net.minecraft.world.level.biome.MobSpawnSettings;
 
 /**
  * Holds lazy-evaluable modified biome info.
@@ -27,14 +28,18 @@ import net.minecraft.world.level.biome.MobSpawnSettings;
 public class ModifiableBiomeInfo {
     @NotNull
     private final BiomeInfo originalBiomeInfo;
+    @NotNull
+    private final Consumer<BiomeInfo> callback;
     @Nullable
     private BiomeInfo modifiedBiomeInfo = null;
 
     /**
      * @param originalBiomeInfo BiomeInfo representing the original state of a biome when the biome was constructed.
      */
-    public ModifiableBiomeInfo(@NotNull final BiomeInfo originalBiomeInfo) {
+    @ApiStatus.Internal
+    public ModifiableBiomeInfo(@NotNull final BiomeInfo originalBiomeInfo, @NotNull final Consumer<BiomeInfo> callback) {
         this.originalBiomeInfo = originalBiomeInfo;
+        this.callback = callback;
     }
 
     /**
@@ -77,12 +82,13 @@ public class ModifiableBiomeInfo {
             throw new IllegalStateException(String.format(Locale.ENGLISH, "Biome %s already modified", biome));
 
         var original = this.getOriginalBiomeInfo();
-        var builder = BiomeInfo.Builder.copyOf(original);
+        var builder = original.builder();
         for (var phase : BiomeModifier.Phase.values()) {
             for (var modifier : biomeModifiers)
                 modifier.modify(biome, phase, builder);
         }
         this.modifiedBiomeInfo = builder.build();
+        this.callback.accept(this.modifiedBiomeInfo);
     }
 
     /**
@@ -92,57 +98,46 @@ public class ModifiableBiomeInfo {
      * @param generationSettings Worldgen features and carvers.
      * @param mobSpawnSettings Mob spawn settings.
      */
-    public record BiomeInfo(ClimateSettings climateSettings, BiomeSpecialEffects effects, BiomeGenerationSettings generationSettings) {
-        public static class Builder {
-            private ClimateSettingsBuilder climateSettings;
-            private BiomeSpecialEffectsBuilder effects;
-            private BiomeGenerationSettings.PlainBuilder generationSettings;
-            private MobSpawnSettingsBuilder mobSpawnSettings;
+    public record BiomeInfo(
+        ClimateSettings climateSettings,
+        EnvironmentAttributeMap attributes,
+        BiomeSpecialEffects effects,
+        BiomeGenerationSettings generationSettings
+    ) {
+        /**
+         * @param original the biome to copy
+         * @return A ModifiedBiomeInfo.Builder with a copy of the biome's data
+         */
+        private Builder builder() {
+            var climateBuilder = ClimateSettingsBuilder.copyOf(climateSettings());
+            var attributes = EnvironmentAttributeMap.builder().putAll(attributes());
+            var effectsBuilder = BiomeSpecialEffectsBuilder.copyOf(effects());
+            var generationBuilder = new BiomeGenerationSettings.PlainBuilder();
+            generationBuilder.addFrom(generationSettings());
 
-            /**
-             * @param original the biome to copy
-             * @return A ModifiedBiomeInfo.Builder with a copy of the biome's data
-             */
-            public static Builder copyOf(final BiomeInfo original) {
-                final ClimateSettingsBuilder climateBuilder = ClimateSettingsBuilder.copyOf(original.climateSettings());
-                final BiomeSpecialEffectsBuilder effectsBuilder = BiomeSpecialEffectsBuilder.copyOf(original.effects());
-                final var generationBuilder = new BiomeGenerationSettings.PlainBuilder();
-                generationBuilder.addFrom(original.generationSettings());
-                final MobSpawnSettingsBuilder mobSpawnBuilder = new MobSpawnSettingsBuilder(original.mobSpawnSettings());
+            return new Builder(
+                climateBuilder,
+                attributes,
+                effectsBuilder,
+                generationBuilder
+            );
+        }
 
-                return new Builder(
-                    climateBuilder,
-                    effectsBuilder,
-                    generationBuilder,
-                    mobSpawnBuilder
-                );
-            }
 
-            private Builder(final ClimateSettingsBuilder climateSettings, final BiomeSpecialEffectsBuilder effects, final BiomeGenerationSettings.PlainBuilder generationSettings, final MobSpawnSettingsBuilder mobSpawnSettings) {
-                this.climateSettings = climateSettings;
-                this.effects = effects;
-                this.generationSettings = generationSettings;
-                this.mobSpawnSettings = mobSpawnSettings;
-            }
 
+        public record Builder(
+            ClimateSettingsBuilder climateSettings,
+            EnvironmentAttributeMap.Builder attributes,
+            BiomeSpecialEffectsBuilder effects,
+            BiomeGenerationSettings.PlainBuilder generationSettings
+        ) {
             public BiomeInfo build() {
-                return new BiomeInfo(this.climateSettings.build(), this.effects.build(), this.generationSettings.build());
-            }
-
-            public ClimateSettingsBuilder getClimateSettings() {
-                return climateSettings;
-            }
-
-            public BiomeSpecialEffectsBuilder getSpecialEffects() {
-                return effects;
-            }
-
-            public BiomeGenerationSettings.PlainBuilder getGenerationSettings() {
-                return generationSettings;
-            }
-
-            public MobSpawnSettingsBuilder getMobSpawnSettings() {
-                return mobSpawnSettings;
+                return new BiomeInfo(
+                    this.climateSettings.build(),
+                    this.attributes.build(),
+                    this.effects.build(),
+                    this.generationSettings.build()
+                );
             }
         }
     }

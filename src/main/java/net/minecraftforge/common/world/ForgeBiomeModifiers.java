@@ -15,7 +15,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryCodecs;
+import net.minecraft.core.registries.codec.RegistryCodecs;
 import net.minecraft.util.random.Weighted;
 import net.minecraft.util.random.WeightedList;
 import net.minecraft.world.entity.EntityType;
@@ -179,7 +179,7 @@ public final class ForgeBiomeModifiers {
                 var spawns = builder.getMobSpawnSettings();
                 for (var weighted : this.spawners.unwrap()) {
                     var spawner = weighted.value();
-                    spawns.addSpawn(spawner.type().getCategory(), weighted.weight(), spawner);
+                    spawns.addSpawn(spawner.type(), weighted.weight(), spawner.count());
                 }
             }
         }
@@ -207,7 +207,7 @@ public final class ForgeBiomeModifiers {
         public static final MapCodec<RemoveSpawnsBiomeModifier> CODEC = RecordCodecBuilder.mapCodec(builder ->
             builder.group(
                 Biome.LIST_CODEC.fieldOf("biomes").forGetter(RemoveSpawnsBiomeModifier::biomes),
-                RegistryCodecs.homogeneousList(ForgeRegistries.Keys.ENTITY_TYPES).fieldOf("entity_types").forGetter(RemoveSpawnsBiomeModifier::entityTypes)
+                RegistryCodecs.holderSet(ForgeRegistries.Keys.ENTITY_TYPES).fieldOf("entity_types").forGetter(RemoveSpawnsBiomeModifier::entityTypes)
             ).apply(builder, RemoveSpawnsBiomeModifier::new));
 
         @Override

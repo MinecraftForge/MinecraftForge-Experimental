@@ -82,6 +82,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickAction;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemUtils;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -427,19 +428,9 @@ public final class ForgeEventFactory {
         if (FillBucketEvent.BUS.post(event))
             return InteractionResult.FAIL;
 
-        if (event.getResult() == Result.ALLOW) {
-            if (player.getAbilities().instabuild)
-                return InteractionResult.SUCCESS.heldItemTransformedTo(stack);
+        if (event.getResult() == Result.ALLOW)
+            return InteractionResult.SUCCESS.heldItemTransformedTo(ItemUtils.createFilledResult(stack, player, event.getFilledBucket()));
 
-            stack.shrink(1);
-            if (stack.isEmpty())
-                return InteractionResult.SUCCESS.heldItemTransformedTo(event.getFilledBucket());
-
-            if (!player.getInventory().add(event.getFilledBucket()))
-                player.drop(event.getFilledBucket(), false);
-
-            return InteractionResult.SUCCESS.heldItemTransformedTo(stack);
-        }
         return null;
     }
 
@@ -581,6 +572,12 @@ public final class ForgeEventFactory {
     }
 
     public static boolean onSleepingTimeCheck(Player player, Optional<BlockPos> sleepingLocation) {
+        var state = player.getInBlockState();
+        var rule = state.getBlock() instanceof AbstractBedBlock bed ? bed.getBedRule(player.level(), player.blockPosition()) : player.level().environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, player.blockPosition());
+        return onSleepingTimeCheck(player, sleepingLocation, rule);
+    }
+
+    public static boolean onSleepingTimeCheck(Player player, Optional<BlockPos> sleepingLocation, BedRule rule) {
         var evt = new SleepingTimeCheckEvent(player, sleepingLocation);
         SleepingTimeCheckEvent.BUS.post(evt);
 
@@ -588,8 +585,6 @@ public final class ForgeEventFactory {
         if (canContinueSleep != Result.DEFAULT)
             return canContinueSleep == Result.ALLOW;
 
-        var state = player.getInBlockState();
-        var rule = state.getBlock() instanceof AbstractBedBlock bed ? bed.getBedRule(player.level(), player.blockPosition()) : player.level().environmentAttributes().getValue(EnvironmentAttributes.BED_RULE, player.blockPosition());
         return rule.canSleep(player.level());
     }
 
@@ -646,7 +641,6 @@ public final class ForgeEventFactory {
         return result == Result.DEFAULT ? level.getGameRules().get(GameRules.MOB_GRIEFING) : result == Result.ALLOW;
     }
 
-    @SuppressWarnings("removal")
     public static BlockFeatureGrowEvent blockGrowFeature(LevelAccessor level, RandomSource randomSource, BlockPos pos, @Nullable Holder<Feature> holder) {
         return BlockFeatureGrowEvent.BUS.fire(new BlockFeatureGrowEvent(level, randomSource, pos, holder));
     }

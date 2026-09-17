@@ -110,7 +110,7 @@ public class ResourcePackLoader {
             if (!client || mod.showAsResourcePack())
                 packAcceptor.accept(pack);
             else
-                hiddenPacks.add(pack.open());
+                pack.open().forEach(hiddenPacks::add);
         }
 
         if (!hiddenPacks.isEmpty()) {

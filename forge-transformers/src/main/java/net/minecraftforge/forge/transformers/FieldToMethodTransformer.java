@@ -32,12 +32,6 @@ record FieldToMethodTransformer(String className, Map<String, String> fields) im
     // TODO [Forge][Transformer] Make this properly data driven or configurable.
     //      It was hard-coded like this before when using JS CoreMods, though.
     static final Map<String, Map<String, String>> TARGETS = Map.of(
-        "net.minecraft.world.level.biome.Biome",
-        Map.of(
-            "climateSettings", "getModifiedClimateSettings",
-            "specialEffects", "getModifiedSpecialEffects"
-        ),
-
         "net.minecraft.world.effect.MobEffectInstance",
         Map.of(
             "effect", "getEffect"

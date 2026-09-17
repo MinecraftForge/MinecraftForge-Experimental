@@ -50,6 +50,7 @@ import net.minecraftforge.common.data.ForgeItemTagsProvider;
 import net.minecraftforge.common.data.ForgeLootTableProvider;
 import net.minecraftforge.common.data.ForgeRecipeProvider;
 import net.minecraftforge.common.data.ForgeStructureTagsProvider;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.common.data.VanillaSoundDefinitionsProvider;
 import net.minecraftforge.common.loot.CanToolPerformAction;
 import net.minecraftforge.common.loot.LootTableIdCondition;
@@ -428,6 +429,13 @@ public class ForgeMod {
         PackOutput packOutput = gen.getPackOutput();
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
 
+        var dataLayers = RegistryDataBuilder.of()
+            .name("forge")
+            .reloadable(set -> set
+                .add(Registries.LOOT_TABLE, ForgeLootTableProvider.create())
+                .add(ForgeRecipeProvider.create())
+            );
+
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         gen.addProvider(true, new PackMetadataGenerator(packOutput)
             .add(PackMetadataSection.SERVER_TYPE, new PackMetadataSection(
@@ -441,8 +449,7 @@ public class ForgeMod {
         gen.addProvider(event.includeServer(), new ForgeEntityTypeTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeFluidTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeEnchantmentTagsProvider(packOutput, lookupProvider, existingFileHelper));
-        gen.addProvider(event.includeServer(), new ForgeRecipeProvider.Runner(packOutput, lookupProvider));
-        gen.addProvider(event.includeServer(), new ForgeLootTableProvider(packOutput, lookupProvider));
+        gen.addProvider(event.includeServer(), dataLayers.reloadableGenerator(packOutput));
         gen.addProvider(event.includeServer(), new ForgeBiomeTagsProvider(packOutput, lookupProvider, existingFileHelper));
         gen.addProvider(event.includeServer(), new ForgeStructureTagsProvider(packOutput, lookupProvider, existingFileHelper));
 

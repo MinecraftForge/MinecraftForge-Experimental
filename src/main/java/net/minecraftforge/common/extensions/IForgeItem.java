@@ -470,7 +470,7 @@ public interface IForgeItem {
      * @apiNote If the item stack is not {@linkplain ItemStack#isDamageableItem() damageable} or the player
      * {@linkplain Player#hasInfiniteMaterials() has infinite materials}, this method will not be called.
      */
-    default int damageItem(ItemStack stack, int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<Item> onBroken) {
+    default int damageItem(ItemStack stack, int damage, ServerLevel level, @Nullable ServerPlayer player, boolean canBreak, Consumer<ItemStack> onBroken) {
         return damage;
     }
 

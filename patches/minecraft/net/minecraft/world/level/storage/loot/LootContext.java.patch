@@ -34,7 +34,7 @@
      }
  
 +    public int getLootingModifier() {
-+        return net.minecraftforge.common.ForgeHooks.getLootingLevel(getOptionalParameter(LootContextParams.THIS_ENTITY), getOptionalParameter(LootContextParams.ATTACKING_ENTITY), getOptionalParameter(LootContextParams.DAMAGE_SOURCE));
++        return net.minecraftforge.common.ForgeHooks.getLootingLevel(getOptional(LootContextParams.THIS_ENTITY), getOptional(LootContextParams.ATTACKING_ENTITY), getOptional(LootContextParams.DAMAGE_SOURCE));
 +    }
 +
 +    public void setQueriedLootTableId(Identifier queriedLootTableId) {

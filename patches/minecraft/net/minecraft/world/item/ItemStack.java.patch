@@ -63,11 +63,11 @@
      }
  
      private int processDurabilityChange(final int amount, final ServerLevel level, final @Nullable ServerPlayer player) {
-+        return this.processDurabilityChange(amount, level, player, false, item -> { });
++        return this.processDurabilityChange(amount, level, player, false, _ -> { });
 +    }
 +
 +    /** FORGE: context-sensitive sister of processDurabilityChange that calls IForgeItem.damageItem */
-+    private int processDurabilityChange(int amount, final ServerLevel level, final @Nullable ServerPlayer player, final boolean canBreak, final Consumer<Item> onBreak) {
++    private int processDurabilityChange(int amount, final ServerLevel level, final @Nullable ServerPlayer player, final boolean canBreak, final Consumer<ItemStack> onBreak) {
          if (!this.isDamageableItem()) {
              return 0;
          } else if (player != null && player.hasInfiniteMaterials()) {

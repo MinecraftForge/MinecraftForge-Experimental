@@ -8,7 +8,7 @@
 +            return save(output, Identifier.parse(name));
 +        }
 +
-+        public AdvancementHolder save(Consumer<AdvancementHolder> output, Identifier id) {
++        public AdvancementHolder save(final BootstrapContext<Advancement> output, final Identifier id) {
 +            AdvancementHolder advancement = this.build(id);
              advancement.register(output);
              return advancement;

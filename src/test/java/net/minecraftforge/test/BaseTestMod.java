@@ -16,12 +16,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import com.mojang.serialization.Lifecycle;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
+import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.registries.VanillaRegistries;
@@ -32,7 +32,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
 import net.minecraft.world.level.block.state.BlockBehaviour;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.bus.BusGroup;
@@ -168,31 +168,32 @@ public abstract class BaseTestMod {
 
         var gen = event.getGenerator();
         var packOutput = gen.getPackOutput();
-        var registrySet = VanillaRegistries.builder();
+        var data = populate(this.dataRegistries);
 
+        if (data.hasWorld)
+            gen.addProvider(event.includeServer(), data.builder.worldGenerator(packOutput));
+        if (data.hasReload)
+            gen.addProvider(event.includeServer(), data.builder.reloadableGenerator(packOutput));
+    }
+
+    private record RegistryData(RegistryDataBuilder builder, boolean hasWorld, boolean hasReload) {}
+    private RegistryData populate(List<Map<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>> registries) {
+        var reloadableRegistries = new HashSet<>(VanillaRegistries.reloadableBuilder().getEntryKeys());
+        var dataBuilder = RegistryDataBuilder.of().name(modid());
+
+        RegistrySetBuilder world = null, reload = null;
         for (var level : this.dataRegistries) {
-            for (var reg : level.values())
-                registrySet.add(reg);
-        }
-
-        var toDump = new HashSet<ResourceKey<?>>();
-        for (var reg : myDataRegistries) {
-            for (var entry : reg.getEntries())
-                toDump.add(entry.getKey());
-        }
-
-        var modid = modid();
-        gen.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(packOutput, event.getLookupProvider(), registrySet, modid) {
-            @Override
-            public String getName() {
-                return "Data Registries: " + modid;
+            world = new RegistrySetBuilder();
+            reload = new RegistrySetBuilder();
+            for (var reg : level.values()) {
+                if (reloadableRegistries.contains(reg.getRegistryKey()))
+                    reload.add(reg);
+                else
+                    world.add(reg);
             }
-
-            @Override
-            protected boolean shouldDump(ResourceKey<?> key) {
-                return toDump.contains(key);
-            }
-        });
+            dataBuilder.layer(world, reload);
+        }
+        return new RegistryData(dataBuilder, world != null && !world.getEntryKeys().isEmpty(), reload != null && !reload.getEntryKeys().isEmpty());
     }
 
     protected void registerTestFunctions(RegisterEvent event) {
@@ -204,20 +205,16 @@ public abstract class BaseTestMod {
     }
 
     protected void generateGameTests(GatherDataEvent event) {
-        if (!event.includeServer())
+        if (!event.includeServer() || tests.isEmpty())
             return;
 
         var gen = event.getGenerator();
         var packOutput = gen.getPackOutput();
-        var registrySet = VanillaRegistries.builder();
+        var data = this.populate(this.dataRegistries);
 
-        for (var level : this.dataRegistries) {
-            for (var reg : level.values())
-                registrySet.add(reg);
-        }
 
-        registrySet
-            .add(Registries.TEST_INSTANCE, Lifecycle.stable(), ctx -> {
+        var registrySet = new RegistrySetBuilder()
+            .add(Registries.TEST_INSTANCE, ctx -> {
                 var envs = ctx.lookup(Registries.TEST_ENVIRONMENT);
                 for (var entry : tests.entrySet()) {
                     var rdata = entry.getValue().data();
@@ -225,6 +222,7 @@ public abstract class BaseTestMod {
 
                     var edata = new TestData<Holder<TestEnvironmentDefinition<?>>>(
                         env,
+                        rdata.dimension(),
                         rdata.structure(),
                         rdata.maxTicks(),
                         rdata.setupTicks(),
@@ -247,18 +245,9 @@ public abstract class BaseTestMod {
                 }
             });
 
-        var modid = modid();
-        gen.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(packOutput, event.getLookupProvider(), registrySet, modid) {
-            @Override
-            public String getName() {
-                return "Game Tests: " + modid;
-            }
-
-            @Override
-            protected boolean shouldDump(ResourceKey<?> key) {
-                return tests.containsKey(key.identifier());
-            }
-        });
+        data.builder.world(registrySet);
+        data.builder.name("Game Tests: " + modid());
+        gen.addProvider(event.includeServer(), data.builder.worldGenerator(packOutput));
     }
 
     @SuppressWarnings("unchecked")

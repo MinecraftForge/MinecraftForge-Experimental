@@ -5,18 +5,17 @@
 
 package net.minecraftforge.common.data;
 
-import com.google.gson.JsonElement;
-
 import net.minecraft.advancements.Advancement;
 import net.minecraft.advancements.AdvancementHolder;
 import net.minecraft.advancements.Advancement.Builder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderGetter;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
@@ -47,6 +46,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -59,9 +59,23 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
     private final UnsafeFieldAccess<ShapedRecipe, ShapedRecipePattern> PATTERN = UnsafeHacks.findField(ShapedRecipe.class, "pattern");
     private final UnsafeFieldAccess<Ingredient, HolderSet<Item>> VALUES = UnsafeHacks.findField(Ingredient.class, "values");
 
+    public static MultiRegistryBootstrap create() {
+        return new MultiRegistryBootstrap() {
+            @Override
+            public Set<ResourceKey<? extends Registry<?>>> requestedRegistries() {
+                return Set.of(Registries.RECIPE, Registries.ADVANCEMENT);
+            }
+
+            @Override
+            public void run(BootstrapGetter registries) {
+                new ForgeRecipeProvider(registries.get(Registries.RECIPE), registries.get(Registries.ADVANCEMENT)).buildRecipes();
+            }
+        };
+    }
+
     private ForgeRecipeProvider(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
         super(recipeOutput, advancementOutput);
-        this.output = new Wrapped(this.output);
+        this.output = new Wrapped(this.output, this);
         this.items = recipeOutput.lookup(Registries.ITEM);
     }
 
@@ -187,16 +201,10 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         return ret;
     }
 
-    private class Wrapped implements RecipeOutput {
-        private final RecipeOutput wrapped;
-
-        private Wrapped(RecipeOutput wrapped) {
-            this.wrapped = wrapped;
-        }
-
+    private record Wrapped(RecipeOutput wrapped, ForgeRecipeProvider forge) implements RecipeOutput {
         @Override
         public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, AdvancementHolder advancement) {
-            var modified = ForgeRecipeProvider.this.enhance(id, recipe);
+            var modified = forge.enhance(id, recipe);
             if (modified != null)
                 wrapped.accept(id, modified, null);
         }
@@ -207,18 +215,6 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         }
 
         @Override
-        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, Identifier advancementId, JsonElement advancement) {
-            var modified = ForgeRecipeProvider.this.enhance(id, recipe);
-            if (modified != null)
-                wrapped.accept(id, modified, null);
-        }
-
-        @Override
-        public Provider registry() {
-            return wrapped.registry();
-        }
-
-        @Override
         public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> key) {
             return wrapped.lookup(key);
         }
@@ -226,6 +222,11 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         @Override
         public <S> Stream<Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
             return wrapped.listContextElements(key);
+        }
+
+        @Override
+        public <S> Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
+            return wrapped.registryLookup(registry);
         }
     }
 }

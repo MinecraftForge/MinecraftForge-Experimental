@@ -16,15 +16,6 @@
      }
  
      public static Pack.@Nullable Metadata readPackMetadata(
-@@ -65,7 +_,7 @@
-                 PackCompatibility packCompatibility = PackCompatibility.forVersion(meta.supportedFormats(), currentPackVersion);
-                 OverlayMetadataSection overlays = pack.getMetadataSection(OverlayMetadataSection.forPackType(type));
-                 List<String> overlaySet = overlays != null ? overlays.overlaysForVersion(currentPackVersion) : List.of();
--                return new Pack.Metadata(meta.description(), packCompatibility, requiredFlags, overlaySet);
-+                return new Pack.Metadata(meta.description(), packCompatibility, requiredFlags, overlaySet, pack.isHidden());
-             }
-         } catch (Exception e) {
-             LOGGER.warn("Failed to read pack {} metadata", location.id(), e);
 @@ -129,6 +_,10 @@
          return this.location.source();
      }

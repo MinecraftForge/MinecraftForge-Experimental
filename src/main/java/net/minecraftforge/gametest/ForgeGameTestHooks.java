@@ -6,10 +6,12 @@
 package net.minecraftforge.gametest;
 
 import net.minecraft.SharedConstants;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestEnvironments;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.loading.FMLLoader;
 import org.jetbrains.annotations.ApiStatus;
@@ -138,8 +140,13 @@ public class ForgeGameTestHooks {
                     ? Identifier.withDefaultNamespace(gametest.environment())
                     : key(namespace, "", gametest.environment());
 
+                var dim = ResourceKey.create(Registries.DIMENSION, GameTest.DEFAULT_DIMENSION.equals(gametest.dimension())
+                    ? Identifier.withDefaultNamespace(gametest.dimension())
+                    : key(namespace, "", gametest.dimension()));
+
                 var data = new TestData<Identifier>(
                     env,
+                    dim,
                     structure,
                     gametest.maxTicks(),
                     gametest.setupTicks(),

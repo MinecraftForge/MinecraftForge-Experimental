@@ -5,9 +5,13 @@
 
 package net.minecraftforge.network.packets;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import io.netty.buffer.ByteBuf;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.forgespi.language.IModInfo;
@@ -17,35 +21,19 @@ import net.minecraftforge.forgespi.language.IModInfo;
  * The mod data is stored as follows: [modId -> [modName, modVersion]]
  */
 public record ModVersions(Map<String, Info> mods) {
-    public static final StreamCodec<FriendlyByteBuf, ModVersions> STREAM_CODEC = StreamCodec.ofMember(ModVersions::encode, ModVersions::decode);
-
-    private static final int MAX_LENGTH = 0x100;
+    private static final StreamCodec<ByteBuf, String> STRING_CODEC = ByteBufCodecs.stringUtf8(0x100);
+    public static final StreamCodec<FriendlyByteBuf, ModVersions> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.map(HashMap::new, STRING_CODEC, StreamCodec.composite(
+            STRING_CODEC, Info::name, STRING_CODEC, Info::version, Info::new
+        )), ModVersions::mods,
+        ModVersions::new
+    );
 
     public static ModVersions create() {
         return new ModVersions(ModList.getMods().stream().collect(Collectors.toMap(
             IModInfo::getModId,
             mod -> new Info(mod.getDisplayName(), mod.getVersion().toString())
         )));
-    }
-
-    public static ModVersions decode(FriendlyByteBuf buf) {
-        return new ModVersions(buf.readMap(
-            o -> o.readUtf(MAX_LENGTH),
-            o -> new Info(
-                o.readUtf(MAX_LENGTH),
-                o.readUtf(MAX_LENGTH)
-            )
-        ));
-    }
-
-    public void encode(FriendlyByteBuf output) {
-        output.writeMap(mods,
-            (o, s) -> o.writeUtf(s, MAX_LENGTH),
-            (o, p) -> {
-                o.writeUtf(p.name(), MAX_LENGTH);
-                o.writeUtf(p.version(), MAX_LENGTH);
-            }
-        );
     }
 
     public record Info(String name, String version) { }

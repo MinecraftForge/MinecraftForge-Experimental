@@ -16,20 +16,22 @@
      }
  
      private synchronized void loadLibrary() {
-@@ -363,7 +_,7 @@
+@@ -363,15 +_,18 @@
          }
      }
  
 -    public SoundEngine.PlayResult play(final SoundInstance instance) {
-+    public SoundEngine.PlayResult play(SoundInstance instance) {
++    public SoundEngine.PlayResult play(final SoundInstance instanceArg) {
          if (!this.loaded) {
              return SoundEngine.PlayResult.NOT_STARTED;
          }
-@@ -372,6 +_,9 @@
+ 
+-        if (!instance.canPlaySound()) {
++        if (!instanceArg.canPlaySound()) {
              return SoundEngine.PlayResult.NOT_STARTED;
          }
  
-+        instance = net.minecraftforge.client.ForgeHooksClient.playSound(this, instance);
++        final var instance = net.minecraftforge.client.ForgeHooksClient.playSound(this, instanceArg);
 +        if (instance == null || !instance.canPlaySound())
 +            return SoundEngine.PlayResult.NOT_STARTED;
          WeighedSoundEvents soundEvent = instance.getOrResolve(this.soundManager);

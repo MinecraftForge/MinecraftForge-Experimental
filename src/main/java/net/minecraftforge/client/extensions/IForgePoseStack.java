@@ -29,11 +29,11 @@ public interface IForgePoseStack {
         var trans = transformation.translation();
         self.translate(trans.x(), trans.y(), trans.z());
 
-        self.mulPose(transformation.leftRotation());
+        self.last().rotate(transformation.leftRotation());
 
         var scale = transformation.scale();
         self.scale(scale.x(), scale.y(), scale.z());
 
-        self.mulPose(transformation.rightRotation());
+        self.last().rotate(transformation.rightRotation());
     }
 }

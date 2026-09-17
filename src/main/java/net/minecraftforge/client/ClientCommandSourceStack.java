@@ -31,8 +31,8 @@ import java.util.stream.Collectors;
  * overrides for {@link CommandSourceStack} so that the methods will run successfully client side
  */
 public class ClientCommandSourceStack extends CommandSourceStack {
-    public ClientCommandSourceStack(CommandSource source, Vec3 position, Vec2 rotation, PermissionSet permission, String plainTextName, Component displayName, Entity executing) {
-        super(source, position, rotation, null, permission, plainTextName, displayName, null, executing);
+    public ClientCommandSourceStack(CommandSource source, Vec3 position, Vec2 rotation, PermissionSet permission, Entity executing) {
+        super(source, position, rotation, null, permission, null, executing);
     }
 
     /**

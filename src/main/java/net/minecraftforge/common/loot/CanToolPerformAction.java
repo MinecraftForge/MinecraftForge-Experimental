@@ -40,7 +40,7 @@ public record CanToolPerformAction(ToolAction action) implements LootItemConditi
 
     @Override
     public boolean test(LootContext ctx) {
-        var instance = ctx.getOptionalParameter(LootContextParams.TOOL);
+        var instance = ctx.getOptional(LootContextParams.TOOL);
         ItemStack item = null;
         if (instance instanceof ItemStack stack)
             item = stack;

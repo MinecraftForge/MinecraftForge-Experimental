@@ -1,10 +1,14 @@
 --- a/net/minecraft/data/registries/RegistriesDatapackGenerator.java
 +++ b/net/minecraft/data/registries/RegistriesDatapackGenerator.java
-@@ -21,6 +_,7 @@
+@@ -21,6 +_,11 @@
      private final String name;
      private final Collection<RegistryDataLoader.RegistryData<?>> registryData;
      private final CompletableFuture<HolderLookup.Provider> registries;
-+    private final java.util.function.Predicate<String> namespacePredicate;
++    private final java.util.function.Predicate<ResourceKey<?>> entryPredicate;
++
++    public static net.minecraftforge.common.data.RegistryDataBuilder builder() {
++        return net.minecraftforge.common.data.RegistryDataBuilder.of();
++    }
  
      public RegistriesDatapackGenerator(
          final PackOutput output,
@@ -12,7 +16,7 @@
          final Collection<RegistryDataLoader.RegistryData<?>> registryData,
          final CompletableFuture<HolderLookup.Provider> registryContents
      ) {
-+        this(output, name, registryData, registryContents, null);
++        this(output, name, registryData, registryContents, _ -> true);
 +    }
 +
 +    public RegistriesDatapackGenerator(
@@ -20,23 +24,23 @@
 +        final String name,
 +        final Collection<RegistryDataLoader.RegistryData<?>> registryData,
 +        final CompletableFuture<HolderLookup.Provider> registryContents,
-+        final java.util.@org.jspecify.annotations.Nullable Set<String> modIds
++        final java.util.function.Predicate<ResourceKey<?>> entryPredicate
 +    ) {
          this.name = name;
          this.registryData = registryData;
          this.registries = registryContents;
          this.output = output;
-+        this.namespacePredicate = modIds == null ? _ -> true : modIds::contains;
++        this.entryPredicate = entryPredicate;
 +    }
 +
-+    /** Forge: Call this to get the registry holder lookup provider that includes elements added via {@link net.minecraftforge.common.data.DatapackBuiltinEntriesProvider} */
++    /** Forge: Call this to get the registry holder lookup provider that includes elements added via {@link net.minecraftforge.common.data.RegistryDataBuilder} */
 +    public CompletableFuture<HolderLookup.Provider> getRegistryProvider() {
 +        return this.registries;
      }
  
      public static RegistriesDatapackGenerator forWorldLayer(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registryContents) {
 -        return new RegistriesDatapackGenerator(output, "world", RegistryDataLoader.WORLD_REGISTRIES, registryContents);
-+        return new RegistriesDatapackGenerator(output, "world", RegistryDataLoader.getWorldGenAndDimensionStream().toList(), registryContents);
++        return new RegistriesDatapackGenerator(output, "world", RegistryDataLoader.getWorldAndDimensionRegistries(), registryContents);
      }
  
      public static DataProvider forReloadableLayer(final PackOutput output, final CompletableFuture<HolderLookup.Provider> registryContents) {
@@ -53,7 +57,7 @@
 +    }
 +
 +    protected boolean shouldDump(ResourceKey<?> key) {
-+        return this.namespacePredicate.test(key.identifier().getNamespace());
++        return this.entryPredicate.test(key);
      }
  
      private static <E> CompletableFuture<?> dumpValue(

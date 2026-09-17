@@ -21,7 +21,7 @@ import net.minecraft.world.level.levelgen.feature.Feature;
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.placement.*;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
-import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.common.world.ForgeBiomeModifiers;
 import net.minecraftforge.data.event.GatherDataEvent;
@@ -63,7 +63,7 @@ public class DatapackBuiltinEntriesProviderTest extends BaseTestMod {
          * Reason: The RegistrySetBuilder creates a full patched registry including a lookup for all registries
          *         For the lookup a cloner is needed, which is not available for forge registries
          */
-        gen.addProvider(event.includeServer(), new DatapackBuiltinEntriesProvider(packOutput, event.getLookupProvider(), this.createProvider(), Set.of(MOD_ID)));
+        gen.addProvider(event.includeServer(), new RegistryDataBuilder(packOutput, event.getLookupProvider(), this.createProvider(), Set.of(MOD_ID)));
     }
 
     // Creates the registry builder for 2 vanilla and 1 forge registry

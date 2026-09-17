@@ -27,6 +27,7 @@ import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.core.particles.ParticleType;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.item.alchemy.Potion;
 import net.minecraft.stats.StatType;
@@ -36,9 +37,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProviderType;
-import net.minecraft.world.level.levelgen.carver.WorldCarver;
-import net.minecraft.world.level.levelgen.feature.Feature;
+import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecoratorType;
 import net.minecraftforge.common.Tags;
@@ -98,10 +97,8 @@ public class ForgeRegistries {
     public static final IForgeRegistry<Activity> ACTIVITIES = active(Keys.ACTIVITIES);
 
     // Worldgen
-    public static final IForgeRegistry<WorldCarver<?>> WORLD_CARVERS = active(Keys.WORLD_CARVERS);
-    public static final IForgeRegistry<Feature<?>> FEATURES = active(Keys.FEATURES);
     public static final IForgeRegistry<ChunkStatus> CHUNK_STATUS = active(Keys.CHUNK_STATUS);
-    public static final IForgeRegistry<BlockStateProviderType<?>> BLOCK_STATE_PROVIDER_TYPES = active(Keys.BLOCK_STATE_PROVIDER_TYPES);
+    public static final IForgeRegistry<MapCodec<? extends BlockStateProvider>> BLOCK_STATE_PROVIDER_TYPES = active(Registries.BLOCK_STATE_PROVIDER_TYPE);
     public static final IForgeRegistry<FoliagePlacerType<?>> FOLIAGE_PLACER_TYPES = active(Keys.FOLIAGE_PLACER_TYPES);
     public static final IForgeRegistry<TreeDecoratorType<?>> TREE_DECORATOR_TYPES = active(Keys.TREE_DECORATOR_TYPES);
 
@@ -142,10 +139,7 @@ public class ForgeRegistries {
         public static final ResourceKey<Registry<MemoryModuleType<?>>> MEMORY_MODULE_TYPES = key("memory_module_type");
         public static final ResourceKey<Registry<SensorType<?>>> SENSOR_TYPES = key("sensor_type");
         public static final ResourceKey<Registry<Activity>> ACTIVITIES = key("activity");
-        public static final ResourceKey<Registry<WorldCarver<?>>> WORLD_CARVERS = key("worldgen/carver");
-        public static final ResourceKey<Registry<Feature<?>>> FEATURES = key("worldgen/feature");
         public static final ResourceKey<Registry<ChunkStatus>> CHUNK_STATUS = key("chunk_status");
-        public static final ResourceKey<Registry<BlockStateProviderType<?>>> BLOCK_STATE_PROVIDER_TYPES = key("worldgen/block_state_provider_type");
         public static final ResourceKey<Registry<FoliagePlacerType<?>>> FOLIAGE_PLACER_TYPES = key("worldgen/foliage_placer_type");
         public static final ResourceKey<Registry<TreeDecoratorType<?>>> TREE_DECORATOR_TYPES = key("worldgen/tree_decorator_type");
 

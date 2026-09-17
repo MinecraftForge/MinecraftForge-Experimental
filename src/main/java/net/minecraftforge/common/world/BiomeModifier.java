@@ -10,8 +10,7 @@ import com.mojang.serialization.MapCodec;
 
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
-import net.minecraft.core.RegistryCodecs;
-import net.minecraft.resources.RegistryFileCodec;
+import net.minecraft.core.registries.codec.RegistryCodecs;
 import net.minecraft.resources.RegistryOps;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraftforge.common.world.ModifiableBiomeInfo.BiomeInfo;
@@ -43,13 +42,13 @@ public interface BiomeModifier {
      * Codec for referring to biome modifiers by id in other datapack registry files.
      * Can only be used with {@link RegistryOps}.
      */
-    Codec<Holder<BiomeModifier>> REFERENCE_CODEC = RegistryFileCodec.create(ForgeRegistries.Keys.BIOME_MODIFIERS, DIRECT_CODEC);
+    Codec<Holder<BiomeModifier>> REFERENCE_CODEC = RegistryCodecs.holder(ForgeRegistries.Keys.BIOME_MODIFIERS, DIRECT_CODEC);
 
     /**
      * Codec for referring to biome modifiers by id, list of id, or tags.
      * Can only be used with {@link RegistryOps}.
      */
-    Codec<HolderSet<BiomeModifier>> LIST_CODEC = RegistryCodecs.homogeneousList(ForgeRegistries.Keys.BIOME_MODIFIERS, DIRECT_CODEC);
+    Codec<HolderSet<BiomeModifier>> LIST_CODEC = RegistryCodecs.holderSet(ForgeRegistries.Keys.BIOME_MODIFIERS, DIRECT_CODEC);
 
     /**
      * Modifies the information via the provided biome builder.

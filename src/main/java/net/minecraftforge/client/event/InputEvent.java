@@ -175,19 +175,6 @@ public sealed interface InputEvent {
         }
 
         /**
-         * {@return the platform-specific scan code}
-         * <p>
-         * The scan code is unique for every key, regardless of whether it has a key code.
-         * Scan codes are platform-specific but consistent over time, so keys will have different scan codes depending
-         * on the platform but they are safe to save to disk as custom key bindings.
-         *
-         * @see InputConstants#getKey(int, int)
-         */
-        public int getScanCode() {
-            return getInfo().scancode();
-        }
-
-        /**
          * {@return the mouse button's action}
          *
          * @see InputConstants#PRESS
