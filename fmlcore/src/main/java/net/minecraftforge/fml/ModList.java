@@ -101,7 +101,7 @@ public final class ModList {
     }
 
     public static Optional<? extends ModContainer> getModContainerById(String modId) {
-        return Optional.ofNullable(indexedMods.get(modId));
+        return Optional.ofNullable(indexedMods == null ? null : indexedMods.get(modId));
     }
 
     public static Optional<? extends ModContainer> getModContainerByObject(Object obj) {

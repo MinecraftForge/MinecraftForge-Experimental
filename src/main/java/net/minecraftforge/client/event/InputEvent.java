@@ -18,7 +18,6 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
-import org.lwjgl.glfw.GLFW;
 
 /**
  * Fired when an input is detected from the user's input devices.

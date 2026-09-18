@@ -13,13 +13,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.LoadingOverlay;
 import net.minecraft.server.packs.resources.ReloadInstance;
 
+import static org.lwjgl.sdl.SDLVideo.SDL_GL_CONTEXT_MAJOR_VERSION;
+import static org.lwjgl.sdl.SDLVideo.SDL_GL_CONTEXT_MINOR_VERSION;
+import static org.lwjgl.sdl.SDLVideo.SDL_GL_GetAttribute;
+
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.LongSupplier;
 import java.util.function.Supplier;
-
-import org.lwjgl.glfw.GLFW;
 
 public final class NoVizFallback {
     private static long WINDOW;
@@ -49,9 +51,13 @@ public final class NoVizFallback {
 
     public static String glVersion() {
         if (WINDOW != 0) {
-            var maj = GLFW.glfwGetWindowAttrib(WINDOW, GLFW.GLFW_CONTEXT_VERSION_MAJOR);
-            var min = GLFW.glfwGetWindowAttrib(WINDOW, GLFW.GLFW_CONTEXT_VERSION_MINOR);
-            return maj+"."+min;
+            try (var stack = org.lwjgl.system.MemoryStack.stackPush()) {
+                var majBuf = stack.mallocInt(1);
+                var minBuf = stack.mallocInt(1);
+                SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majBuf);
+                SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minBuf);
+                return majBuf.get(0) + "." + minBuf.get(0);
+            }
         } else {
             return "3.2";
         }

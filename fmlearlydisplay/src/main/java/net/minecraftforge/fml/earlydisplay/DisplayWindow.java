@@ -13,10 +13,12 @@ import net.minecraftforge.fml.loading.ImmediateWindowHandler;
 import net.minecraftforge.fml.loading.ImmediateWindowProvider;
 import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.PointerBuffer;
-import org.lwjgl.glfw.GLFWVidMode;
+import org.lwjgl.opengl.GL;
+import org.lwjgl.sdl.SDLError;
+import org.lwjgl.sdl.SDLVideo;
+import org.lwjgl.sdl.SDL_Event;
+import org.lwjgl.sdl.SDL_Rect;
 import org.lwjgl.system.MemoryStack;
-import org.lwjgl.system.MemoryUtil;
 import org.lwjgl.util.tinyfd.TinyFileDialogs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +31,10 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.StringJoiner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -43,16 +43,17 @@ import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.IntConsumer;
 import java.util.function.Supplier;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
 
-import static org.lwjgl.glfw.GLFW.*;
-import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL32C.*;
+
+import static org.lwjgl.sdl.SDLError.*;
+import static org.lwjgl.sdl.SDLEvents.*;
+import static org.lwjgl.sdl.SDLHints.*;
+import static org.lwjgl.sdl.SDLInit.*;
+import static org.lwjgl.sdl.SDLVideo.*;
 
 /**
  * The Loading Window that is opened Immediately after Forge starts.
@@ -83,10 +84,10 @@ public class DisplayWindow implements ImmediateWindowProvider {
     private ScheduledFuture<?> initializationFuture;
 
     private PerformanceInfo performanceInfo;
-    @SuppressWarnings("unused")
-    private ScheduledFuture<?> performanceTick;
     // The GL ID of the window. Used for all operations
     private long window;
+    // The SDL Context we use for switching between threads
+    private long sdlContext;
     // The thread that contains and ticks the window while Forge is loading mods
     private static final ScheduledExecutorService renderScheduler = Executors.newSingleThreadScheduledExecutor(r -> {
         final var thread = Executors.defaultThreadFactory().newThread(r);
@@ -116,8 +117,8 @@ public class DisplayWindow implements ImmediateWindowProvider {
     @Override
     public ImmediateWindowProvider selectBackend(String backend) {
         // We only support opengl
-        if ("default".equals(backend) || "opengl".equals(backend))
-            return this;
+        //if ("default".equals(backend) || "opengl".equals(backend))
+        //    return this;
         return ImmediateWindowProvider.getFallbackHandler();
     }
 
@@ -184,7 +185,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
                 return;
             }
             nextFrameTime = nt + MINFRAMETIME;
-            glfwMakeContextCurrent(window);
+            SDL_GL_MakeCurrent(window, sdlContext);
             framebuffer.activate();
             glViewport(0, 0, this.context.scaledWidth(), this.context.scaledHeight());
             this.context.elementShader().activate();
@@ -196,11 +197,12 @@ public class DisplayWindow implements ImmediateWindowProvider {
             glViewport(0, 0, fbWidth, fbHeight);
             framebuffer.draw(this.fbWidth, this.fbHeight);
             // Swap buffers; we're done
-            glfwSwapBuffers(window);
+            SDL_GL_SwapWindow(window);
         } catch (Throwable t) {
             LOGGER.error("BARF", t);
         } finally {
-            if (this.windowTick != null) glfwMakeContextCurrent(0); // we release the gl context IF we're running off the main thread
+            if (this.windowTick != null)
+                SDL_GL_MakeCurrent(window, 0); // we release the gl context IF we're running off the main thread
             renderLock.release();
         }
     }
@@ -212,12 +214,18 @@ public class DisplayWindow implements ImmediateWindowProvider {
      * Nothing fancy, we just want to draw and render text.
      */
     private void initRender(final @Nullable String mcVersion, final String forgeVersion) {
+        this.sdlContext = SDL_GL_CreateContext(window);
+        if (sdlContext == 0)
+            throw new IllegalStateException("Failed to create OpenGL context: " + SDL_GetError());
+
         // This thread owns the GL render context now. We should make a note of that.
-        glfwMakeContextCurrent(window);
+        bindGlContext();
+        GL.createCapabilities();
+
         // Wait for one frame to be complete before swapping; enable vsync in other words.
-        glfwSwapInterval(1);
-        createCapabilities();
-        LOGGER.info("GL info: "+ glGetString(GL_RENDERER) + " GL version " + glGetString(GL_VERSION) + ", " + glGetString(GL_VENDOR));
+        SDL_GL_SetSwapInterval(1);
+
+        LOGGER.info("GL info: " + glGetString(GL_RENDERER) + " GL version " + glGetString(GL_VERSION) + ", " + glGetString(GL_VENDOR));
 
         elementShader = new ElementShader();
         try {
@@ -227,7 +235,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
             crashElegantly("An error occurred initializing shaders.");
         }
 
-        // Set the clear color based on the colour scheme
+        // Set the clear color based on the color scheme
         glClearColor(colourScheme.background().redf(), colourScheme.background().greenf(), colourScheme.background().bluef(), 1f);
 
         // we always render to an 854x480 texture and then fit that to the screen - with a scale factor
@@ -253,11 +261,15 @@ public class DisplayWindow implements ImmediateWindowProvider {
 
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glfwMakeContextCurrent(0);
+
+        releaseGlContext();
+
         this.windowTick = renderScheduler.scheduleAtFixedRate(this::renderThreadFunc, 50, 50, TimeUnit.MILLISECONDS);
-        this.performanceTick = renderScheduler.scheduleAtFixedRate(performanceInfo::update, 0, 500, TimeUnit.MILLISECONDS);
+
+        // Update the performance information every 1/2 second
+        renderScheduler.scheduleAtFixedRate(performanceInfo::update, 0, 500, TimeUnit.MILLISECONDS);
         // schedule a 50 ms ticker to try and smooth out the rendering
-        renderScheduler.scheduleAtFixedRate(()-> animationTimerTrigger.set(true), 1, 50, TimeUnit.MILLISECONDS);
+        //renderScheduler.scheduleAtFixedRate(() -> animationTimerTrigger.set(true), 1, 50, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -294,6 +306,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
         glBindVertexArray(currentVAO);
         glBindFramebuffer(GL_FRAMEBUFFER, currentFB);
     }
+
     /**
      * Start the window and Render Thread; we're ready to go.
      */
@@ -342,71 +355,65 @@ public class DisplayWindow implements ImmediateWindowProvider {
      * As long as we can verify that, then GL (and things like OS X) have no complaints with doing this.
      *
      * @param mcVersion Minecraft Version
-     * @return The selected GL profile as an integer pair
      */
     public void initWindow(@Nullable String mcVersion) {
-        // Initialize GLFW with a time guard, in case something goes wrong
-        long glfwInitBegin = System.nanoTime();
-        if (!glfwInit()) {
-            crashElegantly("We are unable to initialize the graphics system.\nglfwInit failed.\n");
-            throw new IllegalStateException("Unable to initialize GLFW");
+        // Initialize a time guard, in case something goes wrong
+        long initBegin = System.nanoTime();
+        if (!SDL_Init(SDL_INIT_VIDEO)) {
+            crashElegantly("We are unable to initialize the graphics system.\nSDL_Init failed.\n");
+            throw new IllegalStateException("Unable to initialize SDL");
         }
-        long glfwInitEnd = System.nanoTime();
+        long initEnd = System.nanoTime();
 
-        if (glfwInitEnd - glfwInitBegin > 1e9) {
-            LOGGER.error("WARNING : glfwInit took {} seconds to start.", (glfwInitEnd - glfwInitBegin) / 1.0e9);
-        }
-
-        // Clear the Last Exception (#7285 - Prevent Vanilla throwing an IllegalStateException due to invalid controller mappings)
-        handleLastGLFWError((error, description) -> LOGGER.error(String.format("Suppressing Last GLFW error: [0x%X]%s", error, description)));
+        if (initEnd - initBegin > 1e9)
+            LOGGER.error("WARNING : Window init took {} seconds to start.", (initEnd - initBegin) / 1.0e9);
 
         // Set window hints for the new window we're gonna create.
-        glfwDefaultWindowHints();
-        glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-        glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-        glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+        SDL_ResetHints();
 
         String vanillaWindowTitle = "Minecraft* ";
-        if (mcVersion != null) vanillaWindowTitle += mcVersion;
+        if (mcVersion != null)
+            vanillaWindowTitle += mcVersion;
 
-        // this emulates what we would get without early progress window
-        // as vanilla never sets these, so GLFW uses the first window title
-        // set them explicitly to avoid it using "FML early loading progress" as the class
-        glfwWindowHintString(GLFW_X11_CLASS_NAME, vanillaWindowTitle);
-        glfwWindowHintString(GLFW_X11_INSTANCE_NAME, vanillaWindowTitle);
-
-        long primaryMonitor = glfwGetPrimaryMonitor();
+        var primaryMonitor = SDL_GetPrimaryDisplay();
         if (primaryMonitor == 0) {
             LOGGER.error("Failed to find a primary monitor - this means LWJGL isn't working properly");
-            crashElegantly("Failed to locate a primary monitor.\nglfwGetPrimaryMonitor failed.\n");
+            crashElegantly("Failed to locate a primary monitor.\nSDL_GetPrimaryDisplay failed.\n");
             throw new IllegalStateException("Can't find a primary monitor");
         }
-        GLFWVidMode vidmode = glfwGetVideoMode(primaryMonitor);
 
+        var vidmode = SDL_GetDesktopDisplayMode(primaryMonitor);
         if (vidmode == null) {
             LOGGER.error("Failed to get the current display video mode.");
-            crashElegantly("Failed to get current display resolution.\nglfwGetVideoMode failed.\n");
+            crashElegantly("Failed to get current display resolution.\nSDL_GetDesktopDisplayMode failed.\n");
             throw new IllegalStateException("Can't get a resolution");
         }
+
         long window = 0;
         var successfulWindow = new AtomicBoolean(false);
-        var windowFailFuture = renderScheduler.schedule(()->{
-            if (!successfulWindow.get()) crashElegantly("Timed out trying to setup the Game Window.");
+        var windowFailFuture = renderScheduler.schedule(() -> {
+            if (!successfulWindow.get())
+                crashElegantly("Timed out trying to setup the Game Window.");
         }, 10, TimeUnit.SECONDS);
-        int versidx = 0;
+
         var skipVersions = FMLConfig.<String>getListConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_SKIP_GL_VERSIONS);
         boolean showHelpLog = FMLConfig.getBoolConfigValue(FMLConfig.ConfigValue.EARLY_WINDOW_LOG_HELP_MSG);
-        final String[] lastGLError = new String[GL_VERSIONS.length];
-        do {
-            final var glVersionToTry = GL_VERSIONS[versidx][0] + "." + GL_VERSIONS[versidx][1];
-            if (skipVersions.contains(glVersionToTry)) {
-                LOGGER.info("Skipping GL version "+ glVersionToTry+" because of configuration");
-                versidx++;
+
+        record Attempt(String vesion, String error) {}
+        final List<Attempt> attempts = new ArrayList<>();
+        String requestedVersion = null;
+
+        for (int x = 0; x < GL_VERSIONS.length; x++) {
+            var version = GL_VERSIONS[x];
+            requestedVersion = version[0] + "." + version[1];
+
+            if (skipVersions.contains(requestedVersion)) {
+                LOGGER.info("Skipping GL version " + requestedVersion + " because of configuration");
                 continue;
             }
-            LOGGER.info("Trying GL version " + glVersionToTry);
-            if (showHelpLog && versidx == 0) {
+
+            LOGGER.info("Trying GL version " + requestedVersion);
+            if (showHelpLog && x == 0) {
                 LOGGER.info("""
                 If this message is the only thing at the bottom of your log before a crash, you probably have a driver issue.
 
@@ -418,132 +425,105 @@ public class DisplayWindow implements ImmediateWindowProvider {
 
                 You can safely ignore this message if the game starts up successfully.""");
             }
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GL_VERSIONS[versidx][0]); // we try our versions one at a time
-            glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GL_VERSIONS[versidx][1]);
-            glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-            glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
-            window = glfwCreateWindow(winWidth, winHeight, vanillaWindowTitle, 0L, 0L);
-            var erridx = versidx;
-            handleLastGLFWError((error, description) -> lastGLError[erridx] = String.format("Trying %d.%d: GLFW error: [0x%X]%s", GL_VERSIONS[erridx][0], GL_VERSIONS[erridx][1], error, description));
-            if (lastGLError[versidx] != null) {
-                LOGGER.trace(lastGLError[versidx]);
-            }
-            versidx++;
-        } while (window == 0 && versidx < GL_VERSIONS.length);
-//        LockSupport.parkNanos(TimeUnit.SECONDS.toNanos(12));
-        if (versidx== GL_VERSIONS.length && window == 0) {
-            LOGGER.error("Failed to find any valid GLFW profile. "+lastGLError[0]);
 
-            crashElegantly("Failed to find a valid GLFW profile.\nWe tried "+
-                    Arrays.stream(GL_VERSIONS).map(p->p[0]+"."+p[1]).filter(o -> !skipVersions.contains(o))
-                            .collect(Collector.of(()->new StringJoiner(", ").setEmptyValue("no versions"), StringJoiner::add, StringJoiner::merge, StringJoiner::toString))+
-                    " but none of them worked.\n"+ Arrays.stream(lastGLError).filter(Objects::nonNull).collect(Collectors.joining("\n")));
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION,    version[0]);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION,    version[1]);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,     SDL_GL_CONTEXT_PROFILE_CORE);
+            SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,            SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+            SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, GL_TRUE);
+            window = SDL_CreateWindow(vanillaWindowTitle, winWidth, winHeight,
+                  SDL_WINDOW_OPENGL
+                | SDL_WINDOW_RESIZABLE
+                | SDL_WINDOW_HIGH_PIXEL_DENSITY
+            );
+
+            if (window == 0) {
+                var error = Objects.requireNonNullElse(SDLError.SDL_GetError(), "<no error>");
+                attempts.add(new Attempt(requestedVersion, error));
+                LOGGER.trace("Failed to create window using %d.%d: %s", version[0], version[1], error);
+            } else {
+                SDLVideo.SDL_SetWindowMinimumSize(window, 320, 240);
+                LOGGER.info("Created window using SDL video driver: {}", SDLVideo.SDL_GetCurrentVideoDriver());
+                break; // We got a valid window!
+            }
+        }
+
+        if (window == 0) {
+            LOGGER.error("Failed to find any valid GLFW profile.");
+            var message = new StringBuilder()
+                .append("Failed to find a valid GLFW profile.\n");
+
+            if (attempts.isEmpty()) {
+                message.append("All GL Versions were skipped");
+            } else {
+                message.append("We tried:");
+                for (var attempt : attempts)
+                    message.append("\n\t").append(attempt.vesion).append(':').append(attempt.error);
+            }
+
+            crashElegantly(message.toString());
             throw new IllegalStateException("Failed to create a GLFW window with any profile");
         }
+
         successfulWindow.set(true);
-        if (!windowFailFuture.cancel(true)) throw new IllegalStateException("We died but didn't somehow?");
-        var requestedVersion = GL_VERSIONS[versidx-1][0]+"."+GL_VERSIONS[versidx-1][1];
-        var maj = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MAJOR);
-        var min = glfwGetWindowAttrib(window, GLFW_CONTEXT_VERSION_MINOR);
-        var gotVersion = maj+"."+min;
-        LOGGER.info("Requested GL version "+requestedVersion+" got version "+gotVersion);
-        this.glVersion = gotVersion;
+        if (!windowFailFuture.cancel(true))
+            throw new IllegalStateException("We died but didn't somehow?");
+
+        try (var stack = org.lwjgl.system.MemoryStack.stackPush()) {
+            var majBuf = stack.mallocInt(1);
+            var minBuf = stack.mallocInt(1);
+            SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, majBuf);
+            SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, minBuf);
+           this.glVersion = majBuf.get(0) + "." + minBuf.get(0);
+        }
+
+        LOGGER.info("Requested GL version " + requestedVersion + " got version " + this.glVersion);
         this.window = window;
 
         if (showHelpLog)
             FMLConfig.updateConfig(FMLConfig.ConfigValue.EARLY_WINDOW_LOG_HELP_MSG, false);
 
-        int[] x = new int[1];
-        int[] y = new int[1];
-        glfwGetMonitorPos(primaryMonitor, x, y);
-        int monitorX = x[0];
-        int monitorY = y[0];
-//        glfwSetWindowSizeLimits(window, 854, 480, GLFW_DONT_CARE, GLFW_DONT_CARE);
-        if (this.maximized) {
-            glfwMaximizeWindow(window);
-        }
+        if (this.maximized)
+            SDL_MaximizeWindow(window);
 
-        glfwGetWindowSize(window, x, y);
-        this.winWidth = x[0];
-        this.winHeight = y[0];
+        var size = getWindowSize(window);
+        this.onWindowResize(size.x, size.y);
 
-        // Setting the window position isn't supported on wayland, so check the error here
-        glfwSetWindowPos(window, (vidmode.width() - this.winWidth) / 2 + monitorX, (vidmode.height() - this.winHeight) / 2 + monitorY);
-        handleLastGLFWError();
+        var monitor = getMonitorSize(primaryMonitor);
+        if (monitor != null)
+            SDL_SetWindowPosition(window, (monitor.width - size.x) / 2 + monitor.x, (monitor.height - size.y) / 2 + monitor.y);
 
-        // Attempt setting the icon
-//        int[] channels = new int[1];
-//        try (var glfwImgBuffer = GLFWImage.create(MemoryUtil.getAllocator().malloc(GLFWImage.SIZEOF), 1)) {
-//            final ByteBuffer imgBuffer;
-//            try (GLFWImage glfwImages = GLFWImage.malloc()) {
-//                imgBuffer = STBHelper.loadImageFromClasspath("forge_logo.png", 20000, x, y, channels);
-//                glfwImgBuffer.put(glfwImages.set(x[0], y[0], imgBuffer));
-//                glfwSetWindowIcon(window, glfwImgBuffer);
-//                STBImage.stbi_image_free(imgBuffer);
-//            }
-//        } catch (NullPointerException e) {
-//            System.err.println("Failed to load forge logo");
-//        }
-//        handleLastGLFWError((error, description) -> LOGGER.debug(String.format("Suppressing GLFW icon error: [0x%X]%s", error, description)));
+        pollEvents();
 
-        glfwSetFramebufferSizeCallback(window, this::fbResize);
-        glfwSetWindowPosCallback(window, this::winMove);
-        glfwSetWindowSizeCallback(window, this::winResize);
-
-        // Show the window
-        glfwShowWindow(window);
-        // Getting the window position isn't supported on wayland, so check the error here
-        glfwGetWindowPos(window, x, y);
-        handleLastGLFWError();
-
-        this.winX = x[0];
-        this.winY = y[0];
-        glfwGetFramebufferSize(window, x, y);
-        this.fbWidth = x[0];
-        this.fbHeight = y[0];
-        glfwPollEvents();
+        SDL_ShowWindow(window);
     }
 
-    private static void handleLastGLFWError() {
-        handleLastGLFWError((error, description) -> {
-            if (error == GLFW_FEATURE_UNAVAILABLE) {
-                // suppress window pos errors for unsupported platforms (wayland)
-                LOGGER.debug(String.format("Suppressing GLFW error: [0x%X]%s", error, description));
-                return;
+    private record Point(int x, int y) {}
+    private record Rect(int x, int y, int width, int height) {}
+
+    private static @Nullable Rect getMonitorSize(int monitor) {
+        try (var bounds = SDL_Rect.malloc()) {
+            // Fetch the display bounds for the current index
+            if (SDL_GetDisplayBounds(monitor, bounds)) {
+                int x = bounds.x();
+                int y = bounds.y();
+                int width = bounds.w();
+                int height = bounds.h();
+                LOGGER.info("Display {} Bounds -> X: {}, Y: {}, Width: {}, Height: {}", monitor, x, y, width, height);
+                return new Rect(x, y, width, height);
+            } else {
+                LOGGER.warn("Could not get bounds for display: " + SDL_GetError());
+                return null;
             }
-
-            throw new IllegalStateException(String.format("GLFW error: [0x%X]%s", error, description));
-        });
-    }
-
-    private void winResize(long window, int width, int height) {
-        if (window == this.window && width != 0 && height != 0) {
-            this.winWidth = width;
-            this.winHeight = height;
-        }
-    }
-    private void fbResize(long window, int width, int height) {
-        if (window == this.window && width != 0 && height != 0) {
-            this.fbWidth = width;
-            this.fbHeight = height;
         }
     }
 
-    private void winMove(long window, int x, int y) {
-        if (window == this.window) {
-            this.winX = x;
-            this.winY = y;
-        }
-    }
-    private static void handleLastGLFWError(BiConsumer<Integer, String> handler) {
-        try (MemoryStack memorystack = MemoryStack.stackPush()) {
-            PointerBuffer pointerbuffer = memorystack.mallocPointer(1);
-            int error = glfwGetError(pointerbuffer);
-            if (error != GLFW_NO_ERROR) {
-                long pDescription = pointerbuffer.get();
-                String description = pDescription == 0L ? "" : MemoryUtil.memUTF8(pDescription);
-                handler.accept(error, description);
-            }
+    private static Point getWindowSize(long window) {
+        try (var stack = MemoryStack.stackPush()) {
+            var width  = stack.mallocInt(1);
+            var height = stack.mallocInt(1);
+            SDL_GetWindowSize(window, width, height);
+            return new Point(width.get(0), height.get(0));
         }
     }
 
@@ -586,14 +566,10 @@ public class DisplayWindow implements ImmediateWindowProvider {
         // we don't want the lock, just making sure it's back on the main thread
         renderLock.release();
 
-        glfwMakeContextCurrent(window);
+        SDL_GL_MakeCurrent(window, sdlContext);
         // Set the title to what the game wants
-        glfwSetWindowTitle(window, title);
-        glfwSwapInterval(0);
-        // Clean up our hooks
-        glfwSetFramebufferSizeCallback(window, null).free();
-        glfwSetWindowPosCallback(window, null).free();
-        glfwSetWindowSizeCallback(window, null).free();
+        SDL_SetWindowTitle(window, title);
+        SDL_GL_SetSwapInterval(0); // Disable vsync, let Minecraft control it
         this.repaintTick = this::renderThreadFunc; // the repaint will continue to be called until the overlay takes over
         this.windowTick = null; // this tells the render thread that the async ticker is done
         return window;
@@ -659,7 +635,7 @@ public class DisplayWindow implements ImmediateWindowProvider {
 
     @Override
     public void periodicTick() {
-        glfwPollEvents();
+        pollEvents();
         repaintTick.run();
     }
 
@@ -674,4 +650,67 @@ public class DisplayWindow implements ImmediateWindowProvider {
         this.context.elementShader().close();
         SimpleBufferBuilder.destroy();
     }
+
+    private void bindGlContext() {
+        SDL_GL_MakeCurrent(window, sdlContext);
+        //if (!SDL_GL_MakeCurrent(window, sdlContext))
+        //    throw new IllegalStateException("Failed to make OpenGL context current: " + SDL_GetError());
+    }
+
+    private void releaseGlContext() {
+        SDL_GL_MakeCurrent(window, 0);
+    }
+
+
+    private void pollEvents() {
+        try (var event = SDL_Event.malloc()) {
+            while (SDL_PollEvent(event)) {
+                switch (event.type()) {
+                    case SDL_EVENT_WINDOW_MOVED:
+                        this.onWindowMove(event.window().data1(), event.window().data2());
+                        break;
+                    case SDL_EVENT_WINDOW_RESIZED:
+                        this.onWindowResize(event.window().data1(), event.window().data2());
+                        break;
+                    case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+                        this.onFrameBufferResize(event.window().data1(), event.window().data2());
+                        break;
+
+                    /*
+                    We were told to quit for some reason, find a way to abort?
+                    case SDL_EVENT_QUIT:
+                    case SDL_EVENT_WINDOW_CLOSE_REQUESTED:
+                    case SDL_EVENT_TERMINATING:
+
+                    Window was minimized or restored, maybe stop rendering?
+                    case SDL_EVENT_WINDOW_MINIMIZED:
+                    case SDL_EVENT_WINDOW_MAXIMIZED:
+                    case SDL_EVENT_WINDOW_RESTORED:
+                    */
+                }
+            }
+        }
+    }
+
+    private void onWindowResize(int width, int height) {
+        if (width == 0 || height == 0)
+            return;
+
+        this.winWidth = width;
+        this.winHeight = height;
+    }
+
+    private void onFrameBufferResize(int width, int height) {
+        if (width == 0 || height == 0)
+            return;
+
+        this.fbWidth = width;
+        this.fbHeight = height;
+    }
+
+    private void onWindowMove(int x, int y) {
+        this.winX = x;
+        this.winY = y;
+    }
+
 }

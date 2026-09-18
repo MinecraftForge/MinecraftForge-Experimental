@@ -110,75 +110,78 @@ public record ConditionalAdvancement(ICondition condition, Optional<Advancement>
         }
     }
 
-    public static final Codec<ConditionalAdvancement> CODEC = RecordCodecBuilder.create(i -> i.group(
-        ICondition.SAFE_CODEC.fieldOf(ICondition.DEFAULT_FIELD).forGetter(ConditionalAdvancement::condition),
-        Advancement.CODEC.optionalFieldOf("child").forGetter(ConditionalAdvancement::child)
-    ).apply(i, ConditionalAdvancement::new));
-    private static final Codec<List<ConditionalAdvancement>> LIST_CODEC = CODEC.listOf();
 
 
     private static final String KEY = "forge:children";
-    public static final MapCodec<Advancement> CONDITIONAL_ADVANCEMENT_CODEC = Codec.of(new MapEncoder.Implementation<Advancement>() {
-        @Override
-        public <T> RecordBuilder<T> encode(Advancement input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
-            var root = Advancement.MAP_CODEC.encode(input, ops, prefix);
-            if (input.forgeConditions().isPresent())
-                root.add("forge:children", LIST_CODEC.encodeStart(ops, input.forgeConditions().get()));
-            return root;
-        }
+    public static final Codec<Advancement> wrapCodec(MapCodec<Advancement> vanilla) {
+        var vanillaCodec = vanilla.codec();
+        var childCodec = RecordCodecBuilder.<ConditionalAdvancement>create(i -> i.group(
+            ICondition.SAFE_CODEC.fieldOf(ICondition.DEFAULT_FIELD).forGetter(ConditionalAdvancement::condition),
+            vanillaCodec.optionalFieldOf("child").forGetter(ConditionalAdvancement::child)
+        ).apply(i, ConditionalAdvancement::new)).listOf();
 
-        @Override
-        public <T> Stream<T> keys(DynamicOps<T> ops) {
-            return Stream.concat((Advancement.MAP_CODEC).keys(ops), List.of(ops.createString(KEY)).stream());
-        }
-    }, new MapDecoder.Implementation<Advancement>() {
-        @Override
-        public <T> DataResult<Advancement> decode(DynamicOps<T> ops, MapLike<T> input) {
-            var root = Advancement.MAP_CODEC.decode(ops, input);
-            var children = input.get(KEY);
-            if (children == null)
+        return Codec.of(new MapEncoder.Implementation<Advancement>() {
+            @Override
+            public <T> RecordBuilder<T> encode(Advancement input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
+                var root = vanilla.encode(input, ops, prefix);
+                if (input.forgeConditions().isPresent())
+                    root.add("forge:children", childCodec.encodeStart(ops, input.forgeConditions().get()));
                 return root;
-
-            var context = ConditionCodec.getContext(ops);
-            return ops.getStream(children).flatMap(stream -> {
-                var count = new AtomicInteger();
-                var ret = stream.map(entry -> accept(context, ops, count, entry, root))
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
-
-                if (ret != null)
-                    return ret;
-
-                return DataResult.error(() -> "No advancement passed conditions, if this is the case, you should have an outer condition.");
-            });
-        }
-
-        private static <T> DataResult<Advancement> accept(ICondition.IContext context, DynamicOps<T> ops, AtomicInteger count, T entry, DataResult<Advancement> root) {
-            count.getAndIncrement();
-            var map = ops.getMap(entry).result().orElse(null);
-            if (map == null)
-                return DataResult.error(() -> "Entry " + count.get() + " was not MapLike " + entry.getClass());
-
-            if (map.get(ICondition.DEFAULT_FIELD) != null) {
-                var parsed = ICondition.SAFE_CODEC.parse(ops, (T)map.get(ICondition.DEFAULT_FIELD));
-                if (parsed.result().isPresent()) {
-                    var condition = parsed.result().get();
-                    if (!condition.test(context, ops))
-                        return null;
-                }
             }
 
-            var child = map.get("child");
-            if (child != null)
-                return Advancement.DIRECT_CODEC.parse(ops, (T)child);
-            return root;
-        }
+            @Override
+            public <T> Stream<T> keys(DynamicOps<T> ops) {
+                return Stream.concat(vanilla.keys(ops), List.of(ops.createString(KEY)).stream());
+            }
+        }, new MapDecoder.Implementation<Advancement>() {
+            @Override
+            public <T> DataResult<Advancement> decode(DynamicOps<T> ops, MapLike<T> input) {
+                var root = vanilla.decode(ops, input);
+                var children = input.get(KEY);
+                if (children == null)
+                    return root;
 
-        @Override
-        public <T> Stream<T> keys(DynamicOps<T> ops) {
-            return Stream.concat((Advancement.MAP_CODEC).keys(ops), List.of(ops.createString(KEY)).stream());
-        }
-    });
+                var context = ConditionCodec.getContext(ops);
+                return ops.getStream(children).flatMap(stream -> {
+                    var count = new AtomicInteger();
+                    var ret = stream.map(entry -> accept(context, ops, count, entry, root))
+                        .filter(Objects::nonNull)
+                        .findFirst()
+                        .orElse(null);
+
+                    if (ret != null)
+                        return ret;
+
+                    return DataResult.error(() -> "No advancement passed conditions, if this is the case, you should have an outer condition.");
+                });
+            }
+
+            private <T> DataResult<Advancement> accept(ICondition.IContext context, DynamicOps<T> ops, AtomicInteger count, T entry, DataResult<Advancement> root) {
+                count.getAndIncrement();
+                var map = ops.getMap(entry).result().orElse(null);
+                if (map == null)
+                    return DataResult.error(() -> "Entry " + count.get() + " was not MapLike " + entry.getClass());
+
+                if (map.get(ICondition.DEFAULT_FIELD) != null) {
+                    var parsed = ICondition.SAFE_CODEC.parse(ops, (T)map.get(ICondition.DEFAULT_FIELD));
+                    if (parsed.result().isPresent()) {
+                        var condition = parsed.result().get();
+                        if (!condition.test(context, ops))
+                            return null;
+                    }
+                }
+
+                var child = map.get("child");
+                if (child != null)
+                    return vanillaCodec.parse(ops, (T)child);
+                return root;
+            }
+
+            @Override
+            public <T> Stream<T> keys(DynamicOps<T> ops) {
+                return Stream.concat(vanilla.keys(ops), List.of(ops.createString(KEY)).stream());
+            }
+        }).codec();
+    }
 
 }

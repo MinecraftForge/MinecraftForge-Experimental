@@ -184,13 +184,13 @@ dependencyResolutionManagement.versionCatalogs {
         library 'jopt-simple',    'net.sf.jopt-simple', 'jopt-simple'   version '5.0.4'
         library 'commons-io',     'commons-io',         'commons-io'    version '2.20.0'
 
-        version 'lwjgl', '3.4.1'
+        version 'lwjgl', '3.4.3'
         library 'lwjgl',        'org.lwjgl', 'lwjgl'        versionRef 'lwjgl'
-        library 'lwjgl-glfw',   'org.lwjgl', 'lwjgl-glfw'   versionRef 'lwjgl'
         library 'lwjgl-opengl', 'org.lwjgl', 'lwjgl-opengl' versionRef 'lwjgl'
         library 'lwjgl-stb',    'org.lwjgl', 'lwjgl-stb'    versionRef 'lwjgl'
+        library 'lwjgl-sdl',    'org.lwjgl', 'lwjgl-sdl'    versionRef 'lwjgl'
         library 'lwjgl-tinyfd', 'org.lwjgl', 'lwjgl-tinyfd' versionRef 'lwjgl'
-        bundle  'lwjgl', ['lwjgl', 'lwjgl-glfw', 'lwjgl-opengl', 'lwjgl-stb', 'lwjgl-tinyfd']
+        bundle  'lwjgl', ['lwjgl', 'lwjgl-opengl', 'lwjgl-stb', 'lwjgl-sdl', 'lwjgl-tinyfd']
     }
 
     register('earlyDisplayLibs') {
@@ -203,10 +203,10 @@ dependencyResolutionManagement.versionCatalogs {
         library 'powermock-core', 'org.powermock', 'powermock-core' version '2.0.9'
 
         library 'lwjgl',        'org.lwjgl', 'lwjgl'        withoutVersion()
-        library 'lwjgl-glfw',   'org.lwjgl', 'lwjgl-glfw'   withoutVersion()
         library 'lwjgl-opengl', 'org.lwjgl', 'lwjgl-opengl' withoutVersion()
         library 'lwjgl-stb',    'org.lwjgl', 'lwjgl-stb'    withoutVersion()
-        bundle  'lwjgl', ['lwjgl', 'lwjgl-glfw', 'lwjgl-opengl', 'lwjgl-stb']
+        library 'lwjgl-sdl',    'org.lwjgl', 'lwjgl-sdl'    withoutVersion()
+        bundle  'lwjgl', ['lwjgl', 'lwjgl-opengl', 'lwjgl-stb', 'lwjgl-sdl']
     }
     //@formatter:on
 }

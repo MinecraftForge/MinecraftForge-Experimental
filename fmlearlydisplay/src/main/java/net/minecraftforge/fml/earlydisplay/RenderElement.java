@@ -11,8 +11,6 @@ import net.minecraftforge.fml.loading.progress.StartupNotificationManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
-
 import static org.lwjgl.opengl.GL32C.*;
 
 public class RenderElement {
@@ -39,11 +37,6 @@ public class RenderElement {
         void accept(SimpleBufferBuilder bb, DisplayContext context, int[] size, int frame);
     }
 
-    /** @deprecated Use {@link Renderer} directly. This was always eagerly resolved, making it an unnecessary wrapper. */
-    @Deprecated(since = "1.21.5", forRemoval = true)
-    @FunctionalInterface
-    interface Initializer extends Supplier<Renderer> {}
-
     @FunctionalInterface
     interface TextGenerator {
         void accept(SimpleBufferBuilder bb, SimpleFont fh, DisplayContext ctx);
@@ -57,13 +50,6 @@ public class RenderElement {
         public int scaledHeight() {
             return scale() * height();
         }
-    }
-
-    /** @deprecated Use {@link RenderElement#RenderElement(Renderer)} instead */
-    @Deprecated(since = "1.21.5", forRemoval = true)
-    public RenderElement(final Initializer rendererInitializer) {
-        this.bb = new SimpleBufferBuilder(1);
-        this.renderer = rendererInitializer.get();
     }
 
     public RenderElement(Renderer renderer) {

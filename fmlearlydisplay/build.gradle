@@ -55,9 +55,9 @@ dependencies {
 // We are making the list of providers first BEFORE mapping them to a provider of the resolved objects so that they can be finalized after configuration.
 var lwjglTestLibs = [
         dependencies.variantOf(earlyDisplayTestLibs.lwjgl) { classifier lwjglNatives },
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.glfw) { classifier lwjglNatives },
         dependencies.variantOf(earlyDisplayTestLibs.lwjgl.opengl) { classifier lwjglNatives },
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.stb) { classifier lwjglNatives }
+        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.stb) { classifier lwjglNatives },
+        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.sdl) { classifier lwjglNatives }
 ].with { list ->
     provider { list.collect { it.get() } }
 }

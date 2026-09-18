@@ -29,6 +29,9 @@ jarSigner.autoDetect('forge')
 
 // We have to tell ForgeDev to use the exact versions of tools we ship in the installer
 fdtools {
+    configure('mavenizer') {
+        version = '0.5.22'
+    }
     configure('binpatcher') {
         version = buildLibs.binarypatcher.get().version
     }
@@ -454,8 +457,8 @@ forgedev.userdevCompatibility(minecraftVersion) {
 final clientBinPatches = forgedev.binaryPatches('client') {
     clean = minecraftFiles.client
     // Workaround for 3rd party launcher issues, marker needed to locate MC, store needed to fix zlib-ng issues
-    apply { 
-        store = true 
+    apply {
+        store = true
         marker = '.forge_patched_minecraft'
     }
 }
@@ -759,16 +762,16 @@ publishing {
 def all = tasks.register('all') {}
 afterEvaluate {
     if (gradle.startParameter.taskNames.contains('all')) {
-	    tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
-	        if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
+      tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
+          if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
             if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init', 'buildEnvironment', 'idea',
                 'eclipse', 'javaToolchains', 'outgoingVariants', 'projects', 'properties', 'resolvableConfigurations', 'tasks', 'updateDaemonJvm',
                 'generateActionsWorkflow'
             ]) return
             if (task.name.startsWith('clean')) return
             if (task.name == 'checkJarCompatibility') return // This doesn't work in FG6 dev, I think it's cuz we check vs srg names. Will need to look at later
-        	all.configure { dependsOn(task) }
-	    }
+          all.configure { dependsOn(task) }
+      }
     }
 }
 */

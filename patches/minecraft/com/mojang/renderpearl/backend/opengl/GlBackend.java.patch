@@ -1,0 +1,11 @@
+--- a/com/mojang/renderpearl/backend/opengl/GlBackend.java
++++ b/com/mojang/renderpearl/backend/opengl/GlBackend.java
+@@ -38,6 +_,8 @@
+                     "OpenGL is not supported: " + Objects.requireNonNullElse(SDLError.SDL_GetError(), "<no error>"),
+                     BackendCreationException.Reason.OPENGL_MISSING
+                 );
++                // If we have loaded the early loading screen, we expect the libraries to be loaded, so don't actually error
++                if (!"OpenGL is not supported: OpenGL library already loaded".equals(this.libraryLoadFailure.getMessage()))
+                 throw this.libraryLoadFailure;
+             }
+ 

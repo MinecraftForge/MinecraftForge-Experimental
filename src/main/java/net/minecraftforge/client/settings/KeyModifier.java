@@ -15,7 +15,6 @@ import com.mojang.blaze3d.platform.InputConstants;
 
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
-import org.lwjgl.glfw.GLFW;
 
 public enum KeyModifier {
     CONTROL {
@@ -40,7 +39,7 @@ public enum KeyModifier {
     SHIFT {
         @Override
         public boolean matches(InputConstants.Key key) {
-            return key.getValue() == GLFW.GLFW_KEY_LEFT_SHIFT || key.getValue() == GLFW.GLFW_KEY_RIGHT_SHIFT;
+            return key.getValue() == InputConstants.KEY_LSHIFT || key.getValue() == InputConstants.KEY_RSHIFT;
         }
 
         @Override
@@ -56,7 +55,7 @@ public enum KeyModifier {
     ALT {
         @Override
         public boolean matches(InputConstants.Key key) {
-            return key.getValue() == GLFW.GLFW_KEY_LEFT_ALT || key.getValue() == GLFW.GLFW_KEY_RIGHT_ALT;
+            return key.getValue() == InputConstants.KEY_LALT || key.getValue() == InputConstants.KEY_RALT;
         }
 
         @Override

@@ -12,9 +12,10 @@ import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
-import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
+
+import com.mojang.blaze3d.platform.InputConstants;
 
 /**
  * Slider widget implementation which allows inputting values in a certain range with optional step size.
@@ -134,8 +135,8 @@ public class ForgeSlider extends AbstractSliderButton {
 
     @Override
     public boolean keyPressed(KeyEvent info) {
-        boolean flag = info.key() == GLFW.GLFW_KEY_LEFT;
-        if (flag || info.key() == GLFW.GLFW_KEY_RIGHT) {
+        boolean flag = info.key() == InputConstants.KEY_LEFT;
+        if (flag || info.key() == InputConstants.KEY_RIGHT) {
             if (this.minValue > this.maxValue)
                 flag = !flag;
             float f = flag ? -1F : 1F;
