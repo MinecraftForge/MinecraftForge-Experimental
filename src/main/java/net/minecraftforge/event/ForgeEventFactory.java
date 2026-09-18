@@ -478,7 +478,7 @@ public final class ForgeEventFactory {
         PlayerFlyableFallEvent.BUS.post(new PlayerFlyableFallEvent(player, distance, multiplier));
     }
 
-    public static boolean onPlayerSpawnSet(ServerPlayer player, ServerPlayer.RespawnConfig config) {
+    public static boolean onPlayerSpawnSet(ServerPlayer player, ServerPlayer.@Nullable RespawnConfig config) {
         return PlayerSetSpawnEvent.BUS.post(new PlayerSetSpawnEvent(player, config));
     }
 

@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 /**
  * An OBJ material library (MTL), composed of named {@link Material materials}.
@@ -37,7 +36,7 @@ public class ObjMaterialLibrary
             {
                 case "newmtl":
                 {
-                    String name = Arrays.asList(Arrays.copyOfRange(line, 1, line.length)).stream().collect(Collectors.joining(" "));
+                    String name = String.join(" ", Arrays.copyOfRange(line, 1, line.length));
                     currentMaterial = new Material(name);
                     materials.put(name, currentMaterial);
                     break;

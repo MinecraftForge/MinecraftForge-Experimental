@@ -39,13 +39,9 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
         return new Builder();
     }
 
-    private static class Component {
-        private final String name;
-        private final List<Component> children = new ArrayList<>();
-        private final List<Mesh> meshes = new ArrayList<>();
-
-        public Component(String name) {
-            this.name = name;
+    private record Component(String name, List<Component> children, List<Mesh> meshes) {
+        private Component(String name) {
+            this(name, new ArrayList<>(), new ArrayList<>());
         }
 
         public void render(PoseStack poseStack, ITextureRenderTypeLookup textureRenderTypeLookup, int lightmap, int overlay, Transforms context) {
@@ -66,13 +62,12 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
         }
     }
 
-    private static class Mesh {
-        private final Identifier texture;
-        private final List<BakedQuad> quads = new ArrayList<>();
-        private final QuadInstance quadInstance = new QuadInstance();
+    private record Mesh(List<BakedQuad> quads, QuadInstance quadInstance) {
+//        private final Identifier texture;
 
-        public Mesh(Identifier texture) {
-            this.texture = texture;
+        private Mesh(Identifier texture) {
+//            this.texture = texture;
+            this(new ArrayList<>(), new QuadInstance());
         }
 
         public void render(PoseStack poseStack, ITextureRenderTypeLookup textureRenderTypeLookup, int lightmap, int overlay) {
@@ -85,19 +80,15 @@ public class CompositeRenderable implements IRenderable<CompositeRenderable.Tran
         }
     }
 
-    public static class Builder {
-        private final CompositeRenderable renderable = new CompositeRenderable();
-
-        private Builder() { }
+    public record Builder(CompositeRenderable get) {
+        private Builder() {
+            this(new CompositeRenderable());
+        }
 
         public PartBuilder<Builder> child(String name) {
             var child = new Component(name);
-            renderable.components.add(child);
+            get.components.add(child);
             return new PartBuilder<>(this, child);
-        }
-
-        public CompositeRenderable get() {
-            return renderable;
         }
     }
 

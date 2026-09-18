@@ -35,7 +35,7 @@ public class TimeTracker<T>
 
     private boolean enabled;
     private int trackingDuration;
-    private Map<T, int[]> timings = new MapMaker().weakKeys().makeMap();
+    private final Map<T, int[]> timings = new MapMaker().weakKeys().makeMap();
     private WeakReference<T> currentlyTracking;
     private long trackTime;
     private long timing;
