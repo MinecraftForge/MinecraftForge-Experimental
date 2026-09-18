@@ -8,7 +8,6 @@ package net.minecraftforge.event.entity;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -25,9 +24,8 @@ import net.minecraftforge.fml.LogicalSide;
  * This event is {@linkplain Cancellable cancellable}.
  * If the event is cancelled, the entity will not be added to the level.
  * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
- * on both logical sides.
- **/
+ * This event is fired on both logical sides.
+ */
 public record EntityJoinLevelEvent(Entity getEntity, Level getLevel, boolean loadedFromDisk)
         implements Cancellable, EntityEvent, RecordEvent {
     public static final CancellableEventBus<EntityJoinLevelEvent> BUS = CancellableEventBus.create(EntityJoinLevelEvent.class);

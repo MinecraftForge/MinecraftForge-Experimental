@@ -8,7 +8,6 @@ package net.minecraftforge.client.event;
 import net.minecraft.client.multiplayer.MultiPlayerGameMode;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.Connection;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -20,8 +19,7 @@ import org.jspecify.annotations.NullMarked;
  * Fired for different client connectivity events.
  * See the various subclasses to listen for specific events.
  *
- * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see LoggingIn
  * @see LoggingOut
@@ -48,8 +46,7 @@ public sealed interface ClientPlayerNetworkEvent extends InheritableEvent {
     /**
      * Fired when the client player logs in to the server. The player should be initialized.
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     @NullMarked
     record LoggingIn(MultiPlayerGameMode getMultiPlayerGameMode, LocalPlayer getPlayer, Connection getConnection)
@@ -63,8 +60,7 @@ public sealed interface ClientPlayerNetworkEvent extends InheritableEvent {
     /**
      * Fired when the client player logs out. This event may also fire when a new integrated server is being created.
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     @SuppressWarnings("NullableProblems")
     // Shush IntelliJ, we override non-nullables as nullables in this specific event; see later comment
@@ -117,8 +113,7 @@ public sealed interface ClientPlayerNetworkEvent extends InheritableEvent {
     /**
      * Fired when the client player respawns, creating a new player instance to replace the old player instance.
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @param getOldPlayer the previous player instance
      * @param getNewPlayer the newly created player instance

@@ -24,7 +24,6 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * @param getHand The hand being rendered
  * @param getPoseStack The pose stack used for rendering
- * @param getMultiBufferSource The source of rendering buffers
  * @param getPartialTick The partial tick
  * @param getInterpolatedPitch The interpolated pitch of the player entity
  * @param getSwingProgress The swing progress of the hand being rendered
@@ -51,8 +50,6 @@ public record RenderHandEvent(
 
     /**
      * {@return the amount of packed (sky and block) light for rendering}
-     *
-     * @see LightTexture
      */
     public int getPackedLight() {
         return getPackedLight;

@@ -8,12 +8,12 @@ package net.minecraftforge.event;
 import net.minecraft.world.Difficulty;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
+import org.jspecify.annotations.NullMarked;
 
-/**
- * DifficultyChangeEvent is fired when difficulty is changing. <br>
- * <br>
- * This event is fired via the {@link ForgeEventFactory#onDifficultyChange(Difficulty, Difficulty)}.<br>
- */
+/// This event is fired when difficulty is changing.
+///
+/// This event is fired from [ForgeEventFactory#onDifficultyChange(Difficulty, Difficulty)].
+@NullMarked
 public record DifficultyChangeEvent(Difficulty getDifficulty, Difficulty getOldDifficulty) implements RecordEvent {
     public static final EventBus<DifficultyChangeEvent> BUS = EventBus.create(DifficultyChangeEvent.class);
 }

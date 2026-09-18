@@ -18,37 +18,25 @@ import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * Base piston event, use {@link PistonEvent.Post} and {@link PistonEvent.Pre}
- */
+/// Base piston event, use [PistonEvent.Post] and [PistonEvent.Pre]
 @NullMarked
 public sealed interface PistonEvent extends BlockEvent {
-    /**
-     * @return The position of the piston
-     */
+    /// @return The position of the piston
     @Override
     BlockPos getPos();
 
-    /**
-     * @return The move direction of the piston
-     */
+    /// @return The move direction of the piston
     Direction getDirection();
 
-    /**
-     * Helper method that gets the piston position offset by its facing
-     */
+    /// Helper method that gets the piston position offset by its facing
     default BlockPos getFaceOffsetPos() {
         return this.getPos().relative(getDirection());
     }
 
-    /**
-     * @return The movement type of the piston (extension, retraction)
-     */
+    /// @return The movement type of the piston (extension, retraction)
     PistonMoveType getPistonMoveType();
 
-    /**
-     * @return A piston structure helper for this movement. Returns null if the world stored is not a {@link Level}
-     */
+    /// @return A piston structure helper for this movement. Returns null if the world stored is not a [Level]
     @Nullable
     default PistonStructureResolver getStructureHelper() {
         if (getLevel() instanceof Level) {
@@ -58,9 +46,13 @@ public sealed interface PistonEvent extends BlockEvent {
         }
     }
 
-    /**
-     * Fires before the piston has updated block states. Cancellation prevents movement.
-     */
+    /// Fires before the piston has updated block states.
+    ///
+    /// This event is [Cancellable]. Cancelling prevents movement.
+    ///
+    /// @param getLevel The level the piston is in
+    /// @param getPos The position of the piston in the level
+    /// @param getPistonMoveType The movement type of the piston (extension, retraction)
     record Pre(
             LevelAccessor getLevel,
             BlockPos getPos,
@@ -75,9 +67,7 @@ public sealed interface PistonEvent extends BlockEvent {
         }
     }
 
-    /**
-     * Fires after the piston has moved and set surrounding states. This will not fire if {@link PistonEvent.Pre} is cancelled.
-     */
+    /// Fires after the piston has moved and set surrounding states. This will not fire if [PistonEvent.Pre] is cancelled.
     record Post(
             LevelAccessor getLevel,
             BlockPos getPos,

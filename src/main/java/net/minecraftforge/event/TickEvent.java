@@ -23,18 +23,13 @@ public sealed interface TickEvent {
     sealed interface ServerTickEvent extends TickEvent {
         BooleanSupplier haveTimeSupplier();
 
-        /**
-         * @return {@code true} whether the server has enough time to perform any
-         * additional tasks (usually IO related) during the current tick,
-         * otherwise {@code false}
-         */
+        /// @return `true` whether the server has enough time to perform any
+        ///         additional tasks (usually IO related) during the current tick, otherwise `false`
         default boolean haveTime() {
             return haveTimeSupplier().getAsBoolean();
         }
 
-        /**
-         * {@return the server instance}
-         */
+        /// @return the server instance
         MinecraftServer server();
 
         record Pre(BooleanSupplier haveTimeSupplier, MinecraftServer server) implements RecordEvent, ServerTickEvent {
@@ -67,8 +62,7 @@ public sealed interface TickEvent {
 
         /**
          * @return {@code true} whether the server has enough time to perform any
-         * additional tasks (usually IO related) during the current tick,
-         * otherwise {@code false}
+         *         additional tasks (usually IO related) during the current tick, otherwise {@code false}
          * @see ServerTickEvent#haveTime()
          */
         default boolean haveTime() {
@@ -85,6 +79,8 @@ public sealed interface TickEvent {
     }
 
     sealed interface PlayerTickEvent extends TickEvent {
+        Player player();
+
         LogicalSide side();
 
         record Pre(Player player, LogicalSide side) implements RecordEvent, PlayerTickEvent {
@@ -105,6 +101,8 @@ public sealed interface TickEvent {
     }
 
     sealed interface RenderTickEvent extends TickEvent {
+        DeltaTracker timer();
+
         record Pre(DeltaTracker timer) implements RecordEvent, RenderTickEvent {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
         }

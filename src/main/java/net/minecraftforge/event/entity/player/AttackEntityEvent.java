@@ -11,15 +11,12 @@ import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
-/**
- * AttackEntityEvent is fired when a player attacks an Entity.<br>
- * This event is fired whenever a player attacks an Entity in
- * {@link Player#attack(Entity)}.<br>
- * <br>
- * {@link #getTarget()} contains the Entity that was damaged by the player. <br>
- * <br>
- * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the player does not attack the Entity.
- **/
+/// AttackEntityEvent is fired when a player attacks an Entity in [Player#attack(Entity)].
+///
+/// This event is [cancellable][Cancellable]. If this event is cancelled, the player does not attack the Entity.
+///
+/// @param getEntity the player that attacked the entity
+/// @param getTarget the entity that was attacked by the player
 public record AttackEntityEvent(Player getEntity, Entity getTarget) implements Cancellable, PlayerEvent, RecordEvent {
     public static final CancellableEventBus<AttackEntityEvent> BUS = CancellableEventBus.create(AttackEntityEvent.class);
 }

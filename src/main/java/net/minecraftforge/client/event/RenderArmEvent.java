@@ -22,6 +22,8 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>This event is {@linkplain Cancellable cancellable}. If this event is cancelled, then the arm will not be rendered.</p>
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ *
+ * @param getPackedLight the amount of packed (sky and block) light for rendering
  */
 public record RenderArmEvent(
         PoseStack getPoseStack,
@@ -33,13 +35,4 @@ public record RenderArmEvent(
 
     @ApiStatus.Internal
     public RenderArmEvent {}
-
-    /**
-     * {@return the amount of packed (sky and block) light for rendering}
-     *
-     * @see LightTexture
-     */
-    public int getPackedLight() {
-        return getPackedLight;
-    }
 }

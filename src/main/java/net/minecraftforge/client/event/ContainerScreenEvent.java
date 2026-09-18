@@ -17,8 +17,7 @@ import org.jetbrains.annotations.ApiStatus;
  * Fired for hooking into {@link AbstractContainerScreen} events.
  * See the subclasses to listen for specific events.
  *
- * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see Render.Foreground
  * @see Render.Background
@@ -33,8 +32,7 @@ public sealed interface ContainerScreenEvent {
      * Fired every time an {@link AbstractContainerScreen} renders.
      * See the two subclasses to listen for foreground or background rendering.
      *
-     * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see Foreground
      * @see Background
@@ -62,8 +60,7 @@ public sealed interface ContainerScreenEvent {
          * <p>This can be used for rendering elements that must be above other screen elements, but
          * below tooltips and the dragged stack, such as slot or item stack specific overlays.</p>
          *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-         * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+         * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         record Foreground(
                 AbstractContainerScreen<?> getContainerScreen,
@@ -81,8 +78,7 @@ public sealed interface ContainerScreenEvent {
          * Fired after the container screen's background layer and elements are drawn.
          * This can be used for rendering new background elements.
          *
-         * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-         * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+         * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
          */
         record Background(
                 AbstractContainerScreen<?> getContainerScreen,

@@ -15,8 +15,7 @@ import org.jspecify.annotations.NullMarked;
 /**
  * Fired during the construction of {@linkplain net.minecraft.client.renderer.LevelRenderer}.
  *
- * <p>This event is fired on the {@linkplain net.minecraftforge.common.MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain net.minecraftforge.fml.LogicalSide#CLIENT logical client}.
+ * <p>This event is fired only on the {@linkplain net.minecraftforge.fml.LogicalSide#CLIENT logical client}.
  */
 @NullMarked
 public record AddFramePassEvent() implements RecordEvent {

@@ -8,7 +8,6 @@ package net.minecraftforge.client.event.sound;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.client.sounds.SoundEngine;
 import com.mojang.blaze3d.audio.Channel;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -16,8 +15,7 @@ import net.minecraftforge.fml.LogicalSide;
 /**
  * Superclass for sound related events.
  *
- * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see SoundSourceEvent
  * @see PlaySoundEvent
@@ -32,8 +30,7 @@ public sealed interface SoundEvent permits PlaySoundEvent, SoundEngineLoadEvent,
     /**
      * Superclass for when a sound has started to play on an audio channel.
      *
-     * <p>These events are fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>These events are fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see PlaySoundSourceEvent
      * @see PlayStreamingSourceEvent
@@ -47,7 +44,7 @@ public sealed interface SoundEvent permits PlaySoundEvent, SoundEngineLoadEvent,
         SoundInstance getSound();
 
         /**
-         * {@return the audio channel on which the sound is playing on}
+         * {@return the audio channel on which the sound is playing}
          */
         Channel getChannel();
 

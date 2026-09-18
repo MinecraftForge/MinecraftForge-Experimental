@@ -23,6 +23,8 @@ import org.jetbrains.annotations.ApiStatus;
  *
  * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
+ * @param getPackedLight the amount of packed (sky and block) light for rendering
+ *
  * @see ItemFrameRenderer
  */
 public record RenderItemInFrameEvent(
@@ -36,13 +38,4 @@ public record RenderItemInFrameEvent(
 
     @ApiStatus.Internal
     public RenderItemInFrameEvent {}
-
-    /**
-     * {@return the amount of packed (sky and block) light for rendering}
-     *
-     * @see LightTexture
-     */
-    public int getPackedLight() {
-        return getPackedLight;
-    }
 }

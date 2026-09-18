@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 /**
  * Automatic eventbus subscriber - reads {@link EventBusSubscriber}
  * annotations and passes the class instances to the {@link Bus}
- * defined by the annotation. Defaults to {@code MinecraftForge#EVENT_BUS}
+ * defined by the annotation. Defaults to {@code Bus.BOTH} if not specified.
  */
 public final class AutomaticEventSubscriber {
     private static final Logger LOGGER = LogManager.getLogger();

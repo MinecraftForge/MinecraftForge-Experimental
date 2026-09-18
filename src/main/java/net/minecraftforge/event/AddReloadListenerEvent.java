@@ -19,10 +19,9 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executor;
 
-/**
- * The main ResourceManager is recreated on each reload, just after {@link ReloadableServerResources}'s creation.
- * <p>The event is fired on each reload and lets modders add their own ReloadListeners, for server-side resources.</p>
- */
+/// The main ResourceManager is recreated on each reload, just after [ReloadableServerResources]'s creation.
+///
+/// The event is fired on each reload and lets modders add their own ReloadListeners, for server-side resources.
 @NullMarked
 public final class AddReloadListenerEvent extends MutableEvent {
     public static final EventBus<AddReloadListenerEvent> BUS = EventBus.create(AddReloadListenerEvent.class);
@@ -37,10 +36,8 @@ public final class AddReloadListenerEvent extends MutableEvent {
         this.registries = registries;
     }
 
-   /**
-    * @param listener the listener to add to the ResourceManager on reload
-    */
-    public void addListener(PreparableReloadListener listener) {
+   /// @param listener the listener to add to the ResourceManager on reload
+   public void addListener(PreparableReloadListener listener) {
         listeners.add(new WrappedStateAwareListener(listener));
     }
 
@@ -49,26 +46,20 @@ public final class AddReloadListenerEvent extends MutableEvent {
         return List.copyOf(listeners);
     }
 
-    /**
-     * @return The ReloableServerResources being reloaded.
-     */
+    /// @return The [ReloadableServerResources] being reloaded.
     public ReloadableServerResources getServerResources() {
         return serverResources;
     }
 
-    /**
-     * This context object holds data relevant to the current reload, such as staged tags.
-     * @return The condition context for the currently active reload.
-     */
+    /// This context object holds data relevant to the current reload, such as staged tags.
+    /// @return The condition context for the currently active reload.
     public ICondition.IContext getConditionContext() {
         return serverResources.getConditionContext();
     }
 
-    /**
-     * @return A holder lookup provider containing the registries with updated tags.
-     *
-     * @see net.minecraft.server.ReloadableServerRegistries.LoadResult#lookupWithUpdatedTags()
-     */
+    /// @return A holder lookup provider containing the registries with updated tags.
+    ///
+    /// @see net.minecraft.server.ReloadableServerRegistries.LoadResult#lookupWithUpdatedTags()
     public HolderLookup.Provider getRegistries() {
         return registries;
     }

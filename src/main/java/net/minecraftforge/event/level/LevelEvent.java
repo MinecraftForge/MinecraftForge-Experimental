@@ -25,7 +25,6 @@ import net.minecraft.world.level.StructureManager;
 import net.minecraft.world.level.biome.MobSpawnSettings;
 import net.minecraft.world.level.chunk.ChunkGenerator;
 import net.minecraft.world.level.storage.ServerLevelData;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
@@ -53,9 +52,8 @@ public sealed interface LevelEvent extends InheritableEvent
      * This event is fired whenever a level loads in ClientLevel's constructor and
      * {@literal MinecraftServer#createLevels(ChunkProgressListener)}.
      * <p>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
-     * on both logical sides.
-     **/
+     * This event is fired on both logical sides.
+     */
     record Load(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Load> BUS = EventBus.create(Load.class);
     }
@@ -67,9 +65,8 @@ public sealed interface LevelEvent extends InheritableEvent
      * {@link MinecraftServer#stopServer()},
      * {@link Minecraft#clearClientLevel(Screen)}.
      * <p>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
-     * on both logical sides.
-     **/
+     * This event is fired on both logical sides.
+     */
     record Unload(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Unload> BUS = EventBus.create(Unload.class);
     }
@@ -79,9 +76,8 @@ public sealed interface LevelEvent extends InheritableEvent
      * This event is fired when a level is saved in
      * {@link ServerLevel#save(ProgressListener, boolean, boolean)}.
      * <p>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
-     * only on the {@linkplain LogicalSide#SERVER logical server}.
-     **/
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
+     */
     record Save(LevelAccessor getLevel) implements LevelEvent {
         public static final EventBus<Save> BUS = EventBus.create(Save.class);
     }
@@ -93,8 +89,7 @@ public sealed interface LevelEvent extends InheritableEvent
      * This event is {@linkplain Cancellable cancellable}.
      * If the event is cancelled, the vanilla logic to choose a spawn position will be skipped.
      * <p>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
-     * only on the {@linkplain LogicalSide#SERVER logical server}.
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
      *
      * @see ServerLevelData#isInitialized()
      */

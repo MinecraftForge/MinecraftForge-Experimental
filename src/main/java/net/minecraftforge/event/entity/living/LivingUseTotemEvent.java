@@ -13,15 +13,18 @@ import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import net.minecraftforge.fml.LogicalSide;
+import org.jetbrains.annotations.ApiStatus;
 
-/**
- * Fired when an Entity attempts to use a totem to prevent its death.
- *
- * <p>This event is {@linkplain Cancellable cancellable}.
- * If this event is cancelled, the totem will not prevent the entity's death.</p>
- *
- * <p>This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.</p>
- */
+/// Fired when an Entity attempts to use a totem to prevent its death.
+///
+/// This event is [Cancellable].
+/// If this event is cancelled, the totem will not prevent the entity's death.
+///
+/// This event is fired only on the [logical server][LogicalSide#SERVER].
+///
+/// @param getSource The damage source that caused the entity to die
+/// @param getTotem The totem of undying being used from the entity's inventory
+/// @param getHandHolding The hand holding the totem
 public record LivingUseTotemEvent(
         LivingEntity getEntity,
         DamageSource getSource,
@@ -30,24 +33,6 @@ public record LivingUseTotemEvent(
 ) implements Cancellable, LivingEvent, RecordEvent {
     public static final CancellableEventBus<LivingUseTotemEvent> BUS = CancellableEventBus.create(LivingUseTotemEvent.class);
 
-    /**
-     * {@return the damage source that caused the entity to die}
-     */
-    public DamageSource getSource() {
-        return getSource;
-    }
-
-    /**
-     * {@return the totem of undying being used from the entity's inventory}
-     */
-    public ItemStack getTotem() {
-        return getTotem;
-    }
-
-    /**
-     * {@return the hand holding the totem}
-     */
-    public InteractionHand getHandHolding() {
-        return getHandHolding;
-    }
+    @ApiStatus.Internal
+    public LivingUseTotemEvent {}
 }

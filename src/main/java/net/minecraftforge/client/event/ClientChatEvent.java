@@ -21,8 +21,7 @@ import org.jspecify.annotations.Nullable;
  * <p>This event is {@linkplain Cancellable cancellable}.
  * If the event is cancelled, the chat message will not be sent to the server.</p>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  **/
 @NullMarked
 public final class ClientChatEvent extends MutableEvent implements Cancellable {

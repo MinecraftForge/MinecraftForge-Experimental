@@ -13,12 +13,10 @@ import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 
-/**
- * VillageSiegeEvent is fired just before a zombie siege finds a successful location in
- * {@code VillageSiege#tryToSetupSiege(ServerLevel)}, to give mods the chance to stop the siege.<br>
- * <br>
- * Cancelling this event stops the siege.<br>
- */
+/// VillageSiegeEvent is fired just before a zombie siege finds a successful location, to give mods the chance to stop
+/// the siege.
+///
+/// This event is [Cancellable]. Cancelling this event stops the siege.
 public record VillageSiegeEvent(
         VillageSiege getSiege,
         Level getLevel,

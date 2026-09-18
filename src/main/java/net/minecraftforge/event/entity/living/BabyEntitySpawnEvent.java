@@ -11,7 +11,6 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.fox.Fox;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -20,7 +19,7 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * BabyEntitySpawnEvent is fired just before a baby entity is about to be spawned. <br>
- * Parents will have disengaged their relationship. {@link Cancelable} <br>
+ * Parents will have disengaged their relationship. {@link Cancellable} <br>
  * It is possible to change the child completely by using {@link #setChild(AgeableMob)} <br>
  * This event is fired from {@link Animal#spawnChildFromBreeding(ServerLevel, Animal)} and
  * {@link Fox#spawnChildFromBreeding(ServerLevel, Animal)} <br>
@@ -33,9 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * This event is {@link Cancellable}.<br>
  * If this event is cancelled, the child Entity is not added to the world, and the parents <br>
  * will no longer attempt to mate.
- * <br>
- * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
- **/
+ */
 public final class BabyEntitySpawnEvent extends MutableEvent implements Cancellable {
     public static final CancellableEventBus<BabyEntitySpawnEvent> BUS = CancellableEventBus.create(BabyEntitySpawnEvent.class);
 

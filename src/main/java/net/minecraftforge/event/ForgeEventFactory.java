@@ -352,8 +352,8 @@ public final class ForgeEventFactory {
         return BlockEvent.FluidPlaceBlockEvent.BUS.fire(new BlockEvent.FluidPlaceBlockEvent(level, pos, liquidPos, state)).getNewState();
     }
 
-    public static ItemTooltipEvent onItemTooltip(ItemStack itemStack, @Nullable Player entityPlayer, List<Component> list, TooltipFlag flags, Item.TooltipContext context, TooltipDisplay display) {
-        return ItemTooltipEvent.BUS.fire(new ItemTooltipEvent(itemStack, entityPlayer, list, flags, context, display));
+    public static void onItemTooltip(ItemStack itemStack, @Nullable Player entityPlayer, List<Component> list, TooltipFlag flags, Item.TooltipContext context, TooltipDisplay display) {
+        ItemTooltipEvent.BUS.post(new ItemTooltipEvent(itemStack, entityPlayer, list, flags, context, display));
     }
 
     public static SummonAidEvent fireZombieSummonAid(Zombie zombie, Level level, int x, int y, int z, LivingEntity attacker, double summonChance) {

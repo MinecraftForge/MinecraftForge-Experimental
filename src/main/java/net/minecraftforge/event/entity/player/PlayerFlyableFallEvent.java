@@ -10,9 +10,7 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jspecify.annotations.NullMarked;
 
-/**
- * Occurs when a player falls, but is able to fly.  Doesn't need to be cancelable, this is mainly for notification purposes.
- */
+/// Occurs when a player falls, but is able to fly. Doesn't need to be cancelable, this is mainly for notification purposes.
 @NullMarked
 public final class PlayerFlyableFallEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<PlayerFlyableFallEvent> BUS = EventBus.create(PlayerFlyableFallEvent.class);

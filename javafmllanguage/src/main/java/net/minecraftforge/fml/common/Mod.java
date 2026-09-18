@@ -37,8 +37,7 @@ public @interface Mod {
 
     /**
      * Annotate a class which will be subscribed to an Event Bus at mod construction time.
-     * Defaults to subscribing the current modid to the {@code MinecraftForge#EVENT_BUS}
-     * on both sides.
+     * Defaults to subscribing the current modid to the {@link Bus#BOTH} on both sides.
      *
      * @see Bus
      */

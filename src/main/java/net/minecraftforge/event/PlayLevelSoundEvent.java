@@ -143,10 +143,6 @@ public sealed class PlayLevelSoundEvent extends MutableEvent implements Cancella
      * <p>
      * This event is {@link Cancellable cancellable}.
      * If this event is cancelled, the sound is not played.
-     * <p>
-     * This event does not have a result.
-     * <p>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      */
     public static final class AtEntity extends PlayLevelSoundEvent {
         public static final EventBus<AtEntity> BUS = EventBus.create(AtEntity.class);
@@ -172,10 +168,6 @@ public sealed class PlayLevelSoundEvent extends MutableEvent implements Cancella
      * <p>
      * This event is {@link Cancellable cancellable}.
      * If this event is cancelled, the sound is not played.
-     * <p>
-     * This event does not have a result.
-     * <p>
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
      */
     public static final class AtPosition extends PlayLevelSoundEvent {
         public static final EventBus<AtPosition> BUS = EventBus.create(AtPosition.class);

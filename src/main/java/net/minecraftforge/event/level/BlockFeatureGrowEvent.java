@@ -12,7 +12,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.EventBus;
@@ -27,8 +26,7 @@ import org.jetbrains.annotations.Nullable;
  * using the features set on the event.
  * {@linkplain Result#DENY DENY} will prevent the sapling from growing.
  * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
- * only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.
+ * This event is fired only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.
  */
 public final class BlockFeatureGrowEvent implements LevelEvent, HasResult {
     public static final EventBus<BlockFeatureGrowEvent> BUS = EventBus.create(BlockFeatureGrowEvent.class);

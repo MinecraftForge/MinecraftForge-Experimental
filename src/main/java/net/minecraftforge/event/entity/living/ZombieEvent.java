@@ -8,7 +8,6 @@ package net.minecraftforge.event.entity.living;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.zombie.Zombie;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.util.HasResult;
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.event.ForgeEventFactory;
@@ -20,7 +19,7 @@ import net.minecraftforge.eventbus.api.event.InheritableEvent;
  * ZombieEvent is fired whenever a zombie is spawned for aid.
  * If a method utilizes this event as its parameter, the method will
  * receive every child event of this class.
- **/
+ */
 public sealed abstract class ZombieEvent implements EntityEvent, InheritableEvent {
     public static final EventBus<ZombieEvent> BUS = EventBus.create(ZombieEvent.class);
 
@@ -55,9 +54,7 @@ public sealed abstract class ZombieEvent implements EntityEvent, InheritableEven
      *     <li>{@link Result#ALLOW} Zombie is summoned.</li>
      *     <li>{@link Result#DENY} Zombie is not summoned.</li>
      * </ul>
-     *
-     * This event is fired on the {@link MinecraftForge#EVENT_BUS}.
-     **/
+     */
     public static final class SummonAidEvent extends ZombieEvent implements HasResult {
         public static final EventBus<SummonAidEvent> BUS = EventBus.create(SummonAidEvent.class);
 

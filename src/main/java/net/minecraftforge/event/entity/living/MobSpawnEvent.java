@@ -23,7 +23,6 @@ import net.minecraft.world.level.BaseSpawner;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraftforge.common.ForgeInternalHandler;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.event.entity.EntityEvent;
 import net.minecraftforge.event.entity.SpawnPlacementRegisterEvent;
@@ -101,8 +100,7 @@ public abstract sealed class MobSpawnEvent extends MutableEvent implements Entit
      * <li>Default - The value of the vanilla check will be used to determine success.</li>
      * <li>Deny - The check will fail, and the spawn process will abort.</li>
      * </ul>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#SERVER logical server}.
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
      * <p>
      * This event is not fired for mob spawners which utilize {@link CustomSpawnRules}, as they do not check spawn placements.
      * @apiNote If your modifications are for a single entity, and do not vary at runtime, use {@link SpawnPlacementRegisterEvent}.
@@ -210,8 +208,7 @@ public abstract sealed class MobSpawnEvent extends MutableEvent implements Entit
      * <li>Default - The position will be accepted if {@link Mob#checkSpawnRules} and {@link Mob#checkSpawnObstruction} are both true.</li>
      * <li>Deny - The position will not be accepted. The spawn process will abort, and further events will not be called.</li>
      * </ul>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#SERVER logical server}.
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
      *
      * @apiNote This event fires after Spawn Placement checks, which are the primary set of spawn checks.
      * @see {@link SpawnPlacementRegisterEvent} To modify spawn placements statically at startup.
@@ -269,7 +266,7 @@ public abstract sealed class MobSpawnEvent extends MutableEvent implements Entit
      * Canceling this event will result in {@link Mob#finalizeSpawn} not being called, and the returned value always being null, instead of propagating the SpawnGroupData.<br>
      * The entity will still be spawned. If you want to prevent the spawn, use {@link FinalizeSpawn#setSpawnCancelled}, which will cause Forge to prevent the spawn.
      * <p>
-     * This event is fired on {@link MinecraftForge#EVENT_BUS}, and is only fired on the logical server.
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
      * @see ForgeEventFactory#onFinalizeSpawn
      * @apiNote Callers do not need to check if the entity's spawn was cancelled, as the spawn will be blocked by Forge.
      */
@@ -399,13 +396,12 @@ public abstract sealed class MobSpawnEvent extends MutableEvent implements Entit
      * It fires once per tick per mob that is attempting to despawn.<br>
      * It is not fired if the mob is persistent (meaning it may not despawn).<br>
      * <p>
-     * This event is not {@linkplain Cancelable cancellable}, but does {@linkplain HasResult have a result}.
+     * This event is not {@linkplain Cancellable cancellable}, but does {@linkplain HasResult have a result}.
      * {@link Result#DEFAULT} indicates that default despawn mechanics should be used.
      * {@link Result#ALLOW} indicates that the mob should forcefully despawn.
      * {@link Result#DENY} indicates that the mob should forcefully stay spawned.
      * <p>
-     * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#SERVER logical server}.
+     * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
      *
      * @see LivingEntity#checkDespawn()
      * @author cpw

@@ -10,18 +10,16 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
+import org.jspecify.annotations.Nullable;
 
-/**
- * This event gets fired whenever a entity mounts/dismounts another entity.<br>
- * <b>entityBeingMounted can be null</b>, be sure to check for that.
- * <br>
- * <br>
- * This event is {@linkplain Cancellable cancellable}.<br>
- * If this event is cancelled, the entity does not mount/dismount the other entity.
- */
+/// This event gets fired whenever a entity mounts/dismounts another entity.
+///
+/// **entityBeingMounted can be null**, be sure to check for that.
+///
+/// This event is [Cancellable]. If this event is cancelled, the entity does not mount/dismount the other entity.
 public record EntityMountEvent(
         Entity getEntityMounting,
-        Entity getEntityBeingMounted,
+        @Nullable Entity getEntityBeingMounted,
         Level getLevel,
         boolean isMounting
 ) implements Cancellable, EntityEvent, RecordEvent {

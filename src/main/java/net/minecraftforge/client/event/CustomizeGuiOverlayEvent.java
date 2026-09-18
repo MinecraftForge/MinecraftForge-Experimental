@@ -39,8 +39,7 @@ public sealed interface CustomizeGuiOverlayEvent {
      * <p>This event is {@linkplain Cancellable cancellable}.
      * Cancelling this event will prevent the given bar from rendering.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     final class BossEventProgress extends MutableEvent implements Cancellable, CustomizeGuiOverlayEvent {
         public static final CancellableEventBus<BossEventProgress> BUS = CancellableEventBus.create(BossEventProgress.class);
@@ -121,8 +120,7 @@ public sealed interface CustomizeGuiOverlayEvent {
      * Fired <b>before</b> textual information is rendered to the debug screen.
      * This can be used to add or remove text information.
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @param getText the modifiable list of text to render on the side
      * @param getSide the side of the text getting rendered
@@ -148,8 +146,7 @@ public sealed interface CustomizeGuiOverlayEvent {
     /**
      * Fired <b>before</b> the chat messages overlay is rendered to the screen.
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     final class Chat extends MutableEvent implements CustomizeGuiOverlayEvent {
         public static final EventBus<Chat> BUS = EventBus.create(Chat.class);

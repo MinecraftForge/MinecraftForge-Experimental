@@ -12,16 +12,13 @@ import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 
-/**
- * LivingHealEvent is fired when an Entity is set to be healed. <br>
- * This event is fired whenever an Entity is healed in {@link LivingEntity#heal(float)}<br>
- * <br>
- * This event is fired via the {@link ForgeEventFactory#onLivingHeal(LivingEntity, float)}.<br>
- * <br>
- * {@link #amount} contains the amount of healing done to the Entity that was healed. <br>
- * <br>
- * This event is {@linkplain Cancellable cancellable}. If this event is cancelled, the Entity is not healed.
- **/
+/// LivingHealEvent is fired when an Entity is set to be healed.
+///
+/// This event is fired whenever an Entity is healed in [LivingEntity#heal(float)]
+///
+/// This event is fired via the [ForgeEventFactory#onLivingHeal(LivingEntity, float)].
+///
+/// This event is [Cancellable]. If this event is cancelled, the Entity is not healed.
 @NullMarked
 public final class LivingHealEvent extends MutableEvent implements Cancellable, LivingEvent {
     public static final CancellableEventBus<LivingHealEvent> BUS = CancellableEventBus.create(LivingHealEvent.class);
@@ -39,10 +36,12 @@ public final class LivingHealEvent extends MutableEvent implements Cancellable, 
         return entity;
     }
 
+    /// @return the amount of healing done to the Entity that was healed.
     public float getAmount() {
         return amount;
     }
 
+    /// Sets the amount of healing done to the Entity that was healed.
     public void setAmount(float amount) {
         this.amount = amount;
     }

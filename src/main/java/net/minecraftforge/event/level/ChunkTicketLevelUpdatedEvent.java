@@ -7,7 +7,6 @@ package net.minecraftforge.event.level;
 
 import net.minecraft.server.level.ChunkHolder;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -25,8 +24,7 @@ import org.jspecify.annotations.NullMarked;
  * is by first changing it from 31 to 46, and then queuing the update from 46 to 32. However, when going from 32 to 31,
  * vanilla is able to go directly.
  * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
- * only on the {@linkplain LogicalSide#SERVER logical server}.
+ * This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.
  *
  * @param getLevel the server level containing the chunk
  * @param getChunkPos the long representation of the chunk position the ticket level changed for

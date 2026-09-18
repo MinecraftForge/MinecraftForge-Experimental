@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.MinecraftForge;
 
 import net.minecraftforge.common.util.Result;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
@@ -39,9 +38,8 @@ import java.util.Objects;
 
 /**
  * PlayerInteractEvent is fired when a player interacts in some way.
- * All subclasses are fired on {@link MinecraftForge#EVENT_BUS}.
  * See the individual documentation on each subevent for more details.
- **/
+ */
 public sealed abstract class PlayerInteractEvent implements PlayerEvent, InheritableEvent {
     public static final EventBus<PlayerInteractEvent> BUS = EventBus.create(PlayerInteractEvent.class);
 

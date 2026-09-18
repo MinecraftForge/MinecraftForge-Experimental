@@ -92,14 +92,14 @@ public interface PlayerEvent extends LivingEvent {
         private final BlockState state;
         private final float originalSpeed;
         private float newSpeed = 0.0f;
-        private final Optional<BlockPos> pos; // Y position of -1 notes unknown location
+        private final @Nullable BlockPos pos; // Y position of -1 notes unknown location
 
         public BreakSpeed(Player player, BlockState state, float original, @Nullable BlockPos pos) {
             this.player = player;
             this.state = state;
             this.originalSpeed = original;
             this.setNewSpeed(original);
-            this.pos = Optional.ofNullable(pos);
+            this.pos = pos;
         }
 
         @Override
@@ -111,7 +111,7 @@ public interface PlayerEvent extends LivingEvent {
         public float getOriginalSpeed() { return originalSpeed; }
         public float getNewSpeed() { return newSpeed; }
         public void setNewSpeed(float newSpeed) { this.newSpeed = newSpeed; }
-        public Optional<BlockPos> getPosition() { return this.pos; }
+        public @Nullable BlockPos getPosition() { return this.pos; }
     }
 
     /**

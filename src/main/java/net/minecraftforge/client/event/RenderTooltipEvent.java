@@ -111,8 +111,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * If this event is cancelled, then the list of components will be empty, causing the tooltip to not be rendered and
      * the corresponding {@link RenderTooltipEvent.Pre} to not be fired.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class GatherComponents extends MutableEvent implements Cancellable {
         public static final CancellableEventBus<GatherComponents> BUS = CancellableEventBus.create(GatherComponents.class);
@@ -192,8 +191,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
      * <p>This event is {@linkplain Cancellable cancellable}.
      * If this event is cancelled, then the tooltip will not be rendered
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      */
     public static final class Pre extends RenderTooltipEvent implements Cancellable {
         public static final CancellableEventBus<Pre> BUS = CancellableEventBus.create(Pre.class);
@@ -204,7 +202,7 @@ public abstract sealed class RenderTooltipEvent extends MutableEvent implements 
         @Nullable
         private Identifier background;
         @Nullable
-        private Identifier originalBackground;
+        private final Identifier originalBackground;
 
         @ApiStatus.Internal
         public Pre(ItemStack stack, GuiGraphicsExtractor graphics, int x, int y, int screenWidth, int screenHeight, Font font, List<ClientTooltipComponent> components, ClientTooltipPositioner positioner, @Nullable Identifier background) {

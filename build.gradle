@@ -603,7 +603,7 @@ forgedev.installer {
 }
 
 final mdkGradleWrapper = tasks.register('mdkGradleWrapper', Wrapper) {
-    gradleVersion = '9.5.0'
+    gradleVersion = '9.7.1'
     scriptFile = layout.buildDirectory.dir("wrapper/" + gradleVersion + "/gradlew")
     jarFile = layout.buildDirectory.dir("wrapper/" + gradleVersion + "/gradle/wrapper/gradle-wrapper.jar")
 }

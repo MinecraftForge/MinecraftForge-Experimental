@@ -27,8 +27,7 @@ import java.io.IOException;
  * If this event is cancelled, then the screenshot is not written to disk, and the message in the event will be posted
  * to the player's chat.</p>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see Screenshot
  */

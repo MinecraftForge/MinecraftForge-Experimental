@@ -10,22 +10,20 @@ import net.minecraft.server.packs.repository.PackRepository;
 import net.minecraft.server.packs.repository.RepositorySource;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
+import org.jspecify.annotations.NullMarked;
 
 import java.util.function.Consumer;
 
-/**
- * Fired on {@link PackRepository} creation to allow mods to add new pack finders.
- *
- * @param getPackType the {@link PackType} of the pack repository being constructed.
- */
+/// Fired on [PackRepository] creation to allow mods to add new pack finders.
+///
+/// @param getPackType the [PackType] of the pack repository being constructed.
+@NullMarked
 public record AddPackFindersEvent(PackType getPackType, Consumer<RepositorySource> sourceAdder) implements RecordEvent {
     public static final EventBus<AddPackFindersEvent> BUS = EventBus.create(AddPackFindersEvent.class);
 
-    /**
-     * Adds a new source to the list of pack finders.
-     *
-     * @param source the pack finder
-     */
+    /// Adds a new source to the list of pack finders.
+    ///
+    /// @param source the pack finder
     public void addRepositorySource(RepositorySource source) {
         sourceAdder.accept(source);
     }

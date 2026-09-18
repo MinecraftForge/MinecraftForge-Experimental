@@ -33,6 +33,7 @@ import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
 
 public sealed interface BlockEvent
         permits BlockEvent.BreakEvent, BlockEvent.CropGrowEvent,
@@ -46,10 +47,9 @@ public sealed interface BlockEvent
 
     BlockState getState();
 
-    /**
-     * Event that is fired when an Block is about to be broken by a player
-     * Setting the result to {@link Result#DENY} will prevent the Block from being broken.
-     */
+    /// Event that is fired when an Block is about to be broken by a player.
+    ///
+    /// Setting the result to [Result#DENY] will prevent the Block from being broken.
     final class BreakEvent extends MutableEvent implements Cancellable, BlockEvent, HasResult {
         public static final CancellableEventBus<BreakEvent> BUS = CancellableEventBus.create(BreakEvent.class);
 
@@ -57,7 +57,7 @@ public sealed interface BlockEvent
         private final BlockPos pos;
         private final BlockState state;
 
-        /** Reference to the Player who broke the block. If no player is available, use a EntityFakePlayer */
+        /// Reference to the Player who broke the block
         private final Player player;
         private int exp;
         private Result result;
@@ -99,20 +99,16 @@ public sealed interface BlockEvent
             return player;
         }
 
-        /**
-         * Get the experience dropped by the block after the event has processed
-         *
-         * @return The experience to drop or 0 if the event was denied
-         */
+        /// Get the experience dropped by the block after the event has processed
+        ///
+        /// @return The experience to drop or 0 if the event was denied
         public int getExpToDrop() {
             return this.getResult().isDenied() ? 0 : exp;
         }
 
-        /**
-         * Set the amount of experience dropped by the block after the event has processed
-         *
-         * @param exp 1 or higher to drop experience, else nothing will drop
-         */
+        /// Set the amount of experience dropped by the block after the event has processed
+        ///
+        /// @param exp 1 or higher to drop experience, else nothing will drop
         public void setExpToDrop(int exp) {
             this.exp = exp;
         }
@@ -128,11 +124,9 @@ public sealed interface BlockEvent
         }
     }
 
-    /**
-     * Called when a block is placed.
-     *
-     * If a Block Place event is cancelled, the block will not be placed.
-     */
+    /// Called when a block is placed.
+    ///
+    /// If a Block Place event is cancelled, the block will not be placed.
     sealed class EntityPlaceEvent extends MutableEvent implements Cancellable, BlockEvent {
         public static final CancellableEventBus<EntityPlaceEvent> BUS = CancellableEventBus.create(EntityPlaceEvent.class);
 
@@ -243,14 +237,9 @@ public sealed interface BlockEvent
         }
     }
 
-    /**
-     * Fired when a liquid places a block. Use {@link #setNewState(BlockState)} to change the result of
-     * a cobblestone generator or add variants of obsidian. Alternatively, you  could execute
-     * arbitrary code when lava sets blocks on fire, even preventing it.
-     *
-     * {@link #getState()} will return the block that was originally going to be placed.
-     * {@link #getPos()} will return the position of the block to be changed.
-     */
+    /// Fired when a liquid places a block. Use [#setNewState(BlockState)] to change the result of
+    /// a cobblestone generator or add variants of obsidian. Alternatively, you  could execute
+    /// arbitrary code when lava sets blocks on fire, even preventing it.
     final class FluidPlaceBlockEvent extends MutableEvent implements Cancellable, BlockEvent {
         public static final CancellableEventBus<FluidPlaceBlockEvent> BUS = CancellableEventBus.create(FluidPlaceBlockEvent.class);
 
@@ -276,26 +265,24 @@ public sealed interface BlockEvent
             return level;
         }
 
+        /// @return The position of the block to be changed.
         @Override
         public BlockPos getPos() {
             return pos;
         }
 
+        /// @return The block that was originally going to be placed.
         @Override
         public BlockState getState() {
             return state;
         }
 
-        /**
-         * @return The position of the liquid this event originated from. This may be the same as {@link #getPos()}.
-         */
+        /// @return The position of the liquid this event originated from. This may be the same as [#getPos()].
         public BlockPos getLiquidPos() {
             return liquidPos;
         }
 
-        /**
-         * @return The block state that will be placed after this event resolves.
-         */
+        /// @return The block state that will be placed after this event resolves.
         public BlockState getNewState() {
             return newState;
         }
@@ -304,29 +291,22 @@ public sealed interface BlockEvent
             this.newState = state;
         }
 
-        /**
-         * @return The state of the block to be changed before the event was fired.
-         */
+        /// @return The state of the block to be changed before the event was fired.
         public BlockState getOriginalState() {
             return origState;
         }
     }
 
-    /**
-     * Fired when a crop block grows.  See subevents.
-     */
+    /// Fired when a crop block grows. See subevents.
     sealed interface CropGrowEvent extends BlockEvent, InheritableEvent {
         EventBus<CropGrowEvent> BUS = EventBus.create(CropGrowEvent.class);
 
-        /**
-         * Fired when any "growing age" blocks (for example cacti, chorus plants, or crops
-         * in vanilla) attempt to advance to the next growth age state during a random tick.<br>
-         * <br>
-         * {@link Result#DEFAULT} will pass on to the vanilla growth mechanics.<br>
-         * {@link Result#ALLOW} will force the plant to advance a growth stage.<br>
-         * {@link Result#DENY} will prevent the plant from advancing a growth stage.<br>
-         * <br>
-         */
+        /// Fired when any "growing age" blocks (for example cacti, chorus plants, or crops
+        /// in vanilla) attempt to advance to the next growth age state during a random tick.
+        ///
+        /// - [Result#DEFAULT] will pass on to the vanilla growth mechanics.
+        /// - [Result#ALLOW] will force the plant to advance a growth stage.
+        /// - [Result#DENY] will prevent the plant from advancing a growth stage.
         record Pre(LevelAccessor getLevel, BlockPos getPos, BlockState getState, Result.Holder resultHolder)
                 implements CropGrowEvent, HasResult.Record {
             public static final EventBus<Pre> BUS = EventBus.create(Pre.class);
@@ -336,20 +316,23 @@ public sealed interface BlockEvent
             }
         }
 
-        /**
-         * Fired when "growing age" blocks (for example cacti, chorus plants, or crops
-         * in vanilla) have successfully grown. The block's original state is available,
-         * in addition to its new state.<br>
-         */
+        /// Fired when "growing age" blocks (for example cacti, chorus plants, or crops in vanilla) have successfully
+        /// grown. The block's original state is available, in addition to its new state.
         record Post(LevelAccessor getLevel, BlockPos getPos, BlockState getState, BlockState getOriginalState)
                 implements CropGrowEvent {
             public static final EventBus<Post> BUS = EventBus.create(Post.class);
         }
     }
 
-    /**
-     * Fired when farmland gets trampled
-     */
+    /// Fired when farmland gets trampled by an entity and is about to turn into dirt.
+    ///
+    /// This event is [Cancellable]. Cancelling prevents the farmland from turning into dirt.
+    ///
+    /// @param getLevel The level the farmland block is in
+    /// @param getPos The position of the farmland block in the level
+    /// @param getFallDistance The distance the entity fell before landing on the farmland block
+    /// @param getEntity The entity that trampled the farmland block
+    @NullMarked
     record FarmlandTrampleEvent(
             LevelAccessor getLevel,
             BlockPos getPos,
@@ -360,11 +343,11 @@ public sealed interface BlockEvent
         public static final CancellableEventBus<FarmlandTrampleEvent> BUS = CancellableEventBus.create(FarmlandTrampleEvent.class);
     }
 
-    /** Fired when an attempt is made to spawn a nether portal from
-     * {@link BaseFireBlock#onPlace(BlockState, Level, BlockPos, BlockState, boolean)}.
-     * <br>
-     * If cancelled, the portal will not be spawned.
-     */
+    /// Fired when an attempt is made to spawn a nether portal from
+    /// [BaseFireBlock#onPlace(BlockState, Level, BlockPos, BlockState, boolean)].
+    ///
+    /// This event is [Cancellable]. If cancelled, the portal will not be spawned.
+    @NullMarked
     record PortalSpawnEvent(LevelAccessor getLevel, BlockPos getPos, BlockState getState, PortalShape getPortalSize)
             implements Cancellable, BlockEvent, RecordEvent {
         public static final CancellableEventBus<PortalSpawnEvent> BUS = CancellableEventBus.create(PortalSpawnEvent.class);

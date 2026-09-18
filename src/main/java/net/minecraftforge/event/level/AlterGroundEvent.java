@@ -10,7 +10,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.feature.treedecorators.TreeDecorator;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
@@ -22,8 +21,7 @@ import org.jetbrains.annotations.ApiStatus;
  * <p>
  * This event is not {@linkplain Cancellable cancellable}.
  * <p>
- * This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus}
- * only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.
+ * This event is fired only on the {@linkplain net.minecraftforge.fml.LogicalSide#SERVER logical server}.
  */
 public final class AlterGroundEvent extends MutableEvent {
     public static final EventBus<AlterGroundEvent> BUS = EventBus.create(AlterGroundEvent.class);

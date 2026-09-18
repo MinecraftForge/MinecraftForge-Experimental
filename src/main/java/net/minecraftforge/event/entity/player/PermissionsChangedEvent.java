@@ -10,18 +10,25 @@ import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
+import org.jetbrains.annotations.ApiStatus;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
-/**
- * This event will fire when the player is opped or deopped.
- * <p>
- * This event is cancelable which will stop the op or deop from happening.
- * @param getNewLevel The new permission level.
- * @param getOldLevel The old permission level.
- */
+/// This event will fire when the player is made a server operator ("opped") or stripped of such ("deopped").
+///
+/// This event is cancelable which will stop the op or deop from happening.
+///
+/// @param getEntity The player who is being oped or deopped.
+/// @param getNewLevel The new permission level.
+/// @param getOldLevel The old permission level.
 @NullMarked
-public record PermissionsChangedEvent(ServerPlayer getEntity, @Nullable LevelBasedPermissionSet getNewLevel, @Nullable LevelBasedPermissionSet getOldLevel)
-        implements Cancellable, PlayerEvent, RecordEvent {
+public record PermissionsChangedEvent(
+        ServerPlayer getEntity,
+        @Nullable LevelBasedPermissionSet getNewLevel,
+        @Nullable LevelBasedPermissionSet getOldLevel
+) implements Cancellable, PlayerEvent, RecordEvent {
     public static final CancellableEventBus<PermissionsChangedEvent> BUS = CancellableEventBus.create(PermissionsChangedEvent.class);
+
+    @ApiStatus.Internal
+    public PermissionsChangedEvent {}
 }

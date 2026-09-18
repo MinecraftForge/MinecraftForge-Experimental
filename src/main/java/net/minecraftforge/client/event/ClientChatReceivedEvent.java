@@ -8,7 +8,6 @@ package net.minecraftforge.client.event;
 import net.minecraft.network.chat.ChatType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.PlayerChatMessage;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.InheritableEvent;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -24,8 +23,7 @@ import java.util.UUID;
  * <p>This event is {@linkplain Cancellable cancellable}.
  * If the event is cancelled, the message is not displayed in the chat message window.</p>
  *
- * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
- * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+ * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
  *
  * @see ChatType
  */
@@ -80,8 +78,7 @@ public sealed class ClientChatReceivedEvent extends MutableEvent implements Canc
      * <p>This event is {@linkplain Cancellable cancellable}.
      * If the event is cancelled, the message is not displayed in the chat message window.</p>
      *
-     * <p>This event is fired on the {@linkplain MinecraftForge#EVENT_BUS main Forge event bus},
-     * only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
+     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
      *
      * @see ChatType
      */

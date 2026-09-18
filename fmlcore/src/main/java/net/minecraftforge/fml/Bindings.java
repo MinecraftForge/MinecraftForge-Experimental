@@ -16,7 +16,7 @@ import java.util.function.Supplier;
 /**
  * Used to allow access to certain things from the game layer
  */
-public class Bindings {
+public final class Bindings {
     private Bindings() {}
 
     /**
@@ -27,7 +27,7 @@ public class Bindings {
             .findFirst().orElseThrow(() -> new IllegalStateException("Could not find bindings provider"));
 
     /**
-     * @return A supplier of net.minecraftforge.common.MinecraftForge#EVENT_BUS
+     * @return A supplier of {@link BusGroup#DEFAULT}
      */
     public static Supplier<BusGroup> getForgeBus() {
         return PROVIDER.getForgeBusSupplier();

@@ -15,11 +15,9 @@ import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import org.jetbrains.annotations.NotNull;
 
-/**
- * ArrowNockEvent is fired when a player begins using a bow.<br>
- * This event is fired whenever a player begins using a bow in
- * {@link BowItem#use(Level, Player, InteractionHand)}.
- **/
+/// ArrowNockEvent is fired when a player begins using a bow.
+///
+/// This event is fired whenever a player begins using a bow in [BowItem#use(Level, Player, InteractionHand)].
 public final class ArrowNockEvent extends MutableEvent implements PlayerEvent {
     public static final EventBus<ArrowNockEvent> BUS = EventBus.create(ArrowNockEvent.class);
 

@@ -7,32 +7,26 @@ package net.minecraftforge.event.entity.player;
 
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.bus.CancellableEventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
 import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.eventbus.api.event.characteristic.Cancellable;
 import org.jspecify.annotations.NullMarked;
 
-/**
- * PlayerXpEvent is fired whenever an event involving player experience occurs.
- * <br>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
- */
+/// PlayerXpEvent is fired whenever an event involving player experience occurs.
 @NullMarked
 public sealed interface PlayerXpEvent extends PlayerEvent {
-    /**
-     * This event is fired after the player collides with an experience orb, but before the player has been given the experience.
-     * It can be cancelled, and no further processing will be done.
-     */
+    /// This event is fired after the player collides with an experience orb, but before the player has been given the experience.
+    /// This event is [Cancellable]. If cancelled, no further processing will be done.
+    ///
+    /// @param getEntity The player that is colliding with the experience orb.
+    /// @param getOrb The experience orb that the player is colliding with.
     record PickupXp(Player getEntity, ExperienceOrb getOrb) implements Cancellable, PlayerXpEvent, RecordEvent {
         public static final CancellableEventBus<PickupXp> BUS = CancellableEventBus.create(PickupXp.class);
     }
 
-    /**
-     * This event is fired when the player's experience changes through the {@link Player#giveExperiencePoints(int)} method.
-     * It can be cancelled, and no further processing will be done.
-     */
+    /// This event is fired when the player's experience changes through the {@link Player#giveExperiencePoints(int)} method.
+    /// This event is [Cancellable]. If cancelled, no further processing will be done.
     final class XpChange extends MutableEvent implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<XpChange> BUS = CancellableEventBus.create(XpChange.class);
 
@@ -58,10 +52,8 @@ public sealed interface PlayerXpEvent extends PlayerEvent {
         }
     }
 
-    /**
-     * This event is fired when the player's experience level changes through the {@link Player#giveExperienceLevels(int)} method.
-     * It can be cancelled, and no further processing will be done.
-     */
+    /// This event is fired when the player's experience level changes through the [Player#giveExperienceLevels(int)] method.
+    /// This event is [Cancellable]. If cancelled, no further processing will be done.
     final class LevelChange extends MutableEvent implements Cancellable, PlayerXpEvent {
         public static final CancellableEventBus<LevelChange> BUS = CancellableEventBus.create(LevelChange.class);
 

@@ -22,8 +22,6 @@ import org.jetbrains.annotations.Nullable;
 
 /**
  * This event is fired when an interaction between a {@link LivingEntity} and {@link MobEffectInstance} happens.
- * <p>
- * All children of this event are fired on the {@link MinecraftForge#EVENT_BUS}.
  */
 public sealed interface MobEffectEvent extends LivingEvent, InheritableEvent {
     EventBus<MobEffectEvent> BUS = EventBus.create(MobEffectEvent.class);

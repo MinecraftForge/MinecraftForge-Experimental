@@ -13,14 +13,13 @@ import net.minecraftforge.eventbus.api.event.RecordEvent;
 import net.minecraftforge.fml.LogicalSide;
 import org.jetbrains.annotations.ApiStatus;
 
-/**
- * Fired when a player trades with an {@link AbstractVillager}.
- *
- * <p>This event is fired only on the {@linkplain LogicalSide#SERVER logical server}.</p>
- *
- * @param getMerchantOffer the {@link MerchantOffer} selected by the player to trade with
- * @param getAbstractVillager the villager the player traded with
- */
+/// Fired when a player trades with an [AbstractVillager].
+///
+/// This event is fired only on the [logical server][LogicalSide#SERVER].
+///
+/// @param getEntity the player that traded with the villager
+/// @param getMerchantOffer the [MerchantOffer] selected by the player to trade with
+/// @param getAbstractVillager the villager the player traded with
 public record TradeWithVillagerEvent(
         Player getEntity,
         MerchantOffer getMerchantOffer,
