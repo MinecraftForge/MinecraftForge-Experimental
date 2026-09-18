@@ -5,20 +5,24 @@
 
 package net.minecraftforge.debug.gameplay.crafting;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SimpleCookingRecipeBuilder;
 import net.minecraft.data.recipes.SingleItemRecipeBuilder;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.references.ItemIds;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.ItemStack;
@@ -34,6 +38,7 @@ import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.SimpleCraftingContainer;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -53,7 +58,14 @@ public class ConditionalRecipeTest extends BaseTestMod {
 
     public void gatherData(GatherDataEvent event) {
         var gen = event.getGenerator();
-        gen.addProvider(event.includeServer(), new Recipes.Runner(gen.getPackOutput(), event.getLookupProvider()));
+
+        var registries = RegistryDataBuilder.of()
+            .name(modid())
+            .reloadable(set -> set
+                .add(Recipes.create())
+            );
+
+        gen.addProvider(event.includeServer(), registries.reloadableGenerator(gen.getPackOutput()));
         gen.addProvider(event.includeServer(), new TestItemTags(gen.getPackOutput(), event.getLookupProvider(), event.getExistingFileHelper()));
     }
 
@@ -181,14 +193,28 @@ public class ConditionalRecipeTest extends BaseTestMod {
     }
 
     public static class Recipes extends RecipeProvider implements IConditionBuilder {
-        public Recipes(HolderLookup.Provider lookup, RecipeOutput gen) {
-            super(lookup, gen);
+        public static MultiRegistryBootstrap create() {
+            return new MultiRegistryBootstrap() {
+                @Override
+                public Set<ResourceKey<? extends Registry<?>>> requestedRegistries() {
+                    return Set.of(Registries.RECIPE, Registries.ADVANCEMENT);
+                }
+
+                @Override
+                public void run(BootstrapGetter registries) {
+                    new Recipes(registries.get(Registries.RECIPE), registries.get(Registries.ADVANCEMENT)).buildRecipes();
+                }
+            };
+        }
+
+        public Recipes(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
+            super(recipeOutput, advancementOutput);
         }
 
         @Override
         protected void buildRecipes() {
             // TODO: Move this to a Condition test instead of using recipe encoders.
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(
                     and (
                         or (
@@ -211,7 +237,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("test_encode_all_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     shaped(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 64)
@@ -224,7 +250,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("shaped_false_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(TRUE())
                 .recipe(
                     shaped(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 64)
@@ -237,7 +263,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("shaped_true_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     shapeless(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
@@ -249,7 +275,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("shapeless_false_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(TRUE())
                 .recipe(
                     shapeless(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
@@ -262,7 +288,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("shapeless_true_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, CookingBookCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
@@ -271,7 +297,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("cooking_false_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(TRUE())
                 .recipe(
                     SimpleCookingRecipeBuilder.smelting(Ingredient.of(Blocks.BEE_NEST), RecipeCategory.MISC, CookingBookCategory.MISC, Blocks.DIAMOND_BLOCK, 0.1F, 200)
@@ -280,7 +306,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("cooking_true_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.DIRT), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 1)
@@ -289,7 +315,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("single_item_false_conditions"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(TRUE())
                 .recipe(
                     SingleItemRecipeBuilder.stonecutting(Ingredient.of(Blocks.REDSTONE_ORE), RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 1)
@@ -302,7 +328,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
             // TODO SmithingTrimRecipeBuilder
 
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     shaped(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 64)
@@ -323,7 +349,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("conditional_recipe_choice"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(FALSE())
                 .recipe(
                     shapeless(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK, 64)
@@ -333,7 +359,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("conditional_doesnt_load_empty"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(tagEmpty(ItemTags.DIRT))
                 .recipe(
                     shapeless(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
@@ -345,7 +371,7 @@ public class ConditionalRecipeTest extends BaseTestMod {
                 )
                 .save(this.output, rl("tag_empty_condition_doesnt_load"));
 
-            ConditionalRecipe.builder()
+            ConditionalRecipe.builder(this.output)
                 .condition(tagEmpty(TagKey.create(Registries.ITEM, rl("empty_tag_for_testing"))))
                 .recipe(
                     shapeless(RecipeCategory.MISC, Blocks.DIAMOND_BLOCK)
@@ -356,22 +382,6 @@ public class ConditionalRecipeTest extends BaseTestMod {
                         ::save
                 )
                 .save(this.output, rl("tag_empty_condition_loads"));
-        }
-
-        public static class Runner extends RecipeProvider.Runner {
-            protected Runner(PackOutput output, CompletableFuture<Provider> registries) {
-                super(output, registries);
-            }
-
-            @Override
-            public String getName() {
-                return ConditionalRecipeTest.class.getSimpleName() + "-Recipes";
-            }
-
-            @Override
-            protected RecipeProvider createRecipeProvider(Provider registries, RecipeOutput output) {
-                return new Recipes(registries, output);
-            }
         }
     }
 

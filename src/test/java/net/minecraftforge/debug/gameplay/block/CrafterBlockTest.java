@@ -8,8 +8,6 @@ package net.minecraftforge.debug.gameplay.block;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.mojang.serialization.MapCodec;
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.FrontAndTop;
@@ -84,8 +82,6 @@ public class CrafterBlockTest extends BaseTestMod {
     }
 
     private static class SimpleIItemHandlerBlock extends BaseEntityBlock {
-        private static final MapCodec<SimpleIItemHandlerBlock> CODEC = simpleCodec(SimpleIItemHandlerBlock::new);
-
         protected SimpleIItemHandlerBlock(Properties props) {
             super(props);
         }
@@ -93,11 +89,6 @@ public class CrafterBlockTest extends BaseTestMod {
         @Override
         public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
             return IITEM_BLOCK_TYPE.get().create(pos, state);
-        }
-
-        @Override
-        protected MapCodec<? extends BaseEntityBlock> codec() {
-            return CODEC;
         }
     }
 

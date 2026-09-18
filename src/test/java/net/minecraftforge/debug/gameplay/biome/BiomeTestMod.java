@@ -9,9 +9,8 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.tags.BiomeTags;
 import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.minecraft.world.level.levelgen.feature.Feature;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.feature.NoOpFeature;
 import net.minecraft.world.level.levelgen.placement.PlacedFeature;
 import net.minecraftforge.common.world.BiomeModifier;
 import net.minecraftforge.common.world.ForgeBiomeModifiers;
@@ -27,10 +26,8 @@ import java.util.List;
 public class BiomeTestMod extends BaseTestMod {
     public static final String MOD_ID = "biome_test";
 
-    public static final DeferredRegisterData<ConfiguredFeature<?, ?>> CONFIGURED_FEATURES = DeferredRegisterData.create(Registries.CONFIGURED_FEATURE, MOD_ID);
-    private static final RegistryObject<ConfiguredFeature<?, ?>> CONFIGURED = CONFIGURED_FEATURES.register("configured", () ->
-        new ConfiguredFeature<>(Feature.NO_OP, NoneFeatureConfiguration.INSTANCE)
-    );
+    public static final DeferredRegisterData<Feature> CONFIGURED_FEATURES = DeferredRegisterData.create(Registries.FEATURE, MOD_ID);
+    private static final RegistryObject<Feature> CONFIGURED = CONFIGURED_FEATURES.register("configured", () -> new NoOpFeature());
 
     public static final DeferredRegisterData<PlacedFeature> PLACED_FEATURES = DeferredRegisterData.create(Registries.PLACED_FEATURE, MOD_ID);
     private static final RegistryObject<PlacedFeature> PLACED = PLACED_FEATURES.register("placed", () ->

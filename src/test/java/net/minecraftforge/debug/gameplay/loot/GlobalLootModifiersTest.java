@@ -16,7 +16,6 @@ import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.predicates.MinMaxBounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.component.predicates.DataComponentPredicates;
 import net.minecraft.core.component.predicates.EnchantmentsPredicate;
@@ -29,7 +28,8 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.registries.RegistryPatchGenerator;
+import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
@@ -52,8 +52,8 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
+import net.minecraft.world.level.storage.loot.predicates.MatchBlock;
 import net.minecraft.world.level.storage.loot.predicates.MatchTool;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
@@ -93,15 +93,6 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     }
 
     private static final ResourceKey<Enchantment> SMELT = ResourceKey.create(Registries.ENCHANTMENT, Identifier.fromNamespaceAndPath(MODID, "smelt"));
-    private static final Supplier<RegistrySetBuilder> ENCHANTMENTS = () -> new RegistrySetBuilder()
-        .add(Registries.ENCHANTMENT, ctx -> {
-            ctx.register(SMELT, Enchantment.enchantment(
-                Enchantment.definition(
-                    ctx.lookup(Registries.ITEM).getOrThrow(ItemTags.MINING_LOOT_ENCHANTABLE), 1, 1,
-                    Enchantment.constantCost(15), Enchantment.constantCost(15), 5, EquipmentSlotGroup.MAINHAND
-                )
-            ).build(SMELT.identifier()));
-        });
 
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, MODID);
     private static final RegistryObject<Block> TEST_BLOCK = BLOCKS.register("test", () -> new Block(name(MODID, "test", BlockBehaviour.Properties.of())));
@@ -127,12 +118,29 @@ public class GlobalLootModifiersTest extends BaseTestMod {
 
     public void runData(GatherDataEvent event) {
         var out = event.getGenerator().getPackOutput();
-        var lookup = event.getLookupProvider();
-        var patched = RegistryPatchGenerator.createLookup(lookup, ENCHANTMENTS.get())
-                .thenApply(RegistrySetBuilder.PatchedRegistries::patches);
-        event.getGenerator().addProvider(event.includeServer(), new RegistryDataBuilder(out, lookup, ENCHANTMENTS.get(), Set.of(MODID)));
-        event.getGenerator().addProvider(event.includeServer(), new ModifierProvider(out, MODID, patched));
-        event.getGenerator().addProvider(event.includeServer(), new LootProvider(out, lookup));
+
+        var registries = RegistryDataBuilder.of()
+            .name(MODID)
+            .world(set -> set
+                .add(Registries.ENCHANTMENT, this::enchantments)
+            )
+            .reloadable(set -> set
+                .add(Registries.LOOT_TABLE, new LootProvider())
+            );
+
+        event.getGenerator().addProvider(event.includeServer(), registries.worldGenerator(out));
+        event.getGenerator().addProvider(event.includeServer(), registries.reloadableGenerator(out));
+
+        event.getGenerator().addProvider(event.includeServer(), new ModifierProvider(out, MODID, registries.reloadableFull()));
+    }
+
+    private void enchantments(BootstrapContext<Enchantment> ctx) {
+        ctx.register(SMELT, Enchantment.enchantment(
+            Enchantment.definition(
+                ctx.lookup(Registries.ITEM).getOrThrow(ItemTags.MINING_LOOT_ENCHANTABLE), 1, 1,
+                Enchantment.constantCost(15), Enchantment.constantCost(15), 5, EquipmentSlotGroup.MAINHAND
+            )
+        ).build(SMELT.identifier()));
     }
 
     // Tests the Enchantment condition, as well as the ability to completely override the returned values.
@@ -211,6 +219,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
 
         @Override
         protected void start(HolderLookup.Provider registries) {
+            var blocks = registries.lookupOrThrow(Registries.BLOCK);
             var smelt = registries.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(SMELT);
             var items = registries.lookupOrThrow(Registries.ITEM);
 
@@ -238,7 +247,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
                 new LootItemCondition[] {
                     // the #c:tools_shear tag is used here to test parsing of tags in LootModiferManager
                     MatchTool.toolMatches(ItemPredicate.Builder.item().of(items, Tags.Items.TOOLS_SHEAR)).build(),
-                    LootItemBlockStatePropertyCondition.hasBlockStateProperties(Blocks.WHEAT).build()
+                    MatchBlock.blockMatches(blocks, Blocks.WHEAT).build()
                 },
                 3, Items.WHEAT_SEEDS, Items.WHEAT)
             );
@@ -260,15 +269,15 @@ public class GlobalLootModifiersTest extends BaseTestMod {
     }
 
     private static class LootProvider extends LootTableProvider {
-        public LootProvider(PackOutput out, CompletableFuture<HolderLookup.Provider> lookup) {
-            super(out, Set.of(), List.of(
+        public LootProvider() {
+            super(Set.of(), List.of(
                 new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
-            ), lookup);
+            ));
         }
 
         private static class BlockLoot extends BlockLootSubProvider implements IConditionBuilder {
-            public BlockLoot(HolderLookup.Provider lookup) {
-                super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookup);
+            public BlockLoot(final LootTableSubProvider.Context output) {
+                super(Set.of(), FeatureFlags.REGISTRY.allFlags(), output);
             }
 
             @Override
@@ -342,7 +351,7 @@ public class GlobalLootModifiersTest extends BaseTestMod {
         @NotNull
         @Override
         public ObjectArrayList<ItemStack> doApply(LootTable table, ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
-            var ctxTool = context.getOptionalParameter(LootContextParams.TOOL);
+            var ctxTool = context.getOptional(LootContextParams.TOOL);
             //return early if silk-touch is already applied (otherwise we'll get stuck in an infinite loop).
             var silk = context.getLevel().holderLookup(Registries.ENCHANTMENT).getOrThrow(Enchantments.SILK_TOUCH);
             var silkLevel = EnchantmentHelper.getItemEnchantmentLevel(silk, ctxTool);

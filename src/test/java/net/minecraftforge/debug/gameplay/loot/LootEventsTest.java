@@ -7,16 +7,14 @@ package net.minecraftforge.debug.gameplay.loot;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlags;
@@ -28,8 +26,9 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.LootTableLoadEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -58,9 +57,13 @@ public class LootEventsTest extends BaseTestMod {
     }
 
     public void gatherData(GatherDataEvent event) {
-        var out = event.getGenerator().getPackOutput();
-        var lookup = event.getLookupProvider();
-        event.getGenerator().addProvider(event.includeServer(), new LootProvider(out, lookup));
+        var registries = RegistryDataBuilder.of()
+            .name(MODID)
+            .reloadable(set -> set
+                .add(Registries.LOOT_TABLE, new LootProvider())
+            );
+
+        event.getGenerator().addProvider(event.includeServer(), registries.reloadableGenerator(event.getGenerator().getPackOutput()));
     }
 
     @GameTest
@@ -84,9 +87,9 @@ public class LootEventsTest extends BaseTestMod {
                 event.getTable().removePool(0);
                 event.getTable().addPool(
                     LootPool.lootPool()
-                        .setRolls(ConstantValue.exactly(1f))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(Items.GOLDEN_APPLE))
-                        .apply(SetItemCountFunction.setCount(ConstantValue.exactly(1)))
+                        .apply(SetItemCountFunction.setCount(ContextIntProviders.exactly(1)))
                         .build()
                 );
             }
@@ -94,15 +97,15 @@ public class LootEventsTest extends BaseTestMod {
     }
 
     private static class LootProvider extends LootTableProvider {
-        public LootProvider(PackOutput out, CompletableFuture<HolderLookup.Provider> lookup) {
-            super(out, Set.of(), List.of(
+        public LootProvider() {
+            super(Set.of(), List.of(
                 new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
-            ), lookup);
+            ));
         }
 
         private static class BlockLoot extends BlockLootSubProvider implements IConditionBuilder {
-            public BlockLoot(HolderLookup.Provider lookup) {
-                super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookup);
+            public BlockLoot(final LootTableSubProvider.Context output) {
+                super(Set.of(), FeatureFlags.REGISTRY.allFlags(), output);
             }
 
             @Override

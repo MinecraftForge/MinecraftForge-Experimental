@@ -13,10 +13,14 @@ import net.minecraft.advancements.predicates.BlockPredicate;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.triggers.CriterionTrigger;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.advancements.AdvancementProvider;
+import net.minecraft.data.advancements.AdvancementSubProvider;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.references.ItemIds;
@@ -24,11 +28,13 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.data.ForgeAdvancementProvider;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -49,6 +55,7 @@ public final class CriterionTest extends BaseTestMod {
     public static final RegistryObject<BreakWithItemCriterion> CRITERION = TRIGGERS.register("criterion", BreakWithItemCriterion::new);
     public static final String TEST_CRITERION_ID = "break_glass_with_fish";
     public static final Identifier TEST_ADVANCEMENT_ID = Identifier.fromNamespaceAndPath(MOD_ID, TEST_CRITERION_ID);
+    private static final TagKey<Item> TAG = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "fish"));
 
     public CriterionTest(FMLJavaModLoadingContext context) {
         super(context, false, true);
@@ -102,12 +109,19 @@ public final class CriterionTest extends BaseTestMod {
     }
 
     private void gatherData(GatherDataEvent event) {
-        var tag = TagKey.create(Registries.ITEM, Identifier.fromNamespaceAndPath(MOD_ID, "fish"));
+
+        var registries = RegistryDataBuilder.of()
+            .name(modid())
+            .reloadable(set -> set
+                .add(Registries.ADVANCEMENT, new AdvancementProvider(List.of(
+                    Advancements::new
+                )))
+            );
 
         event.getGenerator().addProvider(true, new VanillaItemTagsProvider(event.getGenerator().getPackOutput(), event.getLookupProvider(), MOD_ID, event.getExistingFileHelper()) {
             @Override
             protected void addTags(HolderLookup.Provider lookup) {
-                this.tag(tag)
+                this.tag(TAG)
                     .add(ItemIds.COD)
                     .add(ItemIds.SALMON)
                     .add(ItemIds.TROPICAL_FISH)
@@ -118,34 +132,39 @@ public final class CriterionTest extends BaseTestMod {
             }
         });
 
-        var STORY_ROOT = new AdvancementHolder(Identifier.fromNamespaceAndPath("minecraft", "story/root"), null);
 
-        event.getGenerator().addProvider(true,
-            new ForgeAdvancementProvider(
-                event.getGenerator().getPackOutput(),
-                event.getLookupProvider(),
-                event.getExistingFileHelper(),
-                List.of(((registries, saver, _) -> {
-                    var blocks = registries.lookup(Registries.BLOCK).get();
-                    var items = registries.lookup(Registries.ITEM).get();
-                    saver.accept(new Advancement.Builder()
-                        .display(Items.COD,
-                            Component.literal("Fish vs Glass"),
-                            Component.literal("Fish wins!"),
-                            null,
-                            AdvancementType.TASK,
-                            true, true, false
-                        )
-                        .parent(STORY_ROOT)
-                        .requirements(AdvancementRequirements.Strategy.AND)
-                        .addCriterion(TEST_CRITERION_ID, CRITERION.get().instance(
-                            BlockPredicate.Builder.block().of(blocks, Tags.Blocks.GLASS_BLOCKS).build(),
-                            ItemPredicate.Builder.item().of(items, tag).build(),
-                            true
-                        ))
-                        .build(TEST_ADVANCEMENT_ID));
-                }))
-            )
-        );
+        event.getGenerator().addProvider(true, registries.reloadableGenerator(event.getGenerator().getPackOutput()));
+    }
+
+    private static class Advancements extends AdvancementSubProvider {
+        private final HolderGetter<Block> blocks;
+        private final HolderGetter<Item> items;
+
+        public Advancements(final BootstrapContext<Advancement> output) {
+            super(output);
+            this.blocks = output.lookup(Registries.BLOCK);
+            this.items = output.lookup(Registries.ITEM);
+        }
+
+        @Override
+        public void generate() {
+            var STORY_ROOT = new AdvancementHolder(Identifier.fromNamespaceAndPath("minecraft", "story/root"), null);
+
+            new Advancement.Builder()
+                .display(Items.COD,
+                    Component.literal("Fish vs Glass"),
+                    Component.literal("Fish wins!"),
+                    AdvancementType.TASK,
+                    true, true, false
+                )
+                .parent(STORY_ROOT)
+                .requirements(AdvancementRequirements.Strategy.AND)
+                .addCriterion(TEST_CRITERION_ID, CRITERION.get().instance(
+                    BlockPredicate.Builder.block().of(blocks, Tags.Blocks.GLASS_BLOCKS).build(),
+                    ItemPredicate.Builder.item().of(items, TAG).build(),
+                    true
+                ))
+                .save(this.output, TEST_ADVANCEMENT_ID);
+        }
     }
 }

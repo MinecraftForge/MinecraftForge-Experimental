@@ -83,7 +83,7 @@ public class FluidBucketModelTest extends BaseTestMod {
             .replaceable()
             .noCollision()
             .strength(100)
-            .pushReaction(PushReaction.DESTROY)
+            .pushReaction(PushReaction.POPPED)
             .noLootTable()
             .liquid()
             .sound(SoundType.EMPTY)

@@ -75,7 +75,7 @@ public class TrySleepTest extends BaseTestMod {
     private static void setTimeAndTest(GameTestHelper helper, ResourceKey<ClockTimeMarker> time, BlockPos bed, Player player, boolean shouldBeSleeping, String err) {
         var manager = helper.getLevel().clockManager();
         var overworld = helper.getLevel().registryAccess().getOrThrow(WorldClocks.OVERWORLD);
-        var origTime = manager.getTotalTicks(overworld);
+        var origTime = manager.getInstance(overworld).totalTicks();
 
         player.setPos(Vec3.atBottomCenterOf(helper.absolutePos(bed)));
         manager.moveToTimeMarker(overworld, time);

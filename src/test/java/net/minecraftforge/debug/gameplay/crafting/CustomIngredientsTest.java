@@ -5,20 +5,23 @@
 
 package net.minecraftforge.debug.gameplay.crafting;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.HolderLookup.Provider;
+import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.tags.VanillaItemTagsProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.references.BlockItemIds;
@@ -38,6 +41,7 @@ import net.minecraftforge.common.crafting.SimpleCraftingContainer;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.crafting.ingredients.IIngredientBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.common.util.INBTBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -67,8 +71,14 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
         var look = event.getLookupProvider();
         var exist = event.getExistingFileHelper();
 
+        var registries = RegistryDataBuilder.of()
+            .name(modid())
+            .reloadable(set -> set
+                .add(Recipes.create())
+            );
+        gen.addProvider(event.includeServer(), registries.reloadableGenerator(gen.getPackOutput()));
+
         gen.addProvider(event.includeServer(), new ItemTagsGen(out, look, exist));
-        gen.addProvider(event.includeServer(), new Recipes.Runner(out, event.getLookupProvider()));
     }
 
     private static TagKey<Item> tag(String name) {
@@ -235,8 +245,25 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
     }
 
     private static class Recipes extends RecipeProvider implements IConditionBuilder, IIngredientBuilder, INBTBuilder {
-        public Recipes(HolderLookup.Provider lookup, RecipeOutput gen) {
-            super(lookup, gen);
+        public static MultiRegistryBootstrap create() {
+            return new MultiRegistryBootstrap() {
+                @Override
+                public Set<ResourceKey<? extends Registry<?>>> requestedRegistries() {
+                    return Set.of(Registries.RECIPE, Registries.ADVANCEMENT, Registries.ITEM);
+                }
+
+                @Override
+                public void run(BootstrapGetter registries) {
+                    new Recipes(registries.get(Registries.RECIPE), registries.get(Registries.ADVANCEMENT), registries.get(Registries.ITEM)).buildRecipes();
+                }
+            };
+        }
+
+        private final BootstrapContext<Item> items;
+
+        public Recipes(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput, final BootstrapContext<Item> itemsOutput) {
+            super(recipeOutput, advancementOutput);
+            items = itemsOutput;
         }
 
         private ShapedRecipeBuilder shaped() {
@@ -251,7 +278,7 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
         protected void buildRecipes() {
             var hasName = getHasName(Items.DIRT);
             var has = has(Items.DIRT);
-            var items = this.registries.lookup(Registries.ITEM).get();
+            var items = this.items.lookup(Registries.ITEM);
 
             // contains NBT match - should match a stone pickaxe that lost 3 durability, regardless of setting its name
             shaped()
@@ -327,22 +354,6 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
                .define('X', difference(items, LEFT, RIGHT))
                .unlockedBy(hasName, has)
                .save(this.output, rk("difference_ingredient"));
-        }
-
-        public static class Runner extends RecipeProvider.Runner {
-            protected Runner(PackOutput output, CompletableFuture<Provider> registries) {
-                super(output, registries);
-            }
-
-            @Override
-            public String getName() {
-                return CustomIngredientsTest.class.getSimpleName() + "-Recipes";
-            }
-
-            @Override
-            protected RecipeProvider createRecipeProvider(Provider registries, RecipeOutput output) {
-                return new Recipes(registries, output);
-            }
         }
     }
 }

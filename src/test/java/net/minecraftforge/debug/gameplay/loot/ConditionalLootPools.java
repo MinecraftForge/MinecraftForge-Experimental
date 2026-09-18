@@ -6,10 +6,10 @@
 package net.minecraftforge.debug.gameplay.loot;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.flag.FeatureFlags;
@@ -21,11 +21,12 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.ints.ContextIntProviders;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.test.BaseTestMod;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
+import net.minecraftforge.common.data.RegistryDataBuilder;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.gametest.GameTest;
 import net.minecraftforge.gametest.GameTestNamespace;
@@ -35,7 +36,6 @@ import net.minecraftforge.registries.RegistryObject;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 @GameTestNamespace("forge")
 @Mod(ConditionalLootPools.MODID)
@@ -51,7 +51,15 @@ public class ConditionalLootPools extends BaseTestMod {
     }
 
     public void gatherData(GatherDataEvent event) {
-        event.getGenerator().addProvider(event.includeServer(), new LootProvider(event.getGenerator().getPackOutput(), event.getLookupProvider()));
+        var registries = RegistryDataBuilder.of()
+            .name(MODID)
+            .reloadable(set -> set
+                .add(Registries.LOOT_TABLE, new LootTableProvider(Set.of(), List.of(
+                    new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
+                )))
+            );
+
+        event.getGenerator().addProvider(event.includeServer(), registries.reloadableGenerator(event.getGenerator().getPackOutput()));
     }
 
     @GameTest
@@ -68,17 +76,9 @@ public class ConditionalLootPools extends BaseTestMod {
         helper.succeed();
     }
 
-    private static class LootProvider extends LootTableProvider {
-        public LootProvider(PackOutput out, CompletableFuture<HolderLookup.Provider> lookup) {
-            super(out, Set.of(), List.of(
-                new LootTableProvider.SubProviderEntry(BlockLoot::new, LootContextParamSets.BLOCK)
-            ), lookup);
-        }
-    }
-
     private static class BlockLoot extends BlockLootSubProvider implements IConditionBuilder {
-        public BlockLoot(HolderLookup.Provider lookup) {
-            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), lookup);
+        public BlockLoot(final LootTableSubProvider.Context output) {
+            super(Set.of(), FeatureFlags.REGISTRY.allFlags(), output);
         }
 
         @Override
@@ -92,13 +92,13 @@ public class ConditionalLootPools extends BaseTestMod {
                 .withPool(
                     LootPool.lootPool()
                         .when(FALSE())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(Items.DIAMOND_BLOCK))
                 )
                 .withPool(
                     LootPool.lootPool()
                         .when(TRUE())
-                        .setRolls(ConstantValue.exactly(1.0F))
+                        .setRolls(ContextIntProviders.exactly(1))
                         .add(LootItem.lootTableItem(Items.GOLDEN_APPLE))
                 )
             );

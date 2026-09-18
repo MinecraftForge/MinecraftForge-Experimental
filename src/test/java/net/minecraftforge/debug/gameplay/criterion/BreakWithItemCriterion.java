@@ -10,14 +10,15 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import org.jspecify.annotations.NullMarked;
 
 import net.minecraft.advancements.predicates.BlockPredicate;
-import net.minecraft.advancements.predicates.ContextAwarePredicate;
 import net.minecraft.advancements.predicates.ItemPredicate;
 import net.minecraft.advancements.triggers.Criterion;
 import net.minecraft.advancements.triggers.SimpleCriterionTrigger;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.level.storage.loot.predicates.LootItemCondition;
 
 import java.util.Optional;
 
@@ -50,7 +51,7 @@ public final class BreakWithItemCriterion extends SimpleCriterionTrigger<BreakWi
 
     public static record Instance(BlockPredicate breakingBlock, ItemPredicate holdingItem, boolean allowOffHand) implements SimpleCriterionTrigger.SimpleInstance {
         @Override
-        public Optional<ContextAwarePredicate> player() {
+        public Optional<Holder<LootItemCondition>> player() {
             return Optional.empty();
         }
     }
