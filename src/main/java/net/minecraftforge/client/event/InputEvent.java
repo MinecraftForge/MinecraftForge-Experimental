@@ -200,35 +200,31 @@ public sealed interface InputEvent {
         }
     }
 
-    /**
-     * Fired when a keymapping that by default involves clicking the mouse buttons is triggered.
-     *
-     * <p>The key bindings that trigger this event are:</p>
-     * <ul>
-     *     <li><b>Use Item</b> - defaults to <em>left mouse click</em></li>
-     *     <li><b>Pick Block</b> - defaults to <em>middle mouse click</em></li>
-     *     <li><b>Attack</b> - defaults to <em>right mouse click</em></li>
-     * </ul>
-     *
-     * <p>If this event is cancelled, then the keymapping's action is not processed further, and the hand will be swung
-     * according to {@link #shouldSwingHand()}.</p>
-     *
-     * <p>This event is fired only on the {@linkplain LogicalSide#CLIENT logical client}.</p>
-     */
-    // TODO: Change the 'button' to sub events. - Lex 0422202
-    final class InteractionKeyMappingTriggered extends MutableEvent implements Cancellable, InputEvent {
-        public static final CancellableEventBus<InteractionKeyMappingTriggered> BUS = CancellableEventBus.create(InteractionKeyMappingTriggered.class);
-
-        private final int button;
+    /// Fired when a keymapping that by default involves clicking the mouse buttons is triggered.
+    ///
+    /// The key bindings that trigger this event are:
+    /// - **Use Item** - defaults to _left mouse click_
+    /// - **Pick Block** - defaults to _middle mouse click_
+    /// - **Attack** - defaults to _right mouse click_
+    ///
+    /// If this event is cancelled, then the keymapping's action is not processed further, and the hand will be swung
+    /// according to [#shouldSwingHand()].
+    ///
+    /// This event is fired only on the [logical client][LogicalSide#CLIENT].
+    ///
+    /// @see InteractionKeyMappingTriggered.Attack
+    /// @see InteractionKeyMappingTriggered.UseItem
+    /// @see InteractionKeyMappingTriggered.PickBlock
+    sealed abstract class InteractionKeyMappingTriggered extends MutableEvent implements Cancellable, InputEvent {
         private final KeyMapping keyMapping;
         private final InteractionHand hand;
         private boolean handSwing = true;
 
         @ApiStatus.Internal
-        public InteractionKeyMappingTriggered(int button, KeyMapping keyMapping, InteractionHand hand) {
-            this.button = button;
+        protected InteractionKeyMappingTriggered(KeyMapping keyMapping, InteractionHand hand) {
             this.keyMapping = keyMapping;
             this.hand = hand;
+            super();
         }
 
         /**
@@ -259,31 +255,52 @@ public sealed interface InputEvent {
         }
 
         /**
-         * {@return {@code true} if the mouse button is the left mouse button}
-         */
-        public boolean isAttack() {
-            return button == 0;
-        }
-
-        /**
-         * {@return {@code true} if the mouse button is the right mouse button}
-         */
-        public boolean isUseItem() {
-            return button == 1;
-        }
-
-        /**
-         * {@return {@code true} if the mouse button is the middle mouse button}
-         */
-        public boolean isPickBlock() {
-            return button == 2;
-        }
-
-        /**
          * {@return the key mapping which triggered this event}
          */
         public KeyMapping getKeyMapping() {
             return keyMapping;
+        }
+
+        /// The mouse button or input for attacking, typically the left mouse button
+        public static final class Attack extends InteractionKeyMappingTriggered {
+            public static final CancellableEventBus<Attack> BUS = CancellableEventBus.create(Attack.class);
+
+            @ApiStatus.Internal
+            public Attack(KeyMapping keyMapping, InteractionHand hand) {
+                super(keyMapping, hand);
+            }
+        }
+
+        /// The mouse button or input for using an item, typically the right mouse button
+        public static final class UseItem extends InteractionKeyMappingTriggered {
+            public static final CancellableEventBus<UseItem> BUS = CancellableEventBus.create(UseItem.class);
+
+            @ApiStatus.Internal
+            public UseItem(KeyMapping keyMapping, InteractionHand hand) {
+                super(keyMapping, hand);
+            }
+        }
+
+        /// The mouse button or input for picking a block, typically the middle mouse button (scroll wheel click)
+        public static final class PickBlock extends InteractionKeyMappingTriggered {
+            public static final CancellableEventBus<PickBlock> BUS = CancellableEventBus.create(PickBlock.class);
+
+            @ApiStatus.Internal
+            public PickBlock(KeyMapping keyMapping, InteractionHand hand) {
+                super(keyMapping, hand);
+            }
+
+            /// @return Always false, as picking a block does not swing the hand and this event doesn't support changing
+            ///         that behaviour
+            @Override
+            public boolean shouldSwingHand() {
+                return false;
+            }
+
+            @Override
+            public void setSwingHand(boolean value) {
+                throw new UnsupportedOperationException("Cannot change hand swing behaviour for pick block input");
+            }
         }
     }
 }

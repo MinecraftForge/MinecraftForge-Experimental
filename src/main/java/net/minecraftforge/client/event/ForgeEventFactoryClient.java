@@ -162,8 +162,8 @@ public final class ForgeEventFactoryClient {
     }
 
     public static boolean onClickInputPickBlock(KeyMapping keyBinding) {
-        var event = new InputEvent.InteractionKeyMappingTriggered(2, keyBinding, InteractionHand.MAIN_HAND);
-        return InputEvent.InteractionKeyMappingTriggered.BUS.post(event);
+        var event = new InputEvent.InteractionKeyMappingTriggered.PickBlock(keyBinding, InteractionHand.MAIN_HAND);
+        return InputEvent.InteractionKeyMappingTriggered.PickBlock.BUS.post(event);
     }
 
     public static void onContainerRenderBackground(AbstractContainerScreen<?> screen, GuiGraphicsExtractor graphics, int mouseX, int mouseY) {

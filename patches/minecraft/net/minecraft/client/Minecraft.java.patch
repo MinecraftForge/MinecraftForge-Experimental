@@ -133,8 +133,8 @@
                      BlockPos pos = blockHit.getBlockPos();
 -                    if (!this.level.getBlockState(pos).isAir()) {
 +                    if (!this.level.isEmptyBlock(pos)) {
-+                        var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
-+                        if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
++                        var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack(this.options.keyAttack, InteractionHand.MAIN_HAND);
++                        if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack.BUS.post(inputEvent)) {
 +                           if (inputEvent.shouldSwingHand()) {
 +                              this.player.swing(InteractionHand.MAIN_HAND, swingAnimation, false);
 +                           }
@@ -150,8 +150,8 @@
                      return true;
                  }
  
-+                var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(0, this.options.keyAttack, InteractionHand.MAIN_HAND);
-+                if (!net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent))
++                var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack(this.options.keyAttack, InteractionHand.MAIN_HAND);
++                if (!net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.Attack.BUS.post(inputEvent))
                  switch (this.hitResult.getType()) {
                      case ENTITY:
                          AttackRange customItemRange = heldItem.get(DataComponents.ATTACK_RANGE);
@@ -183,8 +183,8 @@
  
                      SwingAnimation swingAnimation = heldItem.getInteractAnimation();
 +
-+                    var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered(1, this.options.keyUse, hand);
-+                    if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.BUS.post(inputEvent)) {
++                    var inputEvent = new net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.UseItem(this.options.keyUse, hand);
++                    if (net.minecraftforge.client.event.InputEvent.InteractionKeyMappingTriggered.UseItem.BUS.post(inputEvent)) {
 +                       if (inputEvent.shouldSwingHand()) this.player.swing(hand, swingAnimation, false);
 +                       return;
 +                    }
