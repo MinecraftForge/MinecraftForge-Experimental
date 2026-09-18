@@ -185,7 +185,7 @@ forgedev.runs {
 
             mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
             args '--gameDir', '.'
-            jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders'
+            jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders', '-XX:StackShadowPages=32'
 
             systemProperty 'bsl.debug', 'true'
             systemProperty 'terminal.jline', 'true'
@@ -403,7 +403,7 @@ forgedev.userDev {
                 parents = []
                 main = 'net.minecraftforge.bootstrap.ForgeBootstrap'
                 args '--gameDir', '.'
-                jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders'
+                jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders', '-XX:StackShadowPages=32'
                 client = it.name.containsIgnoreCase('client')
                 environment 'MCP_MAPPINGS', '{mcp_mappings}'
             }
@@ -598,7 +598,7 @@ forgedev.installer {
         inheritsFrom = minecraftVersion
         mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
         gameArgs = [ '--launchTarget', 'forge_client' ]
-        jvmArgs = [ '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders' ]
+        jvmArgs = [ '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders', '-XX:StackShadowPages=32' ]
     }
 }
 
