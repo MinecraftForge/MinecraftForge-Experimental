@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import com.google.gson.JsonObject;
@@ -46,6 +47,8 @@ import net.minecraft.resources.Identifier;
 import net.minecraftforge.common.crafting.conditions.ConditionCodec;
 import net.minecraftforge.common.crafting.conditions.ICondition;
 import net.minecraftforge.common.crafting.conditions.ICondition.IContext;
+import net.minecraftforge.common.crafting.conditions.OrCondition;
+import net.minecraftforge.common.crafting.conditions.TrueCondition;
 import org.jetbrains.annotations.Nullable;
 
 /**
@@ -190,6 +193,25 @@ public class ConditionalRecipe implements Recipe<RecipeInput> {
     private record InnerRecipe(ICondition condition, Recipe<?> recipe) {}
     private record InnerAdvancement(ICondition condition, AdvancementHolder advancement, JsonObject json) {}
 
+    // In order to not error during data loading when all elements are filtered out, we need to add an outer condition so we can read it from the top level
+    static <T> @Nullable ICondition aggregate(@Nullable ICondition main, List<T> conditionals, Function<T, ICondition> getter) {
+        if (main != null)
+            return main;
+        if (conditionals.isEmpty())
+            return null;
+        if (conditionals.size() == 1)
+            return getter.apply(conditionals.getFirst());
+
+        var list = new ArrayList<ICondition>(conditionals.size());
+        for (var entry : conditionals) {
+            var condition = getter.apply(entry);
+            if (condition == null || condition == TrueCondition.INSTANCE)
+                return null;
+            list.add(condition);
+        }
+        return new OrCondition(list);
+    }
+
     private static final MapCodec<Recipe<?>> CODEC = Codec.of(new MapEncoder.Implementation<>() {
         @Override
         public <T> RecordBuilder<T> encode(Recipe<?> input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
@@ -197,10 +219,10 @@ public class ConditionalRecipe implements Recipe<RecipeInput> {
                 new IllegalStateException("ConditionalRecipe.CODEC can only be used for ConditionRecipes, how did you get here?");
 
             var wrapper = (ConditionalRecipe)input;
-            if (wrapper.mainCondition != null)
-                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.mainCondition));
-            else if (wrapper.children.size() == 1)
-                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, wrapper.children.getFirst().condition()));
+
+            var outerCondition = aggregate(wrapper.mainCondition, wrapper.children, InnerRecipe::condition);
+            if (outerCondition != null)
+                prefix.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, outerCondition));
 
             var recipes = ops.listBuilder();
             for (var recipe : wrapper.children) {

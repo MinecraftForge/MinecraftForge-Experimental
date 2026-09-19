@@ -5,7 +5,7 @@
      protected abstract void generate();
  
 +    protected Iterable<Block> getKnownBlocks() {
-+        return BuiltInRegistries.BLOCK;
++        return BuiltInRegistries.BLOCK.stream().filter(b -> net.minecraft.resources.Identifier.DEFAULT_NAMESPACE.equals(BuiltInRegistries.BLOCK.getKey(b).getNamespace()))::iterator;
 +    }
 +
      @Override

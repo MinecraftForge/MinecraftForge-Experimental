@@ -18,6 +18,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.MultiRegistryBootstrap;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.packs.VanillaBrewingProvider;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
 import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.resources.ResourceKey;
@@ -39,7 +40,7 @@ import net.minecraftforge.unsafe.UnsafeHacks;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -75,8 +76,12 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
 
     private ForgeRecipeProvider(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
         super(recipeOutput, advancementOutput);
-        this.output = new Wrapped(this.output, this);
         this.items = recipeOutput.lookup(Registries.ITEM);
+
+        // Not having access to 'this' in super calls is really annoying
+        this.output = new RecipeOutputWrapper(this.output, this);
+        this.advancementOutput = new ContextWrapper<>(this.advancementOutput);
+        this.brewingProvider = new VanillaBrewingProvider(this.output);
     }
 
     private void exclude(ItemLike item) {
@@ -201,9 +206,9 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         return ret;
     }
 
-    private record Wrapped(RecipeOutput wrapped, ForgeRecipeProvider forge) implements RecipeOutput {
+    private record RecipeOutputWrapper(RecipeOutput wrapped, ForgeRecipeProvider forge) implements RecipeOutput {
         @Override
-        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, AdvancementHolder advancement) {
+        public void accept(ResourceKey<Recipe<?>> id, Recipe<?> recipe, @Nullable AdvancementHolder advancement) {
             var modified = forge.enhance(id, recipe);
             if (modified != null)
                 wrapped.accept(id, modified, null);
@@ -219,6 +224,7 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
             return wrapped.lookup(key);
         }
 
+        @SuppressWarnings("deprecation")
         @Override
         public <S> Stream<Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
             return wrapped.listContextElements(key);
@@ -227,6 +233,24 @@ public final class ForgeRecipeProvider extends VanillaRecipeProvider {
         @Override
         public <S> Optional<HolderLookup.RegistryLookup<S>> registryLookup(ResourceKey<? extends Registry<? extends S>> registry) {
             return wrapped.registryLookup(registry);
+        }
+    }
+
+    private record ContextWrapper<T>(BootstrapContext<T> wrapped) implements BootstrapContext<T> {
+        @Override
+        public <S> HolderGetter<S> lookup(ResourceKey<? extends Registry<? extends S>> key) {
+            return wrapped.lookup(key);
+        }
+
+        @SuppressWarnings("deprecation")
+        @Override
+        public <S> Stream<Reference<S>> listContextElements(ResourceKey<? extends Registry<? extends S>> key) {
+            return wrapped.listContextElements(key);
+        }
+
+        @Override
+        public Reference<T> register(ResourceKey<T> key, T value) {
+            return wrapped.lookup(key.registryKey()).getOrThrow(key);
         }
     }
 }

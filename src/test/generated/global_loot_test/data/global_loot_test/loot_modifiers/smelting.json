@@ -2,7 +2,7 @@
   "type": "global_loot_test:smelting",
   "conditions": [
     {
-      "condition": "minecraft:match_tool",
+      "type": "minecraft:match_tool",
       "predicate": {
         "predicates": {
           "minecraft:enchantments": [

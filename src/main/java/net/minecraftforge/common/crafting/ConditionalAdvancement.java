@@ -124,8 +124,20 @@ public record ConditionalAdvancement(ICondition condition, Optional<Advancement>
             @Override
             public <T> RecordBuilder<T> encode(Advancement input, DynamicOps<T> ops, RecordBuilder<T> prefix) {
                 var root = vanilla.encode(input, ops, prefix);
-                if (input.forgeConditions().isPresent())
-                    root.add("forge:children", childCodec.encodeStart(ops, input.forgeConditions().get()));
+                if (!input.forgeConditions().isPresent())
+                    return root;
+
+                var children = input.forgeConditions().get();
+                if (children.isEmpty())
+                    return root;
+
+                if (children.size() != 1)
+                    root.add(KEY, childCodec.encodeStart(ops, children));
+
+                var outerCondition = ConditionalRecipe.aggregate(null, children, ConditionalAdvancement::condition);
+                if (outerCondition != null)
+                    root.add(ICondition.DEFAULT_FIELD, ICondition.CODEC.encodeStart(ops, outerCondition));
+
                 return root;
             }
 

@@ -41,7 +41,6 @@ public class DatapackBuiltinEntriesProviderTest extends BaseTestMod {
     // Forge registry entries
     public static final ResourceKey<BiomeModifier> MOSSY_STONE_MODIFIER = ResourceKey.create(ForgeRegistries.Keys.BIOME_MODIFIERS, Identifier.fromNamespaceAndPath(MOD_ID, "mossy_stone_modifier"));
 
-
     public DatapackBuiltinEntriesProviderTest(FMLJavaModLoadingContext context) {
         super(context, false, true);
         GatherDataEvent.getBus(modBus).addListener(this::gatherData);
@@ -56,12 +55,12 @@ public class DatapackBuiltinEntriesProviderTest extends BaseTestMod {
          */
         var registries = RegistryDataBuilder.of()
             .name(modid())
-            .reloadable(set -> set
+            .world(set -> set
                 .add(Registries.FEATURE, this::createFeature)
                 .add(Registries.PLACED_FEATURE, this::createPlacement)
                 .add(ForgeRegistries.Keys.BIOME_MODIFIERS, this::createModifier)
             );
-        gen.addProvider(event.includeServer(), registries.reloadableGenerator(gen.getPackOutput()));
+        gen.addProvider(event.includeServer(), registries.worldGenerator(gen.getPackOutput()));
     }
 
     // Registers the mossy stone feature

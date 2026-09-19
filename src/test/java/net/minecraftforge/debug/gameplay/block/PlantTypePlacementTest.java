@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+
 import static net.minecraft.world.level.block.Blocks.*;
 
 @GameTestNamespace("forge")
@@ -65,7 +66,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         // VegitationBlock has no direct creations
         map.put(AttachedStemBlock.class, of(this::farmland, ATTACHED_MELON_STEM, ATTACHED_PUMPKIN_STEM));
         map.put(AzaleaBlock.class,       of(this::simple, AZALEA, FLOWERING_AZALEA));
-        map.put(BushBlock.class,         of(this::vegetation, BUSH));
+        map.put(BushBlock.class,         of(this::vegetation, BUSH, RED_SHRUB));
         map.put(CactusFlowerBlock.class, of(this::cactus_flower, CACTUS_FLOWER));
 
         map.put(CropBlock.class,         of(this::farmland, WHEAT));
@@ -98,7 +99,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         map.put(NetherWartBlock.class,    of(this::simple, NETHER_WART));
         map.put(NetherRootsBlock.class,   of(this::simple, CRIMSON_ROOTS, WARPED_ROOTS));
 
-        map.put(SaplingBlock.class,           of(this::vegetation, ACACIA_SAPLING, BIRCH_SAPLING, CHERRY_SAPLING, DARK_OAK_SAPLING, JUNGLE_SAPLING, OAK_SAPLING, PALE_OAK_SAPLING, SPRUCE_SAPLING));
+        map.put(SaplingBlock.class,           of(this::vegetation, ACACIA_SAPLING, BIRCH_SAPLING, CHERRY_SAPLING, DARK_OAK_SAPLING, JUNGLE_SAPLING, OAK_SAPLING, PALE_OAK_SAPLING, POPLAR_SAPLING, SPRUCE_SAPLING));
         map.put(MangrovePropaguleBlock.class, of(this::vegetation, MANGROVE_PROPAGULE));
 
         map.put(SeagrassBlock.class,       of(this::todo, SEAGRASS));
@@ -270,7 +271,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
         helper.succeed();
     }
 
-    @GameTest(structure = "forge:empty11x3x33") // vegetation(11) * 32 plants
+    @GameTest(structure = "forge:empty11x3x34") // vegetation(11) * 33 plants + 1
     public void vegetation(GameTestHelper helper) {
         var plants = plants(
             BushBlock.class,           // 1
@@ -278,7 +279,7 @@ public class PlantTypePlacementTest extends BaseTestMod {
             FlowerBedBlock.class,      // 2
             FlowerBlock.class,         // 14
             EyeblossomBlock.class,     // 2
-            SaplingBlock.class,        // 8
+            SaplingBlock.class,        // 9
             SweetBerryBushBlock.class, // 1
             MangrovePropaguleBlock.class, // 1
             TallGrassBlock.class       // 2

@@ -22,6 +22,8 @@ public record TagEmptyCondition(TagKey<Item> tag) implements ICondition {
 
     @Override
     public boolean test(ICondition.IContext context, DynamicOps<?> ops) {
+        if (tag.toString().contains("dirt"))
+            System.currentTimeMillis();
         return context.getTag(tag).isEmpty();
     }
 

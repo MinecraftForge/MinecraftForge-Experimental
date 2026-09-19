@@ -11,7 +11,7 @@
       "forge:condition": {
         "type": "forge:false"
       },
-      "rolls": 1.0
+      "rolls": 1
     },
     {
       "entries": [
@@ -23,7 +23,7 @@
       "forge:condition": {
         "type": "forge:true"
       },
-      "rolls": 1.0
+      "rolls": 1
     }
   ],
   "random_sequence": "conditional_loot_test:blocks/test"

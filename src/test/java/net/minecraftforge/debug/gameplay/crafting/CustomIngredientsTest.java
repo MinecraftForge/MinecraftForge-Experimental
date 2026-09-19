@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraft.advancements.Advancement;
+import net.minecraft.core.HolderGetter;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.Registry;
 import net.minecraft.core.component.DataComponents;
@@ -249,21 +250,21 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
             return new MultiRegistryBootstrap() {
                 @Override
                 public Set<ResourceKey<? extends Registry<?>>> requestedRegistries() {
-                    return Set.of(Registries.RECIPE, Registries.ADVANCEMENT, Registries.ITEM);
+                    return Set.of(Registries.RECIPE, Registries.ADVANCEMENT);
                 }
 
                 @Override
                 public void run(BootstrapGetter registries) {
-                    new Recipes(registries.get(Registries.RECIPE), registries.get(Registries.ADVANCEMENT), registries.get(Registries.ITEM)).buildRecipes();
+                    new Recipes(registries.get(Registries.RECIPE), registries.get(Registries.ADVANCEMENT)).buildRecipes();
                 }
             };
         }
 
-        private final BootstrapContext<Item> items;
+        private final HolderGetter<Item> items;
 
-        public Recipes(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput, final BootstrapContext<Item> itemsOutput) {
+        public Recipes(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
             super(recipeOutput, advancementOutput);
-            items = itemsOutput;
+            this.items = recipeOutput.lookup(Registries.ITEM);
         }
 
         private ShapedRecipeBuilder shaped() {
@@ -278,7 +279,6 @@ public class CustomIngredientsTest extends BaseTestMod implements INBTBuilder {
         protected void buildRecipes() {
             var hasName = getHasName(Items.DIRT);
             var has = has(Items.DIRT);
-            var items = this.items.lookup(Registries.ITEM);
 
             // contains NBT match - should match a stone pickaxe that lost 3 durability, regardless of setting its name
             shaped()

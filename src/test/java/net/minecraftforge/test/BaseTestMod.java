@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -24,12 +25,12 @@ import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.gametest.framework.FunctionGameTestInstance;
 import net.minecraft.gametest.framework.TestData;
 import net.minecraft.gametest.framework.TestEnvironmentDefinition;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.world.item.CreativeModeTab.TabVisibility;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraftforge.common.data.RegistryDataBuilder;
@@ -178,7 +179,7 @@ public abstract class BaseTestMod {
 
     private record RegistryData(RegistryDataBuilder builder, boolean hasWorld, boolean hasReload) {}
     private RegistryData populate(List<Map<ResourceKey<? extends Registry<?>>, DeferredRegisterData<?>>> registries) {
-        var reloadableRegistries = new HashSet<>(VanillaRegistries.reloadableBuilder().getEntryKeys());
+        var reloadableRegistries = RegistryDataLoader.RELOADABLE_REGISTRIES.stream().map(RegistryDataLoader.RegistryData::key).collect(Collectors.toSet());
         var dataBuilder = RegistryDataBuilder.of().name(modid());
 
         RegistrySetBuilder world = null, reload = null;
@@ -211,7 +212,6 @@ public abstract class BaseTestMod {
         var gen = event.getGenerator();
         var packOutput = gen.getPackOutput();
         var data = this.populate(this.dataRegistries);
-
 
         var registrySet = new RegistrySetBuilder()
             .add(Registries.TEST_INSTANCE, ctx -> {

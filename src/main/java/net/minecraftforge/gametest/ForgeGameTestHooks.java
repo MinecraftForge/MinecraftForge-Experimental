@@ -141,7 +141,7 @@ public class ForgeGameTestHooks {
                     : key(namespace, "", gametest.environment());
 
                 var dim = ResourceKey.create(Registries.DIMENSION, GameTest.DEFAULT_DIMENSION.equals(gametest.dimension())
-                    ? Identifier.withDefaultNamespace(gametest.dimension())
+                    ? Identifier.parse(gametest.dimension())
                     : key(namespace, "", gametest.dimension()));
 
                 var data = new TestData<Identifier>(

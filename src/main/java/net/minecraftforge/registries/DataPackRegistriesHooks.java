@@ -8,9 +8,13 @@ package net.minecraftforge.registries;
 import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySynchronization;
 import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.RegistryDataLoader.RegistryData;
 import net.minecraft.resources.RegistryValidator;
 import net.minecraft.resources.ResourceKey;
 import org.jetbrains.annotations.ApiStatus;
+import org.jspecify.annotations.Nullable;
+
+import com.mojang.serialization.Codec;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +30,8 @@ public final class DataPackRegistriesHooks {
 
     // Mutable views of vanilla registries
     private static final List<RegistryDataLoader.RegistryData<?>> SYNCHRONIZED_REGISTRIES = new ArrayList<>();
-    private static final List<RegistryDataLoader.RegistryData<?>> WORLDGEN_REGISTRIES = new ArrayList<>();
+    private static final List<RegistryDataLoader.RegistryData<?>> WORLD_REGISTRIES = new ArrayList<>();
+    private static final List<RegistryDataLoader.RegistryData<?>> RELOADABLE_REGISTRIES = new ArrayList<>();
     private static final Set<ResourceKey<? extends Registry<?>>> NETWORKABLE_REGISTRIES = new HashSet<>();
 
     // Out custom registries, things we need to make sure the client has
@@ -43,27 +48,43 @@ public final class DataPackRegistriesHooks {
     }
 
     /* Internal forge method, registers a datapack registry codec and folder. */
-    static <T> void addRegistryCodec(DataPackRegistryEvent.DataPackRegistryData<T> data) {
-        RegistryDataLoader.RegistryData<T> loaderData = data.loaderData();
-        WORLDGEN_REGISTRIES.add(loaderData);
-        if (data.networkCodec() != null) {
-            NETWORKABLE_REGISTRIES.add(loaderData.key());
-            SYNCHRONIZED_REGISTRIES_CUSTOM.add(loaderData.key());
-            SYNCHRONIZED_REGISTRIES.add(new RegistryDataLoader.RegistryData<T>(loaderData.key(), data.networkCodec(), RegistryValidator.none()));
+    static <T> void addRegistryCodec(ResourceKey<? extends Registry<T>> key, Codec<T> codec, @Nullable Codec<T> network, boolean reloadable, RegistryValidator<T> validator) {
+        if (reloadable)
+            RELOADABLE_REGISTRIES.add(new RegistryData<>(key, codec));
+        else
+            WORLD_REGISTRIES.add(new RegistryData<>(key, codec));
+
+        if (network != null) {
+            NETWORKABLE_REGISTRIES.add(key);
+            SYNCHRONIZED_REGISTRIES_CUSTOM.add(key);
+            SYNCHRONIZED_REGISTRIES.add(new RegistryData<>(key, network, validator));
         }
     }
 
     /**
-     * Captures a mutable view of {@link RegistryDataLoader#WORLDGEN_REGISTRIES} so that we can register modded entries during the registry event.
+     * Captures a mutable view of {@link RegistryDataLoader#WORLD_REGISTRIES} so that we can register modded entries during the registry event.
      * All uses should use that field instead of this class.
-     * @param vanilla The vanilla worldgen registries
-     * @return An unmodifiable list of worldgen registries
+     * @param vanilla The vanilla registries
+     * @return An unmodifiable list of registries
      */
-    public static List<RegistryDataLoader.RegistryData<?>> grabWorldgenRegistries(RegistryDataLoader.RegistryData<?>... vanilla) {
+    public static List<RegistryData<?>> grabWorldRegistries(RegistryData<?>... vanilla) {
         if (!StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass().equals(RegistryDataLoader.class))
-            throw new IllegalCallerException("Attempted to call DataPackRegistriesHooks#grabWorldgenRegistries!");
-        WORLDGEN_REGISTRIES.addAll(Arrays.asList(vanilla));
-        return Collections.unmodifiableList(WORLDGEN_REGISTRIES);
+            throw new IllegalCallerException("Attempted to call DataPackRegistriesHooks#grabWorldRegistries!");
+        WORLD_REGISTRIES.addAll(Arrays.asList(vanilla));
+        return Collections.unmodifiableList(WORLD_REGISTRIES);
+    }
+
+    /**
+     * Captures a mutable view of {@link RegistryDataLoader#RELOADABLE_REGISTRIES} so that we can register modded entries during the registry event.
+     * All uses should use that field instead of this class.
+     * @param vanilla The vanilla registries
+     * @return An unmodifiable list of registries
+     */
+    public static List<RegistryData<?>> grabReloadableRegistries(RegistryData<?>... vanilla) {
+        if (!StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE).getCallerClass().equals(RegistryDataLoader.class))
+            throw new IllegalCallerException("Attempted to call DataPackRegistriesHooks#grabReloadableRegistries!");
+        RELOADABLE_REGISTRIES.addAll(Arrays.asList(vanilla));
+        return Collections.unmodifiableList(RELOADABLE_REGISTRIES);
     }
 
     /**

@@ -189,13 +189,8 @@ forgedev.runs {
 
             systemProperty 'bsl.debug', 'true'
             systemProperty 'terminal.jline', 'true'
-            with(sourceSets.test) {
-                systemProperty 'forge.enableGameTest', 'true'
-                systemProperty 'forgedev.enableTestMods', 'true'
-            }
         }
     }
-
     create('client') {
         options {
             systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
@@ -209,6 +204,11 @@ forgedev.runs {
                  '--versionType', 'release',
                  '--assetsDir', '{assets_root}',
                  '--assetIndex', '{asset_index}'
+
+            with(sourceSets.test) {
+                systemProperty 'forge.enableGameTest', 'true'
+                systemProperty 'forgedev.enableTestMods', 'true'
+            }
         }
     }
 
@@ -220,8 +220,13 @@ forgedev.runs {
 
     create('gameTestServer') {
         options {
+            systemProperty 'forge.enableGameTest', 'true'
             args '--launchTarget', 'forge_dev_server_gametest'
             args '--uniqueWorld' // Unique world is used so that the world regenerates, as well as the world config isn't influenced by other runs
+
+            with(sourceSets.test) {
+                systemProperty 'forgedev.enableTestMods', 'true'
+            }
         }
     }
 
@@ -239,6 +244,8 @@ forgedev.runs {
             }
 
             with(sourceSets.test) {
+                systemProperty 'forge.enableGameTest', 'true'
+                systemProperty 'forgedev.enableTestMods', 'true'
                 args '--mod', '.+',
                      '--existing', sourceSets.test.resources.srcDirs[0],
                      '--output', rootProject.file('src/test/generated/')
@@ -248,23 +255,20 @@ forgedev.runs {
 
     create('clientData') {
         options {
-            args '--all',
-                    '--existing', sourceSets.main.resources.srcDirs[0],
-                    '--assetsDir', '{assets_root}',
-                    '--assetIndex', '{asset_index}'
+            args '--launchTarget', 'forge_dev_client_data',
+                 '--all',
+                 '--existing', sourceSets.main.resources.srcDirs[0],
+                 '--assetsDir', '{assets_root}',
+                 '--assetIndex', '{asset_index}'
 
             with(sourceSets.main) {
-                args '--launchTarget', 'forge_dev_client_data',
-                     '--mod', 'forge',
-                     '--output', rootProject.file('src/main/generated/'),
-                     '--mod', 'forge'
+                args '--mod', 'forge',
+                     '--output', rootProject.file('src/main/generated/')
             }
 
             with(sourceSets.test) {
-                args '--launchTarget', 'forge_dev',
-                     '--launchEntry', 'minecraft/net.minecraft.client.data.Main',
-                     '--launchData',
-                     '--mod', '.+',
+                systemProperty 'forgedev.enableTestMods', 'true'
+                args '--mod', '.+',
                      '--existing', sourceSets.test.resources.srcDirs[0],
                      '--output', rootProject.file('src/test/generated/')
             }

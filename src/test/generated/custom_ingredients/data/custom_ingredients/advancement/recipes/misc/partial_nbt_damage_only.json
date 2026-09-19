@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "custom_ingredients:partial_nbt_damage_only"
+        "recipes": "custom_ingredients:partial_nbt_damage_only"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

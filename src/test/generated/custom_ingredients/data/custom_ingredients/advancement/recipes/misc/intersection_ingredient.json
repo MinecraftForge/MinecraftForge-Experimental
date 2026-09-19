@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "custom_ingredients:intersection_ingredient"
+        "recipes": "custom_ingredients:intersection_ingredient"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

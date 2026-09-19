@@ -1,74 +1,76 @@
 {
-  "forge:conditional": [
-    {
-      "parent": "minecraft:recipes/root",
-      "criteria": {
-        "has_dirt": {
-          "conditions": {
-            "items": [
-              {
-                "items": "minecraft:dirt"
-              }
-            ]
-          },
-          "trigger": "minecraft:inventory_changed"
-        },
-        "has_the_recipe": {
-          "conditions": {
-            "recipe": "minecraft:diamond_block"
-          },
-          "trigger": "minecraft:recipe_unlocked"
-        }
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_dirt": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:dirt"
+          }
+        ]
       },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipes": "minecraft:diamond_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "forge:children": [
+    {
       "forge:condition": {
         "type": "forge:false"
-      },
-      "requirements": [
-        [
-          "has_the_recipe",
-          "has_dirt"
-        ]
-      ],
-      "rewards": {
-        "recipes": [
-          "minecraft:diamond_block"
-        ]
       }
     },
     {
-      "parent": "minecraft:recipes/root",
-      "criteria": {
-        "has_oak_log": {
-          "conditions": {
-            "items": [
-              {
-                "items": "minecraft:oak_log"
-              }
-            ]
+      "child": {
+        "parent": "minecraft:recipes/root",
+        "criteria": {
+          "has_oak_log": {
+            "conditions": {
+              "items": [
+                {
+                  "items": "minecraft:oak_log"
+                }
+              ]
+            },
+            "trigger": "minecraft:inventory_changed"
           },
-          "trigger": "minecraft:inventory_changed"
+          "has_the_recipe": {
+            "conditions": {
+              "recipes": "minecraft:diamond_block"
+            },
+            "trigger": "minecraft:recipe_unlocked"
+          }
         },
-        "has_the_recipe": {
-          "conditions": {
-            "recipe": "minecraft:diamond_block"
-          },
-          "trigger": "minecraft:recipe_unlocked"
+        "requirements": [
+          [
+            "has_the_recipe",
+            "has_oak_log"
+          ]
+        ],
+        "rewards": {
+          "recipes": [
+            "minecraft:diamond_block"
+          ]
         }
       },
       "forge:condition": {
         "type": "forge:true"
-      },
-      "requirements": [
-        [
-          "has_the_recipe",
-          "has_oak_log"
-        ]
-      ],
-      "rewards": {
-        "recipes": [
-          "minecraft:diamond_block"
-        ]
       }
     }
-  ]
+  ],
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_dirt"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "minecraft:diamond_block"
+    ]
+  }
 }

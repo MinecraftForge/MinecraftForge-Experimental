@@ -1,0 +1,4 @@
+{
+  "type": "forge:can_tool_perform_action",
+  "action": "shears_dig"
+}

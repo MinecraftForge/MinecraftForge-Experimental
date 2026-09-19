@@ -3,5 +3,5 @@
   "environment": "minecraft:default",
   "function": "forge:plant_type_placement/vegetation",
   "max_ticks": 100,
-  "structure": "forge:empty11x3x33"
+  "structure": "forge:empty11x3x34"
 }

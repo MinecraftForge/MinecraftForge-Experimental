@@ -5,7 +5,11 @@
 
 package net.minecraftforge.common.data;
 
+import net.minecraft.core.Holder.Reference;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.HolderLookup.RegistryLookup;
+import net.minecraft.core.HolderSet.Named;
+import net.minecraft.core.Registry;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.RegistrySetBuilder.PatchedRegistries;
 import net.minecraft.data.PackOutput;
@@ -14,14 +18,24 @@ import net.minecraft.data.registries.RegistryPatchGenerator;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.resources.RegistryDataLoader;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.Util;
 
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+
 import org.jspecify.annotations.Nullable;
+
+import com.mojang.serialization.Lifecycle;
 
 /**
  * An extension of the {@link RegistriesDatapackGenerator} which properly handles
@@ -50,10 +64,10 @@ public class RegistryDataBuilder {
     }
 
     private CompletableFuture<PatchedRegistries> world = null;
-    private CompletableFuture<HolderLookup.Provider> worldFull = VANILLA_WORLD;
+    private CompletableFuture<HolderLookup.Provider> worldFull = VANILLA_WORLD.thenApply(p -> addMissing(p, RegistryDataLoader.WORLD_REGISTRIES));
 
     private CompletableFuture<PatchedRegistries> reload = null;
-    private CompletableFuture<HolderLookup.Provider> reloadFull = VANILLA_RELOADABLE;
+    private CompletableFuture<HolderLookup.Provider> reloadFull = VANILLA_RELOADABLE.thenApply(p -> addMissing(p, RegistryDataLoader.RELOADABLE_REGISTRIES));
 
     private Set<String> modIds;
     private Predicate<ResourceKey<?>> filter;
@@ -137,6 +151,9 @@ public class RegistryDataBuilder {
 
     /** Adds a new reloadable layer using a pre-built Registry Set */
     public RegistryDataBuilder reloadable(RegistrySetBuilder layer) {
+        if (world == null) // We called reloadable without any world info. So make an empty layer
+            world(_ -> {});
+
         reload = RegistryPatchGenerator.createReloadableLookup(worldFull, reloadFull, layer);
         reloadFull = world.thenApply(PatchedRegistries::full);
         return this;
@@ -157,5 +174,60 @@ public class RegistryDataBuilder {
     /** Creates a DataGenerator for the patches of the current world layer. Throws IllegalStateException if called with out calling {@link #reloadable(RegistrySetBulder)} */
     public RegistriesDatapackGenerator reloadableGenerator(final PackOutput output) {
         return new RegistriesDatapackGenerator(output, name == null ? "reloadable" : name + " reloadable", RegistryDataLoader.RELOADABLE_REGISTRIES, reloadable(), filter);
+    }
+
+    private static HolderLookup.Provider addMissing(HolderLookup.Provider base, List<RegistryDataLoader.RegistryData<?>> expected) {
+        var registries = new HashMap<ResourceKey<? extends Registry<?>>, HolderLookup.RegistryLookup<?>>();
+        base.listRegistries().forEach(p -> registries.put(p.key(), p));
+
+        for (var data : expected) {
+            @SuppressWarnings("unchecked")
+            var key = (ResourceKey<Registry<Object>>)data.key();
+            if (!registries.containsKey(key))
+                registries.put(key, new DummyRegistry<>(key));
+        }
+
+        return new ProviderWrapper(Collections.unmodifiableMap(registries));
+    }
+
+    private record ProviderWrapper(Map<ResourceKey<? extends Registry<?>>, HolderLookup.RegistryLookup<?>> map) implements HolderLookup.Provider {
+        @Override
+        public Stream<ResourceKey<? extends Registry<?>>> listRegistryKeys() {
+            return map.keySet().stream();
+        }
+
+        @Override
+        public <T> Optional<? extends RegistryLookup<T>> lookup(ResourceKey<? extends Registry<? extends T>> key) {
+            @SuppressWarnings("unchecked")
+            var ret = (HolderLookup.RegistryLookup<T>)map.get(key);
+            return Optional.ofNullable(ret);
+        }
+    }
+
+    private record DummyRegistry<T>(ResourceKey<? extends Registry<T>> key) implements HolderLookup.RegistryLookup<T> {
+        @Override
+        public Stream<Reference<T>> listElements() {
+            return Stream.empty();
+        }
+
+        @Override
+        public Stream<Named<T>> listTags() {
+            return Stream.empty();
+        }
+
+        @Override
+        public Optional<Reference<T>> get(ResourceKey<T> id) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Optional<Named<T>> get(TagKey<T> id) {
+            return Optional.empty();
+        }
+
+        @Override
+        public Lifecycle registryLifecycle() {
+            return Lifecycle.stable();
+        }
     }
 }

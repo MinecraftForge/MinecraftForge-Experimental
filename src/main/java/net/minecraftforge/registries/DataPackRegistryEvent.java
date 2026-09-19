@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.core.Registry;
-import net.minecraft.resources.RegistryDataLoader;
+import net.minecraft.resources.RegistryValidator;
 import net.minecraft.resources.ResourceKey;
 import net.minecraftforge.eventbus.api.bus.EventBus;
 import net.minecraftforge.eventbus.api.event.MutableEvent;
@@ -30,7 +30,7 @@ public sealed interface DataPackRegistryEvent {
     final class NewRegistry extends MutableEvent implements DataPackRegistryEvent {
         public static final EventBus<NewRegistry> BUS = EventBus.create(NewRegistry.class);
 
-        private final List<DataPackRegistryData<?>> registryDataList = new ArrayList<>();
+        private final List<Builder<?>> builders = new ArrayList<>();
 
         @ApiStatus.Internal
         public NewRegistry() {}
@@ -47,7 +47,7 @@ public sealed interface DataPackRegistryEvent {
          * @see #dataPackRegistry(ResourceKey, Codec, Codec)
          */
         public <T> void dataPackRegistry(ResourceKey<Registry<T>> registryKey, Codec<T> codec) {
-            this.dataPackRegistry(registryKey, codec, null);
+            builder(registryKey, codec);
         }
 
         /**
@@ -68,15 +68,56 @@ public sealed interface DataPackRegistryEvent {
          * @see #dataPackRegistry(ResourceKey, Codec)
          */
         public <T> void dataPackRegistry(ResourceKey<? extends Registry<T>> registryKey, Codec<T> codec, @Nullable Codec<T> networkCodec) {
-            this.registryDataList.add(new DataPackRegistryData<>(new RegistryDataLoader.RegistryData<T>(registryKey, codec), networkCodec));
+            builder(registryKey, codec).sync(networkCodec);
+        }
+
+        public <T> Builder<T> builder(ResourceKey<? extends Registry<T>> registryKey, Codec<T> codec) {
+            var ret = new Builder<T>(registryKey, codec);
+            builders.add(ret);
+            return ret;
+        }
+
+        public static class Builder<T> {
+            private final ResourceKey<? extends Registry<T>> key;
+            private final Codec<T> codec;
+            private @Nullable Codec<T> networkCodec;
+            private boolean reloadable = false;
+            private RegistryValidator<T> validator = RegistryValidator.none();
+
+            private Builder(ResourceKey<? extends Registry<T>> key, final Codec<T> codec) {
+                this.key = key;
+                this.codec = codec;
+            }
+
+            public Builder<T> sync(Codec<T> codec) {
+                if (this.networkCodec != null)
+                    throw new IllegalArgumentException("Network codec is already set");
+                this.networkCodec = codec;
+                return this;
+            }
+
+            public Builder<T> reloadable() {
+                this.reloadable = true;
+                return this;
+            }
+
+            public Builder<T> world() {
+                this.reloadable = false;
+                return this;
+            }
+
+            public Builder<T> validator(RegistryValidator<T> validator) {
+                this.validator = validator;
+                return this;
+            }
         }
 
         void process() {
-            for (DataPackRegistryData<?> registryData : this.registryDataList) {
-                DataPackRegistriesHooks.addRegistryCodec(registryData);
+            for (var builder : this.builders) {
+                @SuppressWarnings("unchecked")
+                var typed = (Builder<Object>)builder;
+                DataPackRegistriesHooks.addRegistryCodec(typed.key, typed.codec, typed.networkCodec, typed.reloadable, typed.validator);
             }
         }
     }
-
-    record DataPackRegistryData<T>(RegistryDataLoader.RegistryData<T> loaderData, @Nullable Codec<T> networkCodec) {}
 }

@@ -136,7 +136,7 @@ public class RuntimeEnumExtender implements ILaunchPluginService {
                     classNode.methods.stream().filter(m -> m.name.equals("<init>")).forEach(m -> sb.append("        : ").append(m.desc).append("\n"));
                     LOGGER.error(LogUtils.FATAL_MARKER, sb.toString());
                 }
-                throw new IllegalStateException("Enum has create method with no matching constructor: " + desc);
+                throw new IllegalStateException("Enum has create method with no matching constructor: " + classType.getClassName() + " " + desc);
             }
 
             if (values == null)

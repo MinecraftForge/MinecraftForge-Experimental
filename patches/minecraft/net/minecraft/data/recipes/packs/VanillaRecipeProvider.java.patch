@@ -1,0 +1,11 @@
+--- a/net/minecraft/data/recipes/packs/VanillaRecipeProvider.java
++++ b/net/minecraft/data/recipes/packs/VanillaRecipeProvider.java
+@@ -73,7 +_,7 @@
+     public static final ImmutableList<ItemLike> REDSTONE_SMELTABLES = ImmutableList.of(Items.REDSTONE_ORE, Items.DEEPSLATE_REDSTONE_ORE);
+     public static final ImmutableList<ItemLike> EMERALD_SMELTABLES = ImmutableList.of(Items.EMERALD_ORE, Items.DEEPSLATE_EMERALD_ORE);
+     private static final int DEFAULT_COOKING_TIME = 200;
+-    private final BrewingProvider brewingProvider = new VanillaBrewingProvider(this.output);
++    protected BrewingProvider brewingProvider = new VanillaBrewingProvider(this.output);
+ 
+     public VanillaRecipeProvider(final BootstrapContext<Recipe<?>> recipeOutput, final BootstrapContext<Advancement> advancementOutput) {
+         super(recipeOutput, advancementOutput);

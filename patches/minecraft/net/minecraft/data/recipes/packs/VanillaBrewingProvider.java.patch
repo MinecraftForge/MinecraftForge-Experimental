@@ -1,0 +1,11 @@
+--- a/net/minecraft/data/recipes/packs/VanillaBrewingProvider.java
++++ b/net/minecraft/data/recipes/packs/VanillaBrewingProvider.java
+@@ -6,7 +_,7 @@
+ import net.minecraft.world.item.alchemy.Potions;
+ 
+ public class VanillaBrewingProvider extends BrewingProvider {
+-    protected VanillaBrewingProvider(final RecipeOutput recipeOutput) {
++    public VanillaBrewingProvider(final RecipeOutput recipeOutput) {
+         super(recipeOutput);
+     }
+ 

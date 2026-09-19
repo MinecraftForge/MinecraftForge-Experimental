@@ -16,7 +16,7 @@
          return CompletableFuture.<Map<Identifier, Resource>>supplyAsync(() -> lister.listMatchingResources(this.resourceManager), executor)
              .thenCompose(
                  registryResources -> {
-@@ -49,9 +_,18 @@
+@@ -49,9 +_,19 @@
                          (resourceId, thunk) -> {
                              ResourceKey<T> elementKey = ResourceKey.create(this.registryKey(), lister.fileToId(resourceId));
                              RegistrationInfo registrationInfo = REGISTRATION_INFO_CACHE.apply(thunk.knownPackInfo());
@@ -28,6 +28,7 @@
 +                                    LOGGER.debug("Skipping {} conditions not met", elementKey);
 +                                    return null;
 +                                }
++                                net.minecraftforge.common.ForgeHooks.onJsonDataParsed(this.data.elementCodec(), elementKey.identifier(), value.get());
 +                            }
                              return new RegistryLoadTask.PendingRegistration<>(
                                  elementKey,

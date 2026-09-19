@@ -1,11 +1,13 @@
 --- a/net/minecraft/data/recipes/RecipeProvider.java
 +++ b/net/minecraft/data/recipes/RecipeProvider.java
-@@ -54,7 +_,7 @@
+@@ -54,8 +_,8 @@
  public abstract class RecipeProvider {
      private final HolderGetter<Item> items;
      private final HolderGetter<TrimPattern> trimPatterns;
 -    protected final RecipeOutput output;
+-    protected final BootstrapContext<Advancement> advancementOutput;
 +    protected RecipeOutput output;
-     protected final BootstrapContext<Advancement> advancementOutput;
++    protected BootstrapContext<Advancement> advancementOutput;
      private static final Map<BlockFamily.Variant, RecipeProvider.FamilyCraftingRecipeProvider> SHAPE_BUILDERS = ImmutableMap.<BlockFamily.Variant, RecipeProvider.FamilyCraftingRecipeProvider>builder()
          .put(BlockFamily.Variant.BUTTON, (context, result, base) -> context.buttonBuilder(result, Ingredient.of(base)))
+         .put(BlockFamily.Variant.CHISELED, (context, result, base) -> context.chiseledBuilder(RecipeCategory.BUILDING_BLOCKS, result, Ingredient.of(base)))
