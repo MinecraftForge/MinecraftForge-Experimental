@@ -1,0 +1,7 @@
+# Libraries used solely during the build and publish process.
+
+[libraries]
+binarypatcher  = { module = "net.minecraftforge:binarypatcher",  version = "1.3.4" }
+installer      = { module = "net.minecraftforge:installer",      version = "2.2.+" }
+installertools = { module = "net.minecraftforge:installertools", version = "1.4.5" }
+srg2source     = { module = "net.minecraftforge:Srg2Source",     version = "8.2.0" }

@@ -1,0 +1,37 @@
+plugins {
+    id("groovy-gradle-plugin")
+}
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+    maven { url = 'https://maven.minecraftforge.net/' }
+    //mavenLocal()
+}
+
+dependencies {
+    compileOnly gradleApi()
+
+    // Manually import plugins so that we can apply them by id.
+    implementation plugin('licenser')
+    implementation plugin('gradleutils')
+    implementation plugin('gitversion')
+    implementation plugin('changelog')
+    implementation plugin('forgedev')
+}
+
+gradlePlugin {
+    plugins {
+        register('convention') {
+            id = 'net.minecraftforge.forge.build.convention'
+            implementationClass = 'net.minecraftforge.forge.build.ConventionPlugin'
+        }
+    }
+}
+
+final Provider<String> plugin(String alias) {
+    return (Provider<String>)project.extensions.getByType(VersionCatalogsExtension)
+        .named("libs")
+        .findPlugin(alias).get()
+        .map { it.pluginId + ":" + it.pluginId + ".gradle.plugin:" + it.version }
+}

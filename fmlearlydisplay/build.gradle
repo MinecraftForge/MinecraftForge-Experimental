@@ -1,65 +1,19 @@
 import org.gradle.api.plugins.jvm.JvmTestSuite
-import org.gradle.internal.os.OperatingSystem
 
 plugins {
-    id 'java-library'
     id 'jvm-test-suite'
-    id 'maven-publish'
-    alias libs.plugins.licenser
-    alias libs.plugins.gradleutils
-    alias libs.plugins.gitversion
-    alias libs.plugins.changelog
     id 'net.minecraftforge.forge.build.convention'
 }
 
-switch (OperatingSystem.current()) {
-    case OperatingSystem.LINUX:
-        project.ext.lwjglNatives = "natives-linux"
-        break
-    case OperatingSystem.MAC_OS:
-        project.ext.lwjglNatives = "natives-macos"
-        break
-    case OperatingSystem.WINDOWS:
-        project.ext.lwjglNatives = "natives-windows"
-        break
-}
-
 gradleutils.displayName = 'FML Early Display'
-final vendor = 'Forge Development LLC'
 description = 'A pretty looking, but prone to erroring screen displayed during Forge loading.'
 
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
-    withSourcesJar()
-}
-
-license {
-    header = rootProject.file('LICENSE-header.txt')
-}
-
-changelog {
-    from changelogBase
-}
-
 dependencies {
-    compileOnly libs.jetbrains.annotations
-
     implementation projects.fmlloader
     implementation projects.fmlcore
     implementation libs.bundles.lwjgl
     implementation earlyDisplayLibs.slf4j.api
     implementation libs.jopt.simple
-}
-
-// See gradle/gradle#35070 (https://github.com/gradle/gradle/issues/35070)
-// We are making the list of providers first BEFORE mapping them to a provider of the resolved objects so that they can be finalized after configuration.
-var lwjglTestLibs = [
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl) { classifier lwjglNatives },
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.glfw) { classifier lwjglNatives },
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.opengl) { classifier lwjglNatives },
-        dependencies.variantOf(earlyDisplayTestLibs.lwjgl.stb) { classifier lwjglNatives }
-].with { list ->
-    provider { list.collect { it.get() } }
 }
 
 testing.suites.named('test', JvmTestSuite) {
@@ -68,50 +22,18 @@ testing.suites.named('test', JvmTestSuite) {
     dependencies {
         implementation earlyDisplayTestLibs.powermock.core
         runtimeOnly earlyDisplayLibs.slf4j.jdk14
-        runtimeOnly.bundle lwjglTestLibs
+        runtimeOnly.bundle convention.nativeVariants(earlyDisplayTestLibs.bundles.lwjgl)
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << '-Xlint:unchecked'
-}
-
+convention.manifest('net/minecraftforge/fml/earlydisplay/')
 tasks.named('jar', Jar) {
     manifest {
         attributes([
-                'Automatic-Module-Name': 'net.minecraftforge.earlydisplay',
-                'Forge-Module-Layer'   : 'boot'
+            'Automatic-Module-Name': 'net.minecraftforge.earlydisplay',
+            'Forge-Module-Layer'   : 'boot'
         ])
-        attributes([
-                'Specification-Title'   : gradleutils.displayName.get(),
-                'Specification-Vendor'  : vendor,
-                'Specification-Version' : '1',
-                'Implementation-Title'  : gradleutils.displayName.get(),
-                'Implementation-Vendor' : vendor,
-                'Implementation-Version': '1.0'
-        ], 'net/minecraftforge/fml/earlydisplay/')
     }
 }
 
-publishing {
-    repositories {
-        maven gradleutils.publishingForgeMaven
-    }
-
-    publications.register('mavenJava', MavenPublication) {
-        changelog.publish(it)
-        gradleutils.promote(it)
-
-        from components.java
-
-        pom {
-            description = project.description
-
-            gradleutils.pom.addRemoteDetails(pom)
-
-            licenses {
-                license gradleutils.pom.licenses.LGPLv2_1
-            }
-        }
-    }
-}
+convention.publish()

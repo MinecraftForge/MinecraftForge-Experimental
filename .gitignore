@@ -36,6 +36,7 @@ src/minecraft
 /projects/**/build/
 /projects/**/out/
 /projects/**/run/
+/*/runs/
 /projects/**/*.launch
 /repo/
 /rejects-*/
@@ -58,3 +59,6 @@ src/*/generated/**/.cache/
 /runs/
 /forge.ipr
 /forge.iws
+*.launch
+/build-logic/.idea/
+/forge-runs/runs/

@@ -1,29 +1,15 @@
 import org.apache.tools.ant.filters.ReplaceTokens
 
 plugins {
-    id 'java-library'
-    id 'idea'
     id 'eclipse'
-    id 'maven-publish'
-    alias libs.plugins.licenser
     alias libs.plugins.versions
-    alias libs.plugins.gradleutils
-    alias libs.plugins.gitversion
-    alias libs.plugins.changelog
     alias libs.plugins.jarsigner
-    id 'net.minecraftforge.forgedev'
+    alias libs.plugins.forgedev
     id 'net.minecraftforge.forge.build.convention'
 }
 
 gradleutils.displayName = 'Forge'
-group = 'net.minecraftforge'
 description = 'Modifications to Minecraft to enable mod developers.'
-
-// NOTE: See settings.gradle for all the referenceable version variables.
-// All subprojects (that apply 'net.minecraftforge.forge.build.convention') will have these available.
-println "Version: $version"
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
 
 jarSigner.autoDetect('forge')
 
@@ -44,18 +30,19 @@ fdtools {
 forgedev.validatePublish {
     task {
         baseBranch = 'upstream/26.1.2'
-        versionPrefix = minecraftVersion
+        versionPrefix = versions.minecraft
     }
 }
 */
 
-final minecraftFiles = forgedev.minecraftFiles(minecraftVersion)
+final minecraftFiles = forgedev.minecraftFiles(versions.minecraft)
 
 final mcpBase = forgedev.mcpBase {
-    mcpVersion = "${minecraftVersion}-${project.ext.mcpVersion}"
+    mcpVersion = "${versions.minecraft}-${versions.mcp}"
     accessTransformers.from file('src/main/resources/META-INF/accesstransformer.cfg')
     sideAnnotationStrippers.from file('src/main/resources/forge.sas')
 }
+forgedev.provideFile('metadata', mcpBase.metadata)
 
 forgedev.patches {
     base = mcpBase
@@ -72,14 +59,9 @@ sourceSets {
     named('main') {
         resources.srcDir 'src/main/generated'
     }
-    named('test') {
-        resources.srcDir 'src/test/generated'
-    }
 }
 
 license {
-    header = file('LICENSE-header.txt')
-
     include 'net/minecraftforge/'
     exclude 'net/minecraftforge/common/LenientUnboundedMapCodec.java'
 
@@ -87,15 +69,10 @@ license {
         register('main') {
             files.from files('src/main/java')
         }
-
-        register('test') {
-            files.from files('src/test/java')
-        }
     }
 }
 
 changelog {
-    from changelogBase
     publishAll = false
 }
 
@@ -117,10 +94,7 @@ configurations {
 
     named('api') {
         extendsFrom(installer)
-    }
-
-    named('implementation') {
-        // Inherit vanilla Minecraft's dependencies
+        // Inherit vanilla Minecraft's dependencies, and let downstream access them
         extendsFrom(mcpBase.dependencyConfiguration)
     }
 }
@@ -171,106 +145,12 @@ dependencies {
     annotationProcessor libs.eventbus.validator
 }
 
+convention.basicRuns('forge', file('src/test/generated/'))
+
 final EXTRA_TXTS = [
-        file('LICENSE.txt'),
-        changelog.task.flatMap(task -> task.outputFile)
+    file('LICENSE.txt'),
+    changelog.task.flatMap(task -> task.outputFile)
 ]
-forgedev.runs {
-    configureEach {
-        options {
-            workingDir = layout.projectDirectory.dir("runs/$name")
-
-            mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
-            args '--gameDir', '.'
-            jvmArgs '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders'
-
-            systemProperty 'bsl.debug', 'true'
-            systemProperty 'terminal.jline', 'true'
-            with(sourceSets.test) {
-                systemProperty 'forge.enableGameTest', 'true'
-                systemProperty 'forgedev.enableTestMods', 'true'
-            }
-        }
-    }
-
-    create('client') {
-        options {
-            systemProperty 'eventbus.api.strictRuntimeChecks', 'true'
-            systemProperty 'org.lwjgl.system.SharedLibraryExtractDirectory', 'lwjgl_dll'
-
-            args '--launchTarget', 'forge_dev_client',
-                 '--username', 'Dev',
-                 '--version', project.name,
-                 '--accessToken', '0',
-                 '--userType', 'mojang',
-                 '--versionType', 'release',
-                 '--assetsDir', '{assets_root}',
-                 '--assetIndex', '{asset_index}'
-        }
-    }
-
-    create('server') {
-        options {
-            args '--launchTarget', 'forge_dev_server'
-        }
-    }
-
-    create('gameTestServer') {
-        options {
-            args '--launchTarget', 'forge_dev_server_gametest'
-            args '--uniqueWorld' // Unique world is used so that the world regenerates, as well as the world config isn't influenced by other runs
-        }
-    }
-
-    create('data') {
-        options {
-            args '--launchTarget', 'forge_dev_data',
-                 '--all',
-                 '--existing', sourceSets.main.resources.srcDirs[0],
-                 '--assetsDir', '{assets_root}',
-                 '--assetIndex', '{asset_index}'
-
-            with(sourceSets.main) {
-                args '--mod', 'forge',
-                     '--output', rootProject.file('src/main/generated/')
-            }
-
-            with(sourceSets.test) {
-                args '--mod', '.+',
-                     '--existing', sourceSets.test.resources.srcDirs[0],
-                     '--output', rootProject.file('src/test/generated/')
-            }
-        }
-    }
-
-    create('clientData') {
-        options {
-            args '--all',
-                    '--existing', sourceSets.main.resources.srcDirs[0],
-                    '--assetsDir', '{assets_root}',
-                    '--assetIndex', '{asset_index}'
-
-            with(sourceSets.main) {
-                args '--launchTarget', 'forge_dev_client_data',
-                     '--mod', 'forge',
-                     '--output', rootProject.file('src/main/generated/'),
-                     '--mod', 'forge'
-            }
-
-            with(sourceSets.test) {
-                args '--launchTarget', 'forge_dev',
-                     '--launchEntry', 'minecraft/net.minecraft.client.data.Main',
-                     '--launchData',
-                     '--mod', '.+',
-                     '--existing', sourceSets.test.resources.srcDirs[0],
-                     '--output', rootProject.file('src/test/generated/')
-            }
-        }
-    }
-}
-tasks.register('genAllData') {
-    dependsOn forgedev.runs.data.run, forgedev.runs.data.runTest, forgedev.runs.clientData.run, forgedev.runs.clientData.runTest
-}
 
 final serverShim = forgedev.shim {
     config {
@@ -297,7 +177,7 @@ final finalizeSpawn = forgedev.methodCallFinder('findFinalizeSpawnTargets') {
 }
 
 forgedev.validateDeprecations(tasks.named('jar', Jar)) {
-    mcVersion = minecraftVersion
+    mcVersion = versions.minecraft
 }
 
 forgedev.checks() {
@@ -336,24 +216,15 @@ tasks.named('jar', Jar) {
 
     manifest {
         attributes([
-                'Automatic-Module-Name': 'net.minecraftforge.forge'
+            'Automatic-Module-Name': 'net.minecraftforge.forge'
         ])
-        attributes([
-                'Specification-Title'   : gradleutils.displayName.get(),
-                'Specification-Vendor'  : gradleutils.vendor.get(),
-                'Specification-Version' : gitversion.info.tag,
-                'Implementation-Title'  : project.group,
-                'Implementation-Vendor' : gradleutils.vendor.get(),
-                'Implementation-Version': forgeVersion
-        ], 'net/minecraftforge/versions/forge/')
-        attributes([
-                'Specification-Title'   : 'Minecraft',
-                'Specification-Vendor'  : gradleutils.vendor.get(),
-                'Specification-Version' : minecraftVersion,
-                'Implementation-Title'  : 'MCP',
-                'Implementation-Vendor' : gradleutils.vendor.get(),
-                'Implementation-Version': mcpVersion
-        ], 'net/minecraftforge/versions/mcp/')
+        gradleutils.manifestDefaults(it, 'net/minecraftforge/versions/forge/')
+        gradleutils.manifestDefaults(it, 'net/minecraftforge/versions/mcp/', [
+            'Specification-Title'   : 'Minecraft',
+            'Specification-Version' : versions.minecraft,
+            'Implementation-Title'  : 'MCP',
+            'Implementation-Version': versions.mcp
+        ])
     }
     jarSigner.sign(it)
 }
@@ -445,7 +316,7 @@ forgedev.userDev {
     }
 }
 
-forgedev.userdevCompatibility(minecraftVersion) {
+forgedev.userdevCompatibility(versions.minecraft) {
     clean = mcpBase.classes
     dirty = tasks.named('jar', Jar)
 }
@@ -454,8 +325,8 @@ forgedev.userdevCompatibility(minecraftVersion) {
 final clientBinPatches = forgedev.binaryPatches('client') {
     clean = minecraftFiles.client
     // Workaround for 3rd party launcher issues, marker needed to locate MC, store needed to fix zlib-ng issues
-    apply { 
-        store = true 
+    apply {
+        store = true
         marker = '.forge_patched_minecraft'
     }
 }
@@ -483,7 +354,7 @@ forgedev.installer {
 
     launcherLibraries configurations.installer
 
-    final launcherId = "${minecraftVersion}-${project.name}-${forgeVersion}"
+    final launcherId = "${versions.minecraft}-${project.name}-${versions.forge}"
     final installertools = tool(buildLibs.installertools)
     final binarypatcher = tool(buildLibs.binarypatcher)
 
@@ -526,12 +397,12 @@ forgedev.installer {
     json {
         icon = rootProject.file('icon.ico')
         executable serverShim.jar
-        minecraft = minecraftVersion
+        minecraft = versions.minecraft
         profileVersion = launcherId
 
         final projectArtifact = "${project.group}:${project.name}:${project.version}"
 
-        data 'MC_UNPACKED', "[net.minecraft:client:${minecraftVersion}]", "[net.minecraft:server:${minecraftVersion}:unpacked]"
+        data 'MC_UNPACKED', "[net.minecraft:client:${versions.minecraft}]", "[net.minecraft:server:${versions.minecraft}:unpacked]"
         data 'MC_UNPACKED_SHA', minecraftFiles.client, minecraftFiles.serverExtracted
 
         data 'BINPATCH', '/data/client.lzma', '/data/server.lzma'
@@ -592,7 +463,7 @@ forgedev.installer {
         librariesLast = false // Makes libraries be added before args
 
         id = launcherId
-        inheritsFrom = minecraftVersion
+        inheritsFrom = versions.minecraft
         mainClass = 'net.minecraftforge.bootstrap.ForgeBootstrap'
         gameArgs = [ '--launchTarget', 'forge_client' ]
         jvmArgs = [ '-Djava.net.preferIPv6Addresses=system', '-XX:+UseCompactObjectHeaders' ]
@@ -626,12 +497,12 @@ final mdkZip = tasks.register('mdkZip', Zip) {
                 exclude it
         }
         filter(ReplaceTokens, tokens: [
-                FORGE_VERSION: forgeVersion,
+                FORGE_VERSION: versions.forge,
                 FORGE_GROUP: project.group,
                 FORGE_NAME: project.name,
-                MC_VERSION: minecraftVersion,
-                FORGE_SPEC_VERSION: gitversion.info.tag.split("\\.")[0],
-                MC_NEXT_VERSION: minecraftNextVersion,
+                MC_VERSION: versions.minecraft,
+                FORGE_SPEC_VERSION: gitversion.info.map { tag.split("\\.")[0] },
+                MC_NEXT_VERSION: versions.minecraftNext,
                 EVENTBUS_VERSION: libs.versions.eventbus.get()
         ])
         rename 'gitignore\\.txt', '.gitignore'
@@ -710,8 +581,8 @@ tasks.named('javadoc', Javadoc) {
 
         bottom = "Minecraft Forge is an open source modding API for Minecraft: Java Edition, licensed under the Lesser GNU General Public License, version 2.1."
         windowTitle = "Minecraft Forge API ${version}"
-        docTitle = "Minecraft Forge API - ${forgeVersion} for Minecraft ${minecraftVersion}"
-        header = "<div style=\"margin-top: 9px;padding: 5px 6px;\"><strong>${forgeVersion} for Minecraft ${minecraftVersion}</strong></div>"
+        docTitle = "Minecraft Forge API - ${versions.forge} for Minecraft ${versions.minecraft}"
+        header = "<div style=\"margin-top: 9px;padding: 5px 6px;\"><strong>${versions.forge} for Minecraft ${versions.minecraft}</strong></div>"
     }
 
     doLast {
@@ -724,34 +595,14 @@ tasks.named('javadoc', Javadoc) {
 }
 */
 
-publishing {
-    repositories {
-        maven gradleutils.publishingForgeMaven
-    }
-
-    publications.register('mavenJava', MavenPublication) {
-        changelog.publish(it)
-        gradleutils.promote(it)
-
-        artifact universalJar
-        artifact forgedev.installer.jar
-        artifact mdkZip
-        artifact forgedev.userDev.jar
-        artifact sourcesJar
-        artifact serverShim.jar
-
-        pom {
-            description = project.description
-
-            gradleutils.pom.addRemoteDetails(pom)
-
-            licenses {
-                license gradleutils.pom.licenses.LGPLv2_1
-            }
-        }
-    }
+convention.publish {
+    artifact universalJar
+    artifact forgedev.installer.jar
+    artifact mdkZip
+    artifact forgedev.userDev.jar
+    artifact sourcesJar
+    artifact serverShim.jar
 }
-
 
 /*
 // These are debugging tasks that are only used when developing ForgeDevPlugin, to bulk test task's config/caching
@@ -759,16 +610,16 @@ publishing {
 def all = tasks.register('all') {}
 afterEvaluate {
     if (gradle.startParameter.taskNames.contains('all')) {
-	    tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
-	        if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
+        tasks.forEach { task -> // This forces everything to be realized, which is why we have the startParameter check
+            if (!gradle.startParameter.isTaskGraph() && task.name.startsWith('run')) return
             if (task.name in [all.name, 'dependencyInsight', 'dependencies', 'dependencyUpdates', 'init', 'buildEnvironment', 'idea',
                 'eclipse', 'javaToolchains', 'outgoingVariants', 'projects', 'properties', 'resolvableConfigurations', 'tasks', 'updateDaemonJvm',
                 'generateActionsWorkflow'
             ]) return
             if (task.name.startsWith('clean')) return
             if (task.name == 'checkJarCompatibility') return // This doesn't work in FG6 dev, I think it's cuz we check vs srg names. Will need to look at later
-        	all.configure { dependsOn(task) }
-	    }
+            all.configure { dependsOn(task) }
+        }
     }
 }
 */
@@ -782,8 +633,7 @@ tasks.withType(AbstractTestTask).configureEach {
 [ 'makePatches', 'compileJava', 'checkLicenseMain', 'updateLicenseMain', 'sourcesJar', 'sourcesJarAll' ]
         .each{ tasks.named(it).configure{ mustRunAfter forgedev.patches.apply }}
 forgedev.runs.configureEach {
-    run.configure { dependsOn finalizeSpawn}
-    runTest.configure { dependsOn finalizeSpawn}
+    run.configure { dependsOn finalizeSpawn }
 }
 // run gradlew dependencyUpdates --no-parallel
 //noinspection UnnecessaryQualifiedReference

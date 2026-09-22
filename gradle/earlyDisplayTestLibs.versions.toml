@@ -1,0 +1,9 @@
+[libraries]
+powermock-core = { module = "org.powermock:powermock-core", version = "2.0.9" }
+lwjgl        = { module = "org.lwjgl:lwjgl"        }
+lwjgl-glfw   = { module = "org.lwjgl:lwjgl-glfw"   }
+lwjgl-opengl = { module = "org.lwjgl:lwjgl-opengl" }
+lwjgl-stb    = { module = "org.lwjgl:lwjgl-stb"    }
+
+[bundles]
+lwjgl = ["lwjgl", "lwjgl-glfw", "lwjgl-opengl", "lwjgl-stb"]

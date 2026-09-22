@@ -1,44 +1,17 @@
-import groovy.transform.CompileDynamic
-import groovy.transform.CompileStatic
-import groovy.transform.PackageScope
 import net.minecraftforge.forgedev.legacy.tasks.JarJarMetadataOptions
 import org.gradle.api.plugins.jvm.JvmTestSuite
 
-import javax.inject.Inject
-
 plugins {
-    id 'java-library'
     id 'jvm-test-suite'
-    id 'maven-publish'
-    alias libs.plugins.licenser
-    alias libs.plugins.gradleutils
-    alias libs.plugins.gitversion
-    alias libs.plugins.changelog
-    alias libs.plugins.apt
     id 'net.minecraftforge.forge.build.convention'
+    alias libs.plugins.apt
 }
 
 gradleutils.displayName = 'FMLLoader'
-final vendor = 'Forge Development LLC'
-description = 'Modifications to Minecraft to enable mod developers.'
-
-java {
-    toolchain.languageVersion = JavaLanguageVersion.of(javaVersion)
-    withSourcesJar()
-}
-
-license {
-    header = rootProject.file('LICENSE-header.txt')
-}
-
-changelog {
-    from changelogBase
-}
+description = 'Mod Locator and manager for Minecraft Forge.'
 
 dependencies {
-    compileOnly libs.jetbrains.annotations
-
-    // TODO [FMLLoader] Figure out a better way to lock transitive dependencies to the explicit versions shipped by the isntaller
+    // TODO [FMLLoader] Figure out a better way to lock transitive dependencies to the explicit versions shipped by the installer
     api(libs.bundles.asm         ){ transitive = false } // Needed by all the black magic
     api(libs.forgespi            ){ transitive = false }
     api(libs.mergetool.api       ){ transitive = false }
@@ -73,86 +46,24 @@ testing.suites.named('test', JvmTestSuite) {
     }
 }
 
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs << '-Xlint:unchecked'
-}
-
+convention.manifest('net/minecraftforge/fml/loading/')
 tasks.named('jar', Jar) {
     manifest {
         attributes([
-                'Automatic-Module-Name': 'net.minecraftforge.fmlloader',
-                'Forge-Module-Layer'   : 'boot'
+            'Automatic-Module-Name': 'net.minecraftforge.fmlloader',
+            'Forge-Module-Layer'   : 'boot'
         ])
-        attributes([
-                'Specification-Title'   : gradleutils.displayName.get(),
-                'Specification-Vendor'  : vendor,
-                'Specification-Version' : '1',
-                'Implementation-Title'  : gradleutils.displayName.get(),
-                'Implementation-Vendor' : vendor,
-                'Implementation-Version': forgeVersion
-        ], 'net/minecraftforge/fml/loading/')
     }
 }
 
-publishing {
-    repositories {
-        maven gradleutils.publishingForgeMaven
-    }
+convention.publish()
 
-    publications.register('mavenJava', MavenPublication) {
-        changelog.publish(it)
-        gradleutils.promote(it)
-
-        from components.java
-
-        pom {
-            description = project.description
-
-            gradleutils.pom.addRemoteDetails(pom)
-
-            licenses {
-                license gradleutils.pom.licenses.LGPLv2_1
-            }
-        }
-    }
-}
-
-// A simple task to write JSON to a file. Using Task#doLast to output files is no longer supported.
-// This code may seem verbose, but it's better this way.  If more projects need this, we can move it to buildSrc.
-@CompileStatic
-@PackageScope abstract class WriteForgeVersionJson extends DefaultTask {
-    abstract @Input Property<String> getForgeVersion()
-    abstract @Input Property<String> getMinecraftVersion()
-    abstract @Input Property<String> getMcpVersion()
-
-    abstract @OutputFile RegularFileProperty getOutputFile()
-
-    @Inject
-    WriteForgeVersionJson() {}
-
-    @TaskAction
-    @CompileDynamic
-    void exec() {
-        var json = new groovy.json.JsonBuilder()
-        json {
-            forge this.forgeVersion.get()
-            mc    this.minecraftVersion.get()
-            mcp   this.mcpVersion.get()
-        }
-        this.outputFile.asFile.get().text = json.toPrettyString()
-    }
-}
-
-tasks.register('writeForgeVersionJson', WriteForgeVersionJson) {
-    forgeVersion = project.forgeVersion
-    minecraftVersion = project.minecraftVersion
-    mcpVersion = project.mcpVersion
-
+final forgeJson = convention.forgeVersionJson {
     outputFile = file('src/main/resources/forge_version.json')
 }
 
-tasks.register('jarJarOptionsJson', JarJarMetadataOptions) {
-    metadataFile = project.file('src/main/resources/jarjar_options.json')
+final jarJarJson = tasks.register('jarJarOptionsJson', JarJarMetadataOptions) {
+    metadataFile = file('src/main/resources/jarjar_options.json')
     // This is resolved too early by cpw.mods.modlauncher.TransformationServicesHandler.discoverServices(DiscoveryData) But eventually...
     //add(libs.mixin, 'org/spongepowered/asm/mixin/Mixin.class')
     add(libs.mixinextras.forge) {
@@ -168,11 +79,11 @@ tasks.register('jarJarOptionsJson', JarJarMetadataOptions) {
 
 tasks.named('generateResources') {
     dependsOn(
-            tasks.named('eclipseJdt'),
-            tasks.named('eclipseJdtApt'),
-            tasks.named('eclipseFactorypath'),
-            tasks.named('writeForgeVersionJson', WriteForgeVersionJson),
-            tasks.named('jarJarOptionsJson')
+        tasks.named('eclipseJdt'),
+        tasks.named('eclipseJdtApt'),
+        tasks.named('eclipseFactorypath'),
+        forgeJson,
+        jarJarJson
     )
 }
 

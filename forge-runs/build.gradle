@@ -1,0 +1,9 @@
+plugins {
+    id 'net.minecraftforge.forge.build.convention'
+}
+
+dependencies {
+    implementation projects.forgeTests
+}
+
+convention.basicRuns()

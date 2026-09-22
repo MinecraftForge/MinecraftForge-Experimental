@@ -1,0 +1,27 @@
+pluginManagement {
+
+    repositories {
+        gradlePluginPortal()
+        maven { url = 'https://maven.minecraftforge.net/' }
+        mavenLocal()
+    }
+}
+
+plugins {
+    id 'org.gradle.toolchains.foojay-resolver-convention' version '1.0.0'
+}
+
+//enableFeaturePreview 'TYPESAFE_PROJECT_ACCESSORS'
+
+dependencyResolutionManagement.versionCatalogs {
+    register('bootLibs') {
+        description = 'Important version numbers that are externally declared for easy modification.'
+        from(files('../minecraft.versions.toml'))
+    }
+
+    create('libs') {
+        description = 'Libraries used by Forge and its subprojects.'
+        from(files("../gradle/libs.versions.toml"))
+    }
+}
+includeBuild('../forgedev')

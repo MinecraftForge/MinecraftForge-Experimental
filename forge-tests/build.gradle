@@ -1,0 +1,22 @@
+plugins {
+    id 'net.minecraftforge.forge.build.convention'
+}
+
+gradleutils.displayName = 'Forge-Tests'
+description = 'Mods used for testing Forge features'
+
+license {
+    exclude 'com/example/'
+}
+
+convention.manifest('net/minecraftforge/forge/test/')
+convention.manifest('net/minecraftforge/forge/debug/')
+
+convention.publish()
+
+convention.basicRuns('.+', file('src/main/generated'))
+forgedev.runs.configureEach {
+    options {
+        systemProperty 'forgedev.enableTestMods', 'true'
+    }
+}
