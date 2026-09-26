@@ -4,7 +4,7 @@
          final Predicate<BlockState> predicate,
          final BlockStateConsumer consumer
      ) {
-+        return findBlocksInSection(section, origin, fromX, fromY, fromX, toX, toY, toZ, (state, pos) -> predicate.test(state), consumer);
++        return findBlocksInSection(section, origin, fromX, fromY, fromZ, toX, toY, toZ, (state, _) -> predicate.test(state), consumer);
 +    }
 +
 +    public static boolean findBlocksInSection(
